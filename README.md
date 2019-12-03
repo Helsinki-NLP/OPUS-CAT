@@ -12,7 +12,7 @@ This work is part of the [fiskmö project](https://blogs.helsinki.fi/fiskmo-proj
 
 The latest compiled plugin:
 
-* [SDL Trados Studio 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/master/build/latest/FiskmoTranslationProvider.sdlplugin)
+* [SDL Trados Studio 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/master/build/2019-10-22/FiskmoTranslationProvider.sdlplugin)
 * [SDL Trados Studio 2017](https://github.com/Helsinki-NLP/fiskmo-trados/raw/master/build/2019-10-22/FiskmoTranslationProvider2017.sdlplugin)
 
 
