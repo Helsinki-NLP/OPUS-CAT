@@ -12,8 +12,8 @@ This work is part of the [fiskmö project](https://blogs.helsinki.fi/fiskmo-proj
 
 The latest compiled plugin:
 
-* [SDL Trados Studio 2019](build/latest/FiskmoTranslationProvider.sdlplugin)
-* [SDL Trados Studio 2017](build/latest/FiskmoTranslationProvider2017.sdlplugin)
+* [SDL Trados Studio 2019](build/2019-10-22/FiskmoTranslationProvider.sdlplugin)
+* [SDL Trados Studio 2017](build/2019-10-22/FiskmoTranslationProvider2017.sdlplugin)
 
 
 Source:
