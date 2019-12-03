@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FiskmoTranslationProvider2017" GeneratedClassName="FiskmoTpSettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT</Value>
+    </Setting>
+    <Setting Name="LocalFiskmoDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%localappdata%/fiskmo/</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

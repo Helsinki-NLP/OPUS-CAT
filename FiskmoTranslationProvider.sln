@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiskmoTranslationProvider", "FiskmoTranslationProvider\FiskmoTranslationProvider.csproj", "{2A35CCB8-0405-4BDF-BA7B-7B9E87BC4D60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiskmoTranslationProvider2017", "FiskmoTranslationProvider2017\FiskmoTranslationProvider2017.csproj", "{FC5E3080-72AB-432E-9071-FBE72F30AAE6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A35CCB8-0405-4BDF-BA7B-7B9E87BC4D60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A35CCB8-0405-4BDF-BA7B-7B9E87BC4D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A35CCB8-0405-4BDF-BA7B-7B9E87BC4D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A35CCB8-0405-4BDF-BA7B-7B9E87BC4D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC5E3080-72AB-432E-9071-FBE72F30AAE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC5E3080-72AB-432E-9071-FBE72F30AAE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC5E3080-72AB-432E-9071-FBE72F30AAE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC5E3080-72AB-432E-9071-FBE72F30AAE6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8F143A32-2D24-488F-AD4C-CD6D074641C6}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PluginPackage xmlns="http://www.sdl.com/Plugins/PluginPackage/1.0">
+  <PlugInName>FiskmoTranslationProvider</PlugInName>
+  <Version>1.01</Version>
+  <Description>Plugin description</Description>
+  <Author></Author>
+  <RequiredProduct name="SDLTradosStudio" minversion="15.0" />
+  <Include>
+    <File>Newtonsoft.Json.dll</File>
+    <File>libbz2.dll</File>
+    <File>marian-decoder.exe</File>
+    <File>msvcp140.dll</File>
+    <File>vcruntime140.dll</File>
+    <File>process.exe</File>
+    <File>apply_bpe.exe</File>
+    <File>StartMtPipe.bat</File>
+    <File>boost_chrono-vc140-mt-1_60.dll</File>
+    <File>boost_timer-vc140-mt-1_60.dll</File>
+    <File>boost_iostreams-vc140-mt-1_60.dll</File>
+    <File>boost_system-vc140-mt-1_60.dll</File>
+    <File>boost_zlib-vc140-mt-1_60.dll</File>
+    <File>LICENSE.rtf</File>
+    <File>lgpl-3.0.txt</File>
+    <File>LICENSE_1_0.txt</File>
+    <File>MIT_LICENSE</File>
+  </Include>
+</PluginPackage>
