@@ -90,27 +90,34 @@ namespace FiskmoTranslationProvider
 
         
         /// <summary>
-        /// Determines the language direction of the delimited list file by
-        /// reading the first line. Based upon this information it is determined
-        /// whether the plug-in supports the language pair that was selected by
-        /// the user.
+        /// It seems that this method is called many times (possibly for each segment) by Trados.
+        /// Consequently nothing that requires long waits should be added here.
         /// </summary>
         #region "SupportsLanguageDirection"
         public bool SupportsLanguageDirection(LanguagePair languageDirection)
         {
             var sourceCode = languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = languageDirection.TargetCulture.TwoLetterISOLanguageName;
-            /*if ((sourceCode == "sv" && targetCode == "fi") || (sourceCode == "fi" && targetCode == "sv"))
+
+            //The object storage contains models for multiple language pairs, but Fiskmö plugin
+            //should only support fi-sv-fi.
+            if (FiskmoTpSettings.Default.SupportAllLanguagePairs)
             {
-                return true;
+                var modelManager = new ModelManager();
+                return modelManager.IsLanguagePairSupported(sourceCode, targetCode);
             }
             else
             {
-                return false;
-            }*/
-
-            var modelManager = new ModelManager();
-            return modelManager.IsLanguagePairSupported(sourceCode, targetCode);
+                if ((sourceCode == "sv" && targetCode == "fi") || (sourceCode == "fi" && targetCode == "sv"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
         }
         #endregion
 
@@ -142,7 +149,7 @@ namespace FiskmoTranslationProvider
         #region "SupportsSearchForTranslationUnits"
         public bool SupportsSearchForTranslationUnits
         {
-            get { return false; }
+            get { return true; }
         }
         #endregion
 

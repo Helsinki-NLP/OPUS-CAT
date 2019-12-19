@@ -38,14 +38,18 @@
             this.downloadProgress = new System.Windows.Forms.ProgressBar();
             this.LoadModel_btn = new System.Windows.Forms.Button();
             this.groupBoxCon = new System.Windows.Forms.GroupBox();
+            this.mtOriginCheckbox = new System.Windows.Forms.CheckBox();
             this.pregenerateCheckbox = new System.Windows.Forms.CheckBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.aboutBox = new System.Windows.Forms.RichTextBox();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.useAllModelsCheckBox = new System.Windows.Forms.CheckBox();
             this.tabPage1.SuspendLayout();
             this.groupBoxCon.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // Save_btn
@@ -117,6 +121,7 @@
             // 
             // groupBoxCon
             // 
+            this.groupBoxCon.Controls.Add(this.mtOriginCheckbox);
             this.groupBoxCon.Controls.Add(this.pregenerateCheckbox);
             this.groupBoxCon.Location = new System.Drawing.Point(7, 8);
             this.groupBoxCon.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -126,6 +131,18 @@
             this.groupBoxCon.TabIndex = 24;
             this.groupBoxCon.TabStop = false;
             this.groupBoxCon.Text = "Settings";
+            // 
+            // mtOriginCheckbox
+            // 
+            this.mtOriginCheckbox.AutoSize = true;
+            this.mtOriginCheckbox.Checked = true;
+            this.mtOriginCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.mtOriginCheckbox.Location = new System.Drawing.Point(295, 26);
+            this.mtOriginCheckbox.Name = "mtOriginCheckbox";
+            this.mtOriginCheckbox.Size = new System.Drawing.Size(164, 24);
+            this.mtOriginCheckbox.TabIndex = 19;
+            this.mtOriginCheckbox.Text = "Show MT as origin";
+            this.mtOriginCheckbox.UseVisualStyleBackColor = true;
             // 
             // pregenerateCheckbox
             // 
@@ -143,6 +160,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
             this.tabControl1.Location = new System.Drawing.Point(15, 15);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tabControl1.Name = "tabControl1";
@@ -160,17 +178,39 @@
             this.tabPage2.Text = "About";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // richTextBox1
+            // aboutBox
             // 
             this.aboutBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.aboutBox.Location = new System.Drawing.Point(0, 0);
-            this.aboutBox.Name = "richTextBox1";
+            this.aboutBox.Name = "aboutBox";
             this.aboutBox.Size = new System.Drawing.Size(490, 233);
             this.aboutBox.TabIndex = 0;
             this.aboutBox.Text = "";
-
             // 
-            // FiskmöConfDialog
+            // tabPage3
+            // 
+            this.tabPage3.Controls.Add(this.useAllModelsCheckBox);
+            this.tabPage3.Location = new System.Drawing.Point(4, 29);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(490, 233);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Advanced";
+            this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // useAllModelsCheckBox
+            // 
+            this.useAllModelsCheckBox.AutoSize = true;
+            this.useAllModelsCheckBox.Checked = true;
+            this.useAllModelsCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.useAllModelsCheckBox.Location = new System.Drawing.Point(6, 6);
+            this.useAllModelsCheckBox.Name = "useAllModelsCheckBox";
+            this.useAllModelsCheckBox.Size = new System.Drawing.Size(203, 24);
+            this.useAllModelsCheckBox.TabIndex = 20;
+            this.useAllModelsCheckBox.Text = "Use all available models";
+            this.useAllModelsCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // FiskmoConfDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -180,7 +220,7 @@
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Name = "FiskmöConfDialog";
+            this.Name = "FiskmoConfDialog";
             this.Text = "Fiskmö Configuration";
             this.Load += new System.EventHandler(this.FiskmoConfDialog_Load);
             this.tabPage1.ResumeLayout(false);
@@ -188,6 +228,8 @@
             this.groupBoxCon.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -207,5 +249,8 @@
         private System.Windows.Forms.RichTextBox infoBox;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.RichTextBox aboutBox;
+        private System.Windows.Forms.CheckBox mtOriginCheckbox;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.CheckBox useAllModelsCheckBox;
     }
 }

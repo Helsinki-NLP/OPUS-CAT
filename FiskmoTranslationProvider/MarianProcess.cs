@@ -25,10 +25,18 @@ namespace FiskmoTranslationProvider
         public Process MtPipe { get => mtPipe; set => mtPipe = value; }
 
         private string modelDir;
+
+        public string SystemName { get; }
+
         private ConcurrentDictionary<string, string> translationCache;
+        private ConcurrentDictionary<string, TimeSpan> translationDurations;
         private string mtPipeCmds;
+        private bool sentencePiecePostProcess;
         private static readonly Object lockObj = new Object();
 
+        //This seems like the only way to cleanly close the NMT window when Studio is closing.
+        //On some systems the unclean closing was causing an error pop-up, that's why this was added.
+        //On my dev system the was no pop-up, but the error was reported in Event Viewer.
         private static void KillProcessAndChildren(int pid)
         {
             // Cannot close 'system idle process'.
@@ -61,8 +69,22 @@ namespace FiskmoTranslationProvider
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
             this.modelDir = modelDir;
+            this.SystemName = $"{sourceCode}-{targetCode}_" + (new DirectoryInfo(this.modelDir)).Name;
             this.translationCache = new ConcurrentDictionary<string, string>();
-            this.mtPipeCmds = "StartMtPipe.bat";
+            this.translationDurations = new ConcurrentDictionary<string, TimeSpan>();
+
+            //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
+            if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
+            {
+                this.mtPipeCmds = "StartSentencePieceMtPipe.bat";
+                this.sentencePiecePostProcess = true;
+            }
+            else
+            {
+                this.mtPipeCmds = "StartMosesBpeMtPipe.bat";
+                this.sentencePiecePostProcess = false;
+            }
+
             this.MtPipe = this.StartProcessWithCmd(this.mtPipeCmds, this.modelDir);
             
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
@@ -124,6 +146,23 @@ namespace FiskmoTranslationProvider
             this.MtPipe.Close();
         }
 
+        private string TranslateSentence(string sourceSentence)
+        {
+            this.MtPipe.StandardInput.WriteLine(sourceSentence);
+            this.MtPipe.StandardInput.Flush();
+
+            //There should only ever be a single line in the stdout, since there's only one line of
+            //input per stdout readline, and marian decoder will never insert line breaks into translations.
+            string translation = this.MtPipe.StandardOutput.ReadLine();
+
+            if (this.sentencePiecePostProcess)
+            {
+                translation = (translation.Replace(" ", "")).Replace("▁", " ");
+            }
+
+            return translation;
+        }
+
         public string Translate(string sourceText)
         {
             
@@ -158,6 +197,8 @@ namespace FiskmoTranslationProvider
             {
                 lock (MarianProcess.lockObj)
                 {
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
                     //Check again if the translation has been produced during the lock
                     //waiting period
                     if (this.translationCache.ContainsKey(sourceText))
@@ -165,36 +206,24 @@ namespace FiskmoTranslationProvider
                         return this.translationCache[sourceText];
                     }
 
-                    //The mt pipe may have been closed, so restart it if needed
-                    //DISABLED AS IT MAY CAUSE CYCLE OF RESTARTS
-                    /*if (this.mtPipe.HasExited)
-                    {
-                        this.mtPipe = this.StartProcessWithCmd(this.mtPipeCmds, this.modelDir);
-                    }*/
+                    //It might be the case that the source text contains multiple sentences,
+                    //potentially even line breaks, so the text needs to be split on line breaks.
+                    //(sentence splitting might be nice, but having multiple sentences on one line
+                    //doesn't break anything, while multiple lines cause desyncing problems.
+                    var splitSource = sourceText.Split(new[] {"\r\n","\r","\n"},StringSplitOptions.None);
 
-                    //Should test how this functions with segments containing linebreaks, since
-                    //it only reads one line from output. Potentially stuff might remain in the
-                    //buffer
-
-                    this.MtPipe.StandardInput.WriteLine(sourceText);
-                    this.MtPipe.StandardInput.Flush();
                     StringBuilder translationBuilder = new StringBuilder();
-                    translationBuilder.Append(this.MtPipe.StandardOutput.ReadLine());
+                    foreach (var sourceSentence in splitSource)
+                    {
+                        translationBuilder.Append(this.TranslateSentence(sourceSentence));
+                    }
 
-                    //The translation from the pipe is truecased, do recasing here, since
-                    //doing it correctly requires access to the source string
-                    var truecasedTranslation = translationBuilder.ToString();
-                    string translation;
-                    if (Char.IsUpper(sourceText[0]))
-                    {
-                        translation = truecasedTranslation.Substring(0,1).ToUpper() + truecasedTranslation.Substring(1);
-                    }
-                    else
-                    {
-                        translation = truecasedTranslation;
-                    }
+                    var translation = translationBuilder.ToString();
+                
                     this.translationCache[sourceText] = translation;
-                    
+                    sw.Stop();
+                    this.translationDurations[sourceText] = sw.Elapsed;
+
                     return translation;
                 }
             }

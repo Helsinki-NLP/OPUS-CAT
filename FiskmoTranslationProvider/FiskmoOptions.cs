@@ -14,8 +14,8 @@ namespace FiskmoTranslationProvider
         #endregion
 
         #region "TranslationProviderUriBuilder"
-        TranslationProviderUriBuilder _uriBuilder;        
-
+        TranslationProviderUriBuilder _uriBuilder;
+        
         public FiskmoOptions()
         {
             _uriBuilder = new TranslationProviderUriBuilder(FiskmoProvider.ListTranslationProviderScheme);
@@ -33,7 +33,13 @@ namespace FiskmoTranslationProvider
             get { return GetStringParameter("languageDirection"); }
             set { SetStringParameter("languageDirection", value); }
         }
-       
+
+        public Boolean useAllModels
+        {
+            get { return GetBooleanParameter("useAllModels"); }
+            set { SetBooleanParameter("useAllModels", value); }
+        }
+
         public string serverAddress
         {
             get { return GetStringParameter("serverAddress"); }
@@ -54,6 +60,13 @@ namespace FiskmoTranslationProvider
             get { return GetStringParameter("pregenerateMt"); }
             set { SetStringParameter("pregenerateMt", value); }
         }
+
+        public string showMtAsOrigin
+        {
+            get { return GetStringParameter("showMtAsOrigin"); }
+            set { SetStringParameter("showMtAsOrigin", value); }
+        }
+
         public string subject
         {
             get { return GetStringParameter("subject"); }
@@ -88,6 +101,13 @@ namespace FiskmoTranslationProvider
         }
         #endregion
 
+        #region "SetBooleanParameter"
+        private void SetBooleanParameter(string p, Boolean value)
+        {
+            _uriBuilder[p] = value.ToString();
+        }
+        #endregion
+
         #region "GetStringParameter"
         private string GetStringParameter(string p)
         {
@@ -96,6 +116,22 @@ namespace FiskmoTranslationProvider
         }
         #endregion
 
+        #region "GetBooleanParameter"
+        private Boolean GetBooleanParameter(string p)
+        {
+            string paramString = _uriBuilder[p];
+            Boolean result;
+            var parseResult = Boolean.TryParse(paramString,out result);
+            if (!parseResult)
+            {
+                return false;
+            }
+            else
+            {
+                return result;
+            }
+        }
+        #endregion
 
         #region "Uri"
         public Uri Uri

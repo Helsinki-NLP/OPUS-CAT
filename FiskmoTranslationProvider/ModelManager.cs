@@ -20,6 +20,7 @@ namespace FiskmoTranslationProvider
     class ModelManager
     {
 
+        private static IEnumerable<string> LatestModelInfo = ModelManager.GetLatestModelInfo();
         private DirectoryInfo fiskmoAppdataDir;
         private string downloadPath;
 
@@ -36,7 +37,7 @@ namespace FiskmoTranslationProvider
             
         }
 
-        private IEnumerable<string> GetLatestModelInfo()
+        private static IEnumerable<string> GetLatestModelInfo()
         {
             try
             {
@@ -57,19 +58,33 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal string GetLatestModelDir(string sourceLang, string targetLang)
+        internal string[] GetAllModelDirs(string sourceLang, string targetLang)
         {
-            string newestLanguagePairModel = null;
             if (Directory.Exists(
                 Path.Combine(this.fiskmoAppdataDir.FullName, "models", $"{sourceLang}-{targetLang}")))
             {
                 var languagePairModels = Directory.GetDirectories(Path.Combine(
-                this.fiskmoAppdataDir.FullName, "models", $"{sourceLang}-{targetLang}"));
-                newestLanguagePairModel = languagePairModels.OrderBy(
-                    x => Regex.Match(x, @"\d{8}").Value).LastOrDefault();
+                    this.fiskmoAppdataDir.FullName, "models", $"{sourceLang}-{targetLang}"));
+                return languagePairModels;
             }
-            
-            return newestLanguagePairModel;
+            else
+            {
+                return null;
+            }
+        }
+
+        internal string GetLatestModelDir(string sourceLang, string targetLang)
+        {
+            var allModels = this.GetAllModelDirs(sourceLang, targetLang);
+            if (allModels == null)
+            {
+                return null;
+            }
+            else
+            {
+                var newestLanguagePairModel = allModels.OrderBy(x => Regex.Match(x, @"\d{8}").Value).LastOrDefault();
+                return newestLanguagePairModel;
+            }
         }
 
         internal void DownloadModel(
@@ -101,8 +116,9 @@ namespace FiskmoTranslationProvider
         //Check for existence of current Fiskmo models in ProgramData
         public Boolean IsLanguagePairSupported(string sourceLang, string targetLang)
         {
-            var onlineModels = this.GetLatestModelInfo();
-            return onlineModels.Any(x => x.Contains($"{sourceLang}-{targetLang}"));
+            //This method is called many times (possibly for each segment), so use the cached model list instead of
+            //new model fetch call to check whether pair is supported
+            return ModelManager.LatestModelInfo.Any(x => x.Contains($"{sourceLang}-{targetLang}"));
         }
 
         //Check for existence of current Fiskmo models in ProgramData
@@ -111,7 +127,7 @@ namespace FiskmoTranslationProvider
             string newerModel = null;
             //var timestamps = this.GetLatestModelInfo().Select(x => Regex.Match(x, @"\d{8}").Value);
             //order models by timestamp
-            var onlineModels = this.GetLatestModelInfo().OrderBy(x => Regex.Match(x, @"\d{8}").Value);
+            var onlineModels = ModelManager.LatestModelInfo.OrderBy(x => Regex.Match(x, @"\d{8}").Value);
 
             if (onlineModels != null)
             {

@@ -22,12 +22,12 @@ namespace FiskmoTranslationProvider
         private FiskmoOptions _options;
         private FiskmoProviderElementVisitor _visitor;
         private static Dictionary<string,ConcurrentBag<Document>> processedDocuments = new Dictionary<string, ConcurrentBag<Document>>();
-        internal static Dictionary<string,MarianProcess> _marianProcesses = new Dictionary<string, MarianProcess>();
+        internal static Dictionary<string,List<MarianProcess>> _marianProcesses = new Dictionary<string, List<MarianProcess>>();
         private string langpair;
+        internal static string _segmentTranslation;
         #endregion
 
         #region "ITranslationProviderLanguageDirection Members"
-
 
 
         /// <summary>
@@ -70,15 +70,26 @@ namespace FiskmoTranslationProvider
             //Start a marian instance if one has not been started or the previous one has exited
             //for some reason.
             if (!FiskmoProviderLanguageDirection._marianProcesses.ContainsKey(this.langpair)
-                || FiskmoProviderLanguageDirection._marianProcesses[this.langpair].MtPipe.HasExited)
+                || FiskmoProviderLanguageDirection._marianProcesses[this.langpair].Any(x => x.MtPipe.HasExited))
             {
                 //if ((sourceCode == "sv" && targetCode == "fi") || (sourceCode == "fi" && targetCode == "sv"))
-                if (true)
+                if (_options.useAllModels)
+                {
+                    var allModels = modelManager.GetAllModelDirs(sourceCode, targetCode);
+                    FiskmoProviderLanguageDirection._marianProcesses[this.langpair] = new List<MarianProcess>();
+                    foreach (var model in allModels)
+                    {
+                        FiskmoProviderLanguageDirection._marianProcesses[this.langpair].Add(
+                            new MarianProcess(model, sourceCode, targetCode));
+                    }
+                }
+                else
                 {
                     var latestModelDir = modelManager.GetLatestModelDir(sourceCode, targetCode);
 
                     FiskmoProviderLanguageDirection._marianProcesses[this.langpair] =
-                        new MarianProcess(latestModelDir, sourceCode, targetCode);
+                        new List<MarianProcess>()
+                            { new MarianProcess(latestModelDir, sourceCode, targetCode) };
                 }
             }
             #endregion
@@ -115,7 +126,7 @@ namespace FiskmoTranslationProvider
                 !FiskmoProviderLanguageDirection.processedDocuments[this.langpair].Contains(e.Document))
             {
                 processedDocuments[this.langpair].Add(e.Document);
-                Task.Run(() => TranslateDocumentSegments(e.Document));
+                Task t = Task.Run(() => TranslateDocumentSegments(e.Document));
             }
         }
 
@@ -138,7 +149,11 @@ namespace FiskmoTranslationProvider
                     var langpair = $"{sourceCode}-{targetCode}";
 
                     //This will generate the translation and cache it for later use
-                    FiskmoProviderLanguageDirection._marianProcesses[langpair].Translate(sourceText);
+                    foreach (var marianProcess in FiskmoProviderLanguageDirection._marianProcesses[langpair])
+                    {
+                        marianProcess.Translate(sourceText);
+                    }
+
                 }
             }
         }
@@ -190,47 +205,57 @@ namespace FiskmoTranslationProvider
 
             #endregion
             string sourceText = _visitor.PlainText;
-
-            // If replacements need to be done to the source segment, here iss the place
-            // sourceText = sourceText.Replace("foo", "bar");
-
-            //Get the translation from the server
-            //string translatedSentence = searchInServer(sourceText);
-
+            
             var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
             var langpair = $"{sourceCode}-{targetCode}";
 
-            string translatedSentence = FiskmoProviderLanguageDirection._marianProcesses[langpair].Translate(sourceText);
-            
+            foreach (var mtSystem in FiskmoProviderLanguageDirection._marianProcesses[langpair])
+            {
+                List<SearchResult> systemResults = this.GenerateSystemResult(mtSystem, sourceText, settings.Mode,segment);
+                foreach (var res in systemResults)
+                {
+                    results.Add(res);
+                }
+            }
+ 
+            return results;
+            #endregion
+        }
+
+        private List<SearchResult> GenerateSystemResult(MarianProcess mtSystem, string sourceText, SearchMode mode, Segment segment)
+        {
+            List<SearchResult> systemResults = new List<SearchResult>();
+            string translatedSentence = mtSystem.Translate(sourceText);
+
+            _segmentTranslation = translatedSentence;
+
             if (String.IsNullOrEmpty(translatedSentence))
-                return results;
-            
+                return systemResults;
+
             // Look up the currently selected segment in the collection (normal segment lookup).
-            if (settings.Mode == SearchMode.FullSearch)
+            if (mode == SearchMode.FullSearch)
             {
                 Segment translation = new Segment(_languageDirection.TargetCulture);
                 translation.Add(translatedSentence);
-                
-                results.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags));
+
+                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags,mtSystem.SystemName));
             }
             #region "SegmentLookup"
-            if (settings.Mode == SearchMode.NormalSearch)
+            if (mode == SearchMode.NormalSearch)
             {
                 Segment translation = new Segment(_languageDirection.TargetCulture);
                 translation.Add(translatedSentence);
 
-                results.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags));
+                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags, mtSystem.SystemName));
             }
-            #endregion
 
-            #region "Close"
-            return results;
+            return systemResults;
             #endregion
         }
         #endregion
 
-        
+
 
         /// <summary>
         /// Creates the translation unit as it is later shown in the Translation Results
@@ -243,9 +268,9 @@ namespace FiskmoTranslationProvider
         /// <returns></returns>
         #region "CreateSearchResult"
         private SearchResult CreateSearchResult(Segment searchSegment, Segment translation,
-            string sourceSegment, bool formattingPenalty)
+            string sourceSegment, bool formattingPenalty,string mtSystem)
         {
-
+            
             #region "TranslationUnit"
             TranslationUnit tu = new TranslationUnit();
             Segment orgSegment = new Segment();
@@ -253,31 +278,23 @@ namespace FiskmoTranslationProvider
             tu.SourceSegment = orgSegment;
             tu.TargetSegment = translation;
             #endregion
-
+            
             tu.ResourceId = new PersistentObjectToken(tu.GetHashCode(), Guid.Empty);
-
+            tu.FieldValues.Add(new SingleStringFieldValue("mtSystem", mtSystem));
             #region "TuProperties"
-            tu.Origin = TranslationUnitOrigin.MachineTranslation;
+
+            if (this._options.showMtAsOrigin == null || bool.Parse(this._options.showMtAsOrigin))
+            {
+                tu.Origin = TranslationUnitOrigin.MachineTranslation;
+            }
+            else
+            {
+                tu.Origin = TranslationUnitOrigin.Unknown;
+            }
             
             SearchResult searchResult = new SearchResult(tu);
             searchResult.ScoringResult = new ScoringResult();
             //searchResult.ScoringResult.BaseScore = score;
-
-            //if (formattingPenalty)
-            //{
-            //    #region "Draft"
-            //    tu.ConfirmationLevel = ConfirmationLevel.Draft;
-            //    #endregion
-
-            //    #region "FormattingPenalty"
-            //    Penalty penalty = new Penalty(PenaltyType.TagMismatch, 1);
-            //    searchResult.ScoringResult.ApplyPenalty(penalty);
-            //    #endregion
-            //}
-            //else
-            //{
-            //    tu.ConfirmationLevel = ConfirmationLevel.Translated;
-            //}
             #endregion
 
             return searchResult;
@@ -372,7 +389,6 @@ namespace FiskmoTranslationProvider
         }
 
 
-
         #region "NotForThisImplementation"
         /// <summary>
         /// Not required for this implementation.
@@ -451,8 +467,6 @@ namespace FiskmoTranslationProvider
         {
             throw new NotImplementedException();
         }
-        #endregion
-
         #endregion
     }
 }

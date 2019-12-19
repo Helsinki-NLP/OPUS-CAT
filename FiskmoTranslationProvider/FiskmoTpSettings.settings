@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FiskmoTranslationProvider2017" GeneratedClassName="FiskmoTpSettings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FiskmoTranslationProvider" GeneratedClassName="FiskmoTpSettings">
   <Profiles />
   <Settings>
     <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
@@ -7,6 +7,9 @@
     </Setting>
     <Setting Name="LocalFiskmoDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">%localappdata%/fiskmo/</Value>
+    </Setting>
+    <Setting Name="SupportAllLanguagePairs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>
