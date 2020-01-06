@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Management;
+using System.Text.RegularExpressions;
 
 namespace FiskmoTranslationProvider
 {
@@ -146,8 +147,25 @@ namespace FiskmoTranslationProvider
             this.MtPipe.Close();
         }
 
-        private string TranslateSentence(string sourceSentence)
+        private string PreprocessSpaces(string sourceSentence)
         {
+            var withoutPeripheralSpaces = sourceSentence.Trim();
+            var withoutAdjacentSpaces = Regex.Replace(withoutPeripheralSpaces,"  *", " ");
+            return withoutAdjacentSpaces;
+        }
+
+        private string TranslateSentence(string rawSourceSentence)
+        {
+            //This preprocessing must correspond to the one used in model training. Currently
+            //this is:
+            //${TOKENIZER}/replace-unicode-punctuation.perl |
+            //${ TOKENIZER}/ remove - non - printing - char.perl |
+            //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
+            //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
+            var sourceSentence = MosesPreprocessor.RunMosesPreprocessing(rawSourceSentence,this.TargetCode);
+            sourceSentence = this.PreprocessSpaces(sourceSentence);
+            
+
             this.MtPipe.StandardInput.WriteLine(sourceSentence);
             this.MtPipe.StandardInput.Flush();
 
