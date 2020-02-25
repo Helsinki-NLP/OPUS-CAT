@@ -3,3 +3,17 @@
 ################################################################################
 
 /.vs/FiskmoTranslationProvider/v15/Server/sqlite3
+/bin
+/FiskmoTranslationProvider/bin/Debug
+/FiskmoTranslationProvider/obj/Debug
+/FiskmoTranslationProvider2017/bin/Debug
+/FiskmoTranslationProvider2017/obj/Debug/TempPE
+/FiskmoTranslationProvider2017/obj/Debug
+/.vs/FiskmoTranslationProvider/v15
+/OpusMTInterface/obj/Debug
+/OpusMTService/bin/Debug
+/OpusMTService/obj/Debug
+/OpusMTService_old
+/OpusMTSetup/bin/Debug
+/OpusMTSetup/obj/Debug
+/packages
