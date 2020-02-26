@@ -11,7 +11,7 @@
     </Window.DataContext>
     <Grid>
         <local:ListBoxWithControls>
-            <local:ListBoxWithControls DataContext="{Binding LatestModelInfo}"/>
+            <local:ListBoxWithControls DataContext="{Binding .}" />
         </local:ListBoxWithControls>
     </Grid>
 </Window>

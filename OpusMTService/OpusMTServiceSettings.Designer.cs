@@ -37,7 +37,7 @@ namespace OpusMTService {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("%localappdata%/fiskmo/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("fiskmo/")]
         public string LocalFiskmoDir {
             get {
                 return ((string)(this["LocalFiskmoDir"]));

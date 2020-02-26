@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="OpusMTService.ListBoxWithControls"
+﻿<Window x:Class="OpusMTService.OnlineModelSelection"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,12 +14,20 @@
                         <Setter Property="Margin" Value="0,0,0,5" />
                     </Style>
                 </StackPanel.Resources>
-                <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Add model from OPUS repository</Button>
-                <Button Name="addZipModel" Click="btnAddZipModel_Click">Add model from zip</Button>
-                <Button Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
+                <Button Name="install" Click="btnInstall_Click">Install locally</Button>
             </StackPanel>
-
-            <ListView ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="200" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" Margin="0,0,0,10" Name="txtFilter" TextChanged="sourceLangFilter_TextChanged" />
+                <TextBox Grid.Column="1" Margin="0,0,0,10" Name="txtFilter1" TextChanged="targetLangFilter_TextChanged" />
+                <TextBox Grid.Column="2" Margin="0,0,0,10" Name="txtFilter2" TextChanged="nameFilter_TextChanged" />
+            </Grid>
+            
+            <ListView ItemsSource="{Binding FilteredOnlineModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="BorderBrush" Value="LightGray" />
@@ -38,4 +46,4 @@
 
         </DockPanel>
     </Grid>
-</UserControl>
+</Window>

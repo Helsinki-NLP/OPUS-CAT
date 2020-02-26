@@ -22,10 +22,17 @@ namespace OpusMTService
     public class ModelManager
     {
 
-        private ObservableCollection<ModelInfo> latestModelInfo;
+        private List<MTModel> onlineModels;
 
-        public ObservableCollection<ModelInfo> LatestModelInfo
-        { get => latestModelInfo; set { latestModelInfo = value; NotifyPropertyChanged(); } }
+        private ObservableCollection<MTModel> filteredOnlineModels = new ObservableCollection<MTModel>();
+
+        public ObservableCollection<MTModel> FilteredOnlineModels
+        { get => filteredOnlineModels; set { filteredOnlineModels= value; NotifyPropertyChanged(); } }
+
+        private ObservableCollection<MTModel> localModels;
+
+        public ObservableCollection<MTModel> LocalModels
+        { get => localModels; set { localModels = value; NotifyPropertyChanged(); } }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -37,25 +44,43 @@ namespace OpusMTService
             }
         }
         
-        private DirectoryInfo fiskmoAppdataDir;
-        private string downloadPath;
+        private DirectoryInfo opusModelDir;
 
+        public DirectoryInfo OpusModelDir { get => opusModelDir; }
 
+        internal void FilterOnlineModels(string sourceFilter, string targetFilter, string nameFilter)
+        {
+            var filteredModels = from model in this.onlineModels
+                                 where
+                                    model.SourceLanguageString.Contains(sourceFilter) &&
+                                    model.TargetLanguageString.Contains(targetFilter) &&
+                                    model.Name.Contains(nameFilter)
+                                 select model;
 
-        public DirectoryInfo FiskmoAppdataDir { get => fiskmoAppdataDir; }
+            this.FilteredOnlineModels.Clear();
+            foreach (var model in filteredModels)
+            {
+                this.FilteredOnlineModels.Add(model);
+            }
+        }
 
         public ModelManager()
         {
-            this.LatestModelInfo = this.GetLatestModelInfo();
-            this.fiskmoAppdataDir = new DirectoryInfo(OpusMTServiceSettings.Default.LocalFiskmoDir);
-            if (!FiskmoAppdataDir.Exists)
+            this.GetOnlineModels();
+            this.opusModelDir = new DirectoryInfo(Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                OpusMTServiceSettings.Default.LocalFiskmoDir,
+                "models"));
+            if (!this.OpusModelDir.Exists)
             {
-                FiskmoAppdataDir.Create();
+                this.OpusModelDir.Create();
             }
+
+            this.GetLocalModels();
             
         }
 
-        private ObservableCollection<ModelInfo> GetLatestModelInfo()
+        private void GetOnlineModels()
         {
             try
             {
@@ -68,21 +93,28 @@ namespace OpusMTService
                 var ns = buckets.Root.Name.Namespace;
                 var files = buckets.Descendants(ns + "Key").Select(x => x.Value);
                 var models = files.Where(x => x.StartsWith("models") && x.EndsWith(".zip"));
-                return new ObservableCollection<ModelInfo>(models.Select(x => new ModelInfo(x)));
+                this.onlineModels = new List<MTModel>(models.Select(x => new MTModel(x.Replace("models/",""))));
             }
             catch
             {
-                return null;
+                
             }
+        }
+
+        internal void GetLocalModels()
+        {
+            var modelPaths = this.OpusModelDir.GetFiles("*.npz", SearchOption.AllDirectories).Select(x => x.DirectoryName).Distinct().ToList();
+            this.LocalModels = new ObservableCollection<MTModel>(
+                modelPaths.Select(x => new MTModel(Regex.Match(x, @"[^\\]+\\[^\\]+$").Value)));
         }
 
         internal string[] GetAllModelDirs(string sourceLang, string targetLang)
         {
             if (Directory.Exists(
-                Path.Combine(this.fiskmoAppdataDir.FullName, "models", $"{sourceLang}-{targetLang}")))
+                Path.Combine(this.opusModelDir.FullName, "models", $"{sourceLang}-{targetLang}")))
             {
                 var languagePairModels = Directory.GetDirectories(Path.Combine(
-                    this.fiskmoAppdataDir.FullName, "models", $"{sourceLang}-{targetLang}"));
+                    this.opusModelDir.FullName, "models", $"{sourceLang}-{targetLang}"));
                 return languagePairModels;
             }
             else
@@ -94,7 +126,7 @@ namespace OpusMTService
         internal IEnumerable<string> GetAllLanguagePairs()
         {
             //The format of the model strings is "models/<source>-target/<name>"
-            return this.LatestModelInfo.Select(x => x.Name.Split('/')[1]);
+            return this.LocalModels.Select(x => x.Name.Split('/')[1]);
         }
 
         internal string GetLatestModelDir(string sourceLang, string targetLang)
@@ -111,12 +143,13 @@ namespace OpusMTService
             }
         }
 
+
         internal void DownloadModel(
-            string newerModel, 
+            string newerModel,
             DownloadProgressChangedEventHandler wc_DownloadProgressChanged,
             AsyncCompletedEventHandler wc_DownloadComplete)
         {
-            this.downloadPath = Path.Combine(this.FiskmoAppdataDir.FullName, newerModel);
+            var downloadPath = Path.Combine(this.OpusModelDir.FullName, newerModel);
 
             using (var client = new WebClient())
             {
@@ -126,14 +159,16 @@ namespace OpusMTService
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }
-            
         }
 
-        internal void ExtractModel()
+        internal void ExtractModel(string zipPath,bool deleteZip=false)
         {
-            string extractionFolder = Regex.Replace(downloadPath, @"\.zip$", "");
-            ZipFile.ExtractToDirectory(this.downloadPath, extractionFolder);
-            File.Delete(this.downloadPath);
+            string extractionFolder = Regex.Replace(zipPath, @"\.zip$", "");
+            ZipFile.ExtractToDirectory(zipPath, extractionFolder);
+            if (deleteZip)
+            {
+                File.Delete(zipPath);
+            }
         }
 
 
@@ -141,7 +176,7 @@ namespace OpusMTService
         {
             //This method is called many times (possibly for each segment), so use the cached model list instead of
             //new model fetch call to check whether pair is supported
-            return this.LatestModelInfo.Any(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
+            return this.LocalModels.Any(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
         }
 
         //Check for existence of current Fiskmo models in ProgramData
@@ -150,7 +185,7 @@ namespace OpusMTService
             string newerModel = null;
             //var timestamps = this.GetLatestModelInfo().Select(x => Regex.Match(x, @"\d{8}").Value);
             //order models by timestamp
-            var onlineModels = this.LatestModelInfo.OrderBy(x => Regex.Match(x.Name, @"\d{8}").Value);
+            var onlineModels = this.onlineModels.OrderBy(x => Regex.Match(x.Name, @"\d{8}").Value);
 
             if (onlineModels != null)
             {
@@ -159,7 +194,7 @@ namespace OpusMTService
                 if (newestLangpairModel != null)
                 {
                     var newestModelDir = Path.Combine(
-                    FiskmoAppdataDir.FullName, Regex.Replace(newestLangpairModel.Name, @"\.zip$", ""));
+                    OpusModelDir.FullName, Regex.Replace(newestLangpairModel.Name, @"\.zip$", ""));
                     if (!Directory.Exists(newestModelDir))
                     {
                         newerModel = newestLangpairModel.Name;

@@ -22,8 +22,6 @@ namespace OpusMTService
     public partial class ListBoxWithControls : UserControl
     {
 
-        ObservableCollection<string> modelList;
-
         public ListBoxWithControls()
         {
             InitializeComponent();
@@ -32,21 +30,33 @@ namespace OpusMTService
 
         private void dataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            this.modelList = this.DataContext as ObservableCollection<string>;
+            
         }
         
         
-        private void btnAddItem_Click(object sender, RoutedEventArgs e)
+        private void btnAddOnlineModel_Click(object sender, RoutedEventArgs e)
         {
-         
+            OnlineModelSelection onlineSelection = new OnlineModelSelection();
+            onlineSelection.DataContext = this.DataContext;
+            onlineSelection.Show();
         }
 
-        private void btnDeleteItem_Click(object sender, RoutedEventArgs e)
+        private void btnAddZipModel_Click(object sender, RoutedEventArgs e)
         {
-         
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".zip"; // Default file extension
+            dlg.Filter = "Zip files (.zip)|*.zip"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                
+            }
         }
 
-        private void btnEditItem_Click(object sender, RoutedEventArgs e)
+        private void btnDeleteModel_Click(object sender, RoutedEventArgs e)
         {
          
         }

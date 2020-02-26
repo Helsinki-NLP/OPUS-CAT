@@ -6,7 +6,7 @@
       <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT</Value>
     </Setting>
     <Setting Name="LocalFiskmoDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">%localappdata%/fiskmo/</Value>
+      <Value Profile="(Default)">fiskmo/</Value>
     </Setting>
   </Settings>
 </SettingsFile>

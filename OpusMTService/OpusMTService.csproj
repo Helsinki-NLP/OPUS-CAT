@@ -59,11 +59,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="OnlineModelSelection.xaml.cs">
+      <DependentUpon>OnlineModelSelection.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ListBoxWithControls.xaml.cs">
       <DependentUpon>ListBoxWithControls.xaml</DependentUpon>
     </Compile>
     <Compile Include="MarianManager.cs" />
-    <Compile Include="ModelInfo.cs" />
+    <Compile Include="MTModel.cs" />
     <Compile Include="OpusMTServiceSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -71,6 +74,10 @@
     </Compile>
     <Compile Include="StoredTranslations.cs" />
     <Compile Include="TokenCodeGenerator.cs" />
+    <Page Include="OnlineModelSelection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ListBoxWithControls.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
