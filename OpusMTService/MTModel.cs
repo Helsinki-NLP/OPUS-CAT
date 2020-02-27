@@ -15,6 +15,8 @@ namespace OpusMTService
         private List<string> targetLanguages;
         private string name;
 
+        private MarianProcess marianProcess;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -23,6 +25,16 @@ namespace OpusMTService
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        internal string Translate(string input)
+        {
+            if (this.marianProcess == null)
+            {
+                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString);
+            }
+
+            return this.marianProcess.Translate(input);
         }
 
         internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -53,7 +65,13 @@ namespace OpusMTService
             this.InstallProgress = e.ProgressPercentage;
         }
 
-        public MTModel(string modelPath)
+        public MTModel(string modelPath, string installDir)
+        {
+            this.InstallDir = installDir;
+            this.ParseModelPath(modelPath);
+        }
+
+        private void ParseModelPath(string modelPath)
         {
             char separator;
             if (modelPath.Contains('/'))
@@ -72,6 +90,11 @@ namespace OpusMTService
             this.Path = modelPath;
         }
 
+        public MTModel(string modelPath)
+        {
+            this.ParseModelPath(modelPath);
+        }
+
         public string SourceLanguageString
         {
             get { return String.Join("+", this.SourceLanguages); }
@@ -83,6 +106,6 @@ namespace OpusMTService
         }
 
         public string Path { get; internal set; }
-        
+        public string InstallDir { get; }
     }
 }

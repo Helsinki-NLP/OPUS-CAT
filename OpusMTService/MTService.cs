@@ -71,12 +71,8 @@ namespace OpusMTService
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            
-            string storedTranslation;
-            if (StoredTranslations.TryTranslate(input, srcLangCode, trgLangCode, out storedTranslation))
-                return storedTranslation;
-
-            return string.Format("{0} -> {1} - {2}", srcLangCode, trgLangCode, input);
+            return this.modelManager.Translate(input, srcLangCode, trgLangCode);
+;
         }
 
         /// <summary>
@@ -89,20 +85,14 @@ namespace OpusMTService
         /// <returns>The translated input strings.</returns>
         public List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode)
         {
-            // simulate the network latency
-            Thread.Sleep(3000);
-
+            
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            string storedTranslation;
             List<string> result = new List<string>();
             foreach (string item in input)
             {
-                if (StoredTranslations.TryTranslate(item, srcLangCode, trgLangCode, out storedTranslation))
-                    result.Add(storedTranslation);
-                else
-                    result.Add(string.Format("{0} -> {1} - {2}", srcLangCode, trgLangCode, item));
+                result.Add(this.modelManager.Translate(item, srcLangCode, trgLangCode));
             }
 
             return result;
@@ -110,28 +100,20 @@ namespace OpusMTService
 
         public void StoreTranslation(string tokenCode, string source, string target, string srcLangCode, string trgLangCode)
         {
-            // simulate the network latency
-            Thread.Sleep(3000);
-
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return;
-
-            StoredTranslations.Store(source, target, srcLangCode, trgLangCode);
         }
 
         public int[] BatchStoreTranslation(string tokenCode, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
         {
-            // simulate the network latency
-            Thread.Sleep(3000);
-
+            
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return new int[0];
 
             var indicesAdded = new int[sources.Count];
             for (int i = 0; i < sources.Count; ++i)
             {
-                StoredTranslations.Store(sources[i], targets[i], srcLangCode, trgLangCode);
-                indicesAdded[i] = i;
+                
             }
             return indicesAdded;
         }

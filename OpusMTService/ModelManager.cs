@@ -116,7 +116,7 @@ namespace OpusMTService
         {
             var modelPaths = this.OpusModelDir.GetFiles("*.npz", SearchOption.AllDirectories).Select(x => x.DirectoryName).Distinct().ToList();
             this.LocalModels = new ObservableCollection<MTModel>(
-                modelPaths.Select(x => new MTModel(Regex.Match(x, @"[^\\]+\\[^\\]+$").Value)));
+                modelPaths.Select(x => new MTModel(Regex.Match(x, @"[^\\]+\\[^\\]+$").Value,x)));
         }
 
         internal string[] GetAllModelDirs(string sourceLang, string targetLang)
@@ -132,6 +132,13 @@ namespace OpusMTService
             {
                 return null;
             }
+        }
+
+        internal string Translate(string input, string srcLangCode, string trgLangCode)
+        {
+            //Use the first suitable model
+            var installedModel = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode)).First();
+            return installedModel.Translate(input);
         }
 
         internal IEnumerable<string> GetAllLanguagePairs()

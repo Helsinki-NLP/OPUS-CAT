@@ -65,14 +65,12 @@
     <Compile Include="LocalModelListView.xaml.cs">
       <DependentUpon>LocalModelListView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MarianManager.cs" />
     <Compile Include="MTModel.cs" />
     <Compile Include="OpusMTServiceSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>OpusMTServiceSettings.settings</DependentUpon>
     </Compile>
-    <Compile Include="StoredTranslations.cs" />
     <Compile Include="TokenCodeGenerator.cs" />
     <Page Include="OnlineModelSelection.xaml">
       <Generator>MSBuild:Compile</Generator>
