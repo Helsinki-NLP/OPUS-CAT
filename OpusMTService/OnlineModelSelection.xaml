@@ -27,7 +27,7 @@
                 <TextBox Grid.Column="2" Margin="0,0,0,10" Name="txtFilter2" TextChanged="nameFilter_TextChanged" />
             </Grid>
             
-            <ListView ItemsSource="{Binding FilteredOnlineModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView Name="ModelListView" ItemsSource="{Binding FilteredOnlineModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="{x:Type ListViewItem}">
                         <Setter Property="BorderBrush" Value="LightGray" />
@@ -39,6 +39,16 @@
                         <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
                         <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
                         <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
+                        <GridViewColumn Width="140" Header="Installation progress">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                     </GridView>
 
                 </ListView.View>

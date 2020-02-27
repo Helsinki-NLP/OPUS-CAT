@@ -1,26 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OpusMTService
 {
-    public class MTModel
+    public class MTModel : INotifyPropertyChanged
     {
         private List<string> sourceLanguages;
         private List<string> targetLanguages;
         private string name;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            this.InstallProgress = e.ProgressPercentage;
+        }
+
         public List<string> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
         public List<string> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
         public string Name { get => name; set => name = value; }
+
+        public int InstallProgress { get => installProgress; set { installProgress = value; NotifyPropertyChanged(); } }
+        private int installProgress = 0;
+
+        public string InstallStatus { get => installStatus; set { installStatus = value; NotifyPropertyChanged(); } }
+        private string installStatus = "";
+
 
         public MTModel(List<string> sourceLanguages, List<string> targetLanguages, string name)
         {
             this.SourceLanguages = sourceLanguages;
             this.TargetLanguages = targetLanguages;
             this.Name = name;
+        }
+
+        void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            this.InstallProgress = e.ProgressPercentage;
         }
 
         public MTModel(string modelPath)
@@ -39,6 +69,7 @@ namespace OpusMTService
             this.SourceLanguages = pathSplit[0].Split('-')[0].Split('+').ToList();
             this.TargetLanguages = pathSplit[0].Split('-')[1].Split('+').ToList();
             this.Name = pathSplit[1];
+            this.Path = modelPath;
         }
 
         public string SourceLanguageString
@@ -51,5 +82,7 @@ namespace OpusMTService
             get { return String.Join("+", this.TargetLanguages); }
         }
 
+        public string Path { get; internal set; }
+        
     }
 }

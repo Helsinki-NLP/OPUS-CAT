@@ -62,8 +62,8 @@
     <Compile Include="OnlineModelSelection.xaml.cs">
       <DependentUpon>OnlineModelSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ListBoxWithControls.xaml.cs">
-      <DependentUpon>ListBoxWithControls.xaml</DependentUpon>
+    <Compile Include="LocalModelListView.xaml.cs">
+      <DependentUpon>LocalModelListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MarianManager.cs" />
     <Compile Include="MTModel.cs" />
@@ -78,7 +78,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ListBoxWithControls.xaml">
+    <Page Include="LocalModelListView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

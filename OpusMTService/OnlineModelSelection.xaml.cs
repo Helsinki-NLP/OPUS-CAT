@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +26,7 @@ namespace OpusMTService
         private string sourceFilter = "";
         private string targetFilter = "";
         private string nameFilter = "";
+        private ModelManager modelManager;
 
         public OnlineModelSelection()
         {
@@ -33,11 +36,27 @@ namespace OpusMTService
 
         private void dataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            ((ModelManager)this.DataContext).FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            this.modelManager = ((ModelManager)this.DataContext);
         }
-        
+
+        internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
+        {
+            model.InstallStatus = "Installed";
+            this.modelManager.ExtractModel(model.Path);
+        }
+
         private void btnInstall_Click(object sender, RoutedEventArgs e)
         {
+            foreach (object selected in this.ModelListView.SelectedItems)
+            {
+                MTModel selectedModel = (MTModel)selected;
+                selectedModel.InstallStatus = "Downloading";
+                this.modelManager.DownloadModel(
+                    selectedModel.Path,
+                    selectedModel.DownloadProgressChanged,
+                    (x,y) => DownloadCompleted(selectedModel,x,y));
+            }
+            
         }
         
         private void LbTodoList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -48,19 +67,19 @@ namespace OpusMTService
         private void nameFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.nameFilter = ((TextBox)sender).Text;
-            ((ModelManager)this.DataContext).FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
         }
 
         private void sourceLangFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.sourceFilter = ((TextBox)sender).Text;
-            ((ModelManager)this.DataContext).FilterOnlineModels(this.sourceFilter,this.targetFilter,this.nameFilter);
+            this.modelManager.FilterOnlineModels(this.sourceFilter,this.targetFilter,this.nameFilter);
         }
 
         private void targetLangFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.targetFilter = ((TextBox)sender).Text;
-            ((ModelManager)this.DataContext).FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
         }
     }
 

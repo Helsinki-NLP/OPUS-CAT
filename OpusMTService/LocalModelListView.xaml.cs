@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,7 +53,7 @@ namespace OpusMTService
 
             if (result == true)
             {
-                
+                ((ModelManager)this.DataContext).ExtractModel(new FileInfo(dlg.FileName));
             }
         }
 

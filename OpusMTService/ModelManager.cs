@@ -19,7 +19,7 @@ namespace OpusMTService
     /// This class contains methods for checking and downloading latest models from
     /// the fiskmo model repository. 
     /// </summary>
-    public class ModelManager
+    public class ModelManager : INotifyPropertyChanged
     {
 
         private List<MTModel> onlineModels;
@@ -44,6 +44,7 @@ namespace OpusMTService
             }
         }
         
+
         private DirectoryInfo opusModelDir;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
@@ -66,6 +67,7 @@ namespace OpusMTService
 
         public ModelManager()
         {
+
             this.GetOnlineModels();
             this.opusModelDir = new DirectoryInfo(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -82,23 +84,32 @@ namespace OpusMTService
 
         private void GetOnlineModels()
         {
-            try
+            using (var client = new WebClient())
             {
-                WebRequest request = WebRequest.Create(OpusMTServiceSettings.Default.ModelStorageUrl);
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                string responseFromServer = reader.ReadToEnd();
-                XDocument buckets = XDocument.Parse(responseFromServer);
-                var ns = buckets.Root.Name.Namespace;
-                var files = buckets.Descendants(ns + "Key").Select(x => x.Value);
-                var models = files.Where(x => x.StartsWith("models") && x.EndsWith(".zip"));
-                this.onlineModels = new List<MTModel>(models.Select(x => new MTModel(x.Replace("models/",""))));
+                client.DownloadStringCompleted += modelListDownloadComplete;
+                client.DownloadStringAsync(new Uri(OpusMTServiceSettings.Default.ModelStorageUrl));
             }
-            catch
+        }
+
+        private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
+        {
+            XDocument buckets = XDocument.Parse(e.Result);
+            var ns = buckets.Root.Name.Namespace;
+            var files = buckets.Descendants(ns + "Key").Select(x => x.Value);
+            var models = files.Where(x => x.StartsWith("models") && x.EndsWith(".zip"));
+            this.onlineModels = new List<MTModel>(models.Select(x => new MTModel(x.Replace("models/", "").Replace(".zip", ""))));
+
+            foreach (var onlineModel in this.onlineModels)
             {
-                
+                var localModelPaths = this.LocalModels.Select(x => x.Path.Replace("\\", "/"));
+                if (localModelPaths.Contains(onlineModel.Path))
+                {
+                    onlineModel.InstallStatus = "Installed";
+                    onlineModel.InstallProgress = 100;
+                }
             }
+
+            this.FilterOnlineModels("", "", "");
         }
 
         internal void GetLocalModels()
@@ -143,7 +154,6 @@ namespace OpusMTService
             }
         }
 
-
         internal void DownloadModel(
             string newerModel,
             DownloadProgressChangedEventHandler wc_DownloadProgressChanged,
@@ -155,19 +165,30 @@ namespace OpusMTService
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{OpusMTServiceSettings.Default.ModelStorageUrl}/{newerModel}";
+                var modelUrl = $"{OpusMTServiceSettings.Default.ModelStorageUrl}/models/{newerModel}.zip";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }
         }
 
-        internal void ExtractModel(string zipPath,bool deleteZip=false)
+        internal void ExtractModel(string modelPath,bool deleteZip=false)
         {
-            string extractionFolder = Regex.Replace(zipPath, @"\.zip$", "");
-            ZipFile.ExtractToDirectory(zipPath, extractionFolder);
+            string modelFolder = Path.Combine(this.OpusModelDir.FullName, modelPath);
+            string zipPath = modelFolder+".zip";
+
+            this.ExtractModel(new FileInfo(zipPath), deleteZip);
+        }
+
+        //For extracting zip files
+        internal void ExtractModel(FileInfo zipPath, bool deleteZip = false)
+        {
+            Match modelPathMatch = Regex.Match(zipPath.FullName, @".*\\([^\\]+\\[^\\]+)\.zip$");
+            string modelPath = modelPathMatch.Groups[1].Value;
+            string modelFolder = Path.Combine(this.OpusModelDir.FullName, modelPath);
+            ZipFile.ExtractToDirectory(zipPath.FullName, modelFolder);
             if (deleteZip)
             {
-                File.Delete(zipPath);
+                zipPath.Delete();
             }
         }
 
