@@ -16,16 +16,15 @@ namespace OpusMTService
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+
     public class MTService : IMTService
     {
-        private ModelManager modelManager;
-        private MarianManager marianManager;
+        
+        public static ModelManager ModelManager { get; internal set; }
 
-        public MTService(ModelManager modelManager, MarianManager marianManager)
+        public MTService()
         {
-            this.modelManager = modelManager;
-            this.marianManager = marianManager;
+            MTService.ModelManager = new ModelManager();
         }
 
         /// <summary>
@@ -54,7 +53,7 @@ namespace OpusMTService
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
             
-            return modelManager.GetAllLanguagePairs().ToList();
+            return MTService.ModelManager.GetAllLanguagePairs().ToList();
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace OpusMTService
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return this.modelManager.Translate(input, srcLangCode, trgLangCode);
+            return MTService.ModelManager.Translate(input, srcLangCode, trgLangCode);
 ;
         }
 
@@ -92,7 +91,7 @@ namespace OpusMTService
             List<string> result = new List<string>();
             foreach (string item in input)
             {
-                result.Add(this.modelManager.Translate(item, srcLangCode, trgLangCode));
+                result.Add(MTService.ModelManager.Translate(item, srcLangCode, trgLangCode));
             }
 
             return result;
@@ -106,7 +105,6 @@ namespace OpusMTService
 
         public int[] BatchStoreTranslation(string tokenCode, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
         {
-            
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return new int[0];
 

@@ -9,15 +9,13 @@ namespace OpusMTService
 
     class Service
     {
-        public ServiceHost StartService(ModelManager modelManager, MarianManager marianManager)
+        public ServiceHost StartService()
         {
-            var baseAddress = new Uri("net.tcp://localhost:8733/MTService");
-
-
-            var mtService = new MTService(modelManager,marianManager);
-
-            var selfHost = new ServiceHost(mtService, baseAddress);
             
+            var baseAddress = new Uri("net.tcp://localhost:8733/");
+
+            var selfHost = new ServiceHost(typeof(MTService), baseAddress);
+            /*
             // Check to see if the service host already has a ServiceMetadataBehavior
             ServiceMetadataBehavior smb = selfHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
             // If not, add one
@@ -31,8 +29,8 @@ namespace OpusMTService
                 MetadataExchangeBindings.CreateMexTcpBinding(),
                 "mex"
             );
-
-            selfHost.AddServiceEndpoint(typeof(IMTService), new NetTcpBinding(), "OpusMTService");
+            */
+            selfHost.AddServiceEndpoint(typeof(IMTService), new NetTcpBinding(), "MTService");
             selfHost.Open();
 
             return selfHost;

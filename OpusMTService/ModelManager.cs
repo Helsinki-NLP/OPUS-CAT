@@ -137,6 +137,10 @@ namespace OpusMTService
         internal string Translate(string input, string srcLangCode, string trgLangCode)
         {
             //Use the first suitable model
+            if (srcLangCode.Length == 3)
+            {
+
+            }
             var installedModel = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode)).First();
             return installedModel.Translate(input);
         }
@@ -144,7 +148,7 @@ namespace OpusMTService
         internal IEnumerable<string> GetAllLanguagePairs()
         {
             //The format of the model strings is "models/<source>-target/<name>"
-            return this.LocalModels.Select(x => x.Name.Split('/')[1]);
+            return this.LocalModels.Select(x => $"{x.SourceLanguageString}-{x.TargetLanguageString}").Distinct();
         }
 
         internal string GetLatestModelDir(string sourceLang, string targetLang)

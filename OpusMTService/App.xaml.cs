@@ -17,14 +17,12 @@ namespace OpusMTService
         private ServiceHost serviceHost;
 
         public ModelManager ModelManager { get; private set; }
-        public MarianManager MarianManager { get; private set; }
-
+        
         protected override void OnStartup(StartupEventArgs e)
         {
-            this.ModelManager = new ModelManager();
-            this.MarianManager = new MarianManager(this.ModelManager);
             var service = new Service();
-            this.serviceHost = service.StartService(this.ModelManager, this.MarianManager);
+            this.ModelManager = MTService.ModelManager;
+            this.serviceHost = service.StartService();
             base.OnStartup(e);
         }
 
