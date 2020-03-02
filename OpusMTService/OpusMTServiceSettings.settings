@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT</Value>
+      <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT-models/</Value>
     </Setting>
     <Setting Name="LocalFiskmoDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">fiskmo/</Value>

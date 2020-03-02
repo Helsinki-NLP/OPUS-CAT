@@ -25,7 +25,7 @@ namespace OpusMTService {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/OPUS-MT")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/OPUS-MT-models/")]
         public string ModelStorageUrl {
             get {
                 return ((string)(this["ModelStorageUrl"]));

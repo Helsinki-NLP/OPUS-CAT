@@ -43,6 +43,7 @@ namespace OpusMTService
         {
             model.InstallStatus = "Installed";
             this.modelManager.ExtractModel(model.Path);
+            this.modelManager.GetLocalModels();
         }
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)

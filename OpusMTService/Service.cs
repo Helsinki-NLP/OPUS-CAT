@@ -9,12 +9,14 @@ namespace OpusMTService
 
     class Service
     {
-        public ServiceHost StartService()
+        public ServiceHost StartService(ModelManager modelManager)
         {
             
             var baseAddress = new Uri("net.tcp://localhost:8733/");
 
-            var selfHost = new ServiceHost(typeof(MTService), baseAddress);
+            var mtService = new MTService(modelManager);
+
+            var selfHost = new ServiceHost(mtService, baseAddress);
             /*
             // Check to see if the service host already has a ServiceMetadataBehavior
             ServiceMetadataBehavior smb = selfHost.Description.Behaviors.Find<ServiceMetadataBehavior>();

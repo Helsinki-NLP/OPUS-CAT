@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using OpusMTInterface;
 
 namespace OpusMTPlugin
 {
@@ -21,7 +20,7 @@ namespace OpusMTPlugin
 
         public static IMTService getNewProxy()
         {
-            var epAddr = new EndpointAddress("  net.tcp://localhost:8733/MTService");
+            var epAddr = new EndpointAddress("net.tcp://localhost:8733/MTService");
             return ChannelFactory<IMTService>.CreateChannel(new NetTcpBinding(), epAddr);
         }
 
@@ -38,7 +37,7 @@ namespace OpusMTPlugin
                 var proxy = getNewProxy();
                 using (proxy as IDisposable)
                 {
-                    TokenCode = proxy.Login(options.SecureSettings.UserName, options.SecureSettings.Password);
+                    TokenCode = proxy.Login("user", "user");
                     TokenCodeExpires = DateTime.Now.AddMinutes(1);
                 }
             }

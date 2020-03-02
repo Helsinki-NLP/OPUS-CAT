@@ -54,6 +54,7 @@ namespace OpusMTService
             if (result == true)
             {
                 ((ModelManager)this.DataContext).ExtractModel(new FileInfo(dlg.FileName));
+                ((ModelManager)this.DataContext).GetLocalModels();
             }
         }
 

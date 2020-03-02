@@ -21,8 +21,8 @@ namespace OpusMTService
         protected override void OnStartup(StartupEventArgs e)
         {
             var service = new Service();
-            this.ModelManager = MTService.ModelManager;
-            this.serviceHost = service.StartService();
+            this.ModelManager = new ModelManager();
+            this.serviceHost = service.StartService(this.ModelManager);
             base.OnStartup(e);
         }
 

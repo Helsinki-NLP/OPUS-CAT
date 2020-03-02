@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DummyMTInterface")]
+[assembly: AssemblyTitle("OpusMTInterface")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DummyMTInterface")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCompany("Tommi Nieminen")]
+[assembly: AssemblyProduct("OpusMTInterface")]
+[assembly: AssemblyCopyright("Copyright © Tommi Nieminen 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("cf3759d2-e91a-46ea-b1ee-793c9f24ce44")]
+[assembly: Guid("D7659D41-AABB-4F79-92DB-3C96DAE9B110")]
 
 // Version information for an assembly consists of the following four values:
 //

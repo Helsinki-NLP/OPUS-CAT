@@ -33,8 +33,7 @@
     /// </summary>
     public class OpusMTGeneralSettings
     {
-        public string[] SupportedLanguages = new string[0];
-        public FormattingAndTagsUsageOption FormattingAndTagUsage;
+        public string MtServicePort = "8477";
     }
 
     /// <summary>
@@ -52,13 +51,6 @@
     /// </summary>
     public class OpusMTSecureSettings
     {
-        /// <summary>
-        /// The user name used to be able to use the MT service.
-        /// </summary>
-        public string UserName = string.Empty;
-        /// <summary>
-        /// The password used to be able to use the MT service.
-        /// </summary>
-        public string Password = string.Empty;
+        
     }
 }

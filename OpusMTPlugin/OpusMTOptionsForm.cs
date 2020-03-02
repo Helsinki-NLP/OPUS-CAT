@@ -49,39 +49,21 @@ namespace OpusMTPlugin
         {
             base.OnLoad(e);
 
-            tbUserName.Text = Options.SecureSettings.UserName;
-            tbPassword.Text = Options.SecureSettings.Password;
-            foreach (string lang in Options.GeneralSettings.SupportedLanguages)
-                lbLanguages.Items.Add(lang);
-
-            this.btnOK.Enabled = !string.IsNullOrEmpty(Options.SecureSettings.UserName);
+            mtServicePort.Text = Options.GeneralSettings.MtServicePort;
             btnHelp.Enabled = isShowHelpSupported();
-            cbFormattingTags.SelectedIndex = (int)Options.GeneralSettings.FormattingAndTagUsage;
         }
 
         private void localizeContent()
         {
             this.Text = LocalizationHelper.Instance.GetResourceString("OptionsFormCaption");
-            this.lblUserName.Text = LocalizationHelper.Instance.GetResourceString("UserNameLabelText");
-            this.lblPassword.Text = LocalizationHelper.Instance.GetResourceString("PasswordLabelText");
             this.lnkRetrieveLangs.Text = LocalizationHelper.Instance.GetResourceString("RetrieveLanguagesLinkText");
             this.lblSupportedLanguages.Text = LocalizationHelper.Instance.GetResourceString("SupportedLanguagesLabelText");
             this.btnOK.Text = LocalizationHelper.Instance.GetResourceString("OkButtonText");
             this.btnCancel.Text = LocalizationHelper.Instance.GetResourceString("CancelButtonText");
             this.btnHelp.Text = LocalizationHelper.Instance.GetResourceString("HelpButtonText");
-            this.lblTagsFormatting.Text = LocalizationHelper.Instance.GetResourceString("TagsAndFormattingLabelText");
-
-            this.cbFormattingTags.Items.Add(LocalizationHelper.Instance.GetResourceString("PlainTextOnly"));
-            this.cbFormattingTags.Items.Add(LocalizationHelper.Instance.GetResourceString("TextAndFormatting"));
-            this.cbFormattingTags.Items.Add(LocalizationHelper.Instance.GetResourceString("FormattingAndTags"));
+            this.mtServicePort.Text = LocalizationHelper.Instance.GetResourceString("MtServicePortText");
         }
-
-        private void tbUserNamePassword_TextChanged(object sender, EventArgs e)
-        {
-            lnkRetrieveLangs.Enabled = !string.IsNullOrEmpty(tbUserName.Text) && !string.IsNullOrEmpty(tbPassword.Text);
-            btnOK.Enabled = false;
-        }
-
+        
         private async void lnkRetrieveLangs_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             setControlsEnabledState(false);
@@ -89,7 +71,7 @@ namespace OpusMTPlugin
             lbLanguages.Items.Clear();
 
             // do the update in the background
-            loginResult = await loginCore(tbUserName.Text, tbPassword.Text);
+            loginResult = await loginCore("user", "user");
 
             handleLoginFinished();
         }
@@ -167,22 +149,17 @@ namespace OpusMTPlugin
 
         private void setControlsEnabledState(bool enabled)
         {
-            tbUserName.Enabled = enabled;
-            tbPassword.Enabled = enabled;
+            //tbUserName.Enabled = enabled;
+            //tbPassword.Enabled = enabled;
             lnkRetrieveLangs.Enabled = enabled;
             progressBar.Visible = !enabled;
         }
 
-        private void DummyMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void OpusMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (DialogResult == System.Windows.Forms.DialogResult.OK && loginResult != null)
             {
-                // if there was a modification, we have to save the changes
-                Options.SecureSettings.UserName = loginResult.UserName;
-                Options.SecureSettings.Password = loginResult.Password;
-
-                Options.GeneralSettings.SupportedLanguages = loginResult.SupportedLanguages.ToArray();
-                Options.GeneralSettings.FormattingAndTagUsage = (FormattingAndTagsUsageOption)cbFormattingTags.SelectedIndex;
+                Options.GeneralSettings.MtServicePort = mtServicePort.Text;
             }
         }
 
@@ -194,7 +171,7 @@ namespace OpusMTPlugin
 
         private void btnHelp_Click(object sender, EventArgs e)
         {
-            (environment as IEnvironment2)?.ShowHelp("googlemt-settings.html");
+            //(environment as IEnvironment2)?.ShowHelp("googlemt-settings.html");
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 using static System.Environment;
 
@@ -67,7 +69,7 @@ namespace OpusMTService
 
         public ModelManager()
         {
-
+             
             this.GetOnlineModels();
             this.opusModelDir = new DirectoryInfo(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -79,11 +81,12 @@ namespace OpusMTService
             }
 
             this.GetLocalModels();
-            
         }
 
         private void GetOnlineModels()
         {
+            this.onlineModels = new List<MTModel>();
+
             using (var client = new WebClient())
             {
                 client.DownloadStringCompleted += modelListDownloadComplete;
@@ -93,30 +96,56 @@ namespace OpusMTService
 
         private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
         {
-            XDocument buckets = XDocument.Parse(e.Result);
-            var ns = buckets.Root.Name.Namespace;
-            var files = buckets.Descendants(ns + "Key").Select(x => x.Value);
-            var models = files.Where(x => x.StartsWith("models") && x.EndsWith(".zip"));
-            this.onlineModels = new List<MTModel>(models.Select(x => new MTModel(x.Replace("models/", "").Replace(".zip", ""))));
+            XDocument bucket = XDocument.Parse(e.Result);
+            var ns = bucket.Root.Name.Namespace;
+            var files = bucket.Descendants(ns + "Key").Select(x => x.Value);
+            var models = files.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
+            this.onlineModels.AddRange(models.Select(x => new MTModel(x.Replace("models /", "").Replace(".zip", ""))));
 
-            foreach (var onlineModel in this.onlineModels)
+            var nextMarker = bucket.Descendants(ns + "NextMarker").SingleOrDefault();
+            if (nextMarker != null)
             {
-                var localModelPaths = this.LocalModels.Select(x => x.Path.Replace("\\", "/"));
-                if (localModelPaths.Contains(onlineModel.Path))
+                using (var client = new WebClient())
                 {
-                    onlineModel.InstallStatus = "Installed";
-                    onlineModel.InstallProgress = 100;
+                    client.DownloadStringCompleted += modelListDownloadComplete;
+                    var uriBuilder = new UriBuilder(OpusMTServiceSettings.Default.ModelStorageUrl);
+                    var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+                    query["marker"] = nextMarker.Value;
+                    uriBuilder.Query = query.ToString();
+                    client.DownloadStringAsync(uriBuilder.Uri);
                 }
             }
 
-            this.FilterOnlineModels("", "", "");
-        }
+            else
+            {
+                foreach (var onlineModel in this.onlineModels)
+                {
+                    var localModelPaths = this.LocalModels.Select(x => x.Path.Replace("\\", "/"));
+                    if (localModelPaths.Contains(onlineModel.Path))
+                    {
+                        onlineModel.InstallStatus = "Installed";
+                        onlineModel.InstallProgress = 100;
+                    }
+                }
 
+                this.FilterOnlineModels("", "", "");
+            }
+        }
+        
         internal void GetLocalModels()
         {
+            if (this.LocalModels == null)
+            {
+                this.LocalModels = new ObservableCollection<MTModel>();
+            }
+
             var modelPaths = this.OpusModelDir.GetFiles("*.npz", SearchOption.AllDirectories).Select(x => x.DirectoryName).Distinct().ToList();
-            this.LocalModels = new ObservableCollection<MTModel>(
-                modelPaths.Select(x => new MTModel(Regex.Match(x, @"[^\\]+\\[^\\]+$").Value,x)));
+            this.LocalModels.Clear();
+
+            foreach (var modelPath in modelPaths)
+            {
+                this.LocalModels.Add(new MTModel(Regex.Match(modelPath, @"[^\\]+\\[^\\]+$").Value, modelPath));
+            }
         }
 
         internal string[] GetAllModelDirs(string sourceLang, string targetLang)
@@ -134,12 +163,38 @@ namespace OpusMTService
             }
         }
 
+        public string ConvertIsoCode(string name)
+        {
+            if (name.Length != 3)
+            {
+                throw new ArgumentException("name must be three letters.");
+            }
+
+            name = name.ToLower();
+
+            CultureInfo[] cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+            foreach (CultureInfo culture in cultures)
+            {
+                if (culture.ThreeLetterISOLanguageName.ToLower() == name)
+                {
+                    return culture.TwoLetterISOLanguageName.ToLower();
+                }
+            }
+
+            return null;
+        }
+
         internal string Translate(string input, string srcLangCode, string trgLangCode)
         {
             //Use the first suitable model
             if (srcLangCode.Length == 3)
             {
+                srcLangCode = this.ConvertIsoCode(srcLangCode);
+            }
 
+            if (trgLangCode.Length == 3)
+            {
+                trgLangCode = this.ConvertIsoCode(trgLangCode);
             }
             var installedModel = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode)).First();
             return installedModel.Translate(input);
@@ -147,8 +202,16 @@ namespace OpusMTService
 
         internal IEnumerable<string> GetAllLanguagePairs()
         {
-            //The format of the model strings is "models/<source>-target/<name>"
-            return this.LocalModels.Select(x => $"{x.SourceLanguageString}-{x.TargetLanguageString}").Distinct();
+            var languagePairs = new List<string>();
+            foreach (var model in this.LocalModels)
+            {
+                var modelLanguagePairs = from sourceLang in model.SourceLanguages
+                                    from targetLang in model.TargetLanguages
+                                    select $"{sourceLang}-{targetLang}";
+                languagePairs.AddRange(modelLanguagePairs);
+            }
+
+            return languagePairs.Distinct();
         }
 
         internal string GetLatestModelDir(string sourceLang, string targetLang)
@@ -170,13 +233,13 @@ namespace OpusMTService
             DownloadProgressChangedEventHandler wc_DownloadProgressChanged,
             AsyncCompletedEventHandler wc_DownloadComplete)
         {
-            var downloadPath = Path.Combine(this.OpusModelDir.FullName, newerModel);
+            var downloadPath = Path.Combine(this.OpusModelDir.FullName, newerModel+".zip");
 
             using (var client = new WebClient())
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{OpusMTServiceSettings.Default.ModelStorageUrl}/models/{newerModel}.zip";
+                var modelUrl = $"{OpusMTServiceSettings.Default.ModelStorageUrl}{newerModel}.zip";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }

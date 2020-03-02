@@ -17,3 +17,4 @@
 /OpusMTSetup/bin/Debug
 /OpusMTSetup/obj/Debug
 /packages
+*.cache

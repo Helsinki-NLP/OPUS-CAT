@@ -13,11 +13,9 @@ namespace OpusMTPlugin
         /// </summary>
         private Dictionary<string, string> defaultTexts = new Dictionary<string, string>()
         {
-            { "OptionsFormCaption", "Dummy MT plugin settings" },
-            { "UserNameLabelText", "User name" },
-            { "PasswordLabelText", "Password" },
-            { "RetrieveLanguagesLinkText", "Check login and retrieve language information"},
-            { "SupportedLanguagesLabelText", "Supported languages" },
+            { "OptionsFormCaption", "Opus MT plugin settings" },
+            { "RetrieveLanguagesLinkText", "Retrieve language pair information"},
+            { "SupportedLanguagesLabelText", "Supported language pairs" },
             { "OkButtonText", "OK" },
             { "CancelButtonText", "Cancel" },
             { "HelpButtonText", "Help" },
@@ -30,6 +28,7 @@ namespace OpusMTPlugin
             { "TextAndFormatting", "Use text and formatting" },
             { "FormattingAndTags", "Use both formatting and tags" },
             { "TagsAndFormattingLabelText", "Tags and formatting"},
+            { "MtServicePortText", "Opus MT service port" }
         };
 
         /// <summary>

@@ -188,22 +188,22 @@ namespace OpusMTService
             {
                 if (this.modelDir == null)
                 {
-                    throw new Exception($"No local Fiskmö model exists for language pair {this.langpair}. Open the Settings dialog of Fiskmö translation provider to download the latest model.");
+                    throw new Exception($"No local OPUS model exists for language pair {this.langpair}. Open the Settings dialog of Fiskmö translation provider to download the latest model.");
                 }
 
                 if (this.translationCache.IsEmpty)
                 {
                     var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     throw new Exception(
-                    "Fiskmo plugin MT functionality startup failed. " +
+                    "Opus plugin MT functionality startup failed. " +
                     "This is probably caused by the security settings (e.g. domain policy or antivirus) used in the computer. " +
                     "MT functionality requires that the script StartMtPipe.bat and the executables within it can be executed. " +
-                    $"The script can be found in the Fiskmö plugin directory ({pluginDir}). " +
+                    $"The script can be found in the Opus service directory ({pluginDir}). " +
                     "If you have no control over the security settings, please contact your system administrator.");
                 }
                 else
                 {
-                    throw new Exception("Fiskmo plugin MT functionality has stopped working. Restarting Trados Studio may resolve the problem.");
+                    throw new Exception("Opus MT functionality has stopped working. Restarting the OPUS MT service may resolve the problem.");
                 }
             }
 

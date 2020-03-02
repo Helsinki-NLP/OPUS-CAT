@@ -49,9 +49,9 @@ namespace OpusMTPlugin
 
             try
             {
-                string textToTranslate = createTextFromSegment(segm, options.GeneralSettings.FormattingAndTagUsage);
+                string textToTranslate = createTextFromSegment(segm, FormattingAndTagsUsageOption.Plaintext);
                 string translation = OpusMTServiceHelper.Translate(options, textToTranslate, this.srcLangCode, this.trgLangCode);
-                result.Translation = createSegmentFromResult(segm, translation, options.GeneralSettings.FormattingAndTagUsage);
+                result.Translation = createSegmentFromResult(segm, translation, FormattingAndTagsUsageOption.Plaintext);
             }
             catch (Exception e)
             {
@@ -72,21 +72,25 @@ namespace OpusMTPlugin
 
             try
             {
-                var texts = segs.Select(s => createTextFromSegment(s, options.GeneralSettings.FormattingAndTagUsage)).ToList();
+                var texts = segs.Select(s => createTextFromSegment(s, FormattingAndTagsUsageOption.Plaintext)).ToList();
                 int i = 0;
                 foreach (string translation in OpusMTServiceHelper.BatchTranslate(options, texts, this.srcLangCode, this.trgLangCode))
                 {
                     results[i] = new TranslationResult();
-                    results[i].Translation = createSegmentFromResult(segs[i], translation, options.GeneralSettings.FormattingAndTagUsage);
+                    results[i].Translation = createSegmentFromResult(segs[i], translation, FormattingAndTagsUsageOption.Plaintext);
                     i++;
                 }
             }
             catch (Exception e)
             {
                 // Use the MTException class is to wrap the original exceptions occurred during the translation.
-                foreach (TranslationResult result in results)
+                for (var i = 0;i < results.Count();i++)
                 {
-                    result.Exception = new MTException(e.Message, e.Message, e);
+                    if (results[i] == null)
+                    {
+                        results[i] = new TranslationResult();
+                    }
+                    results[i].Exception = new MTException(e.Message, e.Message, e);
                 }
             }
 

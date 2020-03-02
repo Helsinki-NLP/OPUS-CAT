@@ -17,14 +17,15 @@ namespace OpusMTService
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
 
+    [ServiceBehavior(InstanceContextMode=InstanceContextMode.Single)]
     public class MTService : IMTService
     {
         
-        public static ModelManager ModelManager { get; internal set; }
+        public ModelManager ModelManager { get; internal set; }
 
-        public MTService()
+        public MTService(ModelManager modelManager)
         {
-            MTService.ModelManager = new ModelManager();
+            this.ModelManager = modelManager;
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace OpusMTService
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
             
-            return MTService.ModelManager.GetAllLanguagePairs().ToList();
+            return this.ModelManager.GetAllLanguagePairs().ToList();
         }
 
         /// <summary>
@@ -70,7 +71,7 @@ namespace OpusMTService
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return MTService.ModelManager.Translate(input, srcLangCode, trgLangCode);
+            return this.ModelManager.Translate(input, srcLangCode, trgLangCode);
 ;
         }
 
@@ -91,7 +92,7 @@ namespace OpusMTService
             List<string> result = new List<string>();
             foreach (string item in input)
             {
-                result.Add(MTService.ModelManager.Translate(item, srcLangCode, trgLangCode));
+                result.Add(this.ModelManager.Translate(item, srcLangCode, trgLangCode));
             }
 
             return result;

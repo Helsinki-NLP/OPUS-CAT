@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMTService.cs" />
     <Compile Include="OpusMTEngine.cs" />
     <Compile Include="OpusMTOptions.cs" />
     <Compile Include="OpusMTOptionsForm.cs">
@@ -86,12 +87,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />
     <Content Include="fiskmo_zIQ_icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj">
-      <Project>{8f60b71d-d796-4b35-a7fb-42b9c90cd943}</Project>
-      <Name>OpusMTInterface</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
