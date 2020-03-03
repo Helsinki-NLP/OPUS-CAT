@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using OpusMTPlugin;
+using FiskmöMTPlugin;
 using MemoQ.Addins.Common.DataStructures;
 using MemoQ.Addins.Common.Framework;
 using MemoQ.Addins.Common.Utils;
@@ -32,7 +32,7 @@ namespace MT_SDK
             plugins = new List<IPluginInfo>();
 
             // add the Dummy MT plugin to the list
-            plugins.Add(PluginInfoFactory.Create(new OpusMTPluginDirector()));
+            plugins.Add(PluginInfoFactory.Create(new FiskmöMTPluginDirector()));
 
             // add other plugin directors
 

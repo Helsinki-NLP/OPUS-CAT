@@ -4,7 +4,7 @@ using MemoQ.Addins.Common.DataStructures;
 using MemoQ.Addins.Common.Utils;
 using MemoQ.MTInterfaces;
 
-namespace OpusMTPlugin
+namespace FiskmöMTPlugin
 {
     /// <summary>
     /// Session that perform actual translation or storing translations. Created on a segment-by-segment basis, or once for batch operations.
@@ -14,7 +14,7 @@ namespace OpusMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    public class OpusMTSession : ISession, ISessionForStoringTranslations
+    public class FiskmöMTSession : ISession, ISessionForStoringTranslations
     {
         /// <summary>
         /// The source language.
@@ -29,9 +29,9 @@ namespace OpusMTPlugin
         /// <summary>
         /// Options of the plugin.
         /// </summary>
-        private readonly OpusMTOptions options;
+        private readonly FiskmöMTOptions options;
 
-        public OpusMTSession(string srcLangCode, string trgLangCode, OpusMTOptions options)
+        public FiskmöMTSession(string srcLangCode, string trgLangCode, FiskmöMTOptions options)
         {
             this.srcLangCode = srcLangCode;
             this.trgLangCode = trgLangCode;
@@ -50,7 +50,7 @@ namespace OpusMTPlugin
             try
             {
                 string textToTranslate = createTextFromSegment(segm, FormattingAndTagsUsageOption.Plaintext);
-                string translation = OpusMTServiceHelper.Translate(options, textToTranslate, this.srcLangCode, this.trgLangCode);
+                string translation = FiskmöMTServiceHelper.Translate(options, textToTranslate, this.srcLangCode, this.trgLangCode);
                 result.Translation = createSegmentFromResult(segm, translation, FormattingAndTagsUsageOption.Plaintext);
             }
             catch (Exception e)
@@ -74,7 +74,7 @@ namespace OpusMTPlugin
             {
                 var texts = segs.Select(s => createTextFromSegment(s, FormattingAndTagsUsageOption.Plaintext)).ToList();
                 int i = 0;
-                foreach (string translation in OpusMTServiceHelper.BatchTranslate(options, texts, this.srcLangCode, this.trgLangCode))
+                foreach (string translation in FiskmöMTServiceHelper.BatchTranslate(options, texts, this.srcLangCode, this.trgLangCode))
                 {
                     results[i] = new TranslationResult();
                     results[i].Translation = createSegmentFromResult(segs[i], translation, FormattingAndTagsUsageOption.Plaintext);
@@ -90,7 +90,9 @@ namespace OpusMTPlugin
                     {
                         results[i] = new TranslationResult();
                     }
-                    results[i].Exception = new MTException(e.Message, e.Message, e);
+
+                    string localizedMessage = LocalizationHelper.Instance.GetResourceString("NetworkError");
+                    results[i].Exception = new MTException(string.Format(localizedMessage, e.Message), string.Format("A network error occured ({0}).", e.Message), e);
                 }
             }
 
@@ -142,7 +144,7 @@ namespace OpusMTPlugin
         {
             try
             {
-                OpusMTServiceHelper.StoreTranslation(options, transunit.Source.PlainText, transunit.Target.PlainText, this.srcLangCode, this.trgLangCode);
+                FiskmöMTServiceHelper.StoreTranslation(options, transunit.Source.PlainText, transunit.Target.PlainText, this.srcLangCode, this.trgLangCode);
             }
             catch (Exception e)
             {
@@ -157,7 +159,7 @@ namespace OpusMTPlugin
 
             try
             {
-                return OpusMTServiceHelper.BatchStoreTranslation(options,
+                return FiskmöMTServiceHelper.BatchStoreTranslation(options,
                                         transunits.Select(s => s.Source.PlainText).ToList(), transunits.Select(s => s.Target.PlainText).ToList(),
                                         this.srcLangCode, this.trgLangCode);
             }

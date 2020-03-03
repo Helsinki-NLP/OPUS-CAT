@@ -2,7 +2,7 @@
 using System.ServiceModel;
 
 
-namespace OpusMTPlugin
+namespace FiskmöMTPlugin
 {
     [ServiceContract]
     public interface IMTService

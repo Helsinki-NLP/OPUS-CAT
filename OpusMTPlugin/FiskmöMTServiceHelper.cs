@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 
-namespace OpusMTPlugin
+namespace FiskmöMTPlugin
 {
     /// <summary>
     /// Helper class to be able to communicate with the web service.
@@ -13,14 +13,15 @@ namespace OpusMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    internal class OpusMTServiceHelper
+    internal class FiskmöMTServiceHelper
     {
         private static DateTime TokenCodeExpires = DateTime.MinValue;
         private static string TokenCode;
 
-        public static IMTService getNewProxy()
+        public static IMTService getNewProxy(string port)
         {
-            var epAddr = new EndpointAddress("net.tcp://localhost:8733/MTService");
+            
+            var epAddr = new EndpointAddress($"net.tcp://localhost:{port}/MTService");
             return ChannelFactory<IMTService>.CreateChannel(new NetTcpBinding(), epAddr);
         }
 
@@ -28,13 +29,13 @@ namespace OpusMTPlugin
         /// Gets the valid token code.
         /// </summary>
         /// <returns>The token code.</returns>
-        public static string GetTokenCode(OpusMTOptions options)
+        public static string GetTokenCode(FiskmöMTOptions options)
         {
             if (TokenCodeExpires < DateTime.Now)
             {
                 // refresh the token code
                 // Always dispose allocated resources
-                var proxy = getNewProxy();
+                var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
                 using (proxy as IDisposable)
                 {
                     TokenCode = proxy.Login("user", "user");
@@ -51,10 +52,10 @@ namespace OpusMTPlugin
         /// <param name="userName">The user name.</param>
         /// <param name="password">The password.</param>
         /// <returns>The token code.</returns>
-        public static string Login(string userName, string password)
+        public static string Login(string userName, string password, string port)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy();
+            var proxy = getNewProxy(port);
             using (proxy as IDisposable)
             {
                 return proxy.Login(userName, password);
@@ -65,9 +66,9 @@ namespace OpusMTPlugin
         /// Lists the supported languages of the dummy MT service.
         /// </summary>
         /// <returns>The list of the supported languages.</returns>
-        public static List<string> ListSupportedLanguages(OpusMTOptions options)
+        public static List<string> ListSupportedLanguages(FiskmöMTOptions options)
         {
-            return ListSupportedLanguages(GetTokenCode(options));
+            return ListSupportedLanguages(GetTokenCode(options),options.GeneralSettings.MtServicePort);
         }
 
         /// <summary>
@@ -75,10 +76,10 @@ namespace OpusMTPlugin
         /// </summary>
         /// <param name="tokenCode">The token code.</param>
         /// <returns>The list of the supported languages.</returns>
-        public static List<string> ListSupportedLanguages(string tokenCode)
+        public static List<string> ListSupportedLanguages(string tokenCode, string port)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy();
+            var proxy = getNewProxy(port);
             using (proxy as IDisposable)
             {
                 string[] supportedLanguages = proxy.ListSupportedLanguagePairs(tokenCode).ToArray();
@@ -94,10 +95,10 @@ namespace OpusMTPlugin
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The translated string.</returns>
-        public static string Translate(OpusMTOptions options, string input, string srcLangCode, string trgLangCode)
+        public static string Translate(FiskmöMTOptions options, string input, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy();
+            var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
             using (proxy as IDisposable)
             {
                 string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode);
@@ -113,10 +114,10 @@ namespace OpusMTPlugin
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The translated strings.</returns>
-        public static List<string> BatchTranslate(OpusMTOptions options, List<string> input, string srcLangCode, string trgLangCode)
+        public static List<string> BatchTranslate(FiskmöMTOptions options, List<string> input, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy();
+            var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
             using (proxy as IDisposable)
             {
                 string[] result = proxy.BatchTranslate(GetTokenCode(options), input, srcLangCode, trgLangCode).ToArray();
@@ -132,10 +133,10 @@ namespace OpusMTPlugin
         /// <param name="target">The target string.</param>
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
-        public static void StoreTranslation(OpusMTOptions options, string source, string target, string srcLangCode, string trgLangCode)
+        public static void StoreTranslation(FiskmöMTOptions options, string source, string target, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy();
+            var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
             using (proxy as IDisposable)
             {
                 proxy.StoreTranslation(GetTokenCode(options), source, target, srcLangCode, trgLangCode);
@@ -151,10 +152,10 @@ namespace OpusMTPlugin
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The indices of the translation units that were succesfully stored.</returns>
-        public static int[] BatchStoreTranslation(OpusMTOptions options, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
+        public static int[] BatchStoreTranslation(FiskmöMTOptions options, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy();
+            var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
             using (proxy as IDisposable)
             {
                 return proxy.BatchStoreTranslation(GetTokenCode(options), sources, targets, srcLangCode, trgLangCode);

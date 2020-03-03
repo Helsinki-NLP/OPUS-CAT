@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace OpusMTPlugin
+namespace FiskmöMTPlugin
 {
     /// <summary>
     /// This class represents the options form of the dummy MT plugin.
@@ -18,7 +18,7 @@ namespace OpusMTPlugin
     ///     - 	The dialog does not call any blocking service in the user interface thread; it has to use background threads.
     ///     -   Check UI so that it is displayed correctly at high DPI settings.
     /// </remarks>
-    public partial class OpusMTOptionsForm : Form
+    public partial class FiskmöMTOptionsForm : Form
     {
         private delegate void LoginDelegate(string userName, string password);
         private IEnvironment environment;
@@ -34,9 +34,9 @@ namespace OpusMTPlugin
 
         private LoginResult loginResult;
 
-        public OpusMTOptions Options { get; set; }
+        public FiskmöMTOptions Options { get; set; }
 
-        public OpusMTOptionsForm(IEnvironment environment)
+        public FiskmöMTOptionsForm(IEnvironment environment)
         {
             InitializeComponent();
             this.environment = environment;
@@ -49,7 +49,7 @@ namespace OpusMTPlugin
         {
             base.OnLoad(e);
 
-            mtServicePort.Text = Options.GeneralSettings.MtServicePort;
+            mtServicePortTextBox.Text = Options.GeneralSettings.MtServicePort;
             btnHelp.Enabled = isShowHelpSupported();
         }
 
@@ -61,7 +61,8 @@ namespace OpusMTPlugin
             this.btnOK.Text = LocalizationHelper.Instance.GetResourceString("OkButtonText");
             this.btnCancel.Text = LocalizationHelper.Instance.GetResourceString("CancelButtonText");
             this.btnHelp.Text = LocalizationHelper.Instance.GetResourceString("HelpButtonText");
-            this.mtServicePort.Text = LocalizationHelper.Instance.GetResourceString("MtServicePortText");
+            this.mtServicePortLabel.Text = LocalizationHelper.Instance.GetResourceString("MtServicePortText");
+            this.instructionTextBox.Text = LocalizationHelper.Instance.GetResourceString("InstructionTextBoxText");
         }
         
         private async void lnkRetrieveLangs_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -88,7 +89,7 @@ namespace OpusMTPlugin
             {
                 // try to login
                 // Do not call any blocking service in the user interface thread; it has to use background threads.
-                string tokenCode = await Task.Run(() => OpusMTServiceHelper.Login(userName, password));
+                string tokenCode = await Task.Run(() => FiskmöMTServiceHelper.Login(userName, password, this.mtServicePortTextBox.Text));
 
                 if (string.IsNullOrEmpty(tokenCode))
                 {
@@ -101,7 +102,7 @@ namespace OpusMTPlugin
                     loginResult.LoginSuccessful = true;
                     // try to get the list of the supported languages in the background
                     // Do not call any blocking service in the user interface thread; it has to use background threads.
-                    loginResult.SupportedLanguages = await Task.Run(() => OpusMTServiceHelper.ListSupportedLanguages(tokenCode));
+                    loginResult.SupportedLanguages = await Task.Run(() => FiskmöMTServiceHelper.ListSupportedLanguages(tokenCode,this.mtServicePortTextBox.Text));
                 }
             }
             catch (Exception ex)
@@ -155,11 +156,11 @@ namespace OpusMTPlugin
             progressBar.Visible = !enabled;
         }
 
-        private void OpusMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void FiskmöMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (DialogResult == System.Windows.Forms.DialogResult.OK && loginResult != null)
             {
-                Options.GeneralSettings.MtServicePort = mtServicePort.Text;
+                Options.GeneralSettings.MtServicePort = mtServicePortTextBox.Text;
             }
         }
 
@@ -171,7 +172,8 @@ namespace OpusMTPlugin
 
         private void btnHelp_Click(object sender, EventArgs e)
         {
-            //(environment as IEnvironment2)?.ShowHelp("googlemt-settings.html");
+            (environment as IEnvironment2)?.ShowHelp("fiskmömt-settings.html");
         }
+
     }
 }

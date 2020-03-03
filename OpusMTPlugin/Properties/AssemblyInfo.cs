@@ -5,11 +5,11 @@ using MemoQ.Addins.Common.Framework;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("OpusMTPlugin")]
+[assembly: AssemblyTitle("FiskmöMTPlugin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tommi Nieminen")]
-[assembly: AssemblyProduct("OpusMTPlugin")]
+[assembly: AssemblyProduct("FiskmöMTPlugin")]
 [assembly: AssemblyCopyright("Copyright © Tommi Nieminen 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -35,4 +35,4 @@ using MemoQ.Addins.Common.Framework;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Module(ModuleName = "Opus MT", ClassName = "OpusMTPlugin.OpusMTPluginDirector")]
+[assembly: Module(ModuleName = "Fiskmö MT", ClassName = "FiskmöMTPlugin.FiskmöMTPluginDirector")]

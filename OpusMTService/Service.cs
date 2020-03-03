@@ -12,7 +12,7 @@ namespace OpusMTService
         public ServiceHost StartService(ModelManager modelManager)
         {
             
-            var baseAddress = new Uri("net.tcp://localhost:8733/");
+            var baseAddress = new Uri("net.tcp://localhost:8477/");
 
             var mtService = new MTService(modelManager);
 

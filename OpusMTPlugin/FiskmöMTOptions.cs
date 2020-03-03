@@ -1,4 +1,4 @@
-﻿namespace OpusMTPlugin
+﻿namespace FiskmöMTPlugin
 {
     /// <summary>
     /// Class for storing the Dummy MT plugin settings.
@@ -9,12 +9,12 @@
 	///     - The options class is a simple entity class, does not call any services, and simply gives back the saved or the default settings.
 	///     - The options class does not store/load its own settings.
     /// </remarks>
-    public class OpusMTOptions : MemoQ.MTInterfaces.PluginSettingsObject<OpusMTGeneralSettings, OpusMTSecureSettings>
+    public class FiskmöMTOptions : MemoQ.MTInterfaces.PluginSettingsObject<FiskmöMTGeneralSettings, FiskmöMTSecureSettings>
     {
         /// <summary>
         /// Create instance by deserializing from provided serialized settings.
         /// </summary>
-        public OpusMTOptions(MemoQ.MTInterfaces.PluginSettings serializedSettings)
+        public FiskmöMTOptions(MemoQ.MTInterfaces.PluginSettings serializedSettings)
             : base(serializedSettings)
         {
         }
@@ -22,7 +22,7 @@
         /// <summary>
         /// Create instance by providing the settings objects.
         /// </summary>
-        public OpusMTOptions(OpusMTGeneralSettings generalSettings, OpusMTSecureSettings secureSettings)
+        public FiskmöMTOptions(FiskmöMTGeneralSettings generalSettings, FiskmöMTSecureSettings secureSettings)
             : base(generalSettings, secureSettings)
         {
         }
@@ -31,7 +31,7 @@
     /// <summary>
     /// General settings, content preserved when settings are exported.
     /// </summary>
-    public class OpusMTGeneralSettings
+    public class FiskmöMTGeneralSettings
     {
         public string MtServicePort = "8477";
     }
@@ -49,7 +49,7 @@
     /// <summary>
     /// Secure settings, content not preserved when settings leave the machine.
     /// </summary>
-    public class OpusMTSecureSettings
+    public class FiskmöMTSecureSettings
     {
         
     }

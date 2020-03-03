@@ -1,6 +1,6 @@
-﻿namespace OpusMTPlugin
+﻿namespace FiskmöMTPlugin
 {
-    partial class OpusMTOptionsForm
+    partial class FiskmöMTOptionsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FiskmöMTOptionsForm));
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.lnkRetrieveLangs = new System.Windows.Forms.LinkLabel();
@@ -35,8 +36,9 @@
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.lblSupportedLanguages = new System.Windows.Forms.Label();
             this.btnHelp = new System.Windows.Forms.Button();
-            this.mtServicePort = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.mtServicePortLabel = new System.Windows.Forms.Label();
+            this.mtServicePortTextBox = new System.Windows.Forms.TextBox();
+            this.instructionTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // btnOK
@@ -74,7 +76,7 @@
             this.lnkRetrieveLangs.Size = new System.Drawing.Size(564, 31);
             this.lnkRetrieveLangs.TabIndex = 4;
             this.lnkRetrieveLangs.TabStop = true;
-            this.lnkRetrieveLangs.Text = "Retrieve language information";
+            this.lnkRetrieveLangs.Text = "Retrieve language pair information";
             this.lnkRetrieveLangs.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkRetrieveLangs_LinkClicked);
             // 
             // lbLanguages
@@ -105,9 +107,10 @@
             this.lblSupportedLanguages.Location = new System.Drawing.Point(12, 174);
             this.lblSupportedLanguages.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSupportedLanguages.Name = "lblSupportedLanguages";
-            this.lblSupportedLanguages.Size = new System.Drawing.Size(564, 25);
+            this.lblSupportedLanguages.Size = new System.Drawing.Size(667, 25);
             this.lblSupportedLanguages.TabIndex = 5;
-            this.lblSupportedLanguages.Text = "Supported language pairs";
+            this.lblSupportedLanguages.Text = "Local language pairs (additional language pairs can be installed in the Fiskmö MT" +
+    " application)";
             // 
             // btnHelp
             // 
@@ -121,31 +124,44 @@
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // mtServicePort
+            // mtServicePortLabel
             // 
-            this.mtServicePort.AutoSize = true;
-            this.mtServicePort.Location = new System.Drawing.Point(14, 108);
-            this.mtServicePort.Name = "mtServicePort";
-            this.mtServicePort.Size = new System.Drawing.Size(158, 20);
-            this.mtServicePort.TabIndex = 11;
-            this.mtServicePort.Text = "Opus MT service port";
+            this.mtServicePortLabel.AutoSize = true;
+            this.mtServicePortLabel.Location = new System.Drawing.Point(14, 108);
+            this.mtServicePortLabel.Name = "mtServicePortLabel";
+            this.mtServicePortLabel.Size = new System.Drawing.Size(546, 20);
+            this.mtServicePortLabel.TabIndex = 11;
+            this.mtServicePortLabel.Text = "Fiskmö MT service port (must  be the same as the port in Fiskmö MT service)";
             // 
-            // textBox1
+            // mtServicePortTextBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(181, 105);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 26);
-            this.textBox1.TabIndex = 12;
+            this.mtServicePortTextBox.Location = new System.Drawing.Point(567, 105);
+            this.mtServicePortTextBox.Name = "mtServicePortTextBox";
+            this.mtServicePortTextBox.Size = new System.Drawing.Size(113, 26);
+            this.mtServicePortTextBox.TabIndex = 12;
             // 
-            // OpusMTOptionsForm
+            // instructionTextBox
+            // 
+            this.instructionTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.instructionTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.instructionTextBox.Location = new System.Drawing.Point(18, 12);
+            this.instructionTextBox.Multiline = true;
+            this.instructionTextBox.Name = "instructionTextBox";
+            this.instructionTextBox.ReadOnly = true;
+            this.instructionTextBox.Size = new System.Drawing.Size(661, 87);
+            this.instructionTextBox.TabIndex = 13;
+            this.instructionTextBox.Text = resources.GetString("instructionTextBox.Text");
+            // 
+            // FiskmöMTOptionsForm
             // 
             this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(692, 428);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.mtServicePort);
+            this.Controls.Add(this.instructionTextBox);
+            this.Controls.Add(this.mtServicePortTextBox);
+            this.Controls.Add(this.mtServicePortLabel);
             this.Controls.Add(this.btnHelp);
             this.Controls.Add(this.lblSupportedLanguages);
             this.Controls.Add(this.progressBar);
@@ -157,11 +173,11 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "OpusMTOptionsForm";
+            this.Name = "FiskmöMTOptionsForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = " ";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OpusMTOptionsForm_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FiskmöMTOptionsForm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -175,7 +191,8 @@
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label lblSupportedLanguages;
         private System.Windows.Forms.Button btnHelp;
-        private System.Windows.Forms.Label mtServicePort;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label mtServicePortLabel;
+        private System.Windows.Forms.TextBox mtServicePortTextBox;
+        private System.Windows.Forms.TextBox instructionTextBox;
     }
 }

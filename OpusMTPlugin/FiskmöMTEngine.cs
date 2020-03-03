@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Reflection;
 using MemoQ.MTInterfaces;
 
-namespace OpusMTPlugin
+namespace FiskmöMTPlugin
 {
     /// <summary>
     /// Dummy MT engine for a particular language combination.
@@ -12,7 +13,7 @@ namespace OpusMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    public class OpusMTEngine : EngineBase
+    public class FiskmöMTEngine : EngineBase
     {
         /// <summary>
         /// The source language.
@@ -27,9 +28,9 @@ namespace OpusMTPlugin
         /// <summary>
         /// Plugin options
         /// </summary>
-        private readonly OpusMTOptions options;
+        private readonly FiskmöMTOptions options;
 
-        public OpusMTEngine(string srcLangCode, string trgLangCode, OpusMTOptions options)
+        public FiskmöMTEngine(string srcLangCode, string trgLangCode, FiskmöMTOptions options)
         {
             this.srcLangCode = srcLangCode;
             this.trgLangCode = trgLangCode;
@@ -43,7 +44,7 @@ namespace OpusMTPlugin
         /// </summary>
         public override ISession CreateLookupSession()
         {
-            return new OpusMTSession(srcLangCode, trgLangCode, options);
+            return new FiskmöMTSession(srcLangCode, trgLangCode, options);
         }
 
         /// <summary>
@@ -60,7 +61,11 @@ namespace OpusMTPlugin
         /// </summary>
         public override Image SmallIcon
         {
-            get { return null; }
+            get
+            {
+                var image = Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("FiskmöMTPlugin.fiskmö_small.png"));
+                return image;
+            }
         }
 
         /// <summary>
@@ -76,7 +81,7 @@ namespace OpusMTPlugin
         /// </summary>
         public override ISessionForStoringTranslations CreateStoreTranslationSession()
         {
-            return new OpusMTSession(srcLangCode, trgLangCode, options);
+            return new FiskmöMTSession(srcLangCode, trgLangCode, options);
         }
 
         #endregion
