@@ -143,9 +143,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="README.md">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="StartMosesBpeMtPipe.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
