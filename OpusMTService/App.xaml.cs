@@ -17,7 +17,17 @@ namespace OpusMTService
         private ServiceHost serviceHost;
 
         public ModelManager ModelManager { get; private set; }
-        
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            // Create the startup window
+            MainWindow wnd = new MainWindow();
+            wnd.DataContext = this.ModelManager;
+            // Do stuff here, e.g. to the window
+            // Show the window
+            wnd.Show();
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             var service = new Service();

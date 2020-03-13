@@ -20,6 +20,13 @@ namespace OpusMTService
 
         }
 
+        public static string PreprocessSpaces(string sourceSentence)
+        {
+            var withoutPeripheralSpaces = sourceSentence.Trim();
+            var withoutAdjacentSpaces = Regex.Replace(withoutPeripheralSpaces, "  *", " ");
+            return withoutAdjacentSpaces;
+        }
+
         public static string RunMosesPreprocessing(string input, string language)
         {
             input = ReplaceUnicodePunctuation(input);

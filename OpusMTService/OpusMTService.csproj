@@ -57,12 +57,19 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="YamlDotNet, Version=8.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.8.1.0\lib\net45\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ModelCustomizerWindow.xaml.cs">
+      <DependentUpon>ModelCustomizerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MarianCustomizer.cs" />
     <Compile Include="OnlineModelSelection.xaml.cs">
       <DependentUpon>OnlineModelSelection.xaml</DependentUpon>
     </Compile>
@@ -76,6 +83,10 @@
       <DependentUpon>OpusMTServiceSettings.settings</DependentUpon>
     </Compile>
     <Compile Include="TokenCodeGenerator.cs" />
+    <Page Include="ModelCustomizerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OnlineModelSelection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -168,6 +179,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="marian-decoder.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="marian.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="msvcp140.dll">

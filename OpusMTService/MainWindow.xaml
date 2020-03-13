@@ -6,12 +6,9 @@
         xmlns:local="clr-namespace:OpusMTService"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Window.DataContext>
-        <local:ModelManager/>
-    </Window.DataContext>
     <Grid>
-        <local:ListBoxWithControls>
-            <local:ListBoxWithControls DataContext="{Binding .}" />
-        </local:ListBoxWithControls>
+        <local:LocalModelListView>
+            <local:LocalModelListView DataContext="{Binding .}" />
+        </local:LocalModelListView>
     </Grid>
 </Window>

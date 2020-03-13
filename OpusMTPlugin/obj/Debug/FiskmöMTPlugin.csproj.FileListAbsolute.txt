@@ -7,3 +7,12 @@ C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\Fiskm�
 C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.csproj.CopyComplete
 C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.dll
 C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.pdb
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\bin\FiskmöMTPlugin.dll
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\bin\FiskmöMTPlugin.pdb
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.csprojAssemblyReference.cache
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.FiskmöMTOptionsForm.resources
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.csproj.GenerateResource.cache
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.csproj.CoreCompileInputs.cache
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.csproj.CopyComplete
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.dll
+C:\Users\niemi\Documents\ohjelmointi\testmemoq\fiskmo-trados\OpusMTPlugin\obj\Debug\FiskmöMTPlugin.pdb

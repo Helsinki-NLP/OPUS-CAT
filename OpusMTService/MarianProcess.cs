@@ -146,14 +146,7 @@ namespace OpusMTService
         {
             this.MtPipe.Close();
         }
-
-        private string PreprocessSpaces(string sourceSentence)
-        {
-            var withoutPeripheralSpaces = sourceSentence.Trim();
-            var withoutAdjacentSpaces = Regex.Replace(withoutPeripheralSpaces,"  *", " ");
-            return withoutAdjacentSpaces;
-        }
-
+        
         private string TranslateSentence(string rawSourceSentence)
         {
             //This preprocessing must correspond to the one used in model training. Currently
@@ -163,7 +156,7 @@ namespace OpusMTService
             //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
             //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
             var sourceSentence = MosesPreprocessor.RunMosesPreprocessing(rawSourceSentence,this.TargetCode);
-            sourceSentence = this.PreprocessSpaces(sourceSentence);
+            sourceSentence = MosesPreprocessor.PreprocessSpaces(sourceSentence);
             
 
             this.MtPipe.StandardInput.WriteLine(sourceSentence);

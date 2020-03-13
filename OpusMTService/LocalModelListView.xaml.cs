@@ -20,10 +20,10 @@ namespace OpusMTService
     /// <summary>
     /// Interaction logic for ListBoxWithControls.xaml
     /// </summary>
-    public partial class ListBoxWithControls : UserControl
+    public partial class LocalModelListView : UserControl
     {
 
-        public ListBoxWithControls()
+        public LocalModelListView()
         {
             InitializeComponent();
             this.DataContextChanged += dataContextChanged;
@@ -66,6 +66,14 @@ namespace OpusMTService
         private void LbTodoList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
+        }
+
+        private void btnCustomizeModel_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            ModelCustomizerWindow customizeModel = new ModelCustomizerWindow(selectedModel);
+            customizeModel.DataContext = this.DataContext;
+            customizeModel.Show();
         }
     }
 
