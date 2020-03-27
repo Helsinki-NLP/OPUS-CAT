@@ -22,7 +22,7 @@ namespace OpusMTService
         {
             // Create the startup window
             MainWindow wnd = new MainWindow();
-            wnd.DataContext = this.ModelManager;
+            //wnd.DataContext = this.ModelManager;
             // Do stuff here, e.g. to the window
             // Show the window
             wnd.Show();
@@ -30,15 +30,14 @@ namespace OpusMTService
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            var service = new Service();
+            /*var service = new Service();
             this.ModelManager = new ModelManager();
-            this.serviceHost = service.StartService(this.ModelManager);
+            this.serviceHost = service.StartService(this.ModelManager);*/
             base.OnStartup(e);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
-            this.serviceHost.Close();
             base.OnExit(e);
         }
     }

@@ -46,5 +46,17 @@ namespace OpusMTService {
                 this["LocalFiskmoDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8477")]
+        public string MtServicePort {
+            get {
+                return ((string)(this["MtServicePort"]));
+            }
+            set {
+                this["MtServicePort"] = value;
+            }
+        }
     }
 }

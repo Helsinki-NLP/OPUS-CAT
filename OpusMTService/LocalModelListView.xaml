@@ -6,36 +6,39 @@
              xmlns:local="clr-namespace:OpusMTService"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <DockPanel Margin="10">
-            <StackPanel DockPanel.Dock="Right" Margin="10,0">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="0,0,0,5" />
-                    </Style>
-                </StackPanel.Resources>
-                <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Add model from OPUS repository</Button>
-                <Button Name="addZipModel" Click="btnAddZipModel_Click">Add model from zip</Button>
-                <Button Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
-                <Button Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
+    <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+            <StackPanel>
+                <Label Margin="10,0,0,0" FontSize="20">Installed models</Label>
+                <DockPanel Margin="10">
+                    <StackPanel DockPanel.Dock="Right" Margin="10,0">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button">
+                                <Setter Property="Margin" Value="0,0,0,5" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Add model from OPUS repository</Button>
+                        <Button Name="addZipModel" Click="btnAddZipModel_Click">Add model from zip</Button>
+                        <Button Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
+                        <!--<Button Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>-->
+                        <Button Name="translateWithModel" Click="btnTranslateWithModel_Click">Test selected model</Button>
+                    </StackPanel>
+                    <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Setter Property="BorderBrush" Value="LightGray" />
+                                <Setter Property="BorderThickness" Value="1,1,1,1" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Employee Information">
+                                <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
+                                <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
+                                <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
             </StackPanel>
-
-            <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="BorderBrush" Value="LightGray" />
-                        <Setter Property="BorderThickness" Value="1,1,1,1" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.View>
-                    <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Employee Information">
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-
-        </DockPanel>
-    </Grid>
+        </Border>
 </UserControl>

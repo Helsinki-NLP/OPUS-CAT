@@ -1,0 +1,24 @@
+﻿<Window x:Class="OpusMTService.TranslateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpusMTService"
+        mc:Ignorable="d"
+        Title="Translate" Height="600" Width="800">
+    <Grid>
+        <StackPanel Margin="10">
+            <Label>Source text:</Label>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <TextBox Name="SourceBox" Height="200"></TextBox>
+            </Border>
+            <StackPanel Orientation="Horizontal">
+                <Button Click="translateButton_Click">Translate</Button>
+            </StackPanel>
+            <Label>Translation:</Label>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <TextBlock Name="TargetBox" Height="200" IsEnabled="False"></TextBlock>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Window>

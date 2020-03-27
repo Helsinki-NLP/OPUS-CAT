@@ -83,6 +83,9 @@
       <DependentUpon>OpusMTServiceSettings.settings</DependentUpon>
     </Compile>
     <Compile Include="TokenCodeGenerator.cs" />
+    <Compile Include="TranslateWindow.xaml.cs">
+      <DependentUpon>TranslateWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="ModelCustomizerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -107,6 +110,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="TranslateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MarianProcess.cs" />

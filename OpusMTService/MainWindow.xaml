@@ -5,10 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusMTService"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Fiskmö MT service" Height="450" Width="800"
+        Closing="Window_Closing">
+    <StackPanel>
         <local:LocalModelListView>
             <local:LocalModelListView DataContext="{Binding .}" />
         </local:LocalModelListView>
-    </Grid>
+        <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+            <DockPanel>
+                <Label DockPanel.Dock="Left">MT service port:</Label>
+                <Button DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>
+                <Button DockPanel.Dock="Right" Width="100" Click="saveButton_Click">Save</Button>
+                
+                <TextBox PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center" Name="ServicePortBox"></TextBox>
+            </DockPanel>
+        </Border>
+    </StackPanel>
 </Window>

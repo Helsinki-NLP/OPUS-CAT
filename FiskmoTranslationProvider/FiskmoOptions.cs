@@ -27,7 +27,13 @@ namespace FiskmoTranslationProvider
             _uriBuilder = new TranslationProviderUriBuilder(uri);
         }
         #endregion
-        
+
+        public string mtServicePort
+        {
+            get { return GetStringParameter("mtServicePort"); }
+            set { SetStringParameter("mtServicePort", value); }
+        }
+
         public string languageDirection
         {
             get { return GetStringParameter("languageDirection"); }

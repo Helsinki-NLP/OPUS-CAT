@@ -22,7 +22,7 @@ namespace FiskmoTranslationProvider
         private FiskmoOptions _options;
         private FiskmoProviderElementVisitor _visitor;
         private static Dictionary<string,ConcurrentBag<Document>> processedDocuments = new Dictionary<string, ConcurrentBag<Document>>();
-        internal static Dictionary<string,List<MarianProcess>> _marianProcesses = new Dictionary<string, List<MarianProcess>>();
+        //internal static Dictionary<string,List<MarianProcess>> _marianProcesses = new Dictionary<string, List<MarianProcess>>();
         private string langpair;
         internal static string _segmentTranslation;
         #endregion
@@ -60,11 +60,12 @@ namespace FiskmoTranslationProvider
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
             this.langpair = $"{sourceCode}-{targetCode}";
 
-            if (!FiskmoProviderLanguageDirection.processedDocuments.ContainsKey(this.langpair))
+            /*if (!FiskmoProviderLanguageDirection.processedDocuments.ContainsKey(this.langpair))
             {
                 FiskmoProviderLanguageDirection.processedDocuments[this.langpair] = new ConcurrentBag<Document>();
-            }
+            }*/
 
+            /*
             var modelManager = new ModelManager();
 
             //Start a marian instance if one has not been started or the previous one has exited
@@ -91,7 +92,7 @@ namespace FiskmoTranslationProvider
                         new List<MarianProcess>()
                             { new MarianProcess(latestModelDir, sourceCode, targetCode) };
                 }
-            }
+            }*/
             #endregion
         }
 
@@ -121,6 +122,11 @@ namespace FiskmoTranslationProvider
                     x.MainTranslationProvider.Uri.OriginalString.Contains("fiskmoprovider")
                 );
 
+            if (!FiskmoProviderLanguageDirection.processedDocuments.ContainsKey(this.langpair))
+            {
+                FiskmoProviderLanguageDirection.processedDocuments.Add(this.langpair, new ConcurrentBag<Document>());
+            }
+
             if (activeFiskmoTp != null &&
                 activeFiskmoTp.MainTranslationProvider.Uri.OriginalString.Contains("pregenerateMt=True") &&
                 !FiskmoProviderLanguageDirection.processedDocuments[this.langpair].Contains(e.Document))
@@ -149,10 +155,12 @@ namespace FiskmoTranslationProvider
                     var langpair = $"{sourceCode}-{targetCode}";
 
                     //This will generate the translation and cache it for later use
-                    foreach (var marianProcess in FiskmoProviderLanguageDirection._marianProcesses[langpair])
+                    FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode);
+                    
+                    /*foreach (var marianProcess in FiskmoProviderLanguageDirection._marianProcesses[langpair])
                     {
                         marianProcess.Translate(sourceText);
-                    }
+                    }*/
 
                 }
             }
@@ -210,24 +218,20 @@ namespace FiskmoTranslationProvider
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
             var langpair = $"{sourceCode}-{targetCode}";
 
-            foreach (var mtSystem in FiskmoProviderLanguageDirection._marianProcesses[langpair])
+            List<SearchResult> systemResults = this.GenerateSystemResult(sourceText, settings.Mode,segment,sourceCode,targetCode);
+            foreach (var res in systemResults)
             {
-                List<SearchResult> systemResults = this.GenerateSystemResult(mtSystem, sourceText, settings.Mode,segment);
-                foreach (var res in systemResults)
-                {
-                    results.Add(res);
-                }
+                results.Add(res);
             }
  
             return results;
             #endregion
         }
 
-        private List<SearchResult> GenerateSystemResult(MarianProcess mtSystem, string sourceText, SearchMode mode, Segment segment)
+        private List<SearchResult> GenerateSystemResult(string sourceText, SearchMode mode, Segment segment, string sourceCode, string targetCode)
         {
             List<SearchResult> systemResults = new List<SearchResult>();
-            string translatedSentence = mtSystem.Translate(sourceText);
-
+            string translatedSentence = FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode);
             _segmentTranslation = translatedSentence;
 
             if (String.IsNullOrEmpty(translatedSentence))
@@ -239,7 +243,7 @@ namespace FiskmoTranslationProvider
                 Segment translation = new Segment(_languageDirection.TargetCulture);
                 translation.Add(translatedSentence);
 
-                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags,mtSystem.SystemName));
+                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags,"fiskmö"));
             }
             #region "SegmentLookup"
             if (mode == SearchMode.NormalSearch)
@@ -247,7 +251,7 @@ namespace FiskmoTranslationProvider
                 Segment translation = new Segment(_languageDirection.TargetCulture);
                 translation.Add(translatedSentence);
 
-                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags, mtSystem.SystemName));
+                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags, "fiskmö"));
             }
 
             return systemResults;

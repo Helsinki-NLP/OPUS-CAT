@@ -72,8 +72,24 @@ namespace OpusMTService
                 return null;
 
             return this.ModelManager.Translate(input, srcLangCode, trgLangCode);
-;
         }
+
+        /// <summary>
+        /// Call this method to get the translation for a single string with the named model.
+        /// </summary>
+        /// <param name="tokenCode">The token code.</param>
+        /// <param name="input">The input string.</param>
+        /// <param name="modelName">Name of the model to use.</param>
+        /// <returns>The translated input string.</returns>
+        public string TranslateWithModel(string tokenCode, string input, string modelName)
+        {
+
+            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
+                return null;
+
+            return this.ModelManager.TranslateWithModel(input, modelName);
+        }
+
 
         /// <summary>
         /// Call this method to get the translation for multiple strings in batch.
@@ -115,6 +131,16 @@ namespace OpusMTService
                 
             }
             return indicesAdded;
+        }
+
+        public string Customize(string tokenCode, List<Tuple<string, string>> input, string srcLangCode, string trgLangCode)
+        {
+            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
+                return null;
+
+            this.ModelManager.Customize(input, srcLangCode, trgLangCode);
+
+            return "tuning set received";
         }
     }
 }

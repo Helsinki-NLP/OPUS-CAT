@@ -36,8 +36,10 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.infoBox = new System.Windows.Forms.RichTextBox();
             this.downloadProgress = new System.Windows.Forms.ProgressBar();
-            this.LoadModel_btn = new System.Windows.Forms.Button();
+            this.Customize_btn = new System.Windows.Forms.Button();
             this.groupBoxCon = new System.Windows.Forms.GroupBox();
+            this.mtServicePortBox = new System.Windows.Forms.TextBox();
+            this.mtServicePortLabel = new System.Windows.Forms.Label();
             this.mtOriginCheckbox = new System.Windows.Forms.CheckBox();
             this.pregenerateCheckbox = new System.Windows.Forms.CheckBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -80,7 +82,7 @@
             this.tabPage1.BackColor = System.Drawing.SystemColors.Control;
             this.tabPage1.Controls.Add(this.infoBox);
             this.tabPage1.Controls.Add(this.downloadProgress);
-            this.tabPage1.Controls.Add(this.LoadModel_btn);
+            this.tabPage1.Controls.Add(this.Customize_btn);
             this.tabPage1.Controls.Add(this.groupBoxCon);
             this.tabPage1.Location = new System.Drawing.Point(4, 29);
             this.tabPage1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -92,10 +94,10 @@
             // 
             // infoBox
             // 
-            this.infoBox.Location = new System.Drawing.Point(7, 80);
+            this.infoBox.Location = new System.Drawing.Point(7, 115);
             this.infoBox.Name = "infoBox";
             this.infoBox.ReadOnly = true;
-            this.infoBox.Size = new System.Drawing.Size(465, 104);
+            this.infoBox.Size = new System.Drawing.Size(465, 69);
             this.infoBox.TabIndex = 28;
             this.infoBox.Text = "";
             // 
@@ -103,34 +105,50 @@
             // 
             this.downloadProgress.Location = new System.Drawing.Point(10, 189);
             this.downloadProgress.Name = "downloadProgress";
-            this.downloadProgress.Size = new System.Drawing.Size(366, 32);
+            this.downloadProgress.Size = new System.Drawing.Size(354, 32);
             this.downloadProgress.TabIndex = 27;
             this.downloadProgress.Visible = false;
             // 
-            // LoadModel_btn
+            // Customize_btn
             // 
-            this.LoadModel_btn.Enabled = false;
-            this.LoadModel_btn.Location = new System.Drawing.Point(382, 190);
-            this.LoadModel_btn.Name = "LoadModel_btn";
-            this.LoadModel_btn.Size = new System.Drawing.Size(90, 31);
-            this.LoadModel_btn.TabIndex = 25;
-            this.LoadModel_btn.Text = "Download";
-            this.LoadModel_btn.UseVisualStyleBackColor = true;
-            this.LoadModel_btn.Visible = false;
-            this.LoadModel_btn.Click += new System.EventHandler(this.LoadModel_btn_Click);
+            this.Customize_btn.Location = new System.Drawing.Point(370, 190);
+            this.Customize_btn.Name = "Customize_btn";
+            this.Customize_btn.Size = new System.Drawing.Size(102, 31);
+            this.Customize_btn.TabIndex = 25;
+            this.Customize_btn.Text = "Customize";
+            this.Customize_btn.UseVisualStyleBackColor = true;
+            this.Customize_btn.Click += new System.EventHandler(this.Customize_btn_Click);
             // 
             // groupBoxCon
             // 
+            this.groupBoxCon.Controls.Add(this.mtServicePortBox);
+            this.groupBoxCon.Controls.Add(this.mtServicePortLabel);
             this.groupBoxCon.Controls.Add(this.mtOriginCheckbox);
             this.groupBoxCon.Controls.Add(this.pregenerateCheckbox);
             this.groupBoxCon.Location = new System.Drawing.Point(7, 8);
             this.groupBoxCon.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBoxCon.Name = "groupBoxCon";
             this.groupBoxCon.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBoxCon.Size = new System.Drawing.Size(465, 65);
+            this.groupBoxCon.Size = new System.Drawing.Size(465, 100);
             this.groupBoxCon.TabIndex = 24;
             this.groupBoxCon.TabStop = false;
             this.groupBoxCon.Text = "Settings";
+            // 
+            // mtServicePortBox
+            // 
+            this.mtServicePortBox.Location = new System.Drawing.Point(132, 60);
+            this.mtServicePortBox.Name = "mtServicePortBox";
+            this.mtServicePortBox.Size = new System.Drawing.Size(100, 26);
+            this.mtServicePortBox.TabIndex = 21;
+            // 
+            // mtServicePortLabel
+            // 
+            this.mtServicePortLabel.AutoSize = true;
+            this.mtServicePortLabel.Location = new System.Drawing.Point(6, 63);
+            this.mtServicePortLabel.Name = "mtServicePortLabel";
+            this.mtServicePortLabel.Size = new System.Drawing.Size(116, 20);
+            this.mtServicePortLabel.TabIndex = 20;
+            this.mtServicePortLabel.Text = "MT service port";
             // 
             // mtOriginCheckbox
             // 
@@ -244,7 +262,7 @@
         private System.Windows.Forms.GroupBox groupBoxCon;
         private System.Windows.Forms.CheckBox pregenerateCheckbox;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.Button LoadModel_btn;
+        private System.Windows.Forms.Button Customize_btn;
         private System.Windows.Forms.ProgressBar downloadProgress;
         private System.Windows.Forms.RichTextBox infoBox;
         private System.Windows.Forms.TabPage tabPage2;
@@ -252,5 +270,7 @@
         private System.Windows.Forms.CheckBox mtOriginCheckbox;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.CheckBox useAllModelsCheckBox;
+        private System.Windows.Forms.TextBox mtServicePortBox;
+        private System.Windows.Forms.Label mtServicePortLabel;
     }
 }

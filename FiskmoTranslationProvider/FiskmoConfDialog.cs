@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.TranslationStudioAutomation.IntegrationApi;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -14,9 +17,12 @@ namespace FiskmoTranslationProvider
 
     public partial class FiskmoConfDialog : Form
     {
-        private DirectoryInfo fiskmoModelDir;
-        private ModelManager modelManager;
-        private string newerModel;
+        private string sourceCode;
+        private string targetCode;
+
+        //private DirectoryInfo fiskmoModelDir;
+        //private ModelManager modelManager;
+        //private string newerModel;
 
         public FiskmoOptions Options
         {
@@ -26,14 +32,15 @@ namespace FiskmoTranslationProvider
 
         public FiskmoConfDialog(FiskmoOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs)
         {
-            string sourceCode = languagePairs[0].SourceCulture.TwoLetterISOLanguageName.ToLower();
-            string targetCode = languagePairs[0].TargetCulture.TwoLetterISOLanguageName.ToLower();
-            this.modelManager = new ModelManager();
+            this.sourceCode = languagePairs[0].SourceCulture.TwoLetterISOLanguageName.ToLower();
+            this.targetCode = languagePairs[0].TargetCulture.TwoLetterISOLanguageName.ToLower();
+            //this.modelManager = new ModelManager();
             Options = options;
             InitializeComponent();
             string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             this.aboutBox.LoadFile(Path.Combine(assemblyFolder,"LICENSE.rtf"));
 
+            /*
             //Add code for disabling form if language pair is not correct, in case it's needed.
             if 
                 ((!((sourceCode == "fi" || sourceCode == "sv") && (targetCode == "fi" || targetCode == "sv"))) &&
@@ -68,8 +75,8 @@ namespace FiskmoTranslationProvider
             if (this.newerModel != null)
             {
                 //Activate the Load model button 
-                this.LoadModel_btn.Visible = true;
-                this.LoadModel_btn.Enabled = true;
+                this.Customize_btn.Visible = true;
+                this.Customize_btn.Enabled = true;
                 var newModelName = new DirectoryInfo(newerModel).Name;
                 this.infoBox.AppendText("New model ");
                 this.infoBox.SelectionFont = new System.Drawing.Font(this.infoBox.Font, System.Drawing.FontStyle.Bold);
@@ -81,7 +88,7 @@ namespace FiskmoTranslationProvider
             if (existingModel == null && this.newerModel == null)
             {
                 this.infoBox.Text = "No model available for the language pair";
-            }
+            }*/
 
         }
         
@@ -94,6 +101,7 @@ namespace FiskmoTranslationProvider
             this.pregenerateCheckbox.Checked = Options.pregenerateMt == "True";
             this.mtOriginCheckbox.Checked = Options.showMtAsOrigin == "True";
             this.useAllModelsCheckBox.Checked = Options.useAllModels;
+            this.mtServicePortBox.Text = Options.mtServicePort;
         }
 
         private void Save_btn_Click(object sender, EventArgs e)
@@ -101,6 +109,7 @@ namespace FiskmoTranslationProvider
             Options.pregenerateMt = this.pregenerateCheckbox.Checked.ToString();
             Options.showMtAsOrigin = this.mtOriginCheckbox.Checked.ToString();
             Options.useAllModels = this.useAllModelsCheckBox.Checked;
+            Options.mtServicePort = this.mtServicePortBox.Text;
             this.DialogResult = DialogResult.OK;
         }
        
@@ -108,14 +117,36 @@ namespace FiskmoTranslationProvider
         {            
             this.DialogResult = DialogResult.Cancel;
         }
-    
-        private void LoadModel_btn_Click(object sender, EventArgs e)
+
+        //this would work best as batch task
+        private void Customize_btn_Click(object sender, EventArgs e)
         {
             this.downloadProgress.Visible = true;
-            this.modelManager.DownloadModel(
-                this.newerModel, wc_DownloadProgressChanged, wc_DownloadComplete);
+
+            EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
+            List<Tuple<string, string>> tuningSet = new List<Tuple<string, string>>();
+            foreach (var doc in editorController.GetDocuments())
+            {
+                foreach (var segmentPair in doc.SegmentPairs)
+                {
+                    if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Translated ||
+                        segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.ApprovedTranslation)
+                    {
+                        var allSourceTextItems = segmentPair.Source.AllSubItems.Where(x => x is IText);
+                        var sourceText = String.Join(" ", allSourceTextItems);
+
+                        var allTargetTextItems = segmentPair.Target.AllSubItems.Where(x => x is IText);
+                        var targetText = String.Join(" ", allTargetTextItems);
+
+                        tuningSet.Add(new Tuple<string, string>(sourceText, targetText));
+                    }
+                }
+            }
+
+            FiskmöMTServiceHelper.Customize(this.Options, tuningSet, this.sourceCode, this.targetCode);
         }
 
+        /*
         async void wc_DownloadComplete(object sender, AsyncCompletedEventArgs e)
         {
             this.infoBox.Text = "Model loaded, extracting it";
@@ -123,18 +154,19 @@ namespace FiskmoTranslationProvider
 
             this.downloadProgress.Visible = false;
             this.Save_btn.Enabled = true;
-            this.LoadModel_btn.Visible = false;
-            this.LoadModel_btn.Enabled = false;
+            this.Customize_btn.Visible = false;
+            this.Customize_btn.Enabled = false;
             
             this.infoBox.Text = "Current model loaded, click Save to start using Fiskmö plugin";
 
         }
-
+        
         void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             this.downloadProgress.Value = e.ProgressPercentage;
         }
-        
+        */
+
     }
 }
     

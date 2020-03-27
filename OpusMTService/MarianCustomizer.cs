@@ -147,7 +147,6 @@ namespace OpusMTService
             ExternalProcess.StartInfo.RedirectStandardOutput = true;
             ExternalProcess.StartInfo.RedirectStandardError = false;*/
             ExternalProcess.StartInfo.CreateNoWindow = false;
-
             ExternalProcess.Start();
             
             return ExternalProcess;

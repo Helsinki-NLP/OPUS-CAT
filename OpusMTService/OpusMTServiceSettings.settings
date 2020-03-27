@@ -8,5 +8,8 @@
     <Setting Name="LocalFiskmoDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">fiskmo/</Value>
     </Setting>
+    <Setting Name="MtServicePort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8477</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -68,6 +68,13 @@ namespace OpusMTService
 
         }
 
+        private void btnTranslateWithModel_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            TranslateWindow translateWindow = new TranslateWindow(selectedModel);
+            translateWindow.Show();
+        }
+
         private void btnCustomizeModel_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;

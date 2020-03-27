@@ -131,7 +131,45 @@ namespace OpusMTService
                 this.FilterOnlineModels("", "", "");
             }
         }
-        
+
+        internal string TranslateWithModel(string input, string modelName)
+        {
+            return this.LocalModels.Single(x => x.Name == modelName).Translate(input);
+        }
+
+        internal void Customize(List<Tuple<string, string>> input, string srcLangCode, string trgLangCode)
+        {
+            var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+
+            //Write the tuning set as two files
+            var fileGuid = Guid.NewGuid();
+            var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLangCode}");
+            var trgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{trgLangCode}");
+            using (var srcStream = new StreamWriter(srcFile,true,Encoding.UTF8))
+            using (var trgStream = new StreamWriter(trgFile,true,Encoding.UTF8))
+            {
+                foreach (var pair in input)
+                {
+                    srcStream.WriteLine(pair.Item1);
+                    trgStream.WriteLine(pair.Item2);
+                }
+            }
+
+            //Note that this does not currently remove the temp files, should
+            //add an event for that in the Marian process startup code
+            //(but make sure that non-temp customization files are not removed).
+
+            var customizer = new MarianCustomizer(
+                primaryModel,
+                new FileInfo(srcFile),
+                new FileInfo(trgFile),
+                "customized"
+                );
+
+            customizer.Customize();
+            
+        }
+
         internal void GetLocalModels()
         {
             if (this.LocalModels == null)
@@ -184,6 +222,8 @@ namespace OpusMTService
             return null;
         }
 
+
+
         internal string Translate(string input, string srcLangCode, string trgLangCode)
         {
             //Use the first suitable model
@@ -196,8 +236,16 @@ namespace OpusMTService
             {
                 trgLangCode = this.ConvertIsoCode(trgLangCode);
             }
-            var installedModel = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode)).First();
+
+            var installedModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+            
             return installedModel.Translate(input);
+        }
+
+        private MTModel GetPrimaryModel(string srcLangCode, string trgLangCode)
+        {
+            var primaryModel = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode)).First();
+            return primaryModel;
         }
 
         internal IEnumerable<string> GetAllLanguagePairs()

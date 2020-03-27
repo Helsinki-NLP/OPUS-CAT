@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 
@@ -15,6 +16,12 @@ namespace OpusMTInterface
 
         [OperationContract]
         string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode);
+
+        [OperationContract]
+        string TranslateWithModel(string tokenCode, string input, string modelName);
+
+        [OperationContract]
+        string Customize(string tokenCode, List<Tuple<string,string>> input, string srcLangCode, string trgLangCode);
 
         [OperationContract]
         List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode);
