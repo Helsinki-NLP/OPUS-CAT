@@ -23,7 +23,7 @@ namespace FiskmöMTPlugin
             { "CommunicationErrorText", "There was an error during the communication with the service. Make sure the Fiskmö MT application is running and that is uses the same port as the plugin.\n\n{0}" },
             { "InvalidUserNameCaption", "Login error" },
             { "InvalidUserNameText", "Invalid user name or password." },
-            { "NetworkError", "A network error occured ({0})" },
+            { "NetworkError", "A network error occured. Check that Fiskmö MT service is running, and that MT service port is the same in service and plugin: {0}" },
             { "PlainTextOnly", "Use plain text only" },
             { "TextAndFormatting", "Use text and formatting" },
             { "FormattingAndTags", "Use both formatting and tags" },
@@ -74,7 +74,7 @@ namespace FiskmöMTPlugin
             string localizedText = environment.GetResourceString(FiskmöMTPluginDirector.PluginId, key);
 
             // use the default texts if the environment returns with null
-            if (string.IsNullOrEmpty(localizedText))
+            if (localizedText == $"MTPlugin.{FiskmöMTPluginDirector.PluginId}.{key}" || string.IsNullOrEmpty(localizedText))
                 localizedText = defaultTexts[key];
 
             return localizedText;

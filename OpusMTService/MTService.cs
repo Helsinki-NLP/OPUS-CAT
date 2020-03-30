@@ -8,14 +8,6 @@ using OpusMTInterface;
 namespace OpusMTService
 {
 
-    /// <summary>
-    /// Dummy web service which can be called by the dummy MT plugin.
-    /// </summary>
-    /// <remarks>
-    /// Implementation checklist:
-    ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
-    ///     - All allocated resources are disposed correctly in the session.
-    /// </remarks>
 
     [ServiceBehavior(InstanceContextMode=InstanceContextMode.Single)]
     public class MTService : IMTService

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,17 +23,97 @@ namespace OpusMTService
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IDataErrorInfo, INotifyPropertyChanged
     {
         public ModelManager ModelManager { get; private set; }
 
+        private bool saveButtonEnabled;
+
+        public string Error
+        {
+            get { return "...."; }
+        }
+
+        public string ServicePortBox
+        {
+            get => servicePortBox;
+            set {
+                servicePortBox = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool SaveButtonEnabled
+        {
+            get => saveButtonEnabled;
+            set
+            {
+                saveButtonEnabled = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                return Validate(columnName);
+            }
+        }
+
+        private string Validate(string propertyName)
+        {
+            // Return error message if there is error on else return empty or null string
+            string validationMessage = string.Empty;
+            this.SaveButtonEnabled = false;
+            switch (propertyName)
+            {
+                case "ServicePortBox":
+                    if (this.ServicePortBox != null && this.ServicePortBox != "" )
+                    {
+                        var portNumber = Int32.Parse(this.ServicePortBox);
+                        if (portNumber < 1024 || portNumber > 65535)
+                        {
+                            validationMessage = "Error";
+                        }
+                        else
+                        {
+                            if (this.ServicePortBox != OpusMTServiceSettings.Default.MtServicePort)
+                            {
+                                this.SaveButtonEnabled = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        validationMessage = "Error";
+                    }
+
+                    break;
+            }
+
+            return validationMessage;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
         private ServiceHost serviceHost;
+        private string servicePortBox;
 
         public MainWindow()
         {
             this.StartService();
             InitializeComponent();
-            this.ServicePortBox.Text = OpusMTServiceSettings.Default.MtServicePort;
+            this.DataContext = this;
+            this.ServicePortBox = OpusMTServiceSettings.Default.MtServicePort;
         }
 
         private void StartService()
@@ -41,7 +123,7 @@ namespace OpusMTService
             this.DataContext = this.ModelManager;
             this.serviceHost = service.StartService(this.ModelManager);
         }
-        
+
         private void restartButton_Click(object sender, RoutedEventArgs e)
         {
             //Close service and start it again
@@ -51,7 +133,7 @@ namespace OpusMTService
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
-            OpusMTServiceSettings.Default.MtServicePort = this.ServicePortBox.Text;
+            OpusMTServiceSettings.Default.MtServicePort = this.ServicePortBox;
             OpusMTServiceSettings.Default.Save();
         }
 

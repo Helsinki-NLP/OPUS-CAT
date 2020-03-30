@@ -11,8 +11,16 @@ namespace OpusMTService
     {
         public ServiceHost StartService(ModelManager modelManager)
         {
+            Uri baseAddress;
+            try
+            {
+                baseAddress = new Uri($"net.tcp://localhost:{OpusMTServiceSettings.Default.MtServicePort}/");
+            }
+            catch
+            {
+                return null;
+            }
             
-            var baseAddress = new Uri($"net.tcp://localhost:{OpusMTServiceSettings.Default.MtServicePort}/");
 
             var mtService = new MTService(modelManager);
 
