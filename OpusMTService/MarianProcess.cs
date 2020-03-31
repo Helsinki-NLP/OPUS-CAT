@@ -25,6 +25,7 @@ namespace OpusMTService
         public bool Faulted { get; private set; }
         public Process MtPipe { get => mtPipe; set => mtPipe = value; }
 
+        private StreamWriter utf8Writer;
         private string modelDir;
 
         public string SystemName { get; }
@@ -87,13 +88,15 @@ namespace OpusMTService
             }
 
             this.MtPipe = this.StartProcessWithCmd(this.mtPipeCmds, this.modelDir);
-            
+
+            this.utf8Writer = new StreamWriter(this.MtPipe.StandardInput.BaseStream, new UTF8Encoding(false));
+
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
         }
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            KillProcessAndChildren(this.mtPipe.Id);
+            this.ShutdownMtPipe();
         }
 
         private Process StartProcessWithCmd(string fileName, string args)
@@ -144,7 +147,9 @@ namespace OpusMTService
 
         public void ShutdownMtPipe()
         {
-            this.MtPipe.Close();
+            KillProcessAndChildren(this.mtPipe.Id);
+            //Remove the event handler so it doesn't try to kill an already killed process
+            AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
         }
         
         private string TranslateSentence(string rawSourceSentence)
@@ -158,9 +163,12 @@ namespace OpusMTService
             var sourceSentence = MosesPreprocessor.RunMosesPreprocessing(rawSourceSentence,this.TargetCode);
             sourceSentence = MosesPreprocessor.PreprocessSpaces(sourceSentence);
             
-
-            this.MtPipe.StandardInput.WriteLine(sourceSentence);
-            this.MtPipe.StandardInput.Flush();
+            this.utf8Writer.WriteLine(sourceSentence);
+            this.utf8Writer.Flush();
+            //this.MtPipe.StandardInput.BaseStream.Flush();
+            //This inputs UTF16 by default, but models expect utf8
+            //this.MtPipe.StandardInput.WriteLine(sourceSentence);
+            //this.MtPipe.StandardInput.Flush();
 
             //There should only ever be a single line in the stdout, since there's only one line of
             //input per stdout readline, and marian decoder will never insert line breaks into translations.

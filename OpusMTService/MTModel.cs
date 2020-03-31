@@ -27,6 +27,15 @@ namespace OpusMTService
             }
         }
 
+        internal void Shutdown()
+        {
+            if (this.marianProcess != null)
+            {
+                this.marianProcess.ShutdownMtPipe();
+                this.marianProcess = null;
+            }
+        }
+
         internal string Translate(string input)
         {
             if (this.marianProcess == null)

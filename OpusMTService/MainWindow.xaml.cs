@@ -112,7 +112,6 @@ namespace OpusMTService
         {
             this.StartService();
             InitializeComponent();
-            this.DataContext = this;
             this.ServicePortBox = OpusMTServiceSettings.Default.MtServicePort;
         }
 
@@ -135,6 +134,7 @@ namespace OpusMTService
         {
             OpusMTServiceSettings.Default.MtServicePort = this.ServicePortBox;
             OpusMTServiceSettings.Default.Save();
+            this.SaveButtonEnabled = false;
         }
 
         private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

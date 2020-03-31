@@ -29,10 +29,16 @@ namespace OpusMTService
             this.model = selectedModel;
             InitializeComponent();
         }
-        
+
         private async void translateButton_Click(object sender, RoutedEventArgs e)
         {
-            await Task.Run(()=>Dispatcher.Invoke(()=> this.TargetBox.Text = this.model.Translate(this.SourceBox.Text)));
+            await Task.Run(() => Dispatcher.Invoke(() =>
+            {
+
+                /*byte[] bytes = Encoding.Default.GetBytes(this.SourceBox.Text);
+                var utf8Source = Encoding.ASCII.GetString(bytes);*/
+                this.TargetBox.Text = this.model.Translate(this.SourceBox.Text);
+            }));
         }
     }
 }

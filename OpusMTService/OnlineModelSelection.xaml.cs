@@ -41,8 +41,9 @@ namespace OpusMTService
 
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
-            model.InstallStatus = "Installed";
+            model.InstallStatus = "Extracting";
             this.modelManager.ExtractModel(model.Path);
+            model.InstallStatus = "Installed";
             this.modelManager.GetLocalModels();
         }
 

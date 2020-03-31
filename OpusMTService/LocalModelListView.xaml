@@ -19,9 +19,9 @@
                         <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Add model from OPUS repository</Button>
                         <Button Name="addZipModel" Click="btnAddZipModel_Click">Add model from zip</Button>
                         <Button Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
-                        <!--<Button Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>-->
+                        <Button Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                         <Button Name="translateWithModel" Click="btnTranslateWithModel_Click">Test selected model</Button>
-                    </StackPanel>
+                </StackPanel>
                     <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">

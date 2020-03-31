@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -65,6 +66,23 @@ namespace OpusMTService
             {
                 this.FilteredOnlineModels.Add(model);
             }
+        }
+
+
+        internal void UninstallModel(MTModel selectedModel)
+        {
+            var onlineModel = this.onlineModels.SingleOrDefault(
+                x => x.Path.Replace("/","\\") == selectedModel.Path);
+            if (onlineModel != null)
+            {
+                onlineModel.InstallStatus = "";
+                onlineModel.InstallProgress = 0;
+            }
+            
+            this.LocalModels.Remove(selectedModel);
+            selectedModel.Shutdown();
+            FileSystem.DeleteDirectory(
+                Path.Combine(this.opusModelDir.FullName,selectedModel.Path),UIOption.OnlyErrorDialogs,RecycleOption.SendToRecycleBin);
         }
 
         public ModelManager()
@@ -177,7 +195,7 @@ namespace OpusMTService
                 this.LocalModels = new ObservableCollection<MTModel>();
             }
 
-            var modelPaths = this.OpusModelDir.GetFiles("*.npz", SearchOption.AllDirectories).Select(x => x.DirectoryName).Distinct().ToList();
+            var modelPaths = this.OpusModelDir.GetFiles("*.npz", System.IO.SearchOption.AllDirectories).Select(x => x.DirectoryName).Distinct().ToList();
             this.LocalModels.Clear();
 
             foreach (var modelPath in modelPaths)
@@ -293,27 +311,50 @@ namespace OpusMTService
             }
         }
 
+        //This is used with automatic downloads from the object storage, where the
+        //language pair is contained in the object storage path
         internal void ExtractModel(string modelPath,bool deleteZip=false)
         {
             string modelFolder = Path.Combine(this.OpusModelDir.FullName, modelPath);
             string zipPath = modelFolder+".zip";
-
-            this.ExtractModel(new FileInfo(zipPath), deleteZip);
-        }
-
-        //For extracting zip files
-        internal void ExtractModel(FileInfo zipPath, bool deleteZip = false)
-        {
-            Match modelPathMatch = Regex.Match(zipPath.FullName, @".*\\([^\\]+\\[^\\]+)\.zip$");
-            string modelPath = modelPathMatch.Groups[1].Value;
-            string modelFolder = Path.Combine(this.OpusModelDir.FullName, modelPath);
-            ZipFile.ExtractToDirectory(zipPath.FullName, modelFolder);
+            
+            ZipFile.ExtractToDirectory(zipPath, modelFolder);
             if (deleteZip)
             {
-                zipPath.Delete();
+                File.Delete(zipPath);
             }
         }
 
+        //This is used for extraction from a zip, where the language pair needs to
+        //be extracted from the README.md file (some nicer metadata file might be useful)
+        internal void ExtractModel(FileInfo zipFile)
+        {
+            var tempExtractionPath = Path.Combine(Path.GetTempPath(), zipFile.Name);
+            if (Directory.Exists(tempExtractionPath))
+            {
+                Directory.Delete(tempExtractionPath,true);
+            }
+            
+            ZipFile.ExtractToDirectory(zipFile.FullName, tempExtractionPath);
+
+            string languagePairs;
+            using (var readme = new StreamReader(Path.Combine(tempExtractionPath, "README.md"),Encoding.UTF8))
+            {
+                var readmeText = readme.ReadToEnd();
+                var regex = @"/([a-z]{2,3}-[a-z]{2,3})/" + zipFile.Name;
+                var match = Regex.Match(readmeText, regex);
+                languagePairs = match.Groups[1].Value;
+            }
+
+            var destinationDirectory = Path.Combine(this.opusModelDir.FullName, languagePairs);
+            if (!Directory.Exists(destinationDirectory))
+            {
+                Directory.CreateDirectory(destinationDirectory);
+            }
+            Directory.Move(tempExtractionPath, Path.Combine(destinationDirectory,zipFile.Name.Replace(".zip","")));
+
+            this.GetLocalModels();
+        }
 
         public Boolean IsLanguagePairSupported(string sourceLang, string targetLang)
         {

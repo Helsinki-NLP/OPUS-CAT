@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -60,7 +61,12 @@ namespace OpusMTService
 
         private void btnDeleteModel_Click(object sender, RoutedEventArgs e)
         {
-         
+            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", "Delete Confirmation", System.Windows.MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+                ((ModelManager)this.DataContext).UninstallModel(selectedModel);
+            }
         }
 
         private void LbTodoList_SelectionChanged(object sender, SelectionChangedEventArgs e)
