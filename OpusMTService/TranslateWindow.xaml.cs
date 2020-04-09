@@ -26,9 +26,12 @@ namespace OpusMTService
 
         public TranslateWindow(MTModel selectedModel)
         {
-            this.model = selectedModel;
+            this.Model = selectedModel;
+            this.Title = $"Translating with model {Model.Name}";
             InitializeComponent();
         }
+
+        public MTModel Model { get => model; set => model = value; }
 
         private async void translateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -37,7 +40,7 @@ namespace OpusMTService
 
                 /*byte[] bytes = Encoding.Default.GetBytes(this.SourceBox.Text);
                 var utf8Source = Encoding.ASCII.GetString(bytes);*/
-                this.TargetBox.Text = this.model.Translate(this.SourceBox.Text);
+                this.TargetBox.Text = this.Model.Translate(this.SourceBox.Text);
             }));
         }
     }

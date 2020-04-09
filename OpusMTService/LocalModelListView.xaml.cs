@@ -23,7 +23,7 @@ namespace OpusMTService
     /// </summary>
     public partial class LocalModelListView : UserControl
     {
-
+        
         public LocalModelListView()
         {
             InitializeComponent();

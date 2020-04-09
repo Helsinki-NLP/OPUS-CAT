@@ -229,7 +229,7 @@ namespace OpusMTService
                     //potentially even line breaks, so the text needs to be split on line breaks.
                     //(sentence splitting might be nice, but having multiple sentences on one line
                     //doesn't break anything, while multiple lines cause desyncing problems.
-                    var splitSource = sourceText.Split(new[] {"\r\n","\r","\n"},StringSplitOptions.None);
+                    var splitSource = new List<string> { sourceText };// sourceText.Split(new[] {"\r\n","\r","\n"},StringSplitOptions.None);
 
                     StringBuilder translationBuilder = new StringBuilder();
                     foreach (var sourceSentence in splitSource)

@@ -23,6 +23,7 @@ namespace OpusMTService
         public ModelCustomizerWindow(MTModel selectedModel)
         {
             this.selectedModel = selectedModel;
+            this.Title = $"Customize model {this.selectedModel.Name}";
             InitializeComponent();
         }
 

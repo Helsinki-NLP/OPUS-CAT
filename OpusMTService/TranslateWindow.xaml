@@ -5,19 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusMTService"
         mc:Ignorable="d"
-        Title="Translate" Height="600" Width="800">
+        Height="600" Width="800" Icon="fiskmo_zIQ_icon.ico">
     <Grid>
         <StackPanel Margin="10">
             <Label>Source text:</Label>
             <Border BorderThickness="1" BorderBrush="Black">
-                <TextBox Name="SourceBox" Height="200"></TextBox>
+                <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="200"></TextBox>
             </Border>
             <StackPanel Orientation="Horizontal">
                 <Button Click="translateButton_Click">Translate</Button>
             </StackPanel>
             <Label>Translation:</Label>
             <Border BorderThickness="1" BorderBrush="Black">
-                <TextBlock Name="TargetBox" Height="200" IsEnabled="False"></TextBlock>
+                <TextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" TextWrapping="Wrap" Name="TargetBox" Height="200"></TextBox>
             </Border>
         </StackPanel>
     </Grid>

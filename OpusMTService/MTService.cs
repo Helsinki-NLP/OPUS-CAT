@@ -9,7 +9,9 @@ namespace OpusMTService
 {
 
 
-    [ServiceBehavior(InstanceContextMode=InstanceContextMode.Single)]
+    [ServiceBehavior(
+        InstanceContextMode=InstanceContextMode.Single,
+        AddressFilterMode = AddressFilterMode.Any)]
     public class MTService : IMTService
     {
         

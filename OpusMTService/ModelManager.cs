@@ -36,6 +36,7 @@ namespace OpusMTService
 
         public ObservableCollection<MTModel> LocalModels
         { get => localModels; set { localModels = value; NotifyPropertyChanged(); } }
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -221,6 +222,9 @@ namespace OpusMTService
 
         public string ConvertIsoCode(string name)
         {
+            //Strip region code if there is one
+            name = Regex.Replace(name, "-[A-Z]{2}", "");
+
             if (name.Length != 3)
             {
                 throw new ArgumentException("name must be three letters.");
@@ -244,17 +248,22 @@ namespace OpusMTService
 
         internal string Translate(string input, string srcLangCode, string trgLangCode)
         {
-            //Use the first suitable model
-            if (srcLangCode.Length == 3)
+
+            //The language codes can be 3 or 2 letter formats, and the code may contain a
+            //region specifier (e.g. swe-FI). Normalize everything as 2 letter codes for now.
+
+            var threeLetterRegex = new Regex("^[a-z]{3}(-[A-Z]{2})?$");
+            if (threeLetterRegex.IsMatch(srcLangCode))
             {
                 srcLangCode = this.ConvertIsoCode(srcLangCode);
             }
 
-            if (trgLangCode.Length == 3)
+            if (threeLetterRegex.IsMatch(trgLangCode))
             {
                 trgLangCode = this.ConvertIsoCode(trgLangCode);
             }
 
+            //Use the first suitable model
             var installedModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
             
             return installedModel.Translate(input);
@@ -341,7 +350,7 @@ namespace OpusMTService
             using (var readme = new StreamReader(Path.Combine(tempExtractionPath, "README.md"),Encoding.UTF8))
             {
                 var readmeText = readme.ReadToEnd();
-                var regex = @"/([a-z]{2,3}-[a-z]{2,3})/" + zipFile.Name;
+                var regex = @"\* download.+/([a-z]{2,3}-[a-z]{2,3})/.+\.zip\)";
                 var match = Regex.Match(readmeText, regex);
                 languagePairs = match.Groups[1].Value;
             }
