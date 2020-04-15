@@ -60,7 +60,7 @@ namespace OpusMTService
 
         public string InstallStatus { get => installStatus; set { installStatus = value; NotifyPropertyChanged(); } }
         private string installStatus = "";
-
+        private bool _prioritized;
 
         public MTModel(List<string> sourceLanguages, List<string> targetLanguages, string name)
         {
@@ -116,5 +116,6 @@ namespace OpusMTService
 
         public string Path { get; internal set; }
         public string InstallDir { get; }
+        public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
     }
 }

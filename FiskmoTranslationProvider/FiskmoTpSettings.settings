@@ -2,8 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FiskmoTranslationProvider" GeneratedClassName="FiskmoTpSettings">
   <Profiles />
   <Settings>
-    <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT</Value>
+    <Setting Name="MtServicePort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8477</Value>
     </Setting>
     <Setting Name="LocalFiskmoDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">%localappdata%/fiskmo/</Value>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,11 +27,18 @@ namespace OpusMTService
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File("logs\\myapp.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("logs\\fiskmö_log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
+
+            //Accessing the model storage on pouta requires this.
+            Log.Information("Setting Tls12 as security protocol (required for accessing online model storage");
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            Log.Information("Opening Fiskmö MT service window");
 
             // Create the startup window
             MainWindow wnd = new MainWindow();

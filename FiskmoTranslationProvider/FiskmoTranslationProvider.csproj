@@ -123,6 +123,7 @@
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
     </Compile>
+    <Compile Include="FileReader.cs" />
     <Compile Include="FiskmoTpSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

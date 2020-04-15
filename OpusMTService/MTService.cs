@@ -67,7 +67,7 @@ namespace OpusMTService
 
             return this.ModelManager.Translate(input, srcLangCode, trgLangCode);
         }
-
+        
         /// <summary>
         /// Call this method to get the translation for a single string with the named model.
         /// </summary>

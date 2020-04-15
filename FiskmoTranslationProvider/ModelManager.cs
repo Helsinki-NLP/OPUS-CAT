@@ -41,7 +41,7 @@ namespace FiskmoTranslationProvider
         {
             try
             {
-                WebRequest request = WebRequest.Create(FiskmoTpSettings.Default.ModelStorageUrl);
+                WebRequest request = WebRequest.Create(FiskmoTpSettings.Default.MtServicePort);
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream dataStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(dataStream);
@@ -98,7 +98,7 @@ namespace FiskmoTranslationProvider
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{FiskmoTpSettings.Default.ModelStorageUrl}/{newerModel}";
+                var modelUrl = $"{FiskmoTpSettings.Default.MtServicePort}/{newerModel}";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }

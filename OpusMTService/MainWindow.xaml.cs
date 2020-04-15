@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -110,6 +111,7 @@ namespace OpusMTService
 
         public MainWindow()
         {
+            Log.Information("Starting Fiskmö MT service");
             this.StartService();
             InitializeComponent();
             this.ServicePortBox = OpusMTServiceSettings.Default.MtServicePort;

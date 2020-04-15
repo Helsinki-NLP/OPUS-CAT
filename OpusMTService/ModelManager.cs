@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -106,6 +107,7 @@ namespace OpusMTService
         {
             this.onlineModels = new List<MTModel>();
 
+            Log.Information($"Fetching a list of online models from {OpusMTServiceSettings.Default.ModelStorageUrl}");
             using (var client = new WebClient())
             {
                 client.DownloadStringCompleted += modelListDownloadComplete;
@@ -115,7 +117,18 @@ namespace OpusMTService
 
         private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
         {
-            XDocument bucket = XDocument.Parse(e.Result);
+            XDocument bucket;
+            try
+            {
+                bucket = XDocument.Parse(e.Result);
+            }
+            catch (Exception ex) when (ex.InnerException is System.Net.WebException)
+            {
+                Log.Information($"Could not connect to online model storage, check that Internet connection exists. Exception: {ex.InnerException.ToString()}");
+
+                return;
+            }
+            
             var ns = bucket.Root.Name.Namespace;
             var files = bucket.Descendants(ns + "Key").Select(x => x.Value);
             var models = files.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
@@ -263,15 +276,27 @@ namespace OpusMTService
                 trgLangCode = this.ConvertIsoCode(trgLangCode);
             }
 
-            //Use the first suitable model
-            var installedModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+            MTModel mtModel;
+
+            mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
             
-            return installedModel.Translate(input);
+            return mtModel.Translate(input);
         }
 
         private MTModel GetPrimaryModel(string srcLangCode, string trgLangCode)
         {
-            var primaryModel = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode)).First();
+            var languagePairModels = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode));
+            MTModel primaryModel;
+            var prioritizedModels = languagePairModels.Where(x => x.Prioritized);
+            if (prioritizedModels.Any())
+            {
+                primaryModel = prioritizedModels.First();
+            }
+            else
+            {
+                primaryModel = languagePairModels.First();
+            }
+            
             return primaryModel;
         }
 

@@ -10,16 +10,18 @@ namespace FiskmoTranslationProvider
 {
     class CustomizeBatchTaskSettingsControl : UserControl, ISettingsAware<CustomizeBatchTaskSettings>
     {
+        private CustomizeBatchTaskSettings settings;
+
         public CustomizeBatchTaskSettings Settings
         {
             get
             {
-                throw new NotImplementedException();
+                return settings;
             }
 
             set
             {
-                throw new NotImplementedException();
+                settings = value;
             }
         }
     }

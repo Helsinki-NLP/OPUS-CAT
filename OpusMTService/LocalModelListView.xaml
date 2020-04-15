@@ -16,8 +16,8 @@
                                 <Setter Property="Margin" Value="0,0,0,5" />
                             </Style>
                         </StackPanel.Resources>
-                        <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Add model from OPUS repository</Button>
-                        <Button Name="addZipModel" Click="btnAddZipModel_Click">Add model from zip</Button>
+                        <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Install OPUS model from Web</Button>
+                        <Button Name="addZipModel" Click="btnAddZipModel_Click">Install model from zip</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Test selected model</Button>
@@ -31,11 +31,19 @@
                         </ListView.ItemContainerStyle>
 
                         <ListView.View>
-                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Employee Information">
+                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
                                 <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
                                 <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
                                 <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
-                            </GridView>
+                                <GridViewColumn Width="140" Header="Prioritized">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Path=Prioritized, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                        </GridView>
                         </ListView.View>
                     </ListView>
                 </DockPanel>

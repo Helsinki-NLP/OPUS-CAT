@@ -30,13 +30,15 @@ namespace FiskmoTranslationProvider
         /// Gets the valid token code.
         /// </summary>
         /// <returns>The token code.</returns>
-        public static string GetTokenCode(FiskmoOptions options)
+        /// 
+
+        public static string GetTokenCode(string mtServicePort)
         {
             if (TokenCodeExpires < DateTime.Now)
             {
                 // refresh the token code
                 // Always dispose allocated resources
-                var proxy = getNewProxy(options.mtServicePort);
+                var proxy = getNewProxy(mtServicePort);
                 using (proxy as IDisposable)
                 {
                     TokenCode = proxy.Login("user", "user");
@@ -45,6 +47,11 @@ namespace FiskmoTranslationProvider
             }
 
             return TokenCode;
+        }
+
+        public static string GetTokenCode(FiskmoOptions options)
+        {
+            return FiskmöMTServiceHelper.GetTokenCode(options.mtServicePort);
         }
 
         /// <summary>
@@ -62,7 +69,7 @@ namespace FiskmoTranslationProvider
                 return proxy.Login(userName, password);
             }
         }
-
+        
         /// <summary>
         /// Lists the supported languages of the dummy MT service.
         /// </summary>
@@ -144,13 +151,18 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal static void Customize(FiskmoOptions options, List<Tuple<string, string>> tuningSet, string sourceCode, string targetCode)
+        internal static void Customize(string mtServicePort, List<Tuple<string, string>> projectTranslations, string sourceCode, string targetCode)
         {
-            var proxy = getNewProxy(options.mtServicePort);
+            var proxy = getNewProxy(mtServicePort);
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(options), tuningSet, sourceCode, targetCode);
+                proxy.Customize(GetTokenCode(mtServicePort), projectTranslations, sourceCode, targetCode);
             }
+        }
+        
+        internal static void Customize(FiskmoOptions options, List<Tuple<string, string>> tuningSet, string sourceCode, string targetCode)
+        {
+            FiskmöMTServiceHelper.Customize(options.mtServicePort, tuningSet, sourceCode, targetCode);
         }
 
         /// <summary>

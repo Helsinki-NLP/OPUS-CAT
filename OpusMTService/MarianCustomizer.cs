@@ -75,10 +75,12 @@ namespace OpusMTService
                 $"--vocabs {Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])} " +
                 $"{Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])} " +
                 $"--disp-freq 10 " +
-                $"--save-freq=100u " +
+                $"--save-freq=300u " +
                 $"--mini-batch-words=400 " +
-                $"--cpu-threads=1 " +
-                $"-w 1024";
+                $"--cpu-threads=3 " +
+                $"--overwrite " +
+                $"--after-epochs=3 " +
+                $"-w 4092";
 
             this.StartProcessWithCmd("marian.exe",trainingArgs);
         }

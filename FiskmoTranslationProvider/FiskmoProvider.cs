@@ -99,25 +99,8 @@ namespace FiskmoTranslationProvider
             var sourceCode = languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = languageDirection.TargetCulture.TwoLetterISOLanguageName;
 
-            //The object storage contains models for multiple language pairs, but Fiskmö plugin
-            //should only support fi-sv-fi.
-            if (FiskmoTpSettings.Default.SupportAllLanguagePairs)
-            {
-                var modelManager = new ModelManager();
-                return modelManager.IsLanguagePairSupported(sourceCode, targetCode);
-            }
-            else
-            {
-                if ((sourceCode == "sv" && targetCode == "fi") || (sourceCode == "fi" && targetCode == "sv"))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            
+            var supportedLanguagePairs = FiskmöMTServiceHelper.ListSupportedLanguages(this.Options);
+            return supportedLanguagePairs.Contains($"{sourceCode}-{targetCode}");    
         }
         #endregion
 

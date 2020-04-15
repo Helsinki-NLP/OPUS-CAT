@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Management;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace OpusMTService
 {
@@ -75,6 +76,7 @@ namespace OpusMTService
             this.translationCache = new ConcurrentDictionary<string, string>();
             this.translationDurations = new ConcurrentDictionary<string, TimeSpan>();
 
+            Log.Information($"Starting MT pipe for model {this.SystemName}.");
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {

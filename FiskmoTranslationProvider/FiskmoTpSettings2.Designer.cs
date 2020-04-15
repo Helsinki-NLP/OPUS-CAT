@@ -25,13 +25,13 @@ namespace FiskmoTranslationProvider2017 {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/OPUS-MT")]
-        public string ModelStorageUrl {
+        [global::System.Configuration.DefaultSettingValueAttribute("8477")]
+        public string MtServicePort {
             get {
-                return ((string)(this["ModelStorageUrl"]));
+                return ((string)(this["MtServicePort"]));
             }
             set {
-                this["ModelStorageUrl"] = value;
+                this["MtServicePort"] = value;
             }
         }
         
