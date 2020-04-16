@@ -114,17 +114,23 @@ namespace OpusMTService
             ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
             ExternalProcess.StartInfo.RedirectStandardInput = true;
             ExternalProcess.StartInfo.RedirectStandardOutput = true;
-            ExternalProcess.StartInfo.RedirectStandardError = false;
+            ExternalProcess.StartInfo.RedirectStandardError = true;
             ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
 
+            ExternalProcess.ErrorDataReceived += errorDataHandler;
+            
             ExternalProcess.StartInfo.CreateNoWindow = true;
             //ExternalProcess.StartInfo.CreateNoWindow = false;
             
             ExternalProcess.Start();
+            ExternalProcess.BeginErrorReadLine();
+
             ExternalProcess.StandardInput.AutoFlush = true;
 
             return ExternalProcess;
         }
+
+
 
         private Process StartProcessWithRedirects(string fileName, string args)
         {
@@ -141,10 +147,14 @@ namespace OpusMTService
             ExternalProcess.StartInfo.RedirectStandardOutput = true;
             ExternalProcess.StartInfo.RedirectStandardError = true;
 
-
             ExternalProcess.Start();
             
             return ExternalProcess;
+        }
+
+        private void errorDataHandler(object sender, DataReceivedEventArgs e)
+        {
+            Log.Information(e.Data);
         }
 
         public void ShutdownMtPipe()

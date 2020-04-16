@@ -10,24 +10,6 @@ using YamlDotNet.Serialization;
 
 namespace OpusMTService
 {
-    public class DecoderSettings
-    {
-        public List<string> models { get; set; }
-        public List<string> vocabs { get; set; }
-        [YamlMember(Alias = "relative-paths", ApplyNamingConventions = false)]
-        public string relativePaths { get; set; }
-        [YamlMember(Alias = "beam-size", ApplyNamingConventions = false)]
-        public string beamSize { get; set; }
-        public string normalize { get; set; }
-        [YamlMember(Alias = "word-penalty", ApplyNamingConventions = false)]
-        public string wordPenalty { get; set; }
-        [YamlMember(Alias = "mini-batch", ApplyNamingConventions = false)]
-        public string miniBatch { get; set; }
-        [YamlMember(Alias = "maxi-batch", ApplyNamingConventions = false)]
-        public string maxiBatch { get; set; }
-        [YamlMember(Alias = "maxi-batch-sort", ApplyNamingConventions = false)]
-        public string maxiBatchSort { get; set; }
-    }
 
     class MarianCustomizer
     {
@@ -67,10 +49,57 @@ namespace OpusMTService
 
             var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
             var deserializer = new Deserializer();
-            var decoderSettings = deserializer.Deserialize<DecoderSettings>(decoderYaml.OpenText());
-            
-            var trainingArgs =
-                $"--model {Path.Combine(this.customDir.FullName,decoderSettings.models.Single())} " +
+            var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+
+            MarianTrainerConfig trainingConfig;
+            using (var reader = new StreamReader(OpusMTServiceSettings.Default.CustomizationBaseConfig))
+            {
+                trainingConfig = deserializer.Deserialize<MarianTrainerConfig>(reader);
+            }
+                
+            trainingConfig.TrainSets = new List<string>
+                    {
+                        spSource.FullName,
+                        spTarget.FullName
+                    };
+            trainingConfig.vocabs = new List<string>
+                    {
+                        Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0]),
+                        Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
+                    };
+
+            trainingConfig.model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single());
+
+            /*var trainingConfig = new MarianTrainerConfig
+            {
+                model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single()),
+                TrainSets = new List<string>
+                    {
+                        spSource.FullName,
+                        spTarget.FullName
+                    },
+                vocabs = new List<string>
+                    {
+                        Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0]),
+                        Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
+                    },
+                dispFreq = "10",
+                saveFreq = "300u",
+                miniBatchWords = "400",
+                cpuThreads = "3",
+                overwrite = "true",
+                afterEpochs = "3",
+                workspace = "4092"
+            };*/
+
+            var serializer = new Serializer();
+            var configPath = Path.Combine(this.customDir.FullName, "train.yml");
+            using (var writer = File.CreateText(configPath))
+            {
+                serializer.Serialize(writer, trainingConfig, typeof(MarianTrainerConfig));
+            }
+            var trainingArgs = $"--config {configPath}";
+                /*$"--model {Path.Combine(this.customDir.FullName,decoderSettings.models.Single())} " +
                 $"--train-sets {spSource.FullName} {spTarget.FullName} " +
                 $"--vocabs {Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])} " +
                 $"{Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])} " +
@@ -80,7 +109,7 @@ namespace OpusMTService
                 $"--cpu-threads=3 " +
                 $"--overwrite " +
                 $"--after-epochs=3 " +
-                $"-w 4092";
+                $"-w 4092";*/
 
             this.StartProcessWithCmd("marian.exe",trainingArgs);
         }

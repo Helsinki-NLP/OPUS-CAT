@@ -73,6 +73,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MarianTrainerConfig.cs" />
+    <Compile Include="MarianDecoderConfig.cs" />
     <Compile Include="ModelCustomizerWindow.xaml.cs">
       <DependentUpon>ModelCustomizerWindow.xaml</DependentUpon>
     </Compile>
@@ -190,6 +192,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="fiskmo_zIQ_icon.ico" />
+    <None Include="customize.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="marian-decoder.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

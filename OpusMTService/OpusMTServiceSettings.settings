@@ -11,5 +11,8 @@
     <Setting Name="MtServicePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">8477</Value>
     </Setting>
+    <Setting Name="CustomizationBaseConfig" Type="System.String" Scope="User">
+      <Value Profile="(Default)">customize.yml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

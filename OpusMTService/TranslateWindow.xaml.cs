@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace OpusMTService
 {
@@ -33,15 +34,13 @@ namespace OpusMTService
 
         public MTModel Model { get => model; set => model = value; }
 
-        private async void translateButton_Click(object sender, RoutedEventArgs e)
+        private void translateButton_Click(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => Dispatcher.Invoke(() =>
-            {
-
-                /*byte[] bytes = Encoding.Default.GetBytes(this.SourceBox.Text);
-                var utf8Source = Encoding.ASCII.GetString(bytes);*/
-                this.TargetBox.Text = this.Model.Translate(this.SourceBox.Text);
-            }));
+            var source = this.SourceBox.Text;
+            Task<string> translate = new Task<string>(() => this.Model.Translate(source));
+            translate.ContinueWith(x => Dispatcher.Invoke(() => this.TargetBox.Text = x.Result));
+            translate.Start();
+            
         }
     }
 }

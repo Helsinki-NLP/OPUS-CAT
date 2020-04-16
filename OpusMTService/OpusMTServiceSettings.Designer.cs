@@ -58,5 +58,17 @@ namespace OpusMTService {
                 this["MtServicePort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("customize.yml")]
+        public string CustomizationBaseConfig {
+            get {
+                return ((string)(this["CustomizationBaseConfig"]));
+            }
+            set {
+                this["CustomizationBaseConfig"] = value;
+            }
+        }
     }
 }
