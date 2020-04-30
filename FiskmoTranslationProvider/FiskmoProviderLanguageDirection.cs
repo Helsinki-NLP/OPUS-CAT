@@ -48,7 +48,7 @@ namespace FiskmoTranslationProvider
             
             
 
-            if (Boolean.Parse(_options.pregenerateMt))
+            if (_options.pregenerateMt)
             {
                 EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
                 editorController.ActiveDocumentChanged += DocChanged;
@@ -277,9 +277,9 @@ namespace FiskmoTranslationProvider
             
             #region "TranslationUnit"
             TranslationUnit tu = new TranslationUnit();
-            Segment orgSegment = new Segment();
-            orgSegment.Add(sourceSegment);
-            tu.SourceSegment = orgSegment;
+            /*Segment orgSegment = new Segment();
+            orgSegment.Add(sourceSegment);*/
+            tu.SourceSegment = searchSegment;
             tu.TargetSegment = translation;
             #endregion
             
@@ -287,7 +287,7 @@ namespace FiskmoTranslationProvider
             tu.FieldValues.Add(new SingleStringFieldValue("mtSystem", mtSystem));
             #region "TuProperties"
 
-            if (this._options.showMtAsOrigin == null || bool.Parse(this._options.showMtAsOrigin))
+            if (this._options.showMtAsOrigin)
             {
                 tu.Origin = TranslationUnitOrigin.MachineTranslation;
             }

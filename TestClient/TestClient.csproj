@@ -99,9 +99,9 @@
     <Content Include="MemoQ.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpusMTPlugin\FiskmöMTPlugin.csproj">
+    <ProjectReference Include="..\OpusMTPlugin\FiskmoMTPlugin.csproj">
       <Project>{29fa4881-4cfc-4a4e-af21-17db1669c05f}</Project>
-      <Name>FiskmöMTPlugin</Name>
+      <Name>FiskmoMTPlugin</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FiskmoTranslationProvider</RootNamespace>
     <AssemblyName>FiskmoTranslationProvider</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PluginDeploymentPath>$(AppData)\Sdl\Sdl Trados Studio\15\Plugins</PluginDeploymentPath>
     <NuGetPackageImportStamp>
@@ -42,6 +42,8 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="RestSharp, Version=106.3.1.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.106.3.1\lib\net452\RestSharp.dll</HintPath>
     </Reference>
@@ -114,16 +116,28 @@
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
     </Compile>
     <Compile Include="FileReader.cs" />
+    <Compile Include="FiskmoOptionControl.xaml.cs">
+      <DependentUpon>FiskmoOptionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FiskmoOptionsFormWPF.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FiskmoOptionsFormWPF.Designer.cs">
+      <DependentUpon>FiskmoOptionsFormWPF.cs</DependentUpon>
+    </Compile>
     <Compile Include="FiskmoTpSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -137,12 +151,6 @@
     <Compile Include="FiskmoProviderWinFormsUI.cs" />
     <Compile Include="FiskmöMTServiceHelper.cs" />
     <Compile Include="MarianProcess.cs" />
-    <Compile Include="FiskmoConfDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FiskmoConfDialog.Designer.cs">
-      <DependentUpon>FiskmoConfDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="ModelManager.cs" />
     <Compile Include="CustomizeBatchTask.cs" />
     <Compile Include="CustomizeBatchTaskSettings.cs" />
@@ -159,43 +167,6 @@
     <Compile Include="MosesPreprocess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\PluginProperties.cs" />
-    <Content Include="boost_chrono-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_iostreams-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_system-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_timer-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_zlib-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="lgpl-3.0.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="LICENSE_1_0.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="msvcp140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="process.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="process.py" />
-    <Content Include="spm_decode.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="spm_encode.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="vcruntime140.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -204,44 +175,32 @@
       <LastGenOutput>FiskmoTpSettings.Designer.cs</LastGenOutput>
     </None>
     <None Include="LICENSE.rtf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="MIT_LICENSE">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\fiskmo_zIQ_icon.ico" />
     <None Include="Resources\fiskmo_7sA_icon.ico" />
     <None Include="Resources\fiskmo_icon.ico" />
     <None Include="Resources\fiskmo.png" />
-    <EmbeddedResource Include="FiskmoConfDialog.resx">
-      <DependentUpon>FiskmoConfDialog.cs</DependentUpon>
+    <EmbeddedResource Include="FiskmoOptionsFormWPF.resx">
+      <DependentUpon>FiskmoOptionsFormWPF.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PluginResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PluginResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Content Include="apply_bpe.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="libbz2.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="marian-decoder.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="pluginpackage.manifest.xml">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="StartMosesBpeMtPipe.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="StartSentencePieceMtPipe.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="FiskmoOptionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <PropertyGroup>
     <CreatePluginPackage>true</CreatePluginPackage>

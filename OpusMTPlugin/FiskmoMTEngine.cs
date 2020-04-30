@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Reflection;
 using MemoQ.MTInterfaces;
 
-namespace FiskmöMTPlugin
+namespace FiskmoMTPlugin
 {
     /// <summary>
     /// Dummy MT engine for a particular language combination.
@@ -13,7 +13,7 @@ namespace FiskmöMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    public class FiskmöMTEngine : EngineBase
+    public class FiskmoMTEngine : EngineBase
     {
         /// <summary>
         /// The source language.
@@ -28,9 +28,9 @@ namespace FiskmöMTPlugin
         /// <summary>
         /// Plugin options
         /// </summary>
-        private readonly FiskmöMTOptions options;
+        private readonly FiskmoMTOptions options;
 
-        public FiskmöMTEngine(string srcLangCode, string trgLangCode, FiskmöMTOptions options)
+        public FiskmoMTEngine(string srcLangCode, string trgLangCode, FiskmoMTOptions options)
         {
             this.srcLangCode = srcLangCode;
             this.trgLangCode = trgLangCode;
@@ -44,7 +44,7 @@ namespace FiskmöMTPlugin
         /// </summary>
         public override ISession CreateLookupSession()
         {
-            return new FiskmöMTSession(srcLangCode, trgLangCode, options);
+            return new FiskmoMTSession(srcLangCode, trgLangCode, options);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace FiskmöMTPlugin
         /// </summary>
         public override ISessionForStoringTranslations CreateStoreTranslationSession()
         {
-            return new FiskmöMTSession(srcLangCode, trgLangCode, options);
+            return new FiskmoMTSession(srcLangCode, trgLangCode, options);
         }
 
         #endregion

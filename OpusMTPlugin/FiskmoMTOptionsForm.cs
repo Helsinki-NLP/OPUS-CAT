@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FiskmöMTPlugin
+namespace FiskmoMTPlugin
 {
     /// <summary>
     /// This class represents the options form of the dummy MT plugin.
@@ -18,7 +18,7 @@ namespace FiskmöMTPlugin
     ///     - 	The dialog does not call any blocking service in the user interface thread; it has to use background threads.
     ///     -   Check UI so that it is displayed correctly at high DPI settings.
     /// </remarks>
-    public partial class FiskmöMTOptionsForm : Form
+    public partial class FiskmoMTOptionsForm : Form
     {
         private delegate void LoginDelegate(string userName, string password);
         private IEnvironment environment;
@@ -34,9 +34,9 @@ namespace FiskmöMTPlugin
 
         private LoginResult loginResult;
 
-        public FiskmöMTOptions Options { get; set; }
+        public FiskmoMTOptions Options { get; set; }
 
-        public FiskmöMTOptionsForm(IEnvironment environment)
+        public FiskmoMTOptionsForm(IEnvironment environment)
         {
             InitializeComponent();
             this.environment = environment;
@@ -89,7 +89,7 @@ namespace FiskmöMTPlugin
             {
                 // try to login
                 // Do not call any blocking service in the user interface thread; it has to use background threads.
-                string tokenCode = await Task.Run(() => FiskmöMTServiceHelper.Login(userName, password, this.mtServicePortTextBox.Text));
+                string tokenCode = await Task.Run(() => FiskmoMTServiceHelper.Login(userName, password, this.mtServicePortTextBox.Text));
 
                 if (string.IsNullOrEmpty(tokenCode))
                 {
@@ -102,7 +102,7 @@ namespace FiskmöMTPlugin
                     loginResult.LoginSuccessful = true;
                     // try to get the list of the supported languages in the background
                     // Do not call any blocking service in the user interface thread; it has to use background threads.
-                    loginResult.SupportedLanguages = await Task.Run(() => FiskmöMTServiceHelper.ListSupportedLanguages(tokenCode,this.mtServicePortTextBox.Text));
+                    loginResult.SupportedLanguages = await Task.Run(() => FiskmoMTServiceHelper.ListSupportedLanguages(tokenCode,this.mtServicePortTextBox.Text));
                 }
             }
             catch (Exception ex)

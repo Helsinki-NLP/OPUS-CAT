@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows;
 using System.Xml.Linq;
 using static System.Environment;
 
@@ -169,7 +170,20 @@ namespace OpusMTService
             return this.LocalModels.Single(x => x.Name == modelName).Translate(input);
         }
 
-        internal void Customize(List<Tuple<string, string>> input, string srcLangCode, string trgLangCode)
+        private void SplitToFiles(List<Tuple<string, string>> biText,string srcPath, string trgPath)
+        {
+            using (var srcStream = new StreamWriter(srcPath, true, Encoding.UTF8))
+            using (var trgStream = new StreamWriter(trgPath, true, Encoding.UTF8))
+            {
+                foreach (var pair in biText)
+                {
+                    srcStream.WriteLine(pair.Item1);
+                    trgStream.WriteLine(pair.Item2);
+                }
+            }
+        }
+
+        internal void Customize(List<Tuple<string, string>> input, List<Tuple<string, string>> validation,string srcLangCode, string trgLangCode)
         {
             var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
 
@@ -177,15 +191,11 @@ namespace OpusMTService
             var fileGuid = Guid.NewGuid();
             var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLangCode}");
             var trgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{trgLangCode}");
-            using (var srcStream = new StreamWriter(srcFile,true,Encoding.UTF8))
-            using (var trgStream = new StreamWriter(trgFile,true,Encoding.UTF8))
-            {
-                foreach (var pair in input)
-                {
-                    srcStream.WriteLine(pair.Item1);
-                    trgStream.WriteLine(pair.Item2);
-                }
-            }
+            var validSrcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{srcLangCode}");
+            var validTrgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{trgLangCode}");
+
+            this.SplitToFiles(input, srcFile, trgFile);
+            this.SplitToFiles(validation, validSrcFile, validTrgFile);
 
             //Note that this does not currently remove the temp files, should
             //add an event for that in the Marian process startup code
@@ -195,6 +205,8 @@ namespace OpusMTService
                 primaryModel,
                 new FileInfo(srcFile),
                 new FileInfo(trgFile),
+                new FileInfo(validSrcFile),
+                new FileInfo(validTrgFile),
                 "customized"
                 );
 
@@ -368,8 +380,16 @@ namespace OpusMTService
             {
                 Directory.Delete(tempExtractionPath,true);
             }
-            
-            ZipFile.ExtractToDirectory(zipFile.FullName, tempExtractionPath);
+
+            try
+            {
+                ZipFile.ExtractToDirectory(zipFile.FullName, tempExtractionPath);
+            }
+            catch (System.IO.InvalidDataException ex)
+            {
+                MessageBox.Show($"Installation from a model zip failed. The zip archive is invalid.", "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             string languagePairs;
             using (var readme = new StreamReader(Path.Combine(tempExtractionPath, "README.md"),Encoding.UTF8))
@@ -385,7 +405,18 @@ namespace OpusMTService
             {
                 Directory.CreateDirectory(destinationDirectory);
             }
-            Directory.Move(tempExtractionPath, Path.Combine(destinationDirectory,zipFile.Name.Replace(".zip","")));
+
+            var modelDir = Path.Combine(destinationDirectory, zipFile.Name.Replace(".zip", ""));
+            if (Directory.Exists(modelDir))
+            {
+                MessageBox.Show($"A model with this name and language direction has already been installed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Directory.Delete(tempExtractionPath,true);
+            }
+            else
+            {
+                Directory.Move(tempExtractionPath, modelDir);
+            }
+            
 
             this.GetLocalModels();
         }

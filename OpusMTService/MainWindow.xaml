@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpusMTService"
         mc:Ignorable="d"
         Title="Fiskmö MT service" Height="450" Width="800" Icon="fiskmo_zIQ_icon.ico"
-        Name="FisköWindow"
+        Name="FiskmoWindow"
         Closing="Window_Closing">
     <StackPanel>
         <local:LocalModelListView>
@@ -18,7 +18,7 @@
                 <Button DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>
                 <Button IsEnabled="{Binding ElementName=FisköWindow, Path=SaveButtonEnabled}" DockPanel.Dock="Right" Width="100"  Click="saveButton_Click">Save</Button>
 
-                <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=FisköWindow, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=FiskmoWindow, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
             </DockPanel>
         </Border>
     </StackPanel>

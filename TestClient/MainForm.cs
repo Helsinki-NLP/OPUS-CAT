@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using FiskmöMTPlugin;
+using FiskmoMTPlugin;
 using MemoQ.Addins.Common.DataStructures;
 using MemoQ.Addins.Common.Framework;
 using MemoQ.Addins.Common.Utils;

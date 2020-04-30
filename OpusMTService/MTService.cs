@@ -127,12 +127,12 @@ namespace OpusMTService
             return indicesAdded;
         }
 
-        public string Customize(string tokenCode, List<Tuple<string, string>> input, string srcLangCode, string trgLangCode)
+        public string Customize(string tokenCode, List<Tuple<string, string>> input, List<Tuple<string, string>> validation, string srcLangCode, string trgLangCode)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            this.ModelManager.Customize(input, srcLangCode, trgLangCode);
+            this.ModelManager.Customize(input, validation, srcLangCode, trgLangCode);
 
             return "tuning set received";
         }

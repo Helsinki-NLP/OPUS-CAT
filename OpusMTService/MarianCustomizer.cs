@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using YamlDotNet.Serialization;
 
 namespace OpusMTService
@@ -17,11 +19,15 @@ namespace OpusMTService
         private DirectoryInfo modelDir;
         private FileInfo customSource;
         private FileInfo customTarget;
+        private FileInfo validationSource;
+        private FileInfo validationTarget;
         private string customLabel;
         private string sourceCode;
         private string targetCode;
         private FileInfo spSource;
         private FileInfo spTarget;
+        private FileInfo spValidSource;
+        private FileInfo spValidTarget;
         private MTModel selectedModel;
         
         private void CopyModelDir(DirectoryInfo modelDir,string customLabel)
@@ -42,8 +48,15 @@ namespace OpusMTService
         public void Customize()
         {
             //First copy the model to new dir
-            this.CopyModelDir(this.modelDir, this.customLabel);
-
+            try
+            {
+                this.CopyModelDir(this.modelDir, this.customLabel);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Customization failed: {ex.Message}", "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             //Preprocess input files
             this.PreprocessInput();
 
@@ -62,54 +75,33 @@ namespace OpusMTService
                         spSource.FullName,
                         spTarget.FullName
                     };
+
+            trainingConfig.ValidSets = new List<string>
+                    {
+                        spValidSource.FullName,
+                        spValidTarget.FullName
+                    };
+
             trainingConfig.vocabs = new List<string>
                     {
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0]),
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
+            trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
+
             trainingConfig.model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single());
 
-            /*var trainingConfig = new MarianTrainerConfig
-            {
-                model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single()),
-                TrainSets = new List<string>
-                    {
-                        spSource.FullName,
-                        spTarget.FullName
-                    },
-                vocabs = new List<string>
-                    {
-                        Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0]),
-                        Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
-                    },
-                dispFreq = "10",
-                saveFreq = "300u",
-                miniBatchWords = "400",
-                cpuThreads = "3",
-                overwrite = "true",
-                afterEpochs = "3",
-                workspace = "4092"
-            };*/
-
             var serializer = new Serializer();
-            var configPath = Path.Combine(this.customDir.FullName, "train.yml");
+            var configPath = Path.Combine(this.customDir.FullName, "customize.yml");
             using (var writer = File.CreateText(configPath))
             {
                 serializer.Serialize(writer, trainingConfig, typeof(MarianTrainerConfig));
             }
+
+            //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config {configPath}";
-                /*$"--model {Path.Combine(this.customDir.FullName,decoderSettings.models.Single())} " +
-                $"--train-sets {spSource.FullName} {spTarget.FullName} " +
-                $"--vocabs {Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])} " +
-                $"{Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])} " +
-                $"--disp-freq 10 " +
-                $"--save-freq=300u " +
-                $"--mini-batch-words=400 " +
-                $"--cpu-threads=3 " +
-                $"--overwrite " +
-                $"--after-epochs=3 " +
-                $"-w 4092";*/
+
 
             this.StartProcessWithCmd("marian.exe",trainingArgs);
         }
@@ -122,6 +114,8 @@ namespace OpusMTService
             this.spSource = this.PreprocessLanguage(this.customSource,this.sourceCode, sourceSpm);
             this.spTarget = this.PreprocessLanguage(this.customTarget, this.targetCode, targetSpm);
 
+            this.spValidSource = this.PreprocessLanguage(this.validationSource, this.sourceCode, sourceSpm);
+            this.spValidTarget = this.PreprocessLanguage(this.validationTarget, this.targetCode, targetSpm);
         }
 
         private FileInfo PreprocessLanguage(FileInfo languageFile, string languageCode, FileInfo spmModel)
@@ -153,19 +147,27 @@ namespace OpusMTService
             MTModel model,
             FileInfo customSource,
             FileInfo customTarget,
+            FileInfo validationSource,
+            FileInfo validationTarget,
             string customLabel)
         {
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customSource = customSource;
             this.customTarget = customTarget;
             this.customLabel = customLabel;
+            this.validationSource = validationSource;
+            this.validationTarget = validationTarget;
             this.sourceCode = model.SourceLanguageString;
             this.targetCode = model.TargetLanguageString;
         }
 
-
+        private void errorDataHandler(object sender, DataReceivedEventArgs e)
+        {
+            Log.Information(e.Data);
+        }
         private Process StartProcessWithCmd(string fileName, string args)
         {
+            var serviceDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process ExternalProcess = new Process();
 
             ExternalProcess.StartInfo.FileName = "cmd";
@@ -173,13 +175,21 @@ namespace OpusMTService
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
-            ExternalProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            /*ExternalProcess.StartInfo.RedirectStandardInput = true;
-            ExternalProcess.StartInfo.RedirectStandardOutput = true;
-            ExternalProcess.StartInfo.RedirectStandardError = false;*/
+            ExternalProcess.StartInfo.WorkingDirectory = serviceDir;
+            //ExternalProcess.StartInfo.RedirectStandardInput = true;
+            //ExternalProcess.StartInfo.RedirectStandardOutput = true;
+            //ExternalProcess.StartInfo.RedirectStandardError = true;
+            //ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+
+            //ExternalProcess.ErrorDataReceived += errorDataHandler;
+
             ExternalProcess.StartInfo.CreateNoWindow = false;
-            ExternalProcess.Start();
             
+            ExternalProcess.Start();
+            //ExternalProcess.BeginErrorReadLine();
+
+            //ExternalProcess.StandardInput.AutoFlush = true;
+
             return ExternalProcess;
         }
     }

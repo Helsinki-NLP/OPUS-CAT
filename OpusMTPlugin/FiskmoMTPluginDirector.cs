@@ -5,12 +5,12 @@ using System.Windows.Forms;
 using MemoQ.Addins.Common.Framework;
 using MemoQ.MTInterfaces;
 
-namespace FiskmöMTPlugin
+namespace FiskmoMTPlugin
 {
     /// <summary>
     /// The main class of the Dummy MT plugin.
     /// </summary>
-    public class FiskmöMTPluginDirector : PluginDirectorBase, IModule
+    public class FiskmoMTPluginDirector : PluginDirectorBase, IModule
     {
         /// <summary>
         /// The identifier of the plugin.
@@ -22,7 +22,7 @@ namespace FiskmöMTPlugin
         /// </summary>
         private IEnvironment environment;
 
-        public FiskmöMTPluginDirector()
+        public FiskmoMTPluginDirector()
         {
         }
 
@@ -130,7 +130,7 @@ namespace FiskmöMTPlugin
         /// </summary>
         public override IEngine2 CreateEngine(CreateEngineParams args)
         {
-            return new FiskmöMTEngine(args.SourceLangCode, args.TargetLangCode, new FiskmöMTOptions(args.PluginSettings));
+            return new FiskmoMTEngine(args.SourceLangCode, args.TargetLangCode, new FiskmoMTOptions(args.PluginSettings));
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace FiskmöMTPlugin
         /// </summary>
         public override PluginSettings EditOptions(IWin32Window parentForm, PluginSettings settings)
         {
-            using (var form = new FiskmöMTOptionsForm(environment) { Options = new FiskmöMTOptions(settings) })
+            using (var form = new FiskmoMTOptionsForm(environment) { Options = new FiskmoMTOptions(settings) })
             {
                 if (form.ShowDialog(parentForm) == DialogResult.OK)
                 {

@@ -1,7 +1,10 @@
-﻿disp-freq: 10
-save-freq: 300u
+﻿disp-freq: 100
+save-freq: 1000u
 mini-batch-words: 400
 cpu-threads: 3
 overwrite: true
 after-epochs: 3
 workspace: 4092
+valid-freq: 100u
+valid-metrics:
+- bleu

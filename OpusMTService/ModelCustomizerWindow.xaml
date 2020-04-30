@@ -22,6 +22,16 @@
             <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
+            <Label>Validation source file</Label>
+            <TextBox Name="ValidSourceFileBox" Width="400"></TextBox>
+            <Button DataContext="{Binding ElementName=ValidSourceFileBox}" Click="browse_Click">Browse</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label>Validation target file</Label>
+            <TextBox Name="ValidTargetFileBox" Width="400"></TextBox>
+            <Button DataContext="{Binding ElementName=ValidTargetFileBox}" Click="browse_Click">Browse</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
             <Label>Custom model label</Label>
             <TextBox Name="LabelBox" Width="400"></TextBox>
         </StackPanel>

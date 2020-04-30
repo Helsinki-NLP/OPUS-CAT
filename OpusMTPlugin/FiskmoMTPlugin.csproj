@@ -7,8 +7,8 @@
     <ProjectGuid>{29FA4881-4CFC-4A4E-AF21-17DB1669C05F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FiskmöMTPlugin</RootNamespace>
-    <AssemblyName>FiskmöMTPlugin</AssemblyName>
+    <RootNamespace>FiskmoMTPlugin</RootNamespace>
+    <AssemblyName>FiskmoMTPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -54,16 +54,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IMTService.cs" />
-    <Compile Include="FiskmöMTEngine.cs" />
-    <Compile Include="FiskmöMTOptions.cs" />
-    <Compile Include="FiskmöMTOptionsForm.cs">
+    <Compile Include="FiskmoMTEngine.cs" />
+    <Compile Include="FiskmoMTOptions.cs" />
+    <Compile Include="FiskmoMTOptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FiskmöMTOptionsForm.Designer.cs">
-      <DependentUpon>FiskmöMTOptionsForm.cs</DependentUpon>
+    <Compile Include="FiskmoMTOptionsForm.Designer.cs">
+      <DependentUpon>FiskmoMTOptionsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FiskmöMTPluginDirector.cs" />
-    <Compile Include="FiskmöMTServiceHelper.cs" />
+    <Compile Include="FiskmoMTPluginDirector.cs" />
+    <Compile Include="FiskmoMTServiceHelper.cs" />
     <Compile Include="LocalizationHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -71,18 +71,18 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="FiskmöMTSession.cs" />
+    <Compile Include="FiskmoMTSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="README.md" />
+    <Content Include="INSTALL.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FiskmöMTOptionsForm.resx">
-      <DependentUpon>FiskmöMTOptionsForm.cs</DependentUpon>
+    <EmbeddedResource Include="FiskmoMTOptionsForm.resx">
+      <DependentUpon>FiskmoMTOptionsForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

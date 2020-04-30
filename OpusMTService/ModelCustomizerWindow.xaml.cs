@@ -38,6 +38,8 @@ namespace OpusMTService
                 this.selectedModel,
                 new FileInfo(this.SourceFileBox.Text),
                 new FileInfo(this.TargetFileBox.Text),
+                new FileInfo(this.ValidSourceFileBox.Text),
+                new FileInfo(this.ValidTargetFileBox.Text),
                 this.LabelBox.Text
                 );
 

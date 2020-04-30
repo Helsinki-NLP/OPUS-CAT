@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 
-namespace FiskmöMTPlugin
+namespace FiskmoMTPlugin
 {
     /// <summary>
     /// Helper class to be able to communicate with the web service.
@@ -13,7 +13,7 @@ namespace FiskmöMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    internal class FiskmöMTServiceHelper
+    internal class FiskmoMTServiceHelper
     {
         private static DateTime TokenCodeExpires = DateTime.MinValue;
         private static string TokenCode;
@@ -29,7 +29,7 @@ namespace FiskmöMTPlugin
         /// Gets the valid token code.
         /// </summary>
         /// <returns>The token code.</returns>
-        public static string GetTokenCode(FiskmöMTOptions options)
+        public static string GetTokenCode(FiskmoMTOptions options)
         {
             if (TokenCodeExpires < DateTime.Now)
             {
@@ -66,7 +66,7 @@ namespace FiskmöMTPlugin
         /// Lists the supported languages of the dummy MT service.
         /// </summary>
         /// <returns>The list of the supported languages.</returns>
-        public static List<string> ListSupportedLanguages(FiskmöMTOptions options)
+        public static List<string> ListSupportedLanguages(FiskmoMTOptions options)
         {
             return ListSupportedLanguages(GetTokenCode(options),options.GeneralSettings.MtServicePort);
         }
@@ -95,7 +95,7 @@ namespace FiskmöMTPlugin
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The translated string.</returns>
-        public static string Translate(FiskmöMTOptions options, string input, string srcLangCode, string trgLangCode)
+        public static string Translate(FiskmoMTOptions options, string input, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
             var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
@@ -114,7 +114,7 @@ namespace FiskmöMTPlugin
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The translated strings.</returns>
-        public static List<string> BatchTranslate(FiskmöMTOptions options, List<string> input, string srcLangCode, string trgLangCode)
+        public static List<string> BatchTranslate(FiskmoMTOptions options, List<string> input, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
             var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
@@ -133,7 +133,7 @@ namespace FiskmöMTPlugin
         /// <param name="target">The target string.</param>
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
-        public static void StoreTranslation(FiskmöMTOptions options, string source, string target, string srcLangCode, string trgLangCode)
+        public static void StoreTranslation(FiskmoMTOptions options, string source, string target, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
             var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
@@ -152,7 +152,7 @@ namespace FiskmöMTPlugin
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The indices of the translation units that were succesfully stored.</returns>
-        public static int[] BatchStoreTranslation(FiskmöMTOptions options, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
+        public static int[] BatchStoreTranslation(FiskmoMTOptions options, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
             var proxy = getNewProxy(options.GeneralSettings.MtServicePort);

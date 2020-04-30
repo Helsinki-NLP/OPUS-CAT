@@ -21,7 +21,7 @@ namespace OpusMTService
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             // Process unhandled exception
-
+            MessageBox.Show($"A fatal exception occurred. See details in log file. Exception: {e.Exception.Message}", "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
             Log.Error(e.Exception.ToString());
         }
 

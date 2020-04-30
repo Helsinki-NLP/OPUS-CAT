@@ -38,7 +38,6 @@
             this.downloadProgress = new System.Windows.Forms.ProgressBar();
             this.Customize_btn = new System.Windows.Forms.Button();
             this.groupBoxCon = new System.Windows.Forms.GroupBox();
-            this.mtServicePortBox = new System.Windows.Forms.TextBox();
             this.mtServicePortLabel = new System.Windows.Forms.Label();
             this.mtOriginCheckbox = new System.Windows.Forms.CheckBox();
             this.pregenerateCheckbox = new System.Windows.Forms.CheckBox();
@@ -47,6 +46,7 @@
             this.aboutBox = new System.Windows.Forms.RichTextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.useAllModelsCheckBox = new System.Windows.Forms.CheckBox();
+            this.maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
             this.tabPage1.SuspendLayout();
             this.groupBoxCon.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -121,7 +121,7 @@
             // 
             // groupBoxCon
             // 
-            this.groupBoxCon.Controls.Add(this.mtServicePortBox);
+            this.groupBoxCon.Controls.Add(this.maskedTextBox1);
             this.groupBoxCon.Controls.Add(this.mtServicePortLabel);
             this.groupBoxCon.Controls.Add(this.mtOriginCheckbox);
             this.groupBoxCon.Controls.Add(this.pregenerateCheckbox);
@@ -133,13 +133,6 @@
             this.groupBoxCon.TabIndex = 24;
             this.groupBoxCon.TabStop = false;
             this.groupBoxCon.Text = "Settings";
-            // 
-            // mtServicePortBox
-            // 
-            this.mtServicePortBox.Location = new System.Drawing.Point(132, 60);
-            this.mtServicePortBox.Name = "mtServicePortBox";
-            this.mtServicePortBox.Size = new System.Drawing.Size(100, 26);
-            this.mtServicePortBox.TabIndex = 21;
             // 
             // mtServicePortLabel
             // 
@@ -228,6 +221,13 @@
             this.useAllModelsCheckBox.Text = "Use all available models";
             this.useAllModelsCheckBox.UseVisualStyleBackColor = true;
             // 
+            // maskedTextBox1
+            // 
+            this.maskedTextBox1.Location = new System.Drawing.Point(128, 60);
+            this.maskedTextBox1.Name = "maskedTextBox1";
+            this.maskedTextBox1.Size = new System.Drawing.Size(103, 26);
+            this.maskedTextBox1.TabIndex = 22;
+            // 
             // FiskmoConfDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -270,7 +270,7 @@
         private System.Windows.Forms.CheckBox mtOriginCheckbox;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.CheckBox useAllModelsCheckBox;
-        private System.Windows.Forms.TextBox mtServicePortBox;
         private System.Windows.Forms.Label mtServicePortLabel;
+        private System.Windows.Forms.MaskedTextBox maskedTextBox1;
     }
 }

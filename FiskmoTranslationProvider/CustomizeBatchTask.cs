@@ -9,6 +9,7 @@ using Sdl.ProjectAutomation.Core;
 
 namespace FiskmoTranslationProvider
 {
+    /* 
     [AutomaticTask("My_Custom_Batch_Task_ID",
                    "My_Custom_Batch_Task_Name",
                    "My_Custom_Batch_Task_Description",
@@ -17,6 +18,7 @@ namespace FiskmoTranslationProvider
     //[TODO] You can change the file type according to your needs
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
     [RequiresSettings(typeof(CustomizeBatchTaskSettings), typeof(CustomizeBatchTaskSettingsPage))]
+    */
     class CustomizeBatchTask : AbstractFileContentProcessingAutomaticTask
     {
         internal List<Tuple<string, string>> ProjectTranslations;

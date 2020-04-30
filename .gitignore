@@ -18,3 +18,5 @@
 /OpusMTSetup/obj/Debug
 /packages
 *.cache
+/.vs/FiskmoTranslationProvider/v16
+/UpgradeLog.htm

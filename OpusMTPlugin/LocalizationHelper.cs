@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MemoQ.MTInterfaces;
 
-namespace FiskmöMTPlugin
+namespace FiskmoMTPlugin
 {
     /// <summary>
     /// Singleton helper class to be able to localize the plugin's textual information.
@@ -71,10 +71,10 @@ namespace FiskmöMTPlugin
         public string GetResourceString(string key)
         {
             // try to get the localized text from the environment
-            string localizedText = environment.GetResourceString(FiskmöMTPluginDirector.PluginId, key);
+            string localizedText = environment.GetResourceString(FiskmoMTPluginDirector.PluginId, key);
 
             // use the default texts if the environment returns with null
-            if (localizedText == $"MTPlugin.{FiskmöMTPluginDirector.PluginId}.{key}" || string.IsNullOrEmpty(localizedText))
+            if (localizedText == $"MTPlugin.{FiskmoMTPluginDirector.PluginId}.{key}" || string.IsNullOrEmpty(localizedText))
                 localizedText = defaultTexts[key];
 
             return localizedText;

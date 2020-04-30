@@ -1,6 +1,6 @@
-﻿namespace FiskmöMTPlugin
+﻿namespace FiskmoMTPlugin
 {
-    partial class FiskmöMTOptionsForm
+    partial class FiskmoMTOptionsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FiskmöMTOptionsForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FiskmoMTOptionsForm));
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.lnkRetrieveLangs = new System.Windows.Forms.LinkLabel();

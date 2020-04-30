@@ -162,6 +162,7 @@ namespace FiskmoTranslationProvider
             //${ TOKENIZER}/ remove - non - printing - char.perl |
             //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
             //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
+            
             var sourceSentence = MosesPreprocessor.RunMosesPreprocessing(rawSourceSentence,this.TargetCode);
             sourceSentence = this.PreprocessSpaces(sourceSentence);
             

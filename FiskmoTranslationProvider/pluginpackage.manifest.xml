@@ -6,25 +6,6 @@
   <Author></Author>
   <RequiredProduct name="SDLTradosStudio" minversion="15.0" />
   <Include>
-    <File>Newtonsoft.Json.dll</File>
-    <File>libbz2.dll</File>
-    <File>marian-decoder.exe</File>
-    <File>msvcp140.dll</File>
-    <File>vcruntime140.dll</File>
-    <File>process.exe</File>
-    <File>spm_decode.exe</File>
-    <File>spm_encode.exe</File>
-    <File>apply_bpe.exe</File>
-    <File>StartSentencePieceMtPipe.bat</File>
-    <File>StartMosesBpeMtPipe.bat</File>
-    <File>boost_chrono-vc140-mt-1_60.dll</File>
-    <File>boost_timer-vc140-mt-1_60.dll</File>
-    <File>boost_iostreams-vc140-mt-1_60.dll</File>
-    <File>boost_system-vc140-mt-1_60.dll</File>
-    <File>boost_zlib-vc140-mt-1_60.dll</File>
-    <File>LICENSE.rtf</File>
-    <File>lgpl-3.0.txt</File>
-    <File>LICENSE_1_0.txt</File>
-    <File>MIT_LICENSE</File>
+	  <File>LICENSE.rtf</File>
   </Include>
 </PluginPackage>

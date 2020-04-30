@@ -1,4 +1,4 @@
-﻿namespace FiskmöMTPlugin
+﻿namespace FiskmoMTPlugin
 {
     /// <summary>
     /// Class for storing the Dummy MT plugin settings.
@@ -9,12 +9,12 @@
 	///     - The options class is a simple entity class, does not call any services, and simply gives back the saved or the default settings.
 	///     - The options class does not store/load its own settings.
     /// </remarks>
-    public class FiskmöMTOptions : MemoQ.MTInterfaces.PluginSettingsObject<FiskmöMTGeneralSettings, FiskmöMTSecureSettings>
+    public class FiskmoMTOptions : MemoQ.MTInterfaces.PluginSettingsObject<FiskmöMTGeneralSettings, FiskmöMTSecureSettings>
     {
         /// <summary>
         /// Create instance by deserializing from provided serialized settings.
         /// </summary>
-        public FiskmöMTOptions(MemoQ.MTInterfaces.PluginSettings serializedSettings)
+        public FiskmoMTOptions(MemoQ.MTInterfaces.PluginSettings serializedSettings)
             : base(serializedSettings)
         {
         }
@@ -22,7 +22,7 @@
         /// <summary>
         /// Create instance by providing the settings objects.
         /// </summary>
-        public FiskmöMTOptions(FiskmöMTGeneralSettings generalSettings, FiskmöMTSecureSettings secureSettings)
+        public FiskmoMTOptions(FiskmöMTGeneralSettings generalSettings, FiskmöMTSecureSettings secureSettings)
             : base(generalSettings, secureSettings)
         {
         }

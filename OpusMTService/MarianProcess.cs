@@ -188,7 +188,7 @@ namespace OpusMTService
 
             if (this.sentencePiecePostProcess)
             {
-                translation = (translation.Replace(" ", "")).Replace("▁", " ");
+                translation = (translation.Replace(" ", "")).Replace("▁", " ").Trim();
             }
 
             return translation;

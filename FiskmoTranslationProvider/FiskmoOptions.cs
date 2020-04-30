@@ -30,71 +30,56 @@ namespace FiskmoTranslationProvider
 
         public string mtServicePort
         {
-            get { return GetStringParameter("mtServicePort"); }
+            get 
+            {
+                var parameter = GetStringParameter("mtServicePort");
+                if (parameter == "" || parameter == null)
+                {
+                    return FiskmoTpSettings.Default.MtServicePort;
+                }
+                else
+                {
+                    return parameter;
+                }
+            }
             set { SetStringParameter("mtServicePort", value); }
         }
 
-        public string languageDirection
-        {
-            get { return GetStringParameter("languageDirection"); }
-            set { SetStringParameter("languageDirection", value); }
-        }
-
-        public Boolean useAllModels
+        /*public Boolean useAllModels
         {
             get { return GetBooleanParameter("useAllModels"); }
             set { SetBooleanParameter("useAllModels", value); }
-        }
+        }*/
 
-        public string serverAddress
+        /*public string serverAddress
         {
             get { return GetStringParameter("serverAddress"); }
             set { SetStringParameter("serverAddress", value); }
-        }
-        public string port
+        }*/
+
+        /*public string port
         {
             get { return GetStringParameter("port"); }
             set { SetStringParameter("port", value); }
         }
+
         public string client
         {
             get { return GetStringParameter("client"); }
             set { SetStringParameter("client", value); }
-        }
-        public string pregenerateMt
+        }*/
+
+        public Boolean pregenerateMt
         {
-            get { return GetStringParameter("pregenerateMt"); }
-            set { SetStringParameter("pregenerateMt", value); }
+            get { return GetBooleanParameter("pregenerateMt"); }
+            set { SetBooleanParameter("pregenerateMt", value); }
+        }
+        public Boolean showMtAsOrigin
+        {
+            get { return GetBooleanParameter("showMtAsOrigin"); }
+            set { SetBooleanParameter("showMtAsOrigin", value); }
         }
 
-        public string showMtAsOrigin
-        {
-            get { return GetStringParameter("showMtAsOrigin"); }
-            set { SetStringParameter("showMtAsOrigin", value); }
-        }
-
-        public string subject
-        {
-            get { return GetStringParameter("subject"); }
-            set { SetStringParameter("subject", value); }
-        }
-
-        public string otherFeatures
-        {
-            get { return GetStringParameter("other_features"); }
-            set { SetStringParameter("other_features", value); }
-        }
-
-        public string languageDirectionSource
-        {
-            get { return GetStringParameter("languageDirectionSource"); }
-            set { SetStringParameter("languageDirectionSource", value); }
-        }
-        public string languageDirectionTarget
-        {
-            get { return GetStringParameter("languageDirectionTarget"); }
-            set { SetStringParameter("languageDirectionTarget", value); }
-        }
 
         
 

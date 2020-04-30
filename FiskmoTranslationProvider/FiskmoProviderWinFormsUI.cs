@@ -27,8 +27,8 @@ namespace FiskmoTranslationProvider
         #region "Browse"
         public ITranslationProvider[] Browse(IWin32Window owner, LanguagePair[] languagePairs, ITranslationProviderCredentialStore credentialStore)
         {
-            FiskmoConfDialog dialog = new FiskmoConfDialog(new FiskmoOptions(),languagePairs);
-            
+            FiskmoOptionsFormWPF dialog = new FiskmoOptionsFormWPF(new FiskmoOptions(), languagePairs);
+             
             if (dialog.ShowDialog(owner) == DialogResult.OK)
             {
                 FiskmoProvider testProvider = new FiskmoProvider(dialog.Options);
@@ -71,7 +71,7 @@ namespace FiskmoTranslationProvider
                 return false;
             }
 
-            FiskmoConfDialog dialog = new FiskmoConfDialog(editProvider.Options,languagePairs);
+            FiskmoOptionsFormWPF dialog = new FiskmoOptionsFormWPF(new FiskmoOptions(), languagePairs);
             if (dialog.ShowDialog(owner) == DialogResult.OK)
             {
                 editProvider.Options = dialog.Options;

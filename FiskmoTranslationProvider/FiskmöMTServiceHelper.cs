@@ -16,6 +16,7 @@ namespace FiskmoTranslationProvider
     /// </remarks>
     internal class FiskmöMTServiceHelper
     {
+        private static Random rng = new Random();
         private static DateTime TokenCodeExpires = DateTime.MinValue;
         private static string TokenCode;
 
@@ -154,9 +155,15 @@ namespace FiskmoTranslationProvider
         internal static void Customize(string mtServicePort, List<Tuple<string, string>> projectTranslations, string sourceCode, string targetCode)
         {
             var proxy = getNewProxy(mtServicePort);
+
+            //Pick out 200 sentence pairs randomly to use as tuning set
+            var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
+            var trainingSet = projectTranslations.Skip(200).ToList();
+            var tuningSet = projectTranslations.Take(200).ToList();
+
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(mtServicePort), projectTranslations, sourceCode, targetCode);
+                proxy.Customize(GetTokenCode(mtServicePort), trainingSet, tuningSet, sourceCode, targetCode);
             }
         }
         
