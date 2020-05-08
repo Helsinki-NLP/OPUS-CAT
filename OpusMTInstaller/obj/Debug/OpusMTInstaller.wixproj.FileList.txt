@@ -1,0 +1,7 @@
+obj\Debug\Product.wixobj
+C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTInstaller\bin\Debug\cab1.cab
+C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTInstaller\bin\Debug\OpusMTInstaller.msi
+C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTInstaller\bin\Debug\OpusMTInstaller.wixpdb
+obj\Debug\OpusMTInstaller.wixproj.BindContentsFileListnull.txt
+obj\Debug\OpusMTInstaller.wixproj.BindOutputsFileListnull.txt
+obj\Debug\OpusMTInstaller.wixproj.BindBuiltOutputsFileListnull.txt

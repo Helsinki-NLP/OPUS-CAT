@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     /// <summary>
     /// Interaction logic for ListBoxWithControls.xaml

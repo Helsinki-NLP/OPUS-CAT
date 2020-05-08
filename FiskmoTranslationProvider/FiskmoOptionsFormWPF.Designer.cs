@@ -33,10 +33,9 @@
             // 
             // wpfHost
             // 
-            this.wpfHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.wpfHost.Location = new System.Drawing.Point(0, 0);
             this.wpfHost.Name = "wpfHost";
-            this.wpfHost.Size = new System.Drawing.Size(800, 450);
+            this.wpfHost.Size = new System.Drawing.Size(797, 454);
             this.wpfHost.TabIndex = 0;
             this.wpfHost.Text = "elementHost1";
             this.wpfHost.Child = null;

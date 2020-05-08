@@ -129,6 +129,15 @@
       <Link>IMTService.cs</Link>
     </Compile>
     <Compile Include="FileReader.cs" />
+    <Compile Include="FinetuneBatchTaskControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FinetuneBatchTaskControl.Designer.cs">
+      <DependentUpon>FinetuneBatchTaskControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FinetuneWpfControl.xaml.cs">
+      <DependentUpon>FinetuneWpfControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FiskmoOptionControl.xaml.cs">
       <DependentUpon>FiskmoOptionControl.xaml</DependentUpon>
     </Compile>
@@ -152,12 +161,9 @@
     <Compile Include="FiskmöMTServiceHelper.cs" />
     <Compile Include="MarianProcess.cs" />
     <Compile Include="ModelManager.cs" />
-    <Compile Include="CustomizeBatchTask.cs" />
-    <Compile Include="CustomizeBatchTaskSettings.cs" />
-    <Compile Include="CustomizeBatchTaskSettingsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="CustomizeBatchTaskSettingsPage.cs" />
+    <Compile Include="FinetuneBatchTask.cs" />
+    <Compile Include="FinetuneBatchTaskSettings.cs" />
+    <Compile Include="FinetuneBatchTaskSettingsPage.cs" />
     <Compile Include="PluginResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -181,6 +187,9 @@
     <None Include="Resources\fiskmo_7sA_icon.ico" />
     <None Include="Resources\fiskmo_icon.ico" />
     <None Include="Resources\fiskmo.png" />
+    <EmbeddedResource Include="FinetuneBatchTaskControl.resx">
+      <DependentUpon>FinetuneBatchTaskControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FiskmoOptionsFormWPF.resx">
       <DependentUpon>FiskmoOptionsFormWPF.cs</DependentUpon>
     </EmbeddedResource>
@@ -197,6 +206,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="FinetuneWpfControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FiskmoOptionControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

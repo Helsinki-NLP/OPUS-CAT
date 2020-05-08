@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     public partial class ModelCustomizerWindow : Window
     {

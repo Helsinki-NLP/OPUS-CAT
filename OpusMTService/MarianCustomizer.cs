@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using YamlDotNet.Serialization;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
 
     class MarianCustomizer

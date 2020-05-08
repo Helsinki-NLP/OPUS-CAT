@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     /// <summary>
     /// This class replicates preprocessing steps from three perl scripts within

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     public class MarianTrainerConfig
     {
@@ -33,6 +33,11 @@ namespace OpusMTService
         [YamlMember(Alias = "after-epochs", ApplyNamingConventions = false)]
         public string afterEpochs { get; set; }
         public string workspace { get; set; }
+
+        [YamlMember(Alias = "gradient-checkpointing", ApplyNamingConventions = false)]
+        public string gradientCheckpointing { get; set; }
+        [YamlMember(Alias = "shuffle-in-ram", ApplyNamingConventions = false)]
+        public string shuffleInRam { get; set; }
 
     }
 }

@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml

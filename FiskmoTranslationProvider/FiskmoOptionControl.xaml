@@ -5,25 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <StackPanel>
-            <DockPanel>
-                <Label>MT service port (1024-65535)</Label>
-                <TextBox Name="ServicePortBoxElement" Text="{Binding Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
-            </DockPanel>
-            <DockPanel>
-                <Label>Pregenerate MT</Label>
-                <CheckBox IsEnabled="{Binding Path=PregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </DockPanel>
-            <DockPanel>
-                <Label>Show MT as origin</Label>
-                <CheckBox IsEnabled="{Binding Path=ShowMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </DockPanel>
-            <DockPanel>
-                <Button HorizontalAlignment="Left" Width="100" Click="save_Click">Save</Button>
-                <Button HorizontalAlignment="Left" Width="100" Click="cancel_Click">Cancel</Button>
-            </DockPanel>
-        </StackPanel>
-    </Grid>
+             d:DesignHeight="140" d:DesignWidth="250">
+    <StackPanel>
+        <Border BorderThickness="1" BorderBrush="Black">
+        <Grid Margin="10,10,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="70" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+        
+            <Label HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0">MT service port (1024-65535)</Label>
+            <TextBox VerticalAlignment="Center" Grid.Column="1"  Grid.Row="0" HorizontalAlignment="Stretch" Name="ServicePortBoxElement" Text="{Binding Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>
+
+            <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">Pregenerate MT</Label>
+            <CheckBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding Path=PregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right">Show MT as origin</Label>
+            <CheckBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding Path=ShowMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+        </Grid>
+        </Border>
+        <DockPanel Margin="10,5,10,0">
+            <Button HorizontalAlignment="Left"  Click="save_Click">Save</Button>
+            <Button HorizontalAlignment="Right" Click="cancel_Click">Cancel</Button>
+        </DockPanel>
+    </StackPanel>
 </UserControl>

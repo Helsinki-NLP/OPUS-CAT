@@ -8,3 +8,5 @@ workspace: 4092
 valid-freq: 100u
 valid-metrics:
 - bleu
+gradient-checkpointing: true
+shuffle-in-ram: true

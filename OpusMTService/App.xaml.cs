@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     /// <summary>
     /// Interaction logic for App.xaml

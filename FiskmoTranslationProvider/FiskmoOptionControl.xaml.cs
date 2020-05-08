@@ -39,8 +39,14 @@ namespace FiskmoTranslationProvider
 
         public FiskmoOptionControl(FiskmoOptionsFormWPF hostForm, FiskmoOptions options)
         {
+            this.DataContext = this;
             InitializeComponent();
+
             this.options = options;
+
+            //Null indicates that all properties have changed. Populates the WPF form
+            PropertyChanged(this, new PropertyChangedEventArgs(null));
+
             this.hostForm = hostForm;
         }
 
@@ -116,11 +122,6 @@ namespace FiskmoTranslationProvider
         public string Error
         {
             get { return "...."; }
-        }
-
-        public FiskmoOptionControl()
-        {
-            InitializeComponent();
         }
 
         private void cancel_Click(object sender, RoutedEventArgs e)

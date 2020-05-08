@@ -6,7 +6,7 @@ using System.ServiceModel.Web;
 using OpusMTInterface;
 using Serilog;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
 
     class Service

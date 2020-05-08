@@ -20,5 +20,6 @@ namespace FiskmoTranslationProvider
         }
 
         public FiskmoOptions Options { get; internal set; }
+
     }
 }

@@ -18,7 +18,7 @@ using System.Windows;
 using System.Xml.Linq;
 using static System.Environment;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     /// <summary>
     /// This class contains methods for checking and downloading latest models from

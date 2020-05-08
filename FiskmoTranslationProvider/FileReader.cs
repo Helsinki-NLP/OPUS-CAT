@@ -2,21 +2,53 @@
 
 using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace FiskmoTranslationProvider
 {
     public class FileReader : AbstractBilingualContentProcessor
     {
         internal List<Tuple<string,string>> FileTranslations;
-        private object _settings;
+        internal List<string> FileNewSegments;
+        internal List<Tuple<string, string>> TmFuzzies;
+        private FinetuneBatchTaskSettings settings;
         private string localFilePath;
+        Dictionary<Language, List<ITranslationProvider>> tms;
 
-        public FileReader()
+        public FileReader(Dictionary<Language, List<ITranslationProvider>> tms, FinetuneBatchTaskSettings settings)
         {
+            this.settings = settings;
             this.FileTranslations = new List<Tuple<string, string>>();
+            this.FileNewSegments = new List<string>();
+            this.TmFuzzies = new List<Tuple<string, string>>();
+            this.tms = tms;
+        }
+
+        private string ExtractSegmentText(ISegment segment)
+        {
+            if (segment.ToString().Contains("\n"))
+            {
+                return "";
+            }
+            StringBuilder segmentText = new StringBuilder();
+            foreach (var item in segment.AllSubItems)
+            {
+                if (item is IText)
+                {
+                    segmentText.Append(item);
+                }
+                else if (settings.IncludePlaceholderTags && item is IPlaceholderTag)
+                {
+                    //segmentText.Append(((IPlaceholderTag)item).TagProperties.DisplayText);
+                    segmentText.Append("PLACEHOLDER");
+                }
+            }
+
+            return segmentText.ToString();
         }
 
         public override void ProcessParagraphUnit(IParagraphUnit paragraphUnit)
@@ -28,21 +60,24 @@ namespace FiskmoTranslationProvider
                 return;
             }
 
-            // If the paragraph contains segment pairs, we loop through them,
-            // determine their confirmation status, and depending on the status
-            // output the text content to a TXT file
             foreach (ISegmentPair segmentPair in paragraphUnit.SegmentPairs)
             {
                 if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Translated ||
                         segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.ApprovedTranslation)
                 {
-                    var allSourceTextItems = segmentPair.Source.AllSubItems.Where(x => x is IText);
-                    var sourceText = String.Join(" ", allSourceTextItems);
+                    FileTranslations.Add(new Tuple<string, string>(
+                        this.ExtractSegmentText(segmentPair.Source),
+                        this.ExtractSegmentText(segmentPair.Target)));
+                }
+                else
+                {
+                    //If segment does not have translation, add it to new strings and look for fuzzies
+                    FileNewSegments.Add(this.ExtractSegmentText(segmentPair.Source));
 
-                    var allTargetTextItems = segmentPair.Target.AllSubItems.Where(x => x is IText);
-                    var targetText = String.Join(" ", allTargetTextItems);
-
-                    FileTranslations.Add(new Tuple<string, string>(sourceText, targetText));
+                    foreach (var tm in this.tms)
+                    {
+                        
+                    }
                 }
             }
         }

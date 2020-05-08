@@ -11,7 +11,7 @@ using System.Management;
 using System.Text.RegularExpressions;
 using Serilog;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     public class MarianProcess
     {

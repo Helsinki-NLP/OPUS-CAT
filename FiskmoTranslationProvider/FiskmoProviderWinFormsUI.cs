@@ -71,7 +71,7 @@ namespace FiskmoTranslationProvider
                 return false;
             }
 
-            FiskmoOptionsFormWPF dialog = new FiskmoOptionsFormWPF(new FiskmoOptions(), languagePairs);
+            FiskmoOptionsFormWPF dialog = new FiskmoOptionsFormWPF(editProvider.Options, languagePairs);
             if (dialog.ShowDialog(owner) == DialogResult.OK)
             {
                 editProvider.Options = dialog.Options;

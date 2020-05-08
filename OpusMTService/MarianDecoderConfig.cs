@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     public class MarianDecoderConfig
     {

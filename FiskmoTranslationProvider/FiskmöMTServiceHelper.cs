@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
+using System.Windows;
 
 namespace FiskmoTranslationProvider
 {
@@ -24,7 +25,8 @@ namespace FiskmoTranslationProvider
         {
             
             var epAddr = new EndpointAddress($"net.tcp://localhost:{port}/MTService");
-            return ChannelFactory<IMTService>.CreateChannel(new NetTcpBinding(), epAddr);
+            var proxy = ChannelFactory<IMTService>.CreateChannel(new NetTcpBinding(), epAddr);
+            return proxy;
         }
 
         /// <summary>
@@ -40,10 +42,19 @@ namespace FiskmoTranslationProvider
                 // refresh the token code
                 // Always dispose allocated resources
                 var proxy = getNewProxy(mtServicePort);
-                using (proxy as IDisposable)
+                try
                 {
-                    TokenCode = proxy.Login("user", "user");
-                    TokenCodeExpires = DateTime.Now.AddMinutes(1);
+                    using (proxy as IDisposable)
+                    {
+                        TokenCode = proxy.Login("user", "user");
+                        TokenCodeExpires = DateTime.Now.AddMinutes(1);
+                    }
+                }
+                catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
+                {
+                    MessageBox.Show(
+                        "No connection to Fiskmö MT service. Check that the MT service is running and that both plugin and MT service use same port numbers.");
+                    throw ex;
                 }
             }
 

@@ -5,7 +5,7 @@ using System.ServiceModel;
 using System.Threading;
 using OpusMTInterface;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
 
 

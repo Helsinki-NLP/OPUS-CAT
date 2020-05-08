@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace OpusMTService
+namespace FiskmoMTEngine
 {
     /// <summary>
     /// Small helper class to be able to generate random token codes.
