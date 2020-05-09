@@ -17,13 +17,13 @@ namespace FiskmoMTEngine
             if (onlyNetTcp)
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{OpusMTServiceSettings.Default.MtServicePort}/")
+                    new Uri($"net.tcp://localhost:{FiskmoMTEngineSettings.Default.MtServicePort}/")
                 };
             }
             else
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{OpusMTServiceSettings.Default.MtServicePort}/"),
+                    new Uri($"net.tcp://localhost:{FiskmoMTEngineSettings.Default.MtServicePort}/"),
                     new Uri($"http://localhost:8500/") };
             };
 

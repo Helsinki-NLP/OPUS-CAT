@@ -13,11 +13,11 @@ namespace FiskmoMTEngine {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
-    internal sealed partial class OpusMTServiceSettings : global::System.Configuration.ApplicationSettingsBase {
+    internal sealed partial class FiskmoMTEngineSettings : global::System.Configuration.ApplicationSettingsBase {
         
-        private static OpusMTServiceSettings defaultInstance = ((OpusMTServiceSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new OpusMTServiceSettings())));
+        private static FiskmoMTEngineSettings defaultInstance = ((FiskmoMTEngineSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new FiskmoMTEngineSettings())));
         
-        public static OpusMTServiceSettings Default {
+        public static FiskmoMTEngineSettings Default {
             get {
                 return defaultInstance;
             }
@@ -68,6 +68,30 @@ namespace FiskmoMTEngine {
             }
             set {
                 this["CustomizationBaseConfig"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("translations.sqlite")]
+        public string TranslationDBName {
+            get {
+                return ((string)(this["TranslationDBName"]));
+            }
+            set {
+                this["TranslationDBName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("logs")]
+        public string LogDir {
+            get {
+                return ((string)(this["LogDir"]));
+            }
+            set {
+                this["LogDir"] = value;
             }
         }
     }

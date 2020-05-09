@@ -65,7 +65,7 @@ namespace FiskmoMTEngine
             var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
 
             MarianTrainerConfig trainingConfig;
-            using (var reader = new StreamReader(OpusMTServiceSettings.Default.CustomizationBaseConfig))
+            using (var reader = new StreamReader(FiskmoMTEngineSettings.Default.CustomizationBaseConfig))
             {
                 trainingConfig = deserializer.Deserialize<MarianTrainerConfig>(reader);
             }

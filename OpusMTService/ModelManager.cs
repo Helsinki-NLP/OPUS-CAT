@@ -94,7 +94,7 @@ namespace FiskmoMTEngine
             this.GetOnlineModels();
             this.opusModelDir = new DirectoryInfo(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusMTServiceSettings.Default.LocalFiskmoDir,
+                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
                 "models"));
             if (!this.OpusModelDir.Exists)
             {
@@ -108,12 +108,20 @@ namespace FiskmoMTEngine
         {
             this.onlineModels = new List<MTModel>();
 
-            Log.Information($"Fetching a list of online models from {OpusMTServiceSettings.Default.ModelStorageUrl}");
+            Log.Information($"Fetching a list of online models from {FiskmoMTEngineSettings.Default.ModelStorageUrl}");
             using (var client = new WebClient())
             {
                 client.DownloadStringCompleted += modelListDownloadComplete;
-                client.DownloadStringAsync(new Uri(OpusMTServiceSettings.Default.ModelStorageUrl));
+                client.DownloadStringAsync(new Uri(FiskmoMTEngineSettings.Default.ModelStorageUrl));
             }
+        }
+
+        internal List<string> BatchTranslate(List<string> input, string srcLangCode, string trgLangCode)
+        {
+            MTModel mtModel;
+            mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+
+            return mtModel.BatchTranslate(input);
         }
 
         private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
@@ -141,7 +149,7 @@ namespace FiskmoMTEngine
                 using (var client = new WebClient())
                 {
                     client.DownloadStringCompleted += modelListDownloadComplete;
-                    var uriBuilder = new UriBuilder(OpusMTServiceSettings.Default.ModelStorageUrl);
+                    var uriBuilder = new UriBuilder(FiskmoMTEngineSettings.Default.ModelStorageUrl);
                     var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                     query["marker"] = nextMarker.Value;
                     uriBuilder.Query = query.ToString();
@@ -269,11 +277,17 @@ namespace FiskmoMTEngine
             return null;
         }
 
-
-
         internal string Translate(string input, string srcLangCode, string trgLangCode)
         {
 
+            MTModel mtModel;
+            mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+            
+            return mtModel.Translate(input);
+        }
+
+        private MTModel GetPrimaryModel(string srcLangCode, string trgLangCode)
+        {
             //The language codes can be 3 or 2 letter formats, and the code may contain a
             //region specifier (e.g. swe-FI). Normalize everything as 2 letter codes for now.
 
@@ -288,15 +302,6 @@ namespace FiskmoMTEngine
                 trgLangCode = this.ConvertIsoCode(trgLangCode);
             }
 
-            MTModel mtModel;
-
-            mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
-            
-            return mtModel.Translate(input);
-        }
-
-        private MTModel GetPrimaryModel(string srcLangCode, string trgLangCode)
-        {
             var languagePairModels = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode));
             MTModel primaryModel;
             var prioritizedModels = languagePairModels.Where(x => x.Prioritized);
@@ -351,7 +356,7 @@ namespace FiskmoMTEngine
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{OpusMTServiceSettings.Default.ModelStorageUrl}{newerModel}.zip";
+                var modelUrl = $"{FiskmoMTEngineSettings.Default.ModelStorageUrl}{newerModel}.zip";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }

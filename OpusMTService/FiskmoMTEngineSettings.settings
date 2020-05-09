@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OpusMTService" GeneratedClassName="OpusMTServiceSettings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FiskmoMTEngine" GeneratedClassName="FiskmoMTEngineSettings">
   <Profiles />
   <Settings>
     <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
@@ -13,6 +13,12 @@
     </Setting>
     <Setting Name="CustomizationBaseConfig" Type="System.String" Scope="User">
       <Value Profile="(Default)">customize.yml</Value>
+    </Setting>
+    <Setting Name="TranslationDBName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">translations.sqlite</Value>
+    </Setting>
+    <Setting Name="LogDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">logs</Value>
     </Setting>
   </Settings>
 </SettingsFile>

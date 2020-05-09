@@ -117,5 +117,11 @@ namespace FiskmoMTEngine
         public string Path { get; internal set; }
         public string InstallDir { get; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
+
+        internal List<string> BatchTranslate(List<string> input)
+        {
+            var batchProcess = new MarianBatchTranslator();
+
+        }
     }
 }

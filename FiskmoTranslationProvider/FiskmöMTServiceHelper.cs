@@ -82,10 +82,7 @@ namespace FiskmoTranslationProvider
             }
         }
         
-        /// <summary>
-        /// Lists the supported languages of the dummy MT service.
-        /// </summary>
-        /// <returns>The list of the supported languages.</returns>
+        
         public static List<string> ListSupportedLanguages(FiskmoOptions options)
         {
             return ListSupportedLanguages(GetTokenCode(options),options.mtServicePort);

@@ -79,7 +79,7 @@ namespace FiskmoMTEngine
                         }
                         else
                         {
-                            if (this.ServicePortBox != OpusMTServiceSettings.Default.MtServicePort)
+                            if (this.ServicePortBox != FiskmoMTEngineSettings.Default.MtServicePort)
                             {
                                 this.SaveButtonEnabled = true;
                             }
@@ -114,7 +114,7 @@ namespace FiskmoMTEngine
             Log.Information("Starting Fiskmö MT service");
             this.StartService();
             InitializeComponent();
-            this.ServicePortBox = OpusMTServiceSettings.Default.MtServicePort;
+            this.ServicePortBox = FiskmoMTEngineSettings.Default.MtServicePort;
         }
 
         private void StartService()
@@ -134,8 +134,8 @@ namespace FiskmoMTEngine
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
-            OpusMTServiceSettings.Default.MtServicePort = this.ServicePortBox;
-            OpusMTServiceSettings.Default.Save();
+            FiskmoMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
+            FiskmoMTEngineSettings.Default.Save();
             this.SaveButtonEnabled = false;
         }
 

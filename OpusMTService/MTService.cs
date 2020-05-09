@@ -61,7 +61,7 @@ namespace FiskmoMTEngine
         /// <returns>The translated input string.</returns>
         public string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode)
         {
-         
+            
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
@@ -99,12 +99,8 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            List<string> result = new List<string>();
-            foreach (string item in input)
-            {
-                result.Add(this.ModelManager.Translate(item, srcLangCode, trgLangCode));
-            }
-
+            List<string> result = this.ModelManager.BatchTranslate(input, srcLangCode, trgLangCode);
+            
             return result;
         }
 

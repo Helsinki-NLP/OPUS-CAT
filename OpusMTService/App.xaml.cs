@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.ServiceModel;
@@ -25,14 +27,48 @@ namespace FiskmoMTEngine
             Log.Error(e.Exception.ToString());
         }
 
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private void SetupLogging()
         {
-            
-            Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            var logDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
+                FiskmoMTEngineSettings.Default.LogDir);
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File("logs\\fiskmö_log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(Path.Combine(logDir, "fiskmö_log.txt"), rollingInterval: RollingInterval.Day)
                 .CreateLogger();
+        }
+
+        private void SetupTranslationDb()
+        {
+            var translationDb = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
+                FiskmoMTEngineSettings.Default.TranslationDBName);
+            if (!File.Exists(translationDb))
+            {
+                SQLiteConnection.CreateFile(translationDb);
+                using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+                {
+                    m_dbConnection.Open();
+
+                    string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, PRIMARY KEY (model,sourcetext))";
+
+                    using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
+            this.SetupTranslationDb();
+            this.SetupLogging();
 
             //Accessing the model storage on pouta requires this.
             Log.Information("Setting Tls12 as security protocol (required for accessing online model storage");

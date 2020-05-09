@@ -16,19 +16,13 @@ using System.Windows.Controls.Primitives;
 
 namespace FiskmoMTEngine
 {
-    public class MarianProcess
+    public class MarianBatchTranslator
     {
-        /*private Process tokenizeAndTruecaseProcess;
-        private Process bpeProcess;
-        private Process decoderProcess;*/
-        private Process mtPipe;
         private string langpair;
 
         public string SourceCode { get; }
         public string TargetCode { get; }
-        public bool Faulted { get; private set; }
-        public Process MtPipe { get => mtPipe; set => mtPipe = value; }
-
+        
         private StreamWriter utf8Writer;
         private string modelDir;
 
@@ -36,69 +30,17 @@ namespace FiskmoMTEngine
 
         private string mtPipeCmds;
         private bool sentencePiecePostProcess;
-        private static readonly Object lockObj = new Object();
-
-        //This seems like the only way to cleanly close the NMT window when Studio is closing.
-        //On some systems the unclean closing was causing an error pop-up, that's why this was added.
-        //On my dev system the was no pop-up, but the error was reported in Event Viewer.
-        private static void KillProcessAndChildren(int pid)
+        
+        public MarianBatchTranslator(string modelDir, string sourceCode, string targetCode)
         {
-            // Cannot close 'system idle process'.
-            if (pid == 0)
-            {
-                return;
-            }
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher
-                    ("Select * From Win32_Process Where ParentProcessID=" + pid);
-            ManagementObjectCollection moc = searcher.Get();
-            foreach (ManagementObject mo in moc)
-            {
-                KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
-            }
-            try
-            {
-                Process proc = Process.GetProcessById(pid);
-                proc.Kill();
-            }
-            catch (ArgumentException)
-            {
-                // Process already exited.
-            }
-        }
-
-        public MarianProcess(string modelDir, string sourceCode, string targetCode)
-        {
-            this.Faulted = false;
             this.langpair = $"{sourceCode}-{targetCode}";
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
             this.modelDir = modelDir;
             this.SystemName = $"{sourceCode}-{targetCode}_" + (new DirectoryInfo(this.modelDir)).Name;
             
-            Log.Information($"Starting MT pipe for model {this.SystemName}.");
-            //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
-            if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
-            {
-                this.mtPipeCmds = "StartSentencePieceMtPipe.bat";
-                this.sentencePiecePostProcess = true;
-            }
-            else
-            {
-                this.mtPipeCmds = "StartMosesBpeMtPipe.bat";
-                this.sentencePiecePostProcess = false;
-            }
-
-            this.MtPipe = this.StartProcessWithCmd(this.mtPipeCmds, this.modelDir);
-
-            this.utf8Writer = new StreamWriter(this.MtPipe.StandardInput.BaseStream, new UTF8Encoding(false));
-
-            AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-        }
-
-        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
-        {
-            this.ShutdownMtPipe();
-        }
+           
+         }
 
         private Process StartProcessWithCmd(string fileName, string args)
         {
@@ -111,8 +53,8 @@ namespace FiskmoMTEngine
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
             ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
-            ExternalProcess.StartInfo.RedirectStandardInput = true;
-            ExternalProcess.StartInfo.RedirectStandardOutput = true;
+            ExternalProcess.StartInfo.RedirectStandardInput = false;
+            ExternalProcess.StartInfo.RedirectStandardOutput = false;
             ExternalProcess.StartInfo.RedirectStandardError = true;
             ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
 
@@ -124,34 +66,46 @@ namespace FiskmoMTEngine
             ExternalProcess.Start();
             ExternalProcess.BeginErrorReadLine();
 
-            ExternalProcess.StandardInput.AutoFlush = true;
-
             return ExternalProcess;
         }
 
         internal List<string> BatchTranslate(List<string> input)
         {
-            throw new NotImplementedException();
+            Log.Information($"Starting batch translator for model {this.SystemName}.");
+            //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
+            if (Directory.GetFiles(this.modelDir).Any(x => new FileInfo(x).Name == "source.spm"))
+            {
+                this.mtPipeCmds = "StartSentencePieceMtPipe.bat";
+                this.sentencePiecePostProcess = true;
+            }
+            else
+            {
+                this.mtPipeCmds = "StartMosesBpeMtPipe.bat";
+                this.sentencePiecePostProcess = false;
+            }
+
+            //TODO: save input as sp temp file using the code from marian customizer
+            this.PreprocessInput(input);
+
+                //Check if batch.yml exists, if not create it from decode.yml
+
+                this.StartProcessWithCmd(this.mtPipeCmds, this.modelDir);
         }
 
-        private Process StartProcessWithRedirects(string fileName, string args)
+        private void PreprocessInput(List<string> input)
         {
-            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Process ExternalProcess = new Process();
- 
-            ExternalProcess.StartInfo.FileName = Path.Combine(pluginDir, fileName);
-            ExternalProcess.StartInfo.Arguments = args;
-            ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            ExternalProcess.StartInfo.UseShellExecute = false;
 
-            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
-            ExternalProcess.StartInfo.RedirectStandardInput = true;
-            ExternalProcess.StartInfo.RedirectStandardOutput = true;
-            ExternalProcess.StartInfo.RedirectStandardError = true;
+            var fileGuid = Guid.NewGuid();
+            var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{this.SourceCode}");
+            var 
+            using (var srcStream = new StreamWriter(srcFile, true, Encoding.UTF8))
+            {
+                foreach (var line in input)
+                {
 
-            ExternalProcess.Start();
-            
-            return ExternalProcess;
+                    srcStream.WriteLine(line);
+                }
+            }
         }
 
         private void errorDataHandler(object sender, DataReceivedEventArgs e)
@@ -159,12 +113,6 @@ namespace FiskmoMTEngine
             Log.Information(e.Data);
         }
 
-        public void ShutdownMtPipe()
-        {
-            KillProcessAndChildren(this.mtPipe.Id);
-            //Remove the event handler so it doesn't try to kill an already killed process
-            AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
-        }
         
         private string TranslateSentence(string rawSourceSentence)
         {
