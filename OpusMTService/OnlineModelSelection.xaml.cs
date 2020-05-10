@@ -42,7 +42,7 @@ namespace FiskmoMTEngine
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
             model.InstallStatus = "Extracting";
-            this.modelManager.ExtractModel(model.Path);
+            this.modelManager.ExtractModel(model.ModelPath);
             model.InstallStatus = "Installed";
             this.modelManager.GetLocalModels();
         }
@@ -54,7 +54,7 @@ namespace FiskmoMTEngine
                 MTModel selectedModel = (MTModel)selected;
                 selectedModel.InstallStatus = "Downloading";
                 this.modelManager.DownloadModel(
-                    selectedModel.Path,
+                    selectedModel.ModelPath,
                     selectedModel.DownloadProgressChanged,
                     (x,y) => DownloadCompleted(selectedModel,x,y));
             }

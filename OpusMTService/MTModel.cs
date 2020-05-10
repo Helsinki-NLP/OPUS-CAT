@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using YamlDotNet.Serialization;
 
 namespace FiskmoMTEngine
 {
@@ -62,12 +65,6 @@ namespace FiskmoMTEngine
         private string installStatus = "";
         private bool _prioritized;
 
-        public MTModel(List<string> sourceLanguages, List<string> targetLanguages, string name)
-        {
-            this.SourceLanguages = sourceLanguages;
-            this.TargetLanguages = targetLanguages;
-            this.Name = name;
-        }
 
         void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -78,6 +75,33 @@ namespace FiskmoMTEngine
         {
             this.InstallDir = installDir;
             this.ParseModelPath(modelPath);
+            
+
+            var modelTagFilePath = Path.Combine(this.InstallDir, "modeltags.txt");
+            if (File.Exists(modelTagFilePath))
+            {
+                using (var sr = new StreamReader(modelTagFilePath))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        this.ModelTags.Add(sr.ReadLine());
+                    }
+                }
+            }
+
+            this.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
+        }
+
+        private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            var modelTagFilePath = Path.Combine(this.InstallDir, "modeltags.txt");
+            using (var sw = new StreamWriter(modelTagFilePath))
+            {
+                foreach (var tag in this.ModelTags)
+                {
+                    sw.WriteLine(tag);
+                }
+            }
         }
 
         private void ParseModelPath(string modelPath)
@@ -96,7 +120,7 @@ namespace FiskmoMTEngine
             this.SourceLanguages = pathSplit[0].Split('-')[0].Split('+').ToList();
             this.TargetLanguages = pathSplit[0].Split('-')[1].Split('+').ToList();
             this.Name = pathSplit[1];
-            this.Path = modelPath;
+            this.ModelPath = modelPath;
         }
 
         public MTModel(string modelPath)
@@ -114,14 +138,16 @@ namespace FiskmoMTEngine
             get { return String.Join("+", this.TargetLanguages); }
         }
 
-        public string Path { get; internal set; }
+        public string ModelPath { get; internal set; }
         public string InstallDir { get; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
 
-        internal List<string> BatchTranslate(List<string> input)
-        {
-            var batchProcess = new MarianBatchTranslator();
+        public ObservableCollection<string> ModelTags = new ObservableCollection<string>();
 
+        internal void PreTranslateBatch(List<string> input)
+        {
+            var batchProcess = new MarianBatchTranslator(this.InstallDir,this.SourceLanguageString,this.TargetLanguageString);
+            batchProcess.BatchTranslate(input);
         }
     }
 }

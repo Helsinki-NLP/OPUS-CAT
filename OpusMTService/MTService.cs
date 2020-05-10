@@ -87,6 +87,7 @@ namespace FiskmoMTEngine
 
         /// <summary>
         /// Call this method to get the translation for multiple strings in batch.
+        /// NOTE: this is not currently used, for pretranslation PretranslateBatch is better.
         /// </summary>
         /// <param name="tokenCode">The token code.</param>
         /// <param name="input">The input strings.</param>
@@ -99,10 +100,34 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            List<string> result = this.ModelManager.BatchTranslate(input, srcLangCode, trgLangCode);
+            List<string> translations = new List<string>();
+            foreach (var sourceSegment in input)
+            {
+                translations.Add(this.ModelManager.Translate(sourceSegment, srcLangCode, trgLangCode));
+            }
             
-            return result;
+            return translations;
         }
+
+        /// <summary>
+        /// This will send a batch to the MT engine for pretranslation, which means
+        /// the translations will be immediately available when it is requested
+        /// </summary>
+        /// <param name="tokenCode"></param>
+        /// <param name="input"></param>
+        /// <param name="srcLangCode"></param>
+        /// <param name="trgLangCode"></param>
+        public void PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+
+            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
+                return;
+
+            this.ModelManager.PreTranslateBatch(input, srcLangCode, trgLangCode, modelTag);
+
+            return;
+        }
+
 
         public void StoreTranslation(string tokenCode, string source, string target, string srcLangCode, string trgLangCode)
         {

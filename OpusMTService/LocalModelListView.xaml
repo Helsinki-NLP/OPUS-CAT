@@ -9,7 +9,7 @@
     <Border BorderBrush="Black" BorderThickness="1" Margin="5">
             <StackPanel>
                 <Label Margin="10,0,0,0" FontSize="20">Installed models</Label>
-                <DockPanel Margin="10">
+                <DockPanel Margin="10,10,10.333,10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0">
                         <StackPanel.Resources>
                             <Style TargetType="Button">
@@ -21,6 +21,7 @@
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Test selected model</Button>
+                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                 </StackPanel>
                     <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
                         <ListView.ItemContainerStyle>

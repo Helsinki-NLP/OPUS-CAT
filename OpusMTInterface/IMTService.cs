@@ -33,6 +33,11 @@ namespace OpusMTInterface
         List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode);
 
         [OperationContract]
+        [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]
+        void PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, String modelId);
+        
+
+        [OperationContract]
         [WebGet]
         void StoreTranslation(string tokenCode, string source, string target, string srcLangCode, string trgLangCode);
 

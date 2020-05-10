@@ -81,6 +81,13 @@ namespace FiskmoMTEngine
             translateWindow.Show();
         }
 
+        private void btnEditModelTags_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            TagEditWindow tagEditWindow = new TagEditWindow(selectedModel);
+            tagEditWindow.Show();
+        }
+
         private void btnCustomizeModel_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;

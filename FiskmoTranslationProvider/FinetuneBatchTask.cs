@@ -9,6 +9,7 @@ using Sdl.ProjectAutomation.Core;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System.Net;
 using Sdl.Core.Globalization;
+using System.Windows.Forms;
 
 namespace FiskmoTranslationProvider
 {
@@ -27,10 +28,13 @@ namespace FiskmoTranslationProvider
         private FinetuneBatchTaskSettings settings;
         internal Dictionary<Language,List<Tuple<string, string>>> ProjectTranslations;
 
+        public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
+
         protected override void OnInitializeTask()
         {
             this.settings = GetSetting<FinetuneBatchTaskSettings>();
             this.ProjectTranslations = new Dictionary<Language, List<Tuple<string, string>>>();
+            this.ProjectNewSegments = new Dictionary<Language, List<string>>();
             base.OnInitializeTask();
         }
 
@@ -46,10 +50,12 @@ namespace FiskmoTranslationProvider
             if (this.ProjectTranslations.ContainsKey(targetLang))
             {
                 this.ProjectTranslations[targetLang].AddRange(_task.FileTranslations);
+                this.ProjectNewSegments[targetLang].AddRange(_task.FileNewSegments);
             }
             else
             {
                 this.ProjectTranslations[targetLang] = _task.FileTranslations;
+                this.ProjectNewSegments[targetLang] = _task.FileNewSegments;
             }
             
         }
@@ -89,14 +95,28 @@ namespace FiskmoTranslationProvider
         public override void TaskComplete()
         {
             var projectInfo = this.Project.GetProjectInfo();
+            var projectGuid = projectInfo.Id;
             var sourceCode = projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
             var mtServicePort = FiskmoTpSettings.Default.MtServicePort;
-            foreach (var targetLang in projectInfo.TargetLanguages)
+
+
+            //TODO: need to send a custom model identifier based on project GUID to make it possible
+            //to match project to model
+            /*foreach (var targetLang in projectInfo.TargetLanguages)
             {
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
                 //Send the tuning set to MT service
                 FiskmöMTServiceHelper.Customize(mtServicePort, this.ProjectTranslations[targetLang], sourceCode, targetCode);
+            }*/
+
+            //Send the new segments to MT engine for pretranslation
+            foreach (var targetLang in projectInfo.TargetLanguages)
+            {
+                var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
+                //Send the new segments to MT service
+                FiskmöMTServiceHelper.PreTranslateBatch(mtServicePort, this.ProjectNewSegments[targetLang], sourceCode, targetCode, projectGuid.ToString());
             }
+
         }
     }
 }

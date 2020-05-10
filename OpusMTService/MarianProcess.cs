@@ -13,6 +13,7 @@ using Serilog;
 using System.Data.SQLite;
 using System.Data;
 using System.Windows.Controls.Primitives;
+using System.ServiceModel.Description;
 
 namespace FiskmoMTEngine
 {
@@ -196,36 +197,7 @@ namespace FiskmoMTEngine
             return translation;
         }
 
-        private string FetchTranslationFromDb(string sourceText)
-        {
-            var translationDb = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
-                FiskmoMTEngineSettings.Default.TranslationDBName);
-
-            List<string> items = new List<string>();
-
-            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
-            {
-                m_dbConnection.Open();
-
-                using (SQLiteCommand fetch =
-                    new SQLiteCommand("SELECT DISTINCT translation FROM translations WHERE sourcetext=@sourcetext AND model=@model LIMIT 1", m_dbConnection))
-                {
-                    fetch.Parameters.Add(new SQLiteParameter("@sourcetext",sourceText));
-                    fetch.Parameters.Add(new SQLiteParameter("@model", this.SystemName));
-                    SQLiteDataReader r = fetch.ExecuteReader();
-
-                    while (r.Read())
-                    {
-                        items.Add(Convert.ToString(r["translation"]));
-                    }
-                }
-
-            }
-
-            return items.SingleOrDefault();
-        }
+        
 
         public string Translate(string sourceText)
         {
@@ -242,7 +214,7 @@ namespace FiskmoMTEngine
                 }
             }
 
-            string existingTranslation = this.FetchTranslationFromDb(sourceText);
+            string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName);
             if (existingTranslation != null)
             {
                 return existingTranslation;
@@ -255,7 +227,7 @@ namespace FiskmoMTEngine
                     sw.Start();*/
                     //Check again if the translation has been produced during the lock
                     //waiting period
-                    existingTranslation = this.FetchTranslationFromDb(sourceText);
+                    existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
                     if (existingTranslation != null)
                     {
                         return existingTranslation;
@@ -275,7 +247,7 @@ namespace FiskmoMTEngine
 
                     var translation = translationBuilder.ToString();
                 
-                    this.WriteTranslationToDb(sourceText, translation);
+                    TranslationDbHelper.WriteTranslationToDb(sourceText, translation, this.SystemName);
                     //sw.Stop();
 
                     return translation;
@@ -284,27 +256,6 @@ namespace FiskmoMTEngine
             
         }
 
-        private void WriteTranslationToDb(string sourceText, string translation)
-        {
-            var translationDb = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
-                FiskmoMTEngineSettings.Default.TranslationDBName);
-
-            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
-            {
-                m_dbConnection.Open();
-
-                using (SQLiteCommand insert =
-                    new SQLiteCommand("INSERT INTO translations (sourcetext, translation, model) VALUES (@sourcetext,@translation,@model)", m_dbConnection))
-                {
-                    insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
-                    insert.Parameters.Add(new SQLiteParameter("@translation", translation));
-                    insert.Parameters.Add(new SQLiteParameter("@model", this.SystemName));
-                    insert.ExecuteNonQuery();
-                }
-            }
-        }
     }
 
 }

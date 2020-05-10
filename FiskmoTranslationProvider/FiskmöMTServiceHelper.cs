@@ -123,6 +123,16 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        internal static void PreTranslateBatch(string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
+        {
+            var proxy = getNewProxy(mtServicePort);
+
+            using (proxy as IDisposable)
+            {
+                proxy.PreTranslateBatch(GetTokenCode(mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
+            }
+        }
+
         /// <summary>
         /// Translates multiple strings with the help of the dummy MT service.
         /// </summary>

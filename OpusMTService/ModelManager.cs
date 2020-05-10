@@ -75,7 +75,7 @@ namespace FiskmoMTEngine
         internal void UninstallModel(MTModel selectedModel)
         {
             var onlineModel = this.onlineModels.SingleOrDefault(
-                x => x.Path.Replace("/","\\") == selectedModel.Path);
+                x => x.ModelPath.Replace("/","\\") == selectedModel.ModelPath);
             if (onlineModel != null)
             {
                 onlineModel.InstallStatus = "";
@@ -85,7 +85,7 @@ namespace FiskmoMTEngine
             this.LocalModels.Remove(selectedModel);
             selectedModel.Shutdown();
             FileSystem.DeleteDirectory(
-                Path.Combine(this.opusModelDir.FullName,selectedModel.Path),UIOption.OnlyErrorDialogs,RecycleOption.SendToRecycleBin);
+                Path.Combine(this.opusModelDir.FullName,selectedModel.ModelPath),UIOption.OnlyErrorDialogs,RecycleOption.SendToRecycleBin);
         }
 
         public ModelManager()
@@ -116,12 +116,30 @@ namespace FiskmoMTEngine
             }
         }
 
-        internal List<string> BatchTranslate(List<string> input, string srcLangCode, string trgLangCode)
+        internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             MTModel mtModel;
-            mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
 
-            return mtModel.BatchTranslate(input);
+            if (modelTag == null)
+            {
+                mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+            }
+            else
+            {
+                mtModel = this.GetModelByTag(modelTag);
+                if (mtModel == null)
+                {
+                    mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+                }
+            }
+
+            mtModel.PreTranslateBatch(input);
+        }
+
+        private MTModel GetModelByTag(string tag)
+        {
+            //There could be multiple models finetuned with the same tag, use the latest.
+            return this.LocalModels.FirstOrDefault(x => x.ModelTags.Contains(tag));
         }
 
         private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
@@ -161,8 +179,8 @@ namespace FiskmoMTEngine
             {
                 foreach (var onlineModel in this.onlineModels)
                 {
-                    var localModelPaths = this.LocalModels.Select(x => x.Path.Replace("\\", "/"));
-                    if (localModelPaths.Contains(onlineModel.Path))
+                    var localModelPaths = this.LocalModels.Select(x => x.ModelPath.Replace("\\", "/"));
+                    if (localModelPaths.Contains(onlineModel.ModelPath))
                     {
                         onlineModel.InstallStatus = "Installed";
                         onlineModel.InstallProgress = 100;
