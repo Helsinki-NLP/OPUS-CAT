@@ -40,9 +40,8 @@ namespace FiskmoTranslationProvider
         public FiskmoOptionControl(FiskmoOptionsFormWPF hostForm, FiskmoOptions options)
         {
             this.DataContext = this;
-            InitializeComponent();
-
             this.options = options;
+            InitializeComponent();
 
             //Null indicates that all properties have changed. Populates the WPF form
             PropertyChanged(this, new PropertyChangedEventArgs(null));
@@ -99,7 +98,17 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        
+        public string ServiceAddressBox
+        {
+            get => this.options.mtServiceAddress;
+            set
+            {
+                this.options.mtServiceAddress = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
         public Boolean PregenerateMt
         {
             get => this.options.pregenerateMt;

@@ -58,5 +58,17 @@ namespace FiskmoTranslationProvider {
                 this["SupportAllLanguagePairs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string MtServiceAddress {
+            get {
+                return ((string)(this["MtServiceAddress"]));
+            }
+            set {
+                this["MtServiceAddress"] = value;
+            }
+        }
     }
 }

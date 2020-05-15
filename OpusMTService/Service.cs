@@ -48,6 +48,10 @@ namespace FiskmoMTEngine
             );
 
             var nettcpBinding = new NetTcpBinding();
+            nettcpBinding.Security.Mode = SecurityMode.Transport;
+            nettcpBinding.Security.Transport.ClientCredentialType =
+                TcpClientCredentialType.Windows;
+
             //Customization tuning sets tend to be big
             nettcpBinding.MaxReceivedMessageSize = 20000000;
             selfHost.AddServiceEndpoint(typeof(IMTService), nettcpBinding, "MTService");

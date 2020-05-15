@@ -23,9 +23,13 @@ namespace FiskmoTranslationProvider
 
         public static IMTService getNewProxy(string port)
         {
-            
+            NetTcpBinding myBinding = new NetTcpBinding();
+            myBinding.Security.Mode = SecurityMode.Transport;
+            myBinding.Security.Transport.ClientCredentialType =
+                TcpClientCredentialType.Windows;
+
             var epAddr = new EndpointAddress($"net.tcp://localhost:{port}/MTService");
-            var proxy = ChannelFactory<IMTService>.CreateChannel(new NetTcpBinding(), epAddr);
+            var proxy = ChannelFactory<IMTService>.CreateChannel(myBinding, epAddr);
             return proxy;
         }
 
@@ -112,13 +116,13 @@ namespace FiskmoTranslationProvider
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The translated string.</returns>
-        public static string Translate(FiskmoOptions options, string input, string srcLangCode, string trgLangCode)
+        public static string Translate(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
             // Always dispose allocated resources
             var proxy = getNewProxy(options.mtServicePort);
             using (proxy as IDisposable)
             {
-                string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode);
+                string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag);
                 return result;
             }
         }
@@ -141,13 +145,13 @@ namespace FiskmoTranslationProvider
         /// <param name="srcLangCode">The source language code.</param>
         /// <param name="trgLangCode">The target language code.</param>
         /// <returns>The translated strings.</returns>
-        public static List<string> BatchTranslate(FiskmoOptions options, List<string> input, string srcLangCode, string trgLangCode)
+        public static List<string> BatchTranslate(FiskmoOptions options, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             // Always dispose allocated resources
             var proxy = getNewProxy(options.mtServicePort);
             using (proxy as IDisposable)
             {
-                string[] result = proxy.BatchTranslate(GetTokenCode(options), input, srcLangCode, trgLangCode).ToArray();
+                string[] result = proxy.BatchTranslate(GetTokenCode(options), input, srcLangCode, trgLangCode,modelTag).ToArray();
                 return result.ToList();
             }
         }
@@ -170,26 +174,21 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal static void Customize(string mtServicePort, List<Tuple<string, string>> projectTranslations, string sourceCode, string targetCode)
+        internal static void Customize(string mtServicePort, List<Tuple<string, string>> projectTranslations, List<string> uniqueNewSegments, string sourceCode, string targetCode, string modelTag)
         {
             var proxy = getNewProxy(mtServicePort);
 
             //Pick out 200 sentence pairs randomly to use as tuning set
             var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
             var trainingSet = projectTranslations.Skip(200).ToList();
-            var tuningSet = projectTranslations.Take(200).ToList();
+            var validSet = projectTranslations.Take(200).ToList();
 
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(mtServicePort), trainingSet, tuningSet, sourceCode, targetCode);
+                proxy.Customize(GetTokenCode(mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag);
             }
         }
         
-        internal static void Customize(FiskmoOptions options, List<Tuple<string, string>> tuningSet, string sourceCode, string targetCode)
-        {
-            FiskmöMTServiceHelper.Customize(options.mtServicePort, tuningSet, sourceCode, targetCode);
-        }
-
         /// <summary>
         /// Stores multiple string pairs as translation with the help of the dummy MT service.
         /// </summary>

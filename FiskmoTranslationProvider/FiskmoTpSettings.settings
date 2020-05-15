@@ -11,5 +11,8 @@
     <Setting Name="SupportAllLanguagePairs" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="MtServiceAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

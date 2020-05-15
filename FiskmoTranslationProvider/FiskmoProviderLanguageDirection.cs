@@ -25,6 +25,7 @@ namespace FiskmoTranslationProvider
         //internal static Dictionary<string,List<MarianProcess>> _marianProcesses = new Dictionary<string, List<MarianProcess>>();
         private string langpair;
         internal static string _segmentTranslation;
+        private string projectId;
         #endregion
 
         #region "ITranslationProviderLanguageDirection Members"
@@ -45,8 +46,9 @@ namespace FiskmoTranslationProvider
             _provider = provider;
             _languageDirection = languages;
             _options = _provider.Options;
-            
-            
+
+            ProjectsController projectsController = SdlTradosStudio.Application.GetController<ProjectsController>();
+            this.projectId = projectsController.CurrentProject.GetProjectInfo().Id.ToString();
 
             if (_options.pregenerateMt)
             {
@@ -155,7 +157,7 @@ namespace FiskmoTranslationProvider
                     var langpair = $"{sourceCode}-{targetCode}";
 
                     //This will generate the translation and cache it for later use
-                    FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode);
+                    FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this.projectId);
                     
                     /*foreach (var marianProcess in FiskmoProviderLanguageDirection._marianProcesses[langpair])
                     {
@@ -231,7 +233,7 @@ namespace FiskmoTranslationProvider
         private List<SearchResult> GenerateSystemResult(string sourceText, SearchMode mode, Segment segment, string sourceCode, string targetCode)
         {
             List<SearchResult> systemResults = new List<SearchResult>();
-            string translatedSentence = FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode);
+            string translatedSentence = FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this.projectId);
             _segmentTranslation = translatedSentence;
 
             if (String.IsNullOrEmpty(translatedSentence))

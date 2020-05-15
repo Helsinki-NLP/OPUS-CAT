@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Threading;
 using System.Xml.Linq;
 using static System.Environment;
 
@@ -116,7 +117,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag)
         {
             MTModel mtModel;
 
@@ -132,7 +133,12 @@ namespace FiskmoMTEngine
                     mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
                 }
             }
+            return mtModel;
+        }
 
+        internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag);
             mtModel.PreTranslateBatch(input);
         }
 
@@ -209,7 +215,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        internal void Customize(List<Tuple<string, string>> input, List<Tuple<string, string>> validation,string srcLangCode, string trgLangCode)
+        internal void Customize(List<Tuple<string, string>> input, List<Tuple<string, string>> validation, List<string> uniqueNewSegments, string srcLangCode, string trgLangCode, string modelTag)
         {
             var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
 
@@ -233,11 +239,38 @@ namespace FiskmoMTEngine
                 new FileInfo(trgFile),
                 new FileInfo(validSrcFile),
                 new FileInfo(validTrgFile),
-                "customized"
+                modelTag
                 );
-
-            customizer.Customize();
             
+            customizer.Customize(
+                (x,y)=> TrainProcess_Exited(
+                    x,y,
+                    customizer.customDir,
+                    modelTag, 
+                    uniqueNewSegments,
+                    srcLangCode,
+                    trgLangCode));
+        }
+
+        private void TrainProcess_Exited(
+            object sender,
+            EventArgs e,
+            DirectoryInfo customDir,
+            string modelTag,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+                {
+                    this.GetLocalModels();
+                    this.LocalModels.Single(x => x.InstallDir == customDir.FullName).ModelTags.Add(modelTag);
+                }
+            );
+            if (uniqueNewSegments.Count > 0)
+            {
+                this.PreTranslateBatch(uniqueNewSegments, srcLangCode, trgLangCode, modelTag);
+            }
         }
 
         internal void GetLocalModels()
@@ -295,12 +328,11 @@ namespace FiskmoMTEngine
             return null;
         }
 
-        internal string Translate(string input, string srcLangCode, string trgLangCode)
+        internal string Translate(string input, string srcLangCode, string trgLangCode, string modelTag)
         {
 
-            MTModel mtModel;
-            mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
-            
+            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag);
+
             return mtModel.Translate(input);
         }
 

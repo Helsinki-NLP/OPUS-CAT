@@ -59,13 +59,13 @@ namespace FiskmoMTEngine
         /// <param name="srcLangCode">The code of the source language.</param>
         /// <param name="trgLangCode">The code of the target language.</param>
         /// <returns>The translated input string.</returns>
-        public string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode)
+        public string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
             
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return this.ModelManager.Translate(input, srcLangCode, trgLangCode);
+            return this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
         }
         
         /// <summary>
@@ -94,7 +94,7 @@ namespace FiskmoMTEngine
         /// <param name="srcLangCode">The code of the source language.</param>
         /// <param name="trgLangCode">The code of the target language.</param>
         /// <returns>The translated input strings.</returns>
-        public List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode)
+        public List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
@@ -103,7 +103,7 @@ namespace FiskmoMTEngine
             List<string> translations = new List<string>();
             foreach (var sourceSegment in input)
             {
-                translations.Add(this.ModelManager.Translate(sourceSegment, srcLangCode, trgLangCode));
+                translations.Add(this.ModelManager.Translate(sourceSegment, srcLangCode, trgLangCode, modelTag));
             }
             
             return translations;
@@ -148,12 +148,12 @@ namespace FiskmoMTEngine
             return indicesAdded;
         }
 
-        public string Customize(string tokenCode, List<Tuple<string, string>> input, List<Tuple<string, string>> validation, string srcLangCode, string trgLangCode)
+        public string Customize(string tokenCode, List<Tuple<string, string>> input, List<Tuple<string, string>> validation, List<string> uniqueNewSegments,string srcLangCode, string trgLangCode, string modelTag)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            this.ModelManager.Customize(input, validation, srcLangCode, trgLangCode);
+            this.ModelManager.Customize(input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag);
 
             return "tuning set received";
         }

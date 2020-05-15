@@ -18,7 +18,7 @@ namespace OpusMTInterface
 
         [OperationContract]
         [WebGet]
-        string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode);
+        string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
         
         [OperationContract]
         [WebGet]
@@ -26,11 +26,11 @@ namespace OpusMTInterface
 
         [OperationContract]
         [WebInvoke(Method = "POST",BodyStyle = WebMessageBodyStyle.Wrapped)]
-        string Customize(string tokenCode, List<Tuple<string,string>> input, List<Tuple<string, string>> validation, string srcLangCode, string trgLangCode);
+        string Customize(string tokenCode, List<Tuple<string,string>> input, List<Tuple<string, string>> validation, List<string> uniqueNewSegments, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]
-        List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode);
+        List<string> BatchTranslate(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]

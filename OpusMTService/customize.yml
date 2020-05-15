@@ -1,7 +1,7 @@
-﻿disp-freq: 100
+﻿disp-freq: 25
 save-freq: 1000u
 mini-batch-words: 400
-cpu-threads: 3
+cpu-threads: 2
 overwrite: true
 after-epochs: 3
 workspace: 4092

@@ -22,7 +22,7 @@ namespace FiskmoMTEngine
                 m_dbConnection.Open();
 
                 using (SQLiteCommand insert =
-                    new SQLiteCommand("INSERT INTO translations (sourcetext, translation, model) VALUES (@sourcetext,@translation,@model)", m_dbConnection))
+                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, translation, model) VALUES (@sourcetext,@translation,@model)", m_dbConnection))
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     insert.Parameters.Add(new SQLiteParameter("@translation", translation));

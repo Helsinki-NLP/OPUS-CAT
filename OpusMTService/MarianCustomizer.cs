@@ -15,7 +15,7 @@ namespace FiskmoMTEngine
 
     class MarianCustomizer
     {
-        private DirectoryInfo customDir;
+        public DirectoryInfo customDir { get; set; }
         private DirectoryInfo modelDir;
         private FileInfo customSource;
         private FileInfo customTarget;
@@ -32,7 +32,6 @@ namespace FiskmoMTEngine
         
         private void CopyModelDir(DirectoryInfo modelDir,string customLabel)
         {
-            this.customDir = new DirectoryInfo($"{modelDir.FullName}_{customLabel}");
             if (this.customDir.Exists)
             {
                 throw new Exception("custom model directory exists already");
@@ -45,7 +44,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        public void Customize()
+        public void Customize(EventHandler exitHandler)
         {
             //First copy the model to new dir
             try
@@ -103,7 +102,12 @@ namespace FiskmoMTEngine
             var trainingArgs = $"--config {configPath}";
 
 
-            this.StartProcessWithCmd("marian.exe",trainingArgs);
+            var trainProcess = MarianHelper.StartProcessWithCmd("marian.exe",trainingArgs);
+
+            if (exitHandler != null)
+            {
+                trainProcess.Exited += exitHandler;
+            }
         }
 
         private void PreprocessInput()
@@ -152,6 +156,7 @@ namespace FiskmoMTEngine
             string customLabel)
         {
             this.modelDir = new DirectoryInfo(model.InstallDir);
+            this.customDir = new DirectoryInfo($"{modelDir.FullName}_{customLabel}");
             this.customSource = customSource;
             this.customTarget = customTarget;
             this.customLabel = customLabel;

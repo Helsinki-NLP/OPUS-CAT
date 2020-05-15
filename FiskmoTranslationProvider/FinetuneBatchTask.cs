@@ -100,21 +100,25 @@ namespace FiskmoTranslationProvider
             var mtServicePort = FiskmoTpSettings.Default.MtServicePort;
 
 
-            //TODO: need to send a custom model identifier based on project GUID to make it possible
-            //to match project to model
-            /*foreach (var targetLang in projectInfo.TargetLanguages)
+            /*
+            foreach (var targetLang in projectInfo.TargetLanguages)
             {
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
+                //Remove duplicates
+                var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
+                var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                 //Send the tuning set to MT service
-                FiskmöMTServiceHelper.Customize(mtServicePort, this.ProjectTranslations[targetLang], sourceCode, targetCode);
+                FiskmöMTServiceHelper.Customize(mtServicePort, uniqueProjectTranslations, uniqueNewSegments, sourceCode, targetCode, projectGuid.ToString());
             }*/
 
+            
             //Send the new segments to MT engine for pretranslation
             foreach (var targetLang in projectInfo.TargetLanguages)
             {
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
+                var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                 //Send the new segments to MT service
-                FiskmöMTServiceHelper.PreTranslateBatch(mtServicePort, this.ProjectNewSegments[targetLang], sourceCode, targetCode, projectGuid.ToString());
+                FiskmöMTServiceHelper.PreTranslateBatch(mtServicePort, uniqueNewSegments, sourceCode, targetCode, projectGuid.ToString());
             }
 
         }

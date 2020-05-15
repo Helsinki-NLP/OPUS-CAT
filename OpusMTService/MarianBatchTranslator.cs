@@ -13,6 +13,7 @@ using Serilog;
 using System.Data.SQLite;
 using System.Data;
 using System.Windows.Controls.Primitives;
+using YamlDotNet.Serialization;
 
 namespace FiskmoMTEngine
 {
@@ -35,9 +36,25 @@ namespace FiskmoMTEngine
             this.TargetCode = targetCode;
             this.modelDir = new DirectoryInfo(modelDir);
             this.SystemName = $"{sourceCode}-{targetCode}_" + this.modelDir.Name;
-            
-           
-         }
+
+            //Check if batch.yml exists, if not create it from decode.yml
+            var batchYaml = this.modelDir.GetFiles("batch.yml");
+            if (batchYaml.Length == 0)
+            {
+                var decoderYaml = this.modelDir.GetFiles("decoder.yml").Single();
+                var deserializer = new Deserializer();
+                var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+                decoderSettings.miniBatch = "16";
+
+                var serializer = new Serializer();
+                var configPath = Path.Combine(this.modelDir.FullName, "batch.yml");
+                using (var writer = File.CreateText(configPath))
+                {
+                    serializer.Serialize(writer, decoderSettings, typeof(MarianDecoderConfig));
+                }
+            }
+
+        }
 
         private Process StartProcessWithCmd(string fileName, string args)
         {
@@ -75,10 +92,9 @@ namespace FiskmoMTEngine
             FileInfo spInput = this.PreprocessInput(input);
             FileInfo spOutput = new FileInfo(
                 spInput.FullName.Replace($".{SourceCode}", $".{TargetCode}"));
-            //Check if batch.yml exists, if not create it from decode.yml
-
+            
             var args = $"{this.modelDir.FullName} {spInput.FullName} {spOutput.FullName}";
-            var batchProcess = this.StartProcessWithCmd(cmd, args);
+            var batchProcess = MarianHelper.StartProcessWithCmd(cmd, args);
 
             batchProcess.Exited += (x,y)=> BatchProcess_Exited(input, spOutput,x,y);
         }
@@ -112,7 +128,7 @@ namespace FiskmoMTEngine
                 }
             }
 
-            var spmModel = this.modelDir.GetFiles("target.spm").Single();
+            var spmModel = this.modelDir.GetFiles("source.spm").Single();
             var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel);
             return spSrcFile;
         }

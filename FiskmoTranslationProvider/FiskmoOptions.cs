@@ -45,6 +45,23 @@ namespace FiskmoTranslationProvider
             set { SetStringParameter("mtServicePort", value); }
         }
 
+        public string mtServiceAddress
+        {
+            get
+            {
+                var parameter = GetStringParameter("mtServiceAddress");
+                if (parameter == "" || parameter == null)
+                {
+                    return FiskmoTpSettings.Default.MtServiceAddress;
+                }
+                else
+                {
+                    return parameter;
+                }
+            }
+            set { SetStringParameter("mtServiceAddress", value); }
+        }
+
         /*public Boolean useAllModels
         {
             get { return GetBooleanParameter("useAllModels"); }

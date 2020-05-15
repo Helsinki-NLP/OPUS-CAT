@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +22,6 @@ namespace FiskmoMTEngine
             ExternalProcess.StartInfo.Arguments = $"/c {fileName} {args}";
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-
             ExternalProcess.StartInfo.WorkingDirectory = serviceDir;
             //ExternalProcess.StartInfo.RedirectStandardInput = true;
             //ExternalProcess.StartInfo.RedirectStandardOutput = true;
@@ -30,13 +31,48 @@ namespace FiskmoMTEngine
             //ExternalProcess.ErrorDataReceived += errorDataHandler;
 
             ExternalProcess.StartInfo.CreateNoWindow = false;
-
             ExternalProcess.Start();
+            ExternalProcess.EnableRaisingEvents = true;
             //ExternalProcess.BeginErrorReadLine();
 
-            //ExternalProcess.StandardInput.AutoFlush = true;
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess) ;
 
             return ExternalProcess;
+        }
+
+        private static void KillProcessAndChildren(int pid)
+        {
+            // Cannot close 'system idle process'.
+            if (pid == 0)
+            {
+                return;
+            }
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher
+                    ("Select * From Win32_Process Where ParentProcessID=" + pid);
+            ManagementObjectCollection moc = searcher.Get();
+            foreach (ManagementObject mo in moc)
+            {
+                KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
+            }
+            try
+            {
+                Process proc = Process.GetProcessById(pid);
+                proc.Kill();
+            }
+            catch (ArgumentException)
+            {
+                // Process already exited.
+            }
+        }
+
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e, Process externalProcess)
+        {
+            KillProcessAndChildren(externalProcess.Id);
+        }
+
+        private static void errorDataHandler(object sender, DataReceivedEventArgs e)
+        {
+            Log.Information(e.Data);
         }
 
         internal static FileInfo PreprocessLanguage(FileInfo languageFile, DirectoryInfo directory, string languageCode, FileInfo spmModel)

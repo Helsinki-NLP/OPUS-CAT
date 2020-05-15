@@ -43,7 +43,7 @@ namespace FiskmoMTEngine
                 this.LabelBox.Text
                 );
 
-            customizer.Customize();
+            customizer.Customize(null);
         }
 
         private void browse_Click(object sender, RoutedEventArgs e)

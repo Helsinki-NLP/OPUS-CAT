@@ -18,7 +18,7 @@ namespace FiskmoMTEngine
         public string miniBatch { get; set; }
         [YamlMember(Alias = "maxi-batch", ApplyNamingConventions = false)]
         public string maxiBatch { get; set; }
-        [YamlMember(Alias = "maxi-batch-sort", ApplyNamingConventions = false)]
-        public string maxiBatchSort { get; set; }
+        /*[YamlMember(Alias = "maxi-batch-sort", ApplyNamingConventions = false)]
+        public string maxiBatchSort { get; set; }*/
     }
 }
