@@ -11,6 +11,10 @@ namespace OpusMTInterface
         [OperationContract]
         [WebGet]
         string Login(string userName, string password);
+        
+        [OperationContract]
+        [WebGet]
+        List<string> GetLanguagePairModelTags(string tokenCode, string languagePair);
 
         [OperationContract]
         [WebGet]
@@ -44,5 +48,6 @@ namespace OpusMTInterface
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]
         int[] BatchStoreTranslation(string tokenCode, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode);
+        
     }
 }

@@ -97,8 +97,27 @@ namespace FiskmoTranslationProvider
             var projectInfo = this.Project.GetProjectInfo();
             var projectGuid = projectInfo.Id;
             var sourceCode = projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
-            var mtServicePort = FiskmoTpSettings.Default.MtServicePort;
 
+            var fiskmoOptions = new FiskmoOptions();
+
+            if (settings.AddFiskmoProvider)
+            {
+                //Add Fiskmö MT provider to the project
+                var tpConfig = this.Project.GetTranslationProviderConfiguration();
+
+                if (settings.IncludePlaceholderTags)
+                {
+                    fiskmoOptions.includePlaceholderTags = true;
+                }
+
+                fiskmoOptions.modelTag = projectGuid.ToString();
+
+                var fiskmoRef = new TranslationProviderReference(fiskmoOptions.Uri);
+                tpConfig.Entries.Add(
+                    new TranslationProviderCascadeEntry(fiskmoRef, false, true, false));
+
+                this.Project.UpdateTranslationProviderConfiguration(tpConfig);
+            }
 
             /*
             foreach (var targetLang in projectInfo.TargetLanguages)
@@ -118,7 +137,7 @@ namespace FiskmoTranslationProvider
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
                 var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                 //Send the new segments to MT service
-                FiskmöMTServiceHelper.PreTranslateBatch(mtServicePort, uniqueNewSegments, sourceCode, targetCode, projectGuid.ToString());
+                FiskmöMTServiceHelper.PreTranslateBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, projectGuid.ToString());
             }
 
         }

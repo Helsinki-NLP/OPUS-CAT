@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <StackPanel>
         <CheckBox IsChecked="{Binding Path=IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
-    </Grid>
+        <CheckBox IsChecked="{Binding Path=AddFiskmoProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add Fiskmo MT provider to project</CheckBox>
+    </StackPanel>
 </UserControl>

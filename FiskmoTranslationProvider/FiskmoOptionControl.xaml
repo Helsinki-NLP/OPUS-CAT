@@ -5,64 +5,60 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
-             d:DesignHeight="160" d:DesignWidth="270">
-    <TabControl>
+             d:DesignHeight="200" d:DesignWidth="270">
+    <DockPanel Background="White">
+        <TabControl DockPanel.Dock="Top">
         <TabItem Header="General">
-            <StackPanel>
             <Border BorderThickness="1" BorderBrush="Black">
-                <Grid Margin="10,10,10,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="170"/>
-                        <ColumnDefinition Width="70" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
-                    </Grid.RowDefinitions>
+                <StackPanel Margin="10,10,10,10">
+                    <CheckBox 
+                            ToolTip="If checked, document segments are sent for translation as soon as the document is opened."
+                            IsChecked="{Binding Path=PregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        Include placeholder tags as text
+                    </CheckBox>
+                    <CheckBox ToolTip="If checked, document segments are sent for translation as soon as the document is opened."
+                                IsChecked="{Binding Path=PregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        Pregenerate MT
+                    </CheckBox>
+                    <CheckBox ToolTip="If checked, the results of Fiskmö MT are identified as MT segments"
+                                IsChecked="{Binding Path=ShowMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                        Show MT as suggestion origin
+                    </CheckBox>
 
-                    <Label ToolTip="If checked, document segments are sent for translation as soon as the document is opened." Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right">Pregenerate MT</Label>
-                    <CheckBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding Path=PregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-                    <Label ToolTip="If checked, the results of Fiskmö MT are identified as MT segments" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right">Show MT as origin</Label>
-                    <CheckBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding Path=ShowMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-
-                </Grid>
+                </StackPanel>
             </Border>
-                <DockPanel Margin="10,5,10,0">
-                    <Button HorizontalAlignment="Left"  Click="save_Click">Save</Button>
-                    <Button HorizontalAlignment="Right" Click="cancel_Click">Cancel</Button>
-                </DockPanel>
-            </StackPanel>
         </TabItem>
-        <TabItem Header="Connection">
-            <StackPanel>
-                <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
-                <Border BorderThickness="1" BorderBrush="Black">
-                    <Grid Margin="10,10,10,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="170"/>
-                            <ColumnDefinition Width="70" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="30" />
-                            <RowDefinition Height="30" />
-                        </Grid.RowDefinitions>
+            <TabItem Header="Connection">
+                <StackPanel>
+                    <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
+                    <Border BorderThickness="1" BorderBrush="Black">
+                        <Grid Margin="10,10,10,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="170"/>
+                                <ColumnDefinition Width="70" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25" />
+                                <RowDefinition Height="25" />
+                                <RowDefinition Height="25" />
+                            </Grid.RowDefinitions>
 
-                        <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0">MT service port (1024-65535)</Label>
-                        <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="0" HorizontalAlignment="Stretch" Name="ServicePortBoxElement" Text="{Binding Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>
+                            <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0">MT service port (1024-65535)</Label>
+                            <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="0" HorizontalAlignment="Stretch" Name="ServicePortBoxElement" Text="{Binding Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>
 
-                        <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1">MT service host address</Label>
-                        <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="1" HorizontalAlignment="Stretch" Name="ServiceAddressBoxElement" Text="{Binding Path=ServiceAddressBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
-                        
-                    </Grid>
-                </Border>
-                <DockPanel Margin="10,5,10,0">
-                    <Button HorizontalAlignment="Left"  Click="save_Click">Save</Button>
-                    <Button HorizontalAlignment="Right" Click="cancel_Click">Cancel</Button>
-                </DockPanel>
-            </StackPanel>
-        </TabItem>
-    </TabControl>
+                            <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1">MT service host address</Label>
+                            <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="1" HorizontalAlignment="Stretch" Name="ServiceAddressBoxElement" Text="{Binding Path=ServiceAddressBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
+                            <Button Name="TestConnectionButton" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Click="testConnection_Click">Test connection</Button>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        
+        <DockPanel Margin="10,10,10,10" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
+            <Button HorizontalAlignment="Left" Padding="5,5,5,5" Click="save_Click">Save</Button>
+            <Button HorizontalAlignment="Right" Padding="5,5,5,5" Click="cancel_Click">Cancel</Button>
+        </DockPanel>
+        <TextBlock Text="{Binding Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+    </DockPanel>
 </UserControl>

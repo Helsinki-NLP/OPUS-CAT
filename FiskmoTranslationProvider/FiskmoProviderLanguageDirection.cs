@@ -25,7 +25,6 @@ namespace FiskmoTranslationProvider
         //internal static Dictionary<string,List<MarianProcess>> _marianProcesses = new Dictionary<string, List<MarianProcess>>();
         private string langpair;
         internal static string _segmentTranslation;
-        private string projectId;
         #endregion
 
         #region "ITranslationProviderLanguageDirection Members"
@@ -47,9 +46,6 @@ namespace FiskmoTranslationProvider
             _languageDirection = languages;
             _options = _provider.Options;
 
-            ProjectsController projectsController = SdlTradosStudio.Application.GetController<ProjectsController>();
-            this.projectId = projectsController.CurrentProject.GetProjectInfo().Id.ToString();
-
             if (_options.pregenerateMt)
             {
                 EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
@@ -62,39 +58,6 @@ namespace FiskmoTranslationProvider
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
             this.langpair = $"{sourceCode}-{targetCode}";
 
-            /*if (!FiskmoProviderLanguageDirection.processedDocuments.ContainsKey(this.langpair))
-            {
-                FiskmoProviderLanguageDirection.processedDocuments[this.langpair] = new ConcurrentBag<Document>();
-            }*/
-
-            /*
-            var modelManager = new ModelManager();
-
-            //Start a marian instance if one has not been started or the previous one has exited
-            //for some reason.
-            if (!FiskmoProviderLanguageDirection._marianProcesses.ContainsKey(this.langpair)
-                || FiskmoProviderLanguageDirection._marianProcesses[this.langpair].Any(x => x.MtPipe.HasExited))
-            {
-                //if ((sourceCode == "sv" && targetCode == "fi") || (sourceCode == "fi" && targetCode == "sv"))
-                if (_options.useAllModels)
-                {
-                    var allModels = modelManager.GetAllModelDirs(sourceCode, targetCode);
-                    FiskmoProviderLanguageDirection._marianProcesses[this.langpair] = new List<MarianProcess>();
-                    foreach (var model in allModels)
-                    {
-                        FiskmoProviderLanguageDirection._marianProcesses[this.langpair].Add(
-                            new MarianProcess(model, sourceCode, targetCode));
-                    }
-                }
-                else
-                {
-                    var latestModelDir = modelManager.GetLatestModelDir(sourceCode, targetCode);
-
-                    FiskmoProviderLanguageDirection._marianProcesses[this.langpair] =
-                        new List<MarianProcess>()
-                            { new MarianProcess(latestModelDir, sourceCode, targetCode) };
-                }
-            }*/
             #endregion
         }
 
@@ -157,7 +120,7 @@ namespace FiskmoTranslationProvider
                     var langpair = $"{sourceCode}-{targetCode}";
 
                     //This will generate the translation and cache it for later use
-                    FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this.projectId);
+                    FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this._options.modelTag);
                     
                     /*foreach (var marianProcess in FiskmoProviderLanguageDirection._marianProcesses[langpair])
                     {
@@ -233,7 +196,7 @@ namespace FiskmoTranslationProvider
         private List<SearchResult> GenerateSystemResult(string sourceText, SearchMode mode, Segment segment, string sourceCode, string targetCode)
         {
             List<SearchResult> systemResults = new List<SearchResult>();
-            string translatedSentence = FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this.projectId);
+            string translatedSentence = FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this._options.modelTag);
             _segmentTranslation = translatedSentence;
 
             if (String.IsNullOrEmpty(translatedSentence))

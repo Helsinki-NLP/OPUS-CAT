@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sdl.LanguagePlatform.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -37,10 +38,54 @@ namespace FiskmoTranslationProvider
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        public FiskmoOptionControl(FiskmoOptionsFormWPF hostForm, FiskmoOptions options)
+        private void FetchServiceData()
+        {
+            try
+            {
+                var serviceLanguagePairs = FiskmöMTServiceHelper.ListSupportedLanguages(this.options);
+
+                var projectLanguagePairsWithMt = serviceLanguagePairs.Intersect(this.projectLanguagePairs);
+                if (projectLanguagePairsWithMt.Count() == 0)
+                {
+                    Dispatcher.Invoke(() => this.ConnectionStatus = "No MT models available for the language pairs of the project");
+                }
+                else if (projectLanguagePairs.Count == projectLanguagePairsWithMt.Count())
+                {
+                    Dispatcher.Invoke(() => this.ConnectionStatus = "MT models available for all the language pairs of the project");
+                }
+                else
+                {
+                    Dispatcher.Invoke(() => this.ConnectionStatus = $"MT models available for some of the language pairs of the project: {String.Join(", ", projectLanguagePairsWithMt)}");
+                }
+
+                //Get a list of model tags that are supported for these language pairs
+                List<string> modelTags = new List<string>();
+                foreach (var languagePair in this.projectLanguagePairs)
+                {
+                    modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(this.options, languagePair.ToString()));
+                }
+
+                Dispatcher.Invoke(() => this.AllModelTags = modelTags);
+            }
+            catch
+            {
+                Dispatcher.Invoke(() =>
+                    this.ConnectionStatus = $"No connection to Fiskmö MT service at {this.options.mtServiceAddress}:{this.options.mtServicePort}.");
+            }
+
+        }
+
+        public FiskmoOptionControl(FiskmoOptionsFormWPF hostForm, FiskmoOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs)
         {
             this.DataContext = this;
             this.options = options;
+            this.projectLanguagePairs = languagePairs.Select(
+                x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
+
+            //Check whether there's a connection to a MT service
+
+            Task.Run(this.FetchServiceData);
+
             InitializeComponent();
 
             //Null indicates that all properties have changed. Populates the WPF form
@@ -86,7 +131,10 @@ namespace FiskmoTranslationProvider
         }
 
         private FiskmoOptions options;
+        private List<string> projectLanguagePairs;
         private FiskmoOptionsFormWPF hostForm;
+        private List<string> allModelTags;
+        private string connectionStatus;
 
         public string ServicePortBox
         {
@@ -107,6 +155,7 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
         }
+
 
 
         public Boolean PregenerateMt
@@ -133,6 +182,24 @@ namespace FiskmoTranslationProvider
             get { return "...."; }
         }
 
+
+
+        public List<string> AllModelTags
+        {
+            get => allModelTags;
+            set { allModelTags = value; NotifyPropertyChanged(); }
+        }
+
+        public string ConnectionStatus
+        { 
+            get => connectionStatus;
+            set
+            {
+                connectionStatus = value;
+                NotifyPropertyChanged();
+            }
+         }
+
         private void cancel_Click(object sender, RoutedEventArgs e)
         {
             this.hostForm.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -143,6 +210,9 @@ namespace FiskmoTranslationProvider
             this.hostForm.DialogResult = System.Windows.Forms.DialogResult.OK;
         }
 
+        private void testConnection_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
 }

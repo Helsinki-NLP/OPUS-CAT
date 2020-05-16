@@ -16,7 +16,7 @@ namespace FiskmoTranslationProvider
         {
             this.Options = options;
             InitializeComponent();
-            this.wpfHost.Child = new FiskmoOptionControl(this, options);
+            this.wpfHost.Child = new FiskmoOptionControl(this, options, languagePairs);
         }
 
         public FiskmoOptions Options { get; internal set; }

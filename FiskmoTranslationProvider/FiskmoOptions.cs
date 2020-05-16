@@ -62,6 +62,23 @@ namespace FiskmoTranslationProvider
             set { SetStringParameter("mtServiceAddress", value); }
         }
 
+        public string modelTag
+        {
+            get
+            {
+                var parameter = GetStringParameter("modelTag");
+                if (parameter == "" || parameter == null)
+                {
+                    return "";
+                }
+                else
+                {
+                    return parameter;
+                }
+            }
+            set { SetStringParameter("mtServiceAddress", value); }
+        }
+
         /*public Boolean useAllModels
         {
             get { return GetBooleanParameter("useAllModels"); }
@@ -91,6 +108,13 @@ namespace FiskmoTranslationProvider
             get { return GetBooleanParameter("pregenerateMt"); }
             set { SetBooleanParameter("pregenerateMt", value); }
         }
+
+        public Boolean includePlaceholderTags
+        {
+            get { return GetBooleanParameter("includePlaceholderTags"); }
+            set { SetBooleanParameter("includePlaceholderTags", value); }
+        }
+
         public Boolean showMtAsOrigin
         {
             get { return GetBooleanParameter("showMtAsOrigin"); }

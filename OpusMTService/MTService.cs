@@ -37,6 +37,14 @@ namespace FiskmoMTEngine
             return userName.Equals(password) ? TokenCodeGenerator.Instance.GenerateTokenCode(userName) : null;
         }
 
+        public List<string> GetLanguagePairModelTags(string tokenCode, string languagePair)
+        {
+            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
+                return null;
+
+            return this.ModelManager.GetLanguagePairModelTags(languagePair);
+        }
+
         /// <summary>
         /// Call this method to get the supported languages of the service.
         /// </summary>
@@ -50,6 +58,7 @@ namespace FiskmoMTEngine
             
             return this.ModelManager.GetAllLanguagePairs().ToList();
         }
+
 
         /// <summary>
         /// Call this method to get the translation for a single string.
@@ -157,5 +166,6 @@ namespace FiskmoMTEngine
 
             return "tuning set received";
         }
+
     }
 }

@@ -32,5 +32,18 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged(); 
             }
         }
+
+        public bool AddFiskmoProvider
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(AddFiskmoProvider));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(AddFiskmoProvider)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
     }
 }

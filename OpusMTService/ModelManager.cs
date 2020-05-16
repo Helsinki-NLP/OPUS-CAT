@@ -50,7 +50,19 @@ namespace FiskmoMTEngine
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-        
+
+        internal List<string> GetLanguagePairModelTags(string languagePair)
+        {
+            var sourceTargetSplit = languagePair.Split('-');
+            var sourceLang = sourceTargetSplit[0];
+            var targetLang = sourceTargetSplit[1];
+            var relevantModels = from m in this.LocalModels
+                                 where m.SourceLanguages.Contains(sourceLang)
+                                 where m.TargetLanguages.Contains(targetLang)
+                                 select m.ModelTags;
+
+            return relevantModels.SelectMany(x => x).ToList();
+        }
 
         private DirectoryInfo opusModelDir;
 

@@ -7,28 +7,21 @@ using System.Windows;
 
 namespace FiskmoTranslationProvider
 {
-    /// <summary>
-    /// Helper class to be able to communicate with the web service.
-    /// </summary>
-    /// <remarks>
-    /// Implementation checklist:
-    ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
-    ///     - All allocated resources are disposed correctly in the session.
-    /// </remarks>
+    
     internal class FiskmöMTServiceHelper
     {
         private static Random rng = new Random();
         private static DateTime TokenCodeExpires = DateTime.MinValue;
         private static string TokenCode;
 
-        public static IMTService getNewProxy(string port)
+        public static IMTService getNewProxy(string host, string port)
         {
             NetTcpBinding myBinding = new NetTcpBinding();
             myBinding.Security.Mode = SecurityMode.Transport;
             myBinding.Security.Transport.ClientCredentialType =
                 TcpClientCredentialType.Windows;
 
-            var epAddr = new EndpointAddress($"net.tcp://localhost:{port}/MTService");
+            var epAddr = new EndpointAddress($"net.tcp://{host}:{port}/MTService");
             var proxy = ChannelFactory<IMTService>.CreateChannel(myBinding, epAddr);
             return proxy;
         }
@@ -39,13 +32,13 @@ namespace FiskmoTranslationProvider
         /// <returns>The token code.</returns>
         /// 
 
-        public static string GetTokenCode(string mtServicePort)
+        public static string GetTokenCode(string host, string mtServicePort)
         {
             if (TokenCodeExpires < DateTime.Now)
             {
                 // refresh the token code
                 // Always dispose allocated resources
-                var proxy = getNewProxy(mtServicePort);
+                var proxy = getNewProxy(host, mtServicePort);
                 try
                 {
                     using (proxy as IDisposable)
@@ -65,9 +58,19 @@ namespace FiskmoTranslationProvider
             return TokenCode;
         }
 
+        public static List<string> GetLanguagePairModelTags(FiskmoOptions options, string languagePair)
+        {
+            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
+            using (proxy as IDisposable)
+            {
+                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(options), languagePair);
+                return modelTags;
+            }
+        }
+
         public static string GetTokenCode(FiskmoOptions options)
         {
-            return FiskmöMTServiceHelper.GetTokenCode(options.mtServicePort);
+            return FiskmöMTServiceHelper.GetTokenCode(options.mtServiceAddress, options.mtServicePort);
         }
 
         /// <summary>
@@ -76,10 +79,10 @@ namespace FiskmoTranslationProvider
         /// <param name="userName">The user name.</param>
         /// <param name="password">The password.</param>
         /// <returns>The token code.</returns>
-        public static string Login(string userName, string password, string port)
+        public static string Login(string host, string userName, string password, string port)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy(port);
+            var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
             {
                 return proxy.Login(userName, password);
@@ -89,7 +92,7 @@ namespace FiskmoTranslationProvider
         
         public static List<string> ListSupportedLanguages(FiskmoOptions options)
         {
-            return ListSupportedLanguages(GetTokenCode(options),options.mtServicePort);
+            return ListSupportedLanguages(GetTokenCode(options),options.mtServiceAddress, options.mtServicePort);
         }
 
         /// <summary>
@@ -97,10 +100,10 @@ namespace FiskmoTranslationProvider
         /// </summary>
         /// <param name="tokenCode">The token code.</param>
         /// <returns>The list of the supported languages.</returns>
-        public static List<string> ListSupportedLanguages(string tokenCode, string port)
+        public static List<string> ListSupportedLanguages(string tokenCode, string host, string port)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy(port);
+            var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
             {
                 string[] supportedLanguages = proxy.ListSupportedLanguagePairs(tokenCode).ToArray();
@@ -119,7 +122,7 @@ namespace FiskmoTranslationProvider
         public static string Translate(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy(options.mtServicePort);
+            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
             using (proxy as IDisposable)
             {
                 string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag);
@@ -127,13 +130,13 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal static void PreTranslateBatch(string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
+        internal static void PreTranslateBatch(string host, string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
         {
-            var proxy = getNewProxy(mtServicePort);
+            var proxy = getNewProxy(host, mtServicePort);
 
             using (proxy as IDisposable)
             {
-                proxy.PreTranslateBatch(GetTokenCode(mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
+                proxy.PreTranslateBatch(GetTokenCode(host, mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
             }
         }
 
@@ -148,7 +151,7 @@ namespace FiskmoTranslationProvider
         public static List<string> BatchTranslate(FiskmoOptions options, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy(options.mtServicePort);
+            var proxy = getNewProxy(options.mtServiceAddress,options.mtServicePort);
             using (proxy as IDisposable)
             {
                 string[] result = proxy.BatchTranslate(GetTokenCode(options), input, srcLangCode, trgLangCode,modelTag).ToArray();
@@ -167,16 +170,16 @@ namespace FiskmoTranslationProvider
         public static void StoreTranslation(FiskmoOptions options, string source, string target, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy(options.mtServicePort);
+            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
             using (proxy as IDisposable)
             {
                 proxy.StoreTranslation(GetTokenCode(options), source, target, srcLangCode, trgLangCode);
             }
         }
 
-        internal static void Customize(string mtServicePort, List<Tuple<string, string>> projectTranslations, List<string> uniqueNewSegments, string sourceCode, string targetCode, string modelTag)
+        internal static void Customize(string host, string mtServicePort, List<Tuple<string, string>> projectTranslations, List<string> uniqueNewSegments, string sourceCode, string targetCode, string modelTag)
         {
-            var proxy = getNewProxy(mtServicePort);
+            var proxy = getNewProxy(host, mtServicePort);
 
             //Pick out 200 sentence pairs randomly to use as tuning set
             var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
@@ -185,7 +188,7 @@ namespace FiskmoTranslationProvider
 
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag);
+                proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag);
             }
         }
         
@@ -201,7 +204,7 @@ namespace FiskmoTranslationProvider
         public static int[] BatchStoreTranslation(FiskmoOptions options, List<string> sources, List<string> targets, string srcLangCode, string trgLangCode)
         {
             // Always dispose allocated resources
-            var proxy = getNewProxy(options.mtServicePort);
+            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
             using (proxy as IDisposable)
             {
                 return proxy.BatchStoreTranslation(GetTokenCode(options), sources, targets, srcLangCode, trgLangCode);
