@@ -24,8 +24,12 @@
                                 IsChecked="{Binding Path=ShowMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         Show MT as suggestion origin
                     </CheckBox>
+                        <DockPanel>
+                            <Label>Model tag</Label>
+                            <ComboBox Name="TagBox" ItemsSource="{Binding Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        </DockPanel>
 
-                </StackPanel>
+                    </StackPanel>
             </Border>
         </TabItem>
             <TabItem Header="Connection">

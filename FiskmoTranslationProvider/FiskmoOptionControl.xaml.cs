@@ -1,8 +1,11 @@
 ﻿using Sdl.LanguagePlatform.Core;
+using Sdl.ProjectAutomation.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,6 +35,8 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        private ObservableCollection<string> allModelTags;
+
         private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]");
@@ -40,22 +45,25 @@ namespace FiskmoTranslationProvider
 
         private void FetchServiceData()
         {
+            string connectionResult;
             try
             {
                 var serviceLanguagePairs = FiskmöMTServiceHelper.ListSupportedLanguages(this.options);
 
+                
+
                 var projectLanguagePairsWithMt = serviceLanguagePairs.Intersect(this.projectLanguagePairs);
                 if (projectLanguagePairsWithMt.Count() == 0)
                 {
-                    Dispatcher.Invoke(() => this.ConnectionStatus = "No MT models available for the language pairs of the project");
+                    connectionResult = "No MT models available for the language pairs of the project";
                 }
                 else if (projectLanguagePairs.Count == projectLanguagePairsWithMt.Count())
                 {
-                    Dispatcher.Invoke(() => this.ConnectionStatus = "MT models available for all the language pairs of the project");
+                    connectionResult = "MT models available for all the language pairs of the project";
                 }
                 else
                 {
-                    Dispatcher.Invoke(() => this.ConnectionStatus = $"MT models available for some of the language pairs of the project: {String.Join(", ", projectLanguagePairsWithMt)}");
+                    connectionResult = $"MT models available for some of the language pairs of the project: {String.Join(", ", projectLanguagePairsWithMt)}";
                 }
 
                 //Get a list of model tags that are supported for these language pairs
@@ -65,26 +73,48 @@ namespace FiskmoTranslationProvider
                     modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(this.options, languagePair.ToString()));
                 }
 
-                Dispatcher.Invoke(() => this.AllModelTags = modelTags);
+                Dispatcher.Invoke(() => UpdateModelTags(modelTags));
             }
             catch
             {
-                Dispatcher.Invoke(() =>
-                    this.ConnectionStatus = $"No connection to Fiskmö MT service at {this.options.mtServiceAddress}:{this.options.mtServicePort}.");
+                connectionResult = $"No connection to Fiskmö MT service at {this.options.mtServiceAddress}:{this.options.mtServicePort}.";
             }
 
+            Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult);
+        }
+
+        private void UpdateModelTags(List<string> tags)
+        {
+            this.AllModelTags.Clear();
+
+            //Always add the model tag from options, if present, and select it
+            if (this.options.modelTag != "" && this.options.modelTag != null)
+            {
+                this.AllModelTags.Add(this.options.modelTag);
+                this.TagBox.SelectedIndex = 0;
+            }
+
+            foreach (var tag in tags)
+            {
+                this.AllModelTags.Add(tag);    
+            }
+            
         }
 
         public FiskmoOptionControl(FiskmoOptionsFormWPF hostForm, FiskmoOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs)
         {
             this.DataContext = this;
+            this.AllModelTags = new ObservableCollection<string>();
             this.options = options;
             this.projectLanguagePairs = languagePairs.Select(
                 x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
 
+            //Update model tag list with potential model tag from options
+            this.UpdateModelTags(new List<string>());
+
             //Check whether there's a connection to a MT service
 
-            Task.Run(this.FetchServiceData);
+            System.Threading.Tasks.Task.Run(this.FetchServiceData);
 
             InitializeComponent();
 
@@ -133,7 +163,6 @@ namespace FiskmoTranslationProvider
         private FiskmoOptions options;
         private List<string> projectLanguagePairs;
         private FiskmoOptionsFormWPF hostForm;
-        private List<string> allModelTags;
         private string connectionStatus;
 
         public string ServicePortBox
@@ -184,11 +213,7 @@ namespace FiskmoTranslationProvider
 
 
 
-        public List<string> AllModelTags
-        {
-            get => allModelTags;
-            set { allModelTags = value; NotifyPropertyChanged(); }
-        }
+        
 
         public string ConnectionStatus
         { 
@@ -199,6 +224,8 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
          }
+
+        public ObservableCollection<string> AllModelTags { get => allModelTags; set { allModelTags = value; NotifyPropertyChanged(); } }
 
         private void cancel_Click(object sender, RoutedEventArgs e)
         {
