@@ -25,7 +25,13 @@ namespace FiskmoTranslationProvider
             this.fineTuneControlHost.Child = this.wpfControl;
         }
 
-        public FinetuneBatchTaskSettings Settings { get => (FinetuneBatchTaskSettings)this.wpfControl.DataContext;  set => this.wpfControl.DataContext = value; }
-        
+        public FinetuneBatchTaskSettings Settings
+        {
+            get => (FinetuneBatchTaskSettings)this.wpfControl.Settings;
+            set
+            {
+                this.wpfControl.Settings = value;
+            }
+        }
     }
 }

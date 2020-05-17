@@ -52,7 +52,7 @@
 
                             <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1">MT service host address</Label>
                             <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="1" HorizontalAlignment="Stretch" Name="ServiceAddressBoxElement" Text="{Binding Path=ServiceAddressBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
-                            <Button Name="TestConnectionButton" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Click="testConnection_Click">Test connection</Button>
+                            <Button Name="TestConnectionButton" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Click="RetryConnection_Click">Test connection</Button>
                         </Grid>
                     </Border>
                 </StackPanel>

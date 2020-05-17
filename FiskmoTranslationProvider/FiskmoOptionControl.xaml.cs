@@ -250,7 +250,7 @@ namespace FiskmoTranslationProvider
             this.hostForm.DialogResult = System.Windows.Forms.DialogResult.OK;
         }
 
-        private void testConnection_Click(object sender, RoutedEventArgs e)
+        private void RetryConnection_Click(object sender, RoutedEventArgs e)
         {
 
         }

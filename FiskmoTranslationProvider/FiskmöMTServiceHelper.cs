@@ -58,10 +58,15 @@ namespace FiskmoTranslationProvider
 
         public static List<string> GetLanguagePairModelTags(FiskmoOptions options, string languagePair)
         {
-            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
+            return FiskmöMTServiceHelper.GetLanguagePairModelTags(options.mtServiceAddress, options.mtServicePort, languagePair);
+        }
+
+        public static List<string> GetLanguagePairModelTags(string host, string port, string languagePair)
+        {
+            var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
             {
-                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(options), languagePair);
+                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(host,port), languagePair);
                 return modelTags;
             }
         }
@@ -91,6 +96,11 @@ namespace FiskmoTranslationProvider
         public static List<string> ListSupportedLanguages(FiskmoOptions options)
         {
             return ListSupportedLanguages(GetTokenCode(options),options.mtServiceAddress, options.mtServicePort);
+        }
+
+        public static List<string> ListSupportedLanguages(string host, string port)
+        {
+            return ListSupportedLanguages(GetTokenCode(host,port), host, port);
         }
 
         /// <summary>

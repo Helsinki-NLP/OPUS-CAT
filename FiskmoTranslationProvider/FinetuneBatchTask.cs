@@ -10,6 +10,7 @@ using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System.Net;
 using Sdl.Core.Globalization;
 using System.Windows.Forms;
+using Sdl.Core.Settings;
 
 namespace FiskmoTranslationProvider
 {
@@ -110,7 +111,7 @@ namespace FiskmoTranslationProvider
                     fiskmoOptions.includePlaceholderTags = true;
                 }
 
-                fiskmoOptions.modelTag = projectGuid.ToString();
+                fiskmoOptions.modelTag = settings.ModelTag;
 
                 var fiskmoRef = new TranslationProviderReference(fiskmoOptions.Uri);
                 tpConfig.Entries.Add(
@@ -119,16 +120,18 @@ namespace FiskmoTranslationProvider
                 this.Project.UpdateTranslationProviderConfiguration(tpConfig);
             }
 
-            /*
-            foreach (var targetLang in projectInfo.TargetLanguages)
+            if (settings.Finetune)
             {
-                var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
-                //Remove duplicates
-                var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
-                var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
-                //Send the tuning set to MT service
-                FiskmöMTServiceHelper.Customize(mtServicePort, uniqueProjectTranslations, uniqueNewSegments, sourceCode, targetCode, projectGuid.ToString());
-            }*/
+                foreach (var targetLang in projectInfo.TargetLanguages)
+                {
+                    var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
+                    //Remove duplicates
+                    var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
+                    var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
+                    //Send the tuning set to MT service
+                    FiskmöMTServiceHelper.Customize(settings.MtServiceAddress, settings.MtServicePort, uniqueProjectTranslations, uniqueNewSegments, sourceCode, targetCode, settings.ModelTag);
+                }
+            }
 
             
             //Send the new segments to MT engine for pretranslation

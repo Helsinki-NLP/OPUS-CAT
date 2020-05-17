@@ -54,7 +54,7 @@ namespace FiskmoTranslationProvider
             if (e.Document.Files.Count() > 0 && activeFiskmoTp != null)
             {
                 var activeFiskmoOptions = new FiskmoOptions(activeFiskmoTp.MainTranslationProvider.Uri);
-                var langPair = e.Document.ActiveFile.GetLanguageDirection();
+                var langPair = e.Document.Files.First().GetLanguageDirection();
                 if (!FiskmoProvider.processedDocuments.ContainsKey(langPair))
                 {
                     FiskmoProvider.processedDocuments.Add(langPair, new ConcurrentBag<Document>());
@@ -94,7 +94,6 @@ namespace FiskmoTranslationProvider
 
                     //This will generate the translation and cache it for later use
                     FiskmöMTServiceHelper.Translate(options, sourceText, sourceCode, targetCode, options.modelTag);
-
                 }
             }
 

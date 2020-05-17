@@ -5,9 +5,49 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <CheckBox IsChecked="{Binding Path=IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
-        <CheckBox IsChecked="{Binding Path=AddFiskmoProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add Fiskmo MT provider to project</CheckBox>
+             d:DesignHeight="450" d:DesignWidth="300">
+    <StackPanel Background="White" Margin="5">
+        <Border BorderBrush="Black" BorderThickness="1">
+            <StackPanel Margin="5,0,0,5">
+                <Label>Preprocessing mode</Label>
+                <RadioButton Name="FinetuneAndTranslate" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model and batch translate</RadioButton>
+                <RadioButton Name="FinetuneOnly" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model only</RadioButton>
+                <RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Mode">Batch translate only</RadioButton>
+            </StackPanel>
+        </Border>
+        <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
+        <CheckBox Margin="0,0,0,5" IsChecked="{Binding Path=Settings.AddFiskmoProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add Fiskmo MT provider to project</CheckBox>
+        <DockPanel>
+            <Label>Model tag</Label>
+            <ComboBox Margin="0,0,0,5" Name="TagBox" IsEditable="True" ItemsSource="{Binding Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+        </DockPanel>
+        <Border BorderThickness="1" BorderBrush="Black">
+            <StackPanel>
+                <Label>Connection status</Label>
+                <TextBlock Text="{Binding Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+            </StackPanel>
+        </Border>
+            <StackPanel>
+            <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <Grid Margin="10,10,10,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="170"/>
+                        <ColumnDefinition Width="70" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="25" />
+                    </Grid.RowDefinitions>
+
+                    <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0">MT service port (1024-65535)</Label>
+                    <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="0" HorizontalAlignment="Stretch" Name="ServicePortBoxElement" Text="{Binding Path=Settings.MtServicePort, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>
+                    <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1">MT service host address</Label>
+                    <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="1" HorizontalAlignment="Stretch" Name="ServiceAddressBoxElement" Text="{Binding Path=Settings.MtServiceAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
+                    <Button Name="TestConnectionButton" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Click="RetryConnection_Click">Retry connection</Button>
+                </Grid>
+            </Border>
+        </StackPanel>
     </StackPanel>
 </UserControl>

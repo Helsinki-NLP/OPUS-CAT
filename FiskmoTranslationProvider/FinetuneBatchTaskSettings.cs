@@ -33,6 +33,87 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        public bool Finetune
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(Finetune));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(Finetune)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool BatchTranslate
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(BatchTranslate));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(BatchTranslate)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string ModelTag
+        {
+            get
+            {
+                return GetSetting<string>(nameof(ModelTag));
+            }
+            set
+            {
+                GetSetting<string>(nameof(ModelTag)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string MtServiceAddress
+        {
+            get
+            {
+                var setting = GetSetting<string>(nameof(MtServiceAddress));
+                if (setting == null || setting == "")
+                {
+                    return FiskmoTpSettings.Default.MtServiceAddress;
+                }
+                else
+                {
+                    return setting;
+                }
+            }
+            set
+            {
+                GetSetting<string>(nameof(MtServiceAddress)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public string MtServicePort
+        {
+            get
+            {
+                var setting = GetSetting<string>(nameof(MtServicePort));
+                if (setting == null || setting == "")
+                {
+                    return FiskmoTpSettings.Default.MtServicePort;
+                }
+                else
+                {
+                    return setting;
+                }
+            }
+            set
+            {
+                GetSetting<string>(nameof(MtServicePort)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public bool AddFiskmoProvider
         {
             get
@@ -45,5 +126,7 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
         }
+
+
     }
 }
