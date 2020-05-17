@@ -18,8 +18,7 @@ namespace FiskmoTranslationProvider
         
         public FiskmoOptions()
         {
-            _uriBuilder = new TranslationProviderUriBuilder(FiskmoProvider.ListTranslationProviderScheme);
-            System.Console.WriteLine(FiskmoProvider.ListTranslationProviderScheme);
+            _uriBuilder = new TranslationProviderUriBuilder(FiskmoProvider.FiskmoTranslationProviderScheme);
         }
 
         public FiskmoOptions(Uri uri)
@@ -35,6 +34,8 @@ namespace FiskmoTranslationProvider
                 var parameter = GetStringParameter("mtServicePort");
                 if (parameter == "" || parameter == null)
                 {
+                    //Add default to URI
+                    SetStringParameter("mtServicePort", FiskmoTpSettings.Default.MtServicePort);
                     return FiskmoTpSettings.Default.MtServicePort;
                 }
                 else
@@ -52,6 +53,8 @@ namespace FiskmoTranslationProvider
                 var parameter = GetStringParameter("mtServiceAddress");
                 if (parameter == "" || parameter == null)
                 {
+                    //Add default to URI
+                    SetStringParameter("mtServiceAddress", FiskmoTpSettings.Default.MtServiceAddress);
                     return FiskmoTpSettings.Default.MtServiceAddress;
                 }
                 else
@@ -78,30 +81,6 @@ namespace FiskmoTranslationProvider
             }
             set { SetStringParameter("mtServiceAddress", value); }
         }
-
-        /*public Boolean useAllModels
-        {
-            get { return GetBooleanParameter("useAllModels"); }
-            set { SetBooleanParameter("useAllModels", value); }
-        }*/
-
-        /*public string serverAddress
-        {
-            get { return GetStringParameter("serverAddress"); }
-            set { SetStringParameter("serverAddress", value); }
-        }*/
-
-        /*public string port
-        {
-            get { return GetStringParameter("port"); }
-            set { SetStringParameter("port", value); }
-        }
-
-        public string client
-        {
-            get { return GetStringParameter("client"); }
-            set { SetStringParameter("client", value); }
-        }*/
 
         public Boolean pregenerateMt
         {
@@ -156,6 +135,8 @@ namespace FiskmoTranslationProvider
             var parseResult = Boolean.TryParse(paramString,out result);
             if (!parseResult)
             {
+                //Default the parameter to make it visible in the URI
+                SetBooleanParameter(p, false);
                 return false;
             }
             else

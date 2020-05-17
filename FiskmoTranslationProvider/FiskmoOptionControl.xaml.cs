@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using System.ServiceModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -75,7 +76,7 @@ namespace FiskmoTranslationProvider
 
                 Dispatcher.Invoke(() => UpdateModelTags(modelTags));
             }
-            catch
+            catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
             {
                 connectionResult = $"No connection to Fiskmö MT service at {this.options.mtServiceAddress}:{this.options.mtServicePort}.";
             }
@@ -205,6 +206,18 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
         }
+
+
+        public Boolean IncludeTagsAsText
+        {
+            get => this.options.includePlaceholderTags;
+            set
+            {
+                this.options.includePlaceholderTags = value;
+                NotifyPropertyChanged();
+            }
+        }
+        
 
         public string Error
         {

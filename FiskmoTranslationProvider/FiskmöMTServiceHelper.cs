@@ -49,8 +49,6 @@ namespace FiskmoTranslationProvider
                 }
                 catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
                 {
-                    MessageBox.Show(
-                        "No connection to Fiskmö MT service. Check that the MT service is running and that both plugin and MT service use same port numbers.");
                     throw ex;
                 }
             }

@@ -11,6 +11,7 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Linq;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using System.Reflection;
 
 namespace FiskmoTranslationProvider
 {
@@ -21,14 +22,13 @@ namespace FiskmoTranslationProvider
         private LanguagePair _languageDirection;
         private FiskmoOptions _options;
         private FiskmoProviderElementVisitor _visitor;
-        private static Dictionary<string,ConcurrentBag<Document>> processedDocuments = new Dictionary<string, ConcurrentBag<Document>>();
-        //internal static Dictionary<string,List<MarianProcess>> _marianProcesses = new Dictionary<string, List<MarianProcess>>();
+      
         private string langpair;
         internal static string _segmentTranslation;
+
         #endregion
 
-        #region "ITranslationProviderLanguageDirection Members"
-
+ 
 
         /// <summary>
         /// Instantiates the variables and fills the list file content into
@@ -46,12 +46,6 @@ namespace FiskmoTranslationProvider
             _languageDirection = languages;
             _options = _provider.Options;
 
-            if (_options.pregenerateMt)
-            {
-                EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
-                editorController.ActiveDocumentChanged += DocChanged;
-            }
-
             _visitor = new FiskmoProviderElementVisitor(_options);
 
             var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
@@ -61,77 +55,7 @@ namespace FiskmoTranslationProvider
             #endregion
         }
 
-        //Whenever doc changes, start translating the segments and caching translations
-        private void DocChanged(object sender, DocumentEventArgs e)
-        {
-            if (e.Document == null)
-            {
-                return;
-            }
 
-            var project = e.Document.Project;
-            var projectInfo = project.GetProjectInfo();
-
-            //Don't generate for incorrect language pairs
-            if (projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName != this.SourceLanguage.TwoLetterISOLanguageName ||
-                !projectInfo.TargetLanguages.Select(x => x.CultureInfo.TwoLetterISOLanguageName).Contains(this.TargetLanguage.TwoLetterISOLanguageName))
-            {
-                return;
-            }
-
-            var projectTpConfig = project.GetTranslationProviderConfiguration();
-            var tpEntries = projectTpConfig.Entries;
-            var activeFiskmoTp = tpEntries.SingleOrDefault(
-                x =>
-                    x.MainTranslationProvider.Enabled &&
-                    x.MainTranslationProvider.Uri.OriginalString.Contains("fiskmoprovider")
-                );
-
-            if (!FiskmoProviderLanguageDirection.processedDocuments.ContainsKey(this.langpair))
-            {
-                FiskmoProviderLanguageDirection.processedDocuments.Add(this.langpair, new ConcurrentBag<Document>());
-            }
-
-            if (activeFiskmoTp != null &&
-                activeFiskmoTp.MainTranslationProvider.Uri.OriginalString.Contains("pregenerateMt=True") &&
-                !FiskmoProviderLanguageDirection.processedDocuments[this.langpair].Contains(e.Document))
-            {
-                processedDocuments[this.langpair].Add(e.Document);
-                Task t = Task.Run(() => TranslateDocumentSegments(e.Document));
-            }
-        }
-
-        //This function starts translating all segments in the document once the document is opened,
-        //so that the translator won't have to wait for the translation to finish when opening a segment.
-        //Note that Studio contains a feature called LookAhead which attempts to do a similar thing, but
-        //this feature appears to be buggy with TMs etc., so it's better to rely on a custom caching system.
-        private void TranslateDocumentSegments(Document doc)
-        {
-            EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
-            foreach (var segmentPair in doc.SegmentPairs)
-            {
-                if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified)
-                {
-                    var allTextItems = segmentPair.Source.AllSubItems.Where(x => x is IText);
-                    var sourceText = String.Join(" ", allTextItems);
-
-                    var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
-                    var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
-                    var langpair = $"{sourceCode}-{targetCode}";
-
-                    //This will generate the translation and cache it for later use
-                    FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this._options.modelTag);
-                    
-                    /*foreach (var marianProcess in FiskmoProviderLanguageDirection._marianProcesses[langpair])
-                    {
-                        marianProcess.Translate(sourceText);
-                    }*/
-
-                }
-            }
-        }
-
-        #endregion
 
         public System.Globalization.CultureInfo SourceLanguage
         {

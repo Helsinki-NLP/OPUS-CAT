@@ -127,8 +127,8 @@ namespace FiskmoMTEngine
 
         private void restartButton_Click(object sender, RoutedEventArgs e)
         {
-            //Close service and start it again
-            this.serviceHost.Close();
+            //Abort the service and start it again
+            this.serviceHost.Abort();
             this.StartService();
         }
 

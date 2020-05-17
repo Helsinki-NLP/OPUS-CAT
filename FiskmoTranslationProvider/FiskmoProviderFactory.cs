@@ -35,7 +35,7 @@ namespace FiskmoTranslationProvider
             {
                 throw new ArgumentNullException("Translation provider URI not supported.");
             }
-            return String.Equals(translationProviderUri.Scheme, FiskmoProvider.ListTranslationProviderScheme, StringComparison.OrdinalIgnoreCase);
+            return String.Equals(translationProviderUri.Scheme, FiskmoProvider.FiskmoTranslationProviderScheme, StringComparison.OrdinalIgnoreCase);
             //return true;
         }
         #endregion

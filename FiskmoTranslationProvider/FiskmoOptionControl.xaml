@@ -13,7 +13,7 @@
                 <StackPanel Margin="10,10,10,10">
                     <CheckBox 
                             ToolTip="If checked, document segments are sent for translation as soon as the document is opened."
-                            IsChecked="{Binding Path=PregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            IsChecked="{Binding Path=IncludeTagsAsText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                         Include placeholder tags as text
                     </CheckBox>
                     <CheckBox ToolTip="If checked, document segments are sent for translation as soon as the document is opened."

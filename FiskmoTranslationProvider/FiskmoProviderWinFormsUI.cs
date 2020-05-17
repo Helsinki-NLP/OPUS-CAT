@@ -130,7 +130,7 @@ namespace FiskmoTranslationProvider
             {
                 throw new ArgumentNullException("URI not supported by the plug-in.");
             }
-            return String.Equals(translationProviderUri.Scheme, FiskmoProvider.ListTranslationProviderScheme, StringComparison.CurrentCultureIgnoreCase);
+            return String.Equals(translationProviderUri.Scheme, FiskmoProvider.FiskmoTranslationProviderScheme, StringComparison.CurrentCultureIgnoreCase);
         }
 
         public string TypeDescription

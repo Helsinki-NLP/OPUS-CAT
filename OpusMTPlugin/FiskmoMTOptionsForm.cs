@@ -158,10 +158,7 @@ namespace FiskmoMTPlugin
 
         private void FiskmöMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (DialogResult == System.Windows.Forms.DialogResult.OK && loginResult != null)
-            {
-                Options.GeneralSettings.MtServicePort = mtServicePortTextBox.Text;
-            }
+            
         }
 
         private bool isShowHelpSupported()
