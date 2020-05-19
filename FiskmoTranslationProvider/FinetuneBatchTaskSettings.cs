@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FiskmoTranslationProvider
 {
-    public class FinetuneBatchTaskSettings : SettingsGroup
+    public class FinetuneBatchTaskSettings : SettingsGroup, INotifyPropertyChanged
     {
 
         public new event PropertyChangedEventHandler PropertyChanged;
@@ -22,16 +22,6 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public bool IncludePlaceholderTags
-        {
-            get {
-                return GetSetting<bool>(nameof(IncludePlaceholderTags));
-            }
-            set { 
-                GetSetting<bool>(nameof(IncludePlaceholderTags)).Value = value;
-                NotifyPropertyChanged(); 
-            }
-        }
 
         public bool Finetune
         {
@@ -59,57 +49,16 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public string ModelTag
-        {
-            get
-            {
-                return GetSetting<string>(nameof(ModelTag));
-            }
-            set
-            {
-                GetSetting<string>(nameof(ModelTag)).Value = value;
-                NotifyPropertyChanged();
-            }
-        }
 
-        public string MtServiceAddress
+        public string ProviderOptions
         {
             get
             {
-                var setting = GetSetting<string>(nameof(MtServiceAddress));
-                if (setting == null || setting == "")
-                {
-                    return FiskmoTpSettings.Default.MtServiceAddress;
-                }
-                else
-                {
-                    return setting;
-                }
+                return GetSetting<string>(nameof(ProviderOptions));
             }
             set
             {
-                GetSetting<string>(nameof(MtServiceAddress)).Value = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public string MtServicePort
-        {
-            get
-            {
-                var setting = GetSetting<string>(nameof(MtServicePort));
-                if (setting == null || setting == "")
-                {
-                    return FiskmoTpSettings.Default.MtServicePort;
-                }
-                else
-                {
-                    return setting;
-                }
-            }
-            set
-            {
-                GetSetting<string>(nameof(MtServicePort)).Value = value;
+                GetSetting<string>(nameof(ProviderOptions)).Value = value;
                 NotifyPropertyChanged();
             }
         }
@@ -126,7 +75,6 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
         }
-
-
+        
     }
 }

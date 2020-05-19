@@ -26,8 +26,10 @@ namespace FiskmoTranslationProvider
     public partial class FinetuneWpfControl : UserControl, INotifyPropertyChanged
     {
         private FinetuneBatchTaskSettings settings;
-        public FinetuneBatchTaskSettings Settings 
-        { 
+        private FiskmoOptions options;
+
+        public FinetuneBatchTaskSettings Settings
+        {
             get
             {
                 return settings;
@@ -35,19 +37,23 @@ namespace FiskmoTranslationProvider
             set
             {
                 settings = value;
-                settings.MtServicePort = settings.MtServicePort;
-                settings.MtServiceAddress = settings.MtServicePort;
-                FetchServiceData();
+            }
+        }
+
+        public FiskmoOptions Options
+        {
+            get
+            {
+                return options;
+            }
+            set
+            {
+                options = value;
+                NotifyPropertyChanged();
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex("[^0-9]");
-            e.Handled = regex.IsMatch(e.Text);
-        }
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -57,66 +63,27 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        private ObservableCollection<string> allModelTags;
-        private string mtServiceAddress;
-        private string mtServicePort;
-        private string connectionStatus;
-        private string modelTag;
-
-        public ObservableCollection<string> AllModelTags { get => allModelTags; set { allModelTags = value; NotifyPropertyChanged(); } }
-
-        private void FetchServiceData()
+        public FinetuneWpfControl(FinetuneBatchTaskSettings Settings)
         {
-            string connectionResult;
-            try
-            {
-                var serviceLanguagePairs = FiskmöMTServiceHelper.ListSupportedLanguages(this.mtServiceAddress,this.mtServicePort);
+            this.DataContext = this;
 
-                connectionResult = $"Available language pairs: {String.Join(", ", serviceLanguagePairs)}";
-                
-                //Get a list of model tags that are supported for these language pairs
-                List<string> modelTags = new List<string>();
-                foreach (var languagePair in serviceLanguagePairs)
-                {
-                    modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(this.Settings.MtServiceAddress, this.Settings.MtServicePort, languagePair.ToString()));
-                }
-
-                Dispatcher.Invoke(() => UpdateModelTags(modelTags));
-            }
-            catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException || ex is UriFormatException)
-            {
-                connectionResult = $"No connection to Fiskmö MT service at {this.mtServiceAddress}:{this.mtServicePort}.";
-            }
-
-            Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult);
-        }
-
-        private void UpdateModelTags(List<string> tags)
-        {
-            this.AllModelTags.Clear();
-
-            foreach (var tag in tags)
-            {
-                this.AllModelTags.Add(tag);
-            }
-
-        }
-
-        public FinetuneWpfControl()
-        {
+            //Settings is the object that is passed on to the batch task.
+            this.Settings = Settings;
+            //Mode defaults, changeable with radio buttons
+            this.Settings.Finetune = true;
+            this.Settings.BatchTranslate = true;
+            //Some settings are initially held in a FiskmoOptions object (the shared properties
+            //with the translation provider settings).
+            this.Options = new FiskmoOptions();
+            //Whenever the options change, also update the option URI string in settings
+            this.Options.PropertyChanged += Options_PropertyChanged;
             InitializeComponent();
         }
 
-        public string ConnectionStatus
+        private void Options_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            get => connectionStatus;
-            set
-            {
-                connectionStatus = value;
-                NotifyPropertyChanged();
-            }
+            this.settings.ProviderOptions = this.Options.Uri.ToString();
         }
-
 
         private void ModeButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -139,11 +106,6 @@ namespace FiskmoTranslationProvider
                         break;
                 }
             }
-        }
-
-        private void RetryConnection_Click(object sender, RoutedEventArgs e)
-        {
-            this.FetchServiceData();
         }
     }
 }

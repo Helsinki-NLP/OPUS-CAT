@@ -13,16 +13,11 @@ namespace FiskmoTranslationProvider
 {
     public partial class FinetuneBatchTaskControl : UserControl, ISettingsAware<FinetuneBatchTaskSettings>
     {
-        private FinetuneBatchTaskSettings settings;
         private FinetuneWpfControl wpfControl;
 
         public FinetuneBatchTaskControl()
         {
-
             InitializeComponent();
-            this.wpfControl = new FinetuneWpfControl();
-
-            this.fineTuneControlHost.Child = this.wpfControl;
         }
 
         public FinetuneBatchTaskSettings Settings
@@ -30,7 +25,8 @@ namespace FiskmoTranslationProvider
             get => (FinetuneBatchTaskSettings)this.wpfControl.Settings;
             set
             {
-                this.wpfControl.Settings = value;
+                this.wpfControl = new FinetuneWpfControl(value);
+                this.fineTuneControlHost.Child = this.wpfControl;
             }
         }
     }

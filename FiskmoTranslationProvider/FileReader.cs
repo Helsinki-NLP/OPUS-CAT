@@ -16,12 +16,14 @@ namespace FiskmoTranslationProvider
         internal List<string> FileNewSegments;
         internal List<Tuple<string, string>> TmFuzzies;
         private FinetuneBatchTaskSettings settings;
+        private FiskmoOptions options;
         private string localFilePath;
         Dictionary<Language, List<ITranslationProvider>> tms;
 
         public FileReader(Dictionary<Language, List<ITranslationProvider>> tms, FinetuneBatchTaskSettings settings)
         {
             this.settings = settings;
+            this.options = new FiskmoOptions(new Uri(settings.ProviderOptions));
             this.FileTranslations = new List<Tuple<string, string>>();
             this.FileNewSegments = new List<string>();
             this.TmFuzzies = new List<Tuple<string, string>>();
@@ -41,7 +43,7 @@ namespace FiskmoTranslationProvider
                 {
                     segmentText.Append(item);
                 }
-                else if (settings.IncludePlaceholderTags && item is IPlaceholderTag)
+                else if (options.includePlaceholderTags && item is IPlaceholderTag)
                 {
                     //segmentText.Append(((IPlaceholderTag)item).TagProperties.DisplayText);
                     segmentText.Append("PLACEHOLDER");

@@ -27,6 +27,7 @@ namespace FiskmoTranslationProvider
     class FinetuneBatchTask : AbstractFileContentProcessingAutomaticTask
     {
         private FinetuneBatchTaskSettings settings;
+        private FiskmoOptions fiskmoOptions;
         internal Dictionary<Language,List<Tuple<string, string>>> ProjectTranslations;
 
         public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
@@ -34,6 +35,7 @@ namespace FiskmoTranslationProvider
         protected override void OnInitializeTask()
         {
             this.settings = GetSetting<FinetuneBatchTaskSettings>();
+            this.fiskmoOptions = new FiskmoOptions(new Uri(this.settings.ProviderOptions));
             this.ProjectTranslations = new Dictionary<Language, List<Tuple<string, string>>>();
             this.ProjectNewSegments = new Dictionary<Language, List<string>>();
             base.OnInitializeTask();
@@ -99,19 +101,18 @@ namespace FiskmoTranslationProvider
             var projectGuid = projectInfo.Id;
             var sourceCode = projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
 
-            var fiskmoOptions = new FiskmoOptions();
+            
 
             if (settings.AddFiskmoProvider)
             {
                 //Add Fiskmö MT provider to the project
                 var tpConfig = this.Project.GetTranslationProviderConfiguration();
 
-                if (settings.IncludePlaceholderTags)
+                if (this.fiskmoOptions.includePlaceholderTags)
                 {
                     fiskmoOptions.includePlaceholderTags = true;
                 }
 
-                fiskmoOptions.modelTag = settings.ModelTag;
 
                 var fiskmoRef = new TranslationProviderReference(fiskmoOptions.Uri);
                 tpConfig.Entries.Add(
@@ -129,7 +130,7 @@ namespace FiskmoTranslationProvider
                     var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
                     var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                     //Send the tuning set to MT service
-                    FiskmöMTServiceHelper.Customize(settings.MtServiceAddress, settings.MtServicePort, uniqueProjectTranslations, uniqueNewSegments, sourceCode, targetCode, settings.ModelTag);
+                    FiskmöMTServiceHelper.Customize(this.fiskmoOptions.mtServiceAddress, this.fiskmoOptions.mtServicePort, uniqueProjectTranslations, uniqueNewSegments, sourceCode, targetCode, this.fiskmoOptions.modelTag);
                 }
             }
 
