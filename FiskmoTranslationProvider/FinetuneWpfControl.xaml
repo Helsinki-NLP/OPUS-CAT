@@ -6,14 +6,11 @@
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
+    <Control.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Control.Resources>
     <DockPanel Background="White">
-        <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Black">
-            <StackPanel>
-                <Label>Connection status</Label>
-                <TextBlock Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
-            </StackPanel>
-        </Border>
-        <TabControl>
+        <TabControl DockPanel.Dock="Top">
             <TabItem Header="Task settings">
                 <StackPanel>
                     <Border BorderBrush="Black" BorderThickness="1">
@@ -51,6 +48,14 @@
             </TabItem>
 
         </TabControl>
-        
+        <Border BorderThickness="1" BorderBrush="Black">
+            <StackPanel>
+                <Label FontWeight="Bold">Connection status</Label>
+                <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+                <TextBlock Margin="5" Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}"><Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate">
+                    Fiskmö MT online documentation
+                </Hyperlink></TextBlock>
+            </StackPanel>
+        </Border>
     </DockPanel>
 </UserControl>

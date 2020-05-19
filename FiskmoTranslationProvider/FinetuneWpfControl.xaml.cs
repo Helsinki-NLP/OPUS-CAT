@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
@@ -85,6 +86,7 @@ namespace FiskmoTranslationProvider
             this.settings.ProviderOptions = this.Options.Uri.ToString();
         }
 
+        
         private void ModeButton_Checked(object sender, RoutedEventArgs e)
         {
             var radioButton = ((RadioButton)sender);
@@ -106,6 +108,12 @@ namespace FiskmoTranslationProvider
                         break;
                 }
             }
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

@@ -9,24 +9,21 @@
     <StackPanel Background="White">
         <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
         <Border BorderThickness="1" BorderBrush="Black">
-            <Grid Margin="10,10,10,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="170"/>
-                    <ColumnDefinition Width="70" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25" />
-                    <RowDefinition Height="25" />
-                    <RowDefinition Height="25" />
-                </Grid.RowDefinitions>
+            <StackPanel Margin="10,10,10,10">
+                <DockPanel>
+                    <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right">MT service port (1024-65535)</Label>
+                    <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServicePortBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServicePort, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>
+                </DockPanel>
 
-                <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="0">MT service port (1024-65535)</Label>
-                <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center"  Grid.Row="0" HorizontalAlignment="Stretch" Name="ServicePortBoxElement" Text="{Binding Path=Options.mtServicePort, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" Margin="170,4,1.333,2.333" Grid.ColumnSpan="2"/>
-                <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)" HorizontalAlignment="Right" Grid.Column="0" Grid.Row="1">MT service host address</Label>
-                <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" VerticalAlignment="Center" Grid.Column="1"  Grid.Row="1" HorizontalAlignment="Stretch" Name="ServiceAddressBoxElement" Text="{Binding Path=Options.mtServiceAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
-                
-                <Button Name="RetryConnectionButton" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Click="RetryConnection_Click">Retry connection</Button>
-            </Grid>
+                <DockPanel>
+                    <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)">MT service host address</Label>
+                    <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServiceAddressBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServiceAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
+                </DockPanel>
+                <DockPanel LastChildFill="False">
+                    <Button Padding="5"  DockPanel.Dock="Left" Name="SaveAsDefaultButton" Click="SaveAsDefault_Click">Save as default</Button>
+                    <Button Padding="5" DockPanel.Dock="Right" Name="RetryConnectionButton" Click="RetryConnection_Click">Retry connection</Button>
+                </DockPanel>
+            </StackPanel>
         </Border>
     </StackPanel>
 </UserControl>
