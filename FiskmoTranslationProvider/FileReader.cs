@@ -17,10 +17,9 @@ namespace FiskmoTranslationProvider
         internal List<Tuple<string, string>> TmFuzzies;
         private FinetuneBatchTaskSettings settings;
         private FiskmoOptions options;
-        private string localFilePath;
-        Dictionary<Language, List<ITranslationProvider>> tms;
+        List<ITranslationProvider> tms;
 
-        public FileReader(Dictionary<Language, List<ITranslationProvider>> tms, FinetuneBatchTaskSettings settings)
+        public FileReader(List<ITranslationProvider> tms, FinetuneBatchTaskSettings settings)
         {
             this.settings = settings;
             this.options = new FiskmoOptions(new Uri(settings.ProviderOptions));
@@ -32,11 +31,13 @@ namespace FiskmoTranslationProvider
 
         private string ExtractSegmentText(ISegment segment)
         {
-            if (segment.ToString().Contains("\n"))
+            //For testing
+            /*if (segment.ToString().Contains("\n"))
             {
                 return "";
-            }
+            }*/
             StringBuilder segmentText = new StringBuilder();
+            int placeholderIndex = 0;
             foreach (var item in segment.AllSubItems)
             {
                 if (item is IText)
@@ -46,7 +47,8 @@ namespace FiskmoTranslationProvider
                 else if (options.includePlaceholderTags && item is IPlaceholderTag)
                 {
                     //segmentText.Append(((IPlaceholderTag)item).TagProperties.DisplayText);
-                    segmentText.Append("PLACEHOLDER");
+                    segmentText.Append($"PLACEHOLDER{placeholderIndex}");
+                    placeholderIndex++;
                 }
             }
 
@@ -76,10 +78,10 @@ namespace FiskmoTranslationProvider
                     //If segment does not have translation, add it to new strings and look for fuzzies
                     FileNewSegments.Add(this.ExtractSegmentText(segmentPair.Source));
 
-                    foreach (var tm in this.tms)
+                    /*foreach (var tm in this.tms[this)
                     {
-                        
-                    }
+                        tm
+                    }*/
                 }
             }
         }

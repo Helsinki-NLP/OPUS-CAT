@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.LanguagePlatform.Core;
@@ -85,8 +86,7 @@ namespace FiskmoTranslationProvider
             {
                 if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified)
                 {
-                    var allTextItems = segmentPair.Source.AllSubItems.Where(x => x is IText);
-                    var sourceText = String.Join(" ", allTextItems);
+                    var sourceText = FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source, options.includePlaceholderTags);
 
                     var sourceCode = langPair.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
                     var targetCode = langPair.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;

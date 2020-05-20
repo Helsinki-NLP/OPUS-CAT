@@ -26,7 +26,7 @@ namespace FiskmoTranslationProvider
                 var activeSegmentPair = editorController.ActiveDocument.ActiveSegmentPair;
                 if (activeSegmentPair == null) return;
 
-                //Create an instance of the document item factory that is need to create segment elements
+                //Create an instance of the document item factory that is needed to create segment elements
                 IDocumentItemFactory documentItemFactory = DefaultDocumentItemFactory.CreateInstance();
                 //Create the text element
                 ITextProperties firstTextProp = documentItemFactory

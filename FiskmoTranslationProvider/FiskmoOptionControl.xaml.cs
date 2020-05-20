@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
@@ -26,129 +27,26 @@ namespace FiskmoTranslationProvider
     /// <summary>
     /// Interaction logic for FiskmoOptions.xaml
     /// </summary>
-    public partial class FiskmoOptionControl : UserControl, IDataErrorInfo, INotifyPropertyChanged
+    public partial class FiskmoOptionControl : UserControl, INotifyPropertyChanged
     {
-        public string this[string columnName]
-        {
-            get
-            {
-                return Validate(columnName);
-            }
-        }
 
-        private ObservableCollection<string> allModelTags;
-
-        private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex("[^0-9]");
-            e.Handled = regex.IsMatch(e.Text);
-        }
-
-        private void FetchServiceData()
-        {
-            string connectionResult;
-            try
-            {
-                var serviceLanguagePairs = FiskmöMTServiceHelper.ListSupportedLanguages(this.options);
-
-                
-
-                var projectLanguagePairsWithMt = serviceLanguagePairs.Intersect(this.projectLanguagePairs);
-                if (projectLanguagePairsWithMt.Count() == 0)
-                {
-                    connectionResult = "No MT models available for the language pairs of the project";
-                }
-                else if (projectLanguagePairs.Count == projectLanguagePairsWithMt.Count())
-                {
-                    connectionResult = "MT models available for all the language pairs of the project";
-                }
-                else
-                {
-                    connectionResult = $"MT models available for some of the language pairs of the project: {String.Join(", ", projectLanguagePairsWithMt)}";
-                }
-
-                //Get a list of model tags that are supported for these language pairs
-                List<string> modelTags = new List<string>();
-                foreach (var languagePair in this.projectLanguagePairs)
-                {
-                    modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(this.options, languagePair.ToString()));
-                }
-
-                Dispatcher.Invoke(() => UpdateModelTags(modelTags));
-            }
-            catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
-            {
-                connectionResult = $"No connection to Fiskmö MT service at {this.options.mtServiceAddress}:{this.options.mtServicePort}.";
-            }
-
-            Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult);
-        }
-
-        private void UpdateModelTags(List<string> tags)
-        {
-            this.AllModelTags.Clear();
-
-            //Always add the model tag from options, if present, and select it
-            if (this.options.modelTag != "" && this.options.modelTag != null)
-            {
-                this.AllModelTags.Add(this.options.modelTag);
-                this.TagBox.SelectedIndex = 0;
-            }
-
-            foreach (var tag in tags)
-            {
-                this.AllModelTags.Add(tag);    
-            }
-            
-        }
 
         public FiskmoOptionControl(FiskmoOptionsFormWPF hostForm, FiskmoOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs)
         {
             this.DataContext = this;
-            this.AllModelTags = new ObservableCollection<string>();
+            
             this.options = options;
             this.projectLanguagePairs = languagePairs.Select(
                 x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
 
-            //Update model tag list with potential model tag from options
-            this.UpdateModelTags(new List<string>());
-
-            //Check whether there's a connection to a MT service
-
-            System.Threading.Tasks.Task.Run(this.FetchServiceData);
-
             InitializeComponent();
+            this.ConnectionControl.LanguagePairs = this.projectLanguagePairs;
+            this.ConnectionControl.AddModelTag(this.options.modelTag);
 
             //Null indicates that all properties have changed. Populates the WPF form
             PropertyChanged(this, new PropertyChangedEventArgs(null));
 
             this.hostForm = hostForm;
-        }
-
-        private string Validate(string propertyName)
-        {
-            // Return error message if there is error on else return empty or null string
-            string validationMessage = string.Empty;
-            switch (propertyName)
-            {
-                case "ServicePortBox":
-                    if (this.ServicePortBox != null && this.ServicePortBox != "")
-                    {
-                        var portNumber = Int32.Parse(this.ServicePortBox);
-                        if (portNumber < 1024 || portNumber > 65535)
-                        {
-                            validationMessage = "Error";
-                        }
-                    }
-                    else
-                    {
-                        validationMessage = "Error";
-                    }
-
-                    break;
-            }
-
-            return validationMessage;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -186,7 +84,15 @@ namespace FiskmoTranslationProvider
             }
         }
 
-
+        public string ModelTag
+        {
+            get => this.options.modelTag;
+            set
+            {
+                this.options.modelTag = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public Boolean PregenerateMt
         {
@@ -219,27 +125,6 @@ namespace FiskmoTranslationProvider
         }
         
 
-        public string Error
-        {
-            get { return "...."; }
-        }
-
-
-
-        
-
-        public string ConnectionStatus
-        { 
-            get => connectionStatus;
-            set
-            {
-                connectionStatus = value;
-                NotifyPropertyChanged();
-            }
-         }
-
-        public ObservableCollection<string> AllModelTags { get => allModelTags; set { allModelTags = value; NotifyPropertyChanged(); } }
-
         private void cancel_Click(object sender, RoutedEventArgs e)
         {
             this.hostForm.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -250,9 +135,11 @@ namespace FiskmoTranslationProvider
             this.hostForm.DialogResult = System.Windows.Forms.DialogResult.OK;
         }
 
-        private void RetryConnection_Click(object sender, RoutedEventArgs e)
-        {
 
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
         }
     }
 }

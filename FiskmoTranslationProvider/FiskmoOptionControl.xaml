@@ -5,7 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="270">
+             d:DesignHeight="400" d:DesignWidth="270">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
     <DockPanel Background="White">
         <TabControl DockPanel.Dock="Top">
         <TabItem Header="General">
@@ -26,14 +29,17 @@
                     </CheckBox>
                         <DockPanel>
                             <Label>Model tag</Label>
-                            <ComboBox Name="TagBox" ItemsSource="{Binding Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            <ComboBox Name="TagBox" SelectedItem="{Binding Path=ModelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ItemsSource="{Binding Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                         </DockPanel>
 
                     </StackPanel>
             </Border>
         </TabItem>
             <TabItem Header="Connection">
-                <StackPanel>
+                <local:ConnectionControl x:Name="ConnectionControl" />
+
+
+                <!--<StackPanel>
                     <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
                     <Border BorderThickness="1" BorderBrush="Black">
                         <Grid Margin="10,10,10,10">
@@ -55,14 +61,18 @@
                             <Button Name="TestConnectionButton" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Click="RetryConnection_Click">Test connection</Button>
                         </Grid>
                     </Border>
-                </StackPanel>
+                </StackPanel>-->
             </TabItem>
         </TabControl>
-        
-        <DockPanel Margin="10,10,10,10" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
-            <Button HorizontalAlignment="Left" Padding="5,5,5,5" Click="save_Click">Save</Button>
-            <Button HorizontalAlignment="Right" Padding="5,5,5,5" Click="cancel_Click">Cancel</Button>
-        </DockPanel>
-        <TextBlock Text="{Binding Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+
+        <Border BorderThickness="1" BorderBrush="Black">
+            <StackPanel>
+                <Label FontWeight="Bold">Connection status</Label>
+                <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+                <TextBlock Margin="5" Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}"><Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate">
+                    Fiskmö MT online documentation
+                </Hyperlink></TextBlock>
+            </StackPanel>
+        </Border>
     </DockPanel>
 </UserControl>

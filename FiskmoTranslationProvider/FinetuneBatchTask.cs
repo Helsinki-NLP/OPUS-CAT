@@ -28,6 +28,7 @@ namespace FiskmoTranslationProvider
     {
         private FinetuneBatchTaskSettings settings;
         private FiskmoOptions fiskmoOptions;
+        private Dictionary<Language, List<ITranslationProvider>> tms;
         internal Dictionary<Language,List<Tuple<string, string>>> ProjectTranslations;
 
         public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
@@ -36,6 +37,7 @@ namespace FiskmoTranslationProvider
         {
             this.settings = GetSetting<FinetuneBatchTaskSettings>();
             this.fiskmoOptions = new FiskmoOptions(new Uri(this.settings.ProviderOptions));
+            this.tms = this.InstantiateProjectTms();
             this.ProjectTranslations = new Dictionary<Language, List<Tuple<string, string>>>();
             this.ProjectNewSegments = new Dictionary<Language, List<string>>();
             base.OnInitializeTask();
@@ -44,8 +46,9 @@ namespace FiskmoTranslationProvider
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter multiFileConverter)
         {
             //Get instances of the translation memories included in the project.
-            Dictionary<Language, List<ITranslationProvider>> tms = this.InstantiateProjectTms();
-            FileReader _task = new FileReader(tms,settings);
+            
+            var language = projectFile.GetLanguageDirection().TargetLanguage;
+            FileReader _task = new FileReader(tms[language],settings);
             multiFileConverter.AddBilingualProcessor(_task);
             multiFileConverter.Parse();
 

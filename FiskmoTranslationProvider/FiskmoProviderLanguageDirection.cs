@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Windows.Controls;
 
 namespace FiskmoTranslationProvider
 {
@@ -82,19 +84,13 @@ namespace FiskmoTranslationProvider
         #region "SearchSegment"
         public SearchResults SearchSegment(SearchSettings settings, Segment segment)
         {
-            // Loop through segment elements to 'filter out' e.g. tags in order to 
-            // make certain that only plain text information is retrieved for
-            // this simplified implementation.
-
-            // TODO: Make it work with tags. Probably alignment information 
-            // is needed from the server for this
-            #region "SegmentElements"
+           
             _visitor.Reset();
             foreach (var element in segment.Elements)
             {
                 element.AcceptSegmentElementVisitor(_visitor);
             }
-            #endregion
+            
 
             #region "SearchResultsObject"
             SearchResults results = new SearchResults();
@@ -102,7 +98,7 @@ namespace FiskmoTranslationProvider
 
             #endregion
             string sourceText = _visitor.PlainText;
-            
+           
             var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
             var langpair = $"{sourceCode}-{targetCode}";
@@ -127,24 +123,32 @@ namespace FiskmoTranslationProvider
                 return systemResults;
 
             // Look up the currently selected segment in the collection (normal segment lookup).
-            if (mode == SearchMode.FullSearch)
+            if (mode == SearchMode.FullSearch || mode == SearchMode.NormalSearch)
             {
                 Segment translation = new Segment(_languageDirection.TargetCulture);
-                translation.Add(translatedSentence);
+                if (_visitor.Placeholders.Any())
+                {
+                    var split = Regex.Split(translatedSentence,@"\b(PLACEHOLDER\d+)\b");
+                    foreach (var part in split)
+                    {
+                        if (_visitor.Placeholders.ContainsKey(part))
+                        {
+                            translation.Add(_visitor.Placeholders[part]);
+                        }
+                        else
+                        {
+                            translation.Add(part);
+                        }
+                    }
+                }
+                else
+                {
+                    translation.Add(translatedSentence);
+                }
 
-                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags,"fiskmö"));
+                systemResults.Add(CreateSearchResult(segment, translation, segment.HasTags,"fiskmö"));
             }
-            #region "SegmentLookup"
-            if (mode == SearchMode.NormalSearch)
-            {
-                Segment translation = new Segment(_languageDirection.TargetCulture);
-                translation.Add(translatedSentence);
-
-                systemResults.Add(CreateSearchResult(segment, translation, _visitor.PlainText, segment.HasTags, "fiskmö"));
-            }
-
             return systemResults;
-            #endregion
         }
         #endregion
 
@@ -161,21 +165,17 @@ namespace FiskmoTranslationProvider
         /// <returns></returns>
         #region "CreateSearchResult"
         private SearchResult CreateSearchResult(Segment searchSegment, Segment translation,
-            string sourceSegment, bool formattingPenalty,string mtSystem)
+            bool formattingPenalty,string mtSystem)
         {
             
-            #region "TranslationUnit"
             TranslationUnit tu = new TranslationUnit();
-            /*Segment orgSegment = new Segment();
-            orgSegment.Add(sourceSegment);*/
+            
             tu.SourceSegment = searchSegment;
             tu.TargetSegment = translation;
-            #endregion
             
             tu.ResourceId = new PersistentObjectToken(tu.GetHashCode(), Guid.Empty);
             tu.FieldValues.Add(new SingleStringFieldValue("mtSystem", mtSystem));
-            #region "TuProperties"
-
+            
             if (this._options.showMtAsOrigin)
             {
                 tu.Origin = TranslationUnitOrigin.MachineTranslation;
@@ -187,8 +187,6 @@ namespace FiskmoTranslationProvider
             
             SearchResult searchResult = new SearchResult(tu);
             searchResult.ScoringResult = new ScoringResult();
-            //searchResult.ScoringResult.BaseScore = score;
-            #endregion
 
             return searchResult;
         }
