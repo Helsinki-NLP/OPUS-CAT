@@ -36,6 +36,19 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        public bool IncludePlaceholderTags
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(IncludePlaceholderTags));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(IncludePlaceholderTags)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public bool BatchTranslate
         {
             get

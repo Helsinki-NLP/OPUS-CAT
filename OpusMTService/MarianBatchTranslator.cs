@@ -56,33 +56,6 @@ namespace FiskmoMTEngine
 
         }
 
-        private Process StartProcessWithCmd(string fileName, string args)
-        {
-            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Process ExternalProcess = new Process();
-
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {fileName} {args}";
-            ExternalProcess.StartInfo.UseShellExecute = false;
-            //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-
-            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
-            ExternalProcess.StartInfo.RedirectStandardInput = false;
-            ExternalProcess.StartInfo.RedirectStandardOutput = false;
-            ExternalProcess.StartInfo.RedirectStandardError = true;
-            ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-
-            ExternalProcess.ErrorDataReceived += errorDataHandler;
-            
-            ExternalProcess.StartInfo.CreateNoWindow = true;
-            //ExternalProcess.StartInfo.CreateNoWindow = false;
-            
-            ExternalProcess.Start();
-            ExternalProcess.BeginErrorReadLine();
-
-            return ExternalProcess;
-        }
-
         internal void BatchTranslate(List<string> input)
         {
             Log.Information($"Starting batch translator for model {this.SystemName}.");

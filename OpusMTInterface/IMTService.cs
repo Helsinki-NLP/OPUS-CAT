@@ -30,7 +30,15 @@ namespace OpusMTInterface
 
         [OperationContract]
         [WebInvoke(Method = "POST",BodyStyle = WebMessageBodyStyle.Wrapped)]
-        string Customize(string tokenCode, List<Tuple<string,string>> input, List<Tuple<string, string>> validation, List<string> uniqueNewSegments, string srcLangCode, string trgLangCode, string modelTag);
+        string Customize(
+            string tokenCode,
+            List<Tuple<string,string>> input,
+            List<Tuple<string, string>> validation,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
+            string modelTag,
+            bool includePlaceholderTags);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]

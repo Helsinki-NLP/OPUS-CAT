@@ -86,7 +86,7 @@ namespace FiskmoTranslationProvider
             {
                 if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified)
                 {
-                    var sourceText = FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source, options.includePlaceholderTags);
+                    var sourceText = FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source);
 
                     var sourceCode = langPair.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
                     var targetCode = langPair.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;

@@ -28,8 +28,7 @@ namespace FiskmoTranslationProvider
         private string connectionStatus;
         private ObservableCollection<string> allModelTags;
         private bool connectionExists;
-        private string modelTag;
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -47,10 +46,9 @@ namespace FiskmoTranslationProvider
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void FetchServiceData()
+        private void FetchServiceData(string host, string port)
         {
-            var host = this.ServiceAddressBoxElement.Text;
-            var port = this.ServicePortBoxElement.Text;
+
             string connectionResult;
             try
             {
@@ -155,12 +153,19 @@ namespace FiskmoTranslationProvider
             InitializeComponent();
 
             //Fetch data only after data context has been set and the bindings have been resolved.
-            Dispatcher.BeginInvoke(new Action(() => Task.Run(this.FetchServiceData)), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+        }
+
+        private void StartFetch()
+        {
+            var host = this.ServiceAddressBoxElement.Text;
+            var port = this.ServicePortBoxElement.Text;
+            Task.Run(() => this.FetchServiceData(host, port));
         }
 
         private void RetryConnection_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(this.FetchServiceData);
+            this.StartFetch();
         }
 
         private void SaveAsDefault_Click(object sender, RoutedEventArgs e)

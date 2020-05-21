@@ -35,13 +35,14 @@ namespace FiskmoTranslationProvider
         {
             this.DataContext = this;
             
-            this.options = options;
+            this.Options = options;
             this.projectLanguagePairs = languagePairs.Select(
                 x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
 
             InitializeComponent();
             this.ConnectionControl.LanguagePairs = this.projectLanguagePairs;
-            this.ConnectionControl.AddModelTag(this.options.modelTag);
+            this.ConnectionControl.AddModelTag(this.Options.modelTag);
+
 
             //Null indicates that all properties have changed. Populates the WPF form
             PropertyChanged(this, new PropertyChangedEventArgs(null));
@@ -62,68 +63,8 @@ namespace FiskmoTranslationProvider
         private FiskmoOptions options;
         private List<string> projectLanguagePairs;
         private FiskmoOptionsFormWPF hostForm;
-        private string connectionStatus;
-
-        public string ServicePortBox
-        {
-            get => this.options.mtServicePort;
-            set
-            {
-                this.options.mtServicePort = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public string ServiceAddressBox
-        {
-            get => this.options.mtServiceAddress;
-            set
-            {
-                this.options.mtServiceAddress = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public string ModelTag
-        {
-            get => this.options.modelTag;
-            set
-            {
-                this.options.modelTag = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public Boolean PregenerateMt
-        {
-            get => this.options.pregenerateMt;
-            set
-            {
-                this.options.pregenerateMt = value;
-                NotifyPropertyChanged();
-            }
-        }
-        public Boolean ShowMtAsOrigin
-        {
-            get => this.options.showMtAsOrigin;
-            set
-            {
-                this.options.showMtAsOrigin = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-
-        public Boolean IncludeTagsAsText
-        {
-            get => this.options.includePlaceholderTags;
-            set
-            {
-                this.options.includePlaceholderTags = value;
-                NotifyPropertyChanged();
-            }
-        }
         
+        public FiskmoOptions Options { get => options; set => options = value; }
 
         private void cancel_Click(object sender, RoutedEventArgs e)
         {

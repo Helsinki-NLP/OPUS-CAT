@@ -7,9 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="270">
     <StackPanel Background="White">
-        <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
         <Border BorderThickness="1" BorderBrush="Black">
             <StackPanel Margin="10,10,10,10">
+                <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
                 <DockPanel>
                     <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right">MT service port (1024-65535)</Label>
                     <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServicePortBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServicePort, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>

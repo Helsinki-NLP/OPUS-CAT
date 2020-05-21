@@ -115,37 +115,13 @@ namespace FiskmoMTEngine
             var sourceSpm = this.customDir.GetFiles("source.spm").Single();
             var targetSpm = this.customDir.GetFiles("target.spm").Single();
 
-            this.spSource = this.PreprocessLanguage(this.customSource,this.sourceCode, sourceSpm);
-            this.spTarget = this.PreprocessLanguage(this.customTarget, this.targetCode, targetSpm);
+            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm);
+            this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm);
 
-            this.spValidSource = this.PreprocessLanguage(this.validationSource, this.sourceCode, sourceSpm);
-            this.spValidTarget = this.PreprocessLanguage(this.validationTarget, this.targetCode, targetSpm);
+            this.spValidSource = MarianHelper.PreprocessLanguage(this.validationSource, this.customDir, this.sourceCode, sourceSpm);
+            this.spValidTarget = MarianHelper.PreprocessLanguage(this.validationTarget, this.customDir, this.targetCode, targetSpm);
         }
 
-        private FileInfo PreprocessLanguage(FileInfo languageFile, string languageCode, FileInfo spmModel)
-        {
-            var preprocessedFile = new FileInfo(Path.Combine(this.customDir.FullName, $"preprocessed_{languageFile.Name}"));
-            var spFile = new FileInfo(Path.Combine(this.customDir.FullName, $"sp_{languageFile.Name}"));
-
-
-            using (var rawFile = languageFile.OpenText())
-            using (var preprocessedWriter = new StreamWriter(preprocessedFile.FullName))
-            {
-                String line;
-                while ((line = rawFile.ReadLine()) != null)
-                {
-                    var preprocessedLine =
-                        MosesPreprocessor.RunMosesPreprocessing(line, languageCode);
-                    preprocessedLine = MosesPreprocessor.PreprocessSpaces(preprocessedLine);
-                    preprocessedWriter.WriteLine(preprocessedLine);
-                }
-            }
-
-            var spArgs = $"{preprocessedFile.FullName} --model {spmModel.FullName} --output {spFile.FullName}";
-            this.StartProcessWithCmd("spm_encode.exe", spArgs);
-
-            return spFile;
-        }
 
         public MarianCustomizer(
             MTModel model,
@@ -153,7 +129,8 @@ namespace FiskmoMTEngine
             FileInfo customTarget,
             FileInfo validationSource,
             FileInfo validationTarget,
-            string customLabel)
+            string customLabel,
+            bool includePlaceholderTags)
         {
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customDir = new DirectoryInfo($"{modelDir.FullName}_{customLabel}");
@@ -166,36 +143,5 @@ namespace FiskmoMTEngine
             this.targetCode = model.TargetLanguageString;
         }
 
-        private void errorDataHandler(object sender, DataReceivedEventArgs e)
-        {
-            Log.Information(e.Data);
-        }
-        private Process StartProcessWithCmd(string fileName, string args)
-        {
-            var serviceDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Process ExternalProcess = new Process();
-
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {fileName} {args}";
-            ExternalProcess.StartInfo.UseShellExecute = false;
-            //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-
-            ExternalProcess.StartInfo.WorkingDirectory = serviceDir;
-            //ExternalProcess.StartInfo.RedirectStandardInput = true;
-            //ExternalProcess.StartInfo.RedirectStandardOutput = true;
-            //ExternalProcess.StartInfo.RedirectStandardError = true;
-            //ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-
-            //ExternalProcess.ErrorDataReceived += errorDataHandler;
-
-            ExternalProcess.StartInfo.CreateNoWindow = false;
-            
-            ExternalProcess.Start();
-            //ExternalProcess.BeginErrorReadLine();
-
-            //ExternalProcess.StandardInput.AutoFlush = true;
-
-            return ExternalProcess;
-        }
     }
 }

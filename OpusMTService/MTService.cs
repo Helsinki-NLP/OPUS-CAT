@@ -157,12 +157,21 @@ namespace FiskmoMTEngine
             return indicesAdded;
         }
 
-        public string Customize(string tokenCode, List<Tuple<string, string>> input, List<Tuple<string, string>> validation, List<string> uniqueNewSegments,string srcLangCode, string trgLangCode, string modelTag)
+        public string Customize(
+            string tokenCode,
+            List<Tuple<string, string>> input,
+            List<Tuple<string, string>> validation,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
+            string modelTag,
+            bool includePlaceholderTags)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            this.ModelManager.Customize(input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag);
+            this.ModelManager.Customize(
+                input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags);
 
             return "tuning set received";
         }

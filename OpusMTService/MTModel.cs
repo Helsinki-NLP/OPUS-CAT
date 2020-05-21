@@ -12,6 +12,13 @@ using YamlDotNet.Serialization;
 
 namespace FiskmoMTEngine
 {
+    
+    public enum MTModelStatus
+    {
+        OK,
+        Customizing
+    }
+
     public class MTModel : INotifyPropertyChanged
     {
         private List<string> sourceLanguages;
@@ -55,6 +62,7 @@ namespace FiskmoMTEngine
         }
 
         public List<string> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
+        public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
         public List<string> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
         public string Name { get => name; set => name = value; }
 
@@ -75,7 +83,7 @@ namespace FiskmoMTEngine
         {
             this.InstallDir = installDir;
             this.ParseModelPath(modelPath);
-            
+
 
             var modelTagFilePath = Path.Combine(this.InstallDir, "modeltags.txt");
             if (File.Exists(modelTagFilePath))
@@ -123,6 +131,14 @@ namespace FiskmoMTEngine
             this.ModelPath = modelPath;
         }
 
+        public MTModel(string name, string sourceCode, string targetCode, MTModelStatus status)
+        {
+            this.Name = name;
+            this.SourceLanguages = new List<string>() { sourceCode };
+            this.TargetLanguages = new List<string>() { targetCode };
+            this.Status = status;
+        }
+
         public MTModel(string modelPath)
         {
             this.ParseModelPath(modelPath);
@@ -143,10 +159,12 @@ namespace FiskmoMTEngine
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
 
         public ObservableCollection<string> ModelTags = new ObservableCollection<string>();
+        private bool customizationOngoing;
+        private MTModelStatus status;
 
         internal void PreTranslateBatch(List<string> input)
         {
-            var batchProcess = new MarianBatchTranslator(this.InstallDir,this.SourceLanguageString,this.TargetLanguageString);
+            var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString);
             batchProcess.BatchTranslate(input);
         }
     }

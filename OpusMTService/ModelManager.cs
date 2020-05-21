@@ -227,7 +227,14 @@ namespace FiskmoMTEngine
             }
         }
 
-        internal void Customize(List<Tuple<string, string>> input, List<Tuple<string, string>> validation, List<string> uniqueNewSegments, string srcLangCode, string trgLangCode, string modelTag)
+        internal void Customize(
+            List<Tuple<string, string>> input, 
+            List<Tuple<string, string>> validation, 
+            List<string> uniqueNewSegments, 
+            string srcLangCode, 
+            string trgLangCode, 
+            string modelTag,
+            bool includePlaceholderTags)
         {
             var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
 
@@ -251,7 +258,8 @@ namespace FiskmoMTEngine
                 new FileInfo(trgFile),
                 new FileInfo(validSrcFile),
                 new FileInfo(validTrgFile),
-                modelTag
+                modelTag,
+                includePlaceholderTags
                 );
             
             customizer.Customize(
@@ -262,6 +270,10 @@ namespace FiskmoMTEngine
                     uniqueNewSegments,
                     srcLangCode,
                     trgLangCode));
+
+            //Add an entry for an incomplete model to the model list
+            this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", srcLangCode, trgLangCode, MTModelStatus.Customizing));
+
         }
 
         private void TrainProcess_Exited(

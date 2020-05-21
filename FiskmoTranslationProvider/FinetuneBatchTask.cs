@@ -111,12 +111,6 @@ namespace FiskmoTranslationProvider
                 //Add Fiskmö MT provider to the project
                 var tpConfig = this.Project.GetTranslationProviderConfiguration();
 
-                if (this.fiskmoOptions.includePlaceholderTags)
-                {
-                    fiskmoOptions.includePlaceholderTags = true;
-                }
-
-
                 var fiskmoRef = new TranslationProviderReference(fiskmoOptions.Uri);
                 tpConfig.Entries.Add(
                     new TranslationProviderCascadeEntry(fiskmoRef, false, true, false));
@@ -133,7 +127,15 @@ namespace FiskmoTranslationProvider
                     var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
                     var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                     //Send the tuning set to MT service
-                    FiskmöMTServiceHelper.Customize(this.fiskmoOptions.mtServiceAddress, this.fiskmoOptions.mtServicePort, uniqueProjectTranslations, uniqueNewSegments, sourceCode, targetCode, this.fiskmoOptions.modelTag);
+                    FiskmöMTServiceHelper.Customize(
+                        this.fiskmoOptions.mtServiceAddress,
+                        this.fiskmoOptions.mtServicePort,
+                        uniqueProjectTranslations,
+                        uniqueNewSegments,
+                        sourceCode, 
+                        targetCode, 
+                        this.fiskmoOptions.modelTag,
+                        this.settings.IncludePlaceholderTags);
                 }
             }
 

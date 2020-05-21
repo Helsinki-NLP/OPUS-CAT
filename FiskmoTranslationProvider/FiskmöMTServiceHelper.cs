@@ -185,7 +185,15 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal static void Customize(string host, string mtServicePort, List<Tuple<string, string>> projectTranslations, List<string> uniqueNewSegments, string sourceCode, string targetCode, string modelTag)
+        internal static void Customize(
+            string host,
+            string mtServicePort,
+            List<Tuple<string, string>> projectTranslations,
+            List<string> uniqueNewSegments,
+            string sourceCode,
+            string targetCode,
+            string modelTag,
+            bool includePlaceholderTags)
         {
             var proxy = getNewProxy(host, mtServicePort);
 
@@ -196,7 +204,7 @@ namespace FiskmoTranslationProvider
 
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag);
+                proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag, includePlaceholderTags);
             }
         }
         

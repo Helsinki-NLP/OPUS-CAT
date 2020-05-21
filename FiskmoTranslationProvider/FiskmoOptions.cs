@@ -139,7 +139,7 @@ namespace FiskmoTranslationProvider
                     return parameter;
                 }
             }
-            set { SetStringParameter("mtServiceAddress", value); NotifyPropertyChanged(); }
+            set { SetStringParameter("modelTag", value); NotifyPropertyChanged(); }
         }
 
         public Boolean pregenerateMt
@@ -148,11 +148,6 @@ namespace FiskmoTranslationProvider
             set { SetBooleanParameter("pregenerateMt", value); NotifyPropertyChanged(); }
         }
 
-        public Boolean includePlaceholderTags
-        {
-            get { return GetBooleanParameter("includePlaceholderTags"); }
-            set { SetBooleanParameter("includePlaceholderTags", value); NotifyPropertyChanged(); }
-        }
 
         public Boolean showMtAsOrigin
         {

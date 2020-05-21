@@ -40,7 +40,8 @@ namespace FiskmoMTEngine
                 new FileInfo(this.TargetFileBox.Text),
                 new FileInfo(this.ValidSourceFileBox.Text),
                 new FileInfo(this.ValidTargetFileBox.Text),
-                this.LabelBox.Text
+                this.LabelBox.Text,
+                false
                 );
 
             customizer.Customize(null);

@@ -19,7 +19,7 @@ namespace FiskmoTranslationProvider
         /// <param name="segment"></param>
         /// <param name="includePlaceholderTags"></param>
         /// <returns></returns>
-        public static string ExtractSegmentText(ISegment segment, bool includePlaceholderTags)
+        public static string ExtractSegmentText(ISegment segment)
         {
             StringBuilder segmentText = new StringBuilder();
             int placeholderIndex = 0;
@@ -32,11 +32,12 @@ namespace FiskmoTranslationProvider
                     
                     if (itemText.Contains("\n"))
                     {
-
+                        itemText.Replace("\n", " ");
                     }
+
                     segmentText.Append(itemText);
                 }
-                else if (includePlaceholderTags && item is IPlaceholderTag)
+                else if (item is IPlaceholderTag)
                 {
                     //segmentText.Append(((IPlaceholderTag)item).TagProperties.DisplayText);
                     segmentText.Append($"PLACEHOLDER{placeholderIndex}");

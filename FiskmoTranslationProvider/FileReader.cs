@@ -29,31 +29,7 @@ namespace FiskmoTranslationProvider
             this.tms = tms;
         }
 
-        private string ExtractSegmentText(ISegment segment)
-        {
-            //For testing
-            /*if (segment.ToString().Contains("\n"))
-            {
-                return "";
-            }*/
-            StringBuilder segmentText = new StringBuilder();
-            int placeholderIndex = 0;
-            foreach (var item in segment.AllSubItems)
-            {
-                if (item is IText)
-                {
-                    segmentText.Append(item);
-                }
-                else if (options.includePlaceholderTags && item is IPlaceholderTag)
-                {
-                    //segmentText.Append(((IPlaceholderTag)item).TagProperties.DisplayText);
-                    segmentText.Append($"PLACEHOLDER{placeholderIndex}");
-                    placeholderIndex++;
-                }
-            }
-
-            return segmentText.ToString();
-        }
+        
 
         public override void ProcessParagraphUnit(IParagraphUnit paragraphUnit)
         {
@@ -70,13 +46,13 @@ namespace FiskmoTranslationProvider
                         segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.ApprovedTranslation)
                 {
                     FileTranslations.Add(new Tuple<string, string>(
-                        this.ExtractSegmentText(segmentPair.Source),
-                        this.ExtractSegmentText(segmentPair.Target)));
+                        FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source),
+                        FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Target)));
                 }
                 else
                 {
                     //If segment does not have translation, add it to new strings and look for fuzzies
-                    FileNewSegments.Add(this.ExtractSegmentText(segmentPair.Source));
+                    FileNewSegments.Add(FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source));
 
                     /*foreach (var tm in this.tms[this)
                     {
