@@ -23,7 +23,11 @@ namespace OpusMTInterface
         [OperationContract]
         [WebGet]
         string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
-        
+
+        [OperationContract]
+        [WebGet]
+        string CheckModelStatus(string tokenCode, string srcLangCode, string trgLangCode, string modelTag);
+
         [OperationContract]
         [WebGet]
         string TranslateWithModel(string tokenCode, string input, string modelName);

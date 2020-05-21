@@ -24,7 +24,7 @@ namespace FiskmoTranslationProvider
     /// <summary>
     /// Interaction logic for FinetuneWpfControl.xaml
     /// </summary>
-    public partial class FinetuneWpfControl : UserControl, INotifyPropertyChanged
+    public partial class FinetuneWpfControl : UserControl, INotifyPropertyChanged, IHasFiskmoOptions
     {
         private FinetuneBatchTaskSettings settings;
         private FiskmoOptions options;
@@ -114,6 +114,11 @@ namespace FiskmoTranslationProvider
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

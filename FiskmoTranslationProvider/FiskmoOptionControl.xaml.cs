@@ -27,7 +27,7 @@ namespace FiskmoTranslationProvider
     /// <summary>
     /// Interaction logic for FiskmoOptions.xaml
     /// </summary>
-    public partial class FiskmoOptionControl : UserControl, INotifyPropertyChanged
+    public partial class FiskmoOptionControl : UserControl, INotifyPropertyChanged, IHasFiskmoOptions
     {
 
 
@@ -41,8 +41,6 @@ namespace FiskmoTranslationProvider
 
             InitializeComponent();
             this.ConnectionControl.LanguagePairs = this.projectLanguagePairs;
-            this.ConnectionControl.AddModelTag(this.Options.modelTag);
-
 
             //Null indicates that all properties have changed. Populates the WPF form
             PropertyChanged(this, new PropertyChangedEventArgs(null));
@@ -81,6 +79,11 @@ namespace FiskmoTranslationProvider
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
+        }
+
+        private void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.ConnectionControl.TagBox_SelectionChanged(sender, e);
         }
     }
 }

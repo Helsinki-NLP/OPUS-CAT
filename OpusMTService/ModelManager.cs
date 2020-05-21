@@ -59,7 +59,7 @@ namespace FiskmoMTEngine
             var relevantModels = from m in this.LocalModels
                                  where m.SourceLanguages.Contains(sourceLang)
                                  where m.TargetLanguages.Contains(targetLang)
-                                 select m.ModelTags;
+                                 select m.ModelConfig.ModelTags;
 
             return relevantModels.SelectMany(x => x).ToList();
         }
@@ -67,6 +67,41 @@ namespace FiskmoMTEngine
         private DirectoryInfo opusModelDir;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
+
+        internal string CheckModelStatus(string sourceCode, string targetCode, string modelTag)
+        {
+            StringBuilder statusMessage = new StringBuilder();
+            var primaryModel = this.GetPrimaryModel(sourceCode, targetCode);
+            if (primaryModel == null)
+            {
+                statusMessage.Append($"No model available for {sourceCode}-{targetCode}. Install a model in the Fiskmö MT engine application.");
+            }
+            else if (modelTag != null && modelTag != "")
+            {
+                var taggedModel = this.GetModelByTag(modelTag, sourceCode, targetCode, true);
+                if (taggedModel == null)
+                {
+                    statusMessage.Append($"No model with tag {modelTag} available for {sourceCode}-{targetCode}. ");
+                    statusMessage.Append($"Fine-tuning may have been aborted, or the model has been deleted. ");
+                    statusMessage.Append($"Primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
+                }
+                else if (taggedModel.Status == MTModelStatus.Customizing)
+                {
+                    statusMessage.Append($"Model with tag {modelTag} for {sourceCode}-{targetCode} is still being fine-tuned. ");
+                    statusMessage.Append($"Wait for fine-tuning to complete. If Fiskmö MT is used before the fine-tuning is complete, primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
+                }
+                else
+                {
+                    statusMessage.Append($"Model with tag {modelTag} for {sourceCode}-{targetCode} is available. ");
+                }
+            }
+            else
+            {
+                statusMessage.Append($"Primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
+            }
+
+            return statusMessage.ToString();
+        }
 
         internal void FilterOnlineModels(string sourceFilter, string targetFilter, string nameFilter)
         {
@@ -139,7 +174,7 @@ namespace FiskmoMTEngine
             }
             else
             {
-                mtModel = this.GetModelByTag(modelTag);
+                mtModel = this.GetModelByTag(srcLangCode, trgLangCode, modelTag);
                 if (mtModel == null)
                 {
                     mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
@@ -154,10 +189,28 @@ namespace FiskmoMTEngine
             mtModel.PreTranslateBatch(input);
         }
 
-        private MTModel GetModelByTag(string tag)
+        private MTModel GetModelByTag(string tag, string srcLangCode, string trgLangCode, bool includeIncomplete = false)
         {
             //There could be multiple models finetuned with the same tag, use the latest.
-            return this.LocalModels.FirstOrDefault(x => x.ModelTags.Contains(tag));
+            if (includeIncomplete)
+            {
+                return this.LocalModels.FirstOrDefault(
+                x =>
+                    x.ModelConfig.ModelTags.Contains(tag) &&
+                    x.SourceLanguages.Contains(srcLangCode) &&
+                    x.TargetLanguages.Contains(trgLangCode));
+            }
+            else
+            {
+                return this.LocalModels.FirstOrDefault(
+                x =>
+                    x.ModelConfig.ModelTags.Contains(tag) &&
+                    x.SourceLanguages.Contains(srcLangCode) &&
+                    x.TargetLanguages.Contains(trgLangCode) &&
+                    x.Status == MTModelStatus.OK);
+            }
+
+            
         }
 
         private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
@@ -269,7 +322,8 @@ namespace FiskmoMTEngine
                     modelTag, 
                     uniqueNewSegments,
                     srcLangCode,
-                    trgLangCode));
+                    trgLangCode,
+                    includePlaceholderTags));
 
             //Add an entry for an incomplete model to the model list
             this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", srcLangCode, trgLangCode, MTModelStatus.Customizing));
@@ -283,12 +337,25 @@ namespace FiskmoMTEngine
             string modelTag,
             List<string> uniqueNewSegments,
             string srcLangCode,
-            string trgLangCode)
+            string trgLangCode,
+            bool includePlaceholderTags)
         {
             Application.Current.Dispatcher.Invoke(() =>
                 {
                     this.GetLocalModels();
-                    this.LocalModels.Single(x => x.InstallDir == customDir.FullName).ModelTags.Add(modelTag);
+                    var customModel = this.LocalModels.Single(x => x.InstallDir == customDir.FullName);
+
+                    if (includePlaceholderTags)
+                    {
+                        customModel.ModelConfig.TagMethod = TagMethod.IncludePlaceholders;
+                    }
+                    else
+                    {
+                        customModel.ModelConfig.TagMethod = TagMethod.Remove;
+                    }
+
+                    //The model config is saved when tags are added
+                    customModel.ModelConfig.ModelTags.Add(modelTag);
                 }
             );
             if (uniqueNewSegments.Count > 0)
@@ -378,17 +445,24 @@ namespace FiskmoMTEngine
 
             var languagePairModels = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode));
             MTModel primaryModel;
-            var prioritizedModels = languagePairModels.Where(x => x.Prioritized);
-            if (prioritizedModels.Any())
+            if (languagePairModels.Any())
             {
-                primaryModel = prioritizedModels.First();
+                var prioritizedModels = languagePairModels.Where(x => x.Prioritized);
+                if (prioritizedModels.Any())
+                {
+                    primaryModel = prioritizedModels.First();
+                }
+                else
+                {
+                    primaryModel = languagePairModels.First();
+                }
+
+                return primaryModel;
             }
             else
             {
-                primaryModel = languagePairModels.First();
+                return null;
             }
-            
-            return primaryModel;
         }
 
         internal IEnumerable<string> GetAllLanguagePairs()

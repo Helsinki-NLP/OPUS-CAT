@@ -59,6 +59,13 @@ namespace FiskmoMTEngine
             return this.ModelManager.GetAllLanguagePairs().ToList();
         }
 
+        public string CheckModelStatus(string tokenCode, string sourceCode, string targetCode, string modelTag)
+        {
+            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
+                return null;
+
+            return this.ModelManager.CheckModelStatus(sourceCode, targetCode, modelTag);
+        }
 
         /// <summary>
         /// Call this method to get the translation for a single string.
@@ -69,8 +76,7 @@ namespace FiskmoMTEngine
         /// <param name="trgLangCode">The code of the target language.</param>
         /// <returns>The translated input string.</returns>
         public string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
-        {
-            
+        {    
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 

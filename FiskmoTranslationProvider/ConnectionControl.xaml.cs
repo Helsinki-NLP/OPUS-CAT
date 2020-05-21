@@ -28,7 +28,8 @@ namespace FiskmoTranslationProvider
         private string connectionStatus;
         private ObservableCollection<string> allModelTags;
         private bool connectionExists;
-        
+        private FiskmoOptions options;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -46,10 +47,10 @@ namespace FiskmoTranslationProvider
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void FetchServiceData(string host, string port)
+        private void FetchServiceData(string host, string port, string modeltag)
         {
 
-            string connectionResult;
+            StringBuilder connectionResult = new StringBuilder();
             try
             {
                 var serviceLanguagePairs = FiskmöMTServiceHelper.ListSupportedLanguages(host,port);
@@ -60,24 +61,33 @@ namespace FiskmoTranslationProvider
                     modelTagLanguagePairs = projectLanguagePairsWithMt;
                     if (projectLanguagePairsWithMt.Count() == 0)
                     {
-                        connectionResult = "No MT models available for the language pairs of the project";
+                        connectionResult.Append("No MT models available for the language pairs of the project");
                     }
                     else if (this.LanguagePairs.Count == projectLanguagePairsWithMt.Count())
                     {
-                        connectionResult = "MT models available for all the language pairs of the project";
+                        connectionResult.Append("MT models available for all the language pairs of the project");
                     }
                     else
                     {
-                        connectionResult = $"MT models available for some of the language pairs of the project: {String.Join(", ", projectLanguagePairsWithMt)}";
+                        connectionResult.Append($"MT models available for some of the language pairs of the project: {String.Join(", ", projectLanguagePairsWithMt)}");
+                    }
+
+                    //Get the detailed status for each project language pair
+                    foreach (var pair in this.LanguagePairs)
+                    {
+                        connectionResult.Append(Environment.NewLine);
+                        var sourceTarget = pair.Split('-');
+                        connectionResult.Append(FiskmöMTServiceHelper.CheckModelStatus(host, port, sourceTarget[0], sourceTarget[1], modeltag));
                     }
                 }
                 else
                 {
+                    //This options is used with the batch task, where there's no easy way of getting
+                    //the project language pairs, so all pairs are assumed.
                     modelTagLanguagePairs = serviceLanguagePairs;
-                    connectionResult = $"MT models available for following language pairs: {String.Join(", ", serviceLanguagePairs)}";
+                    connectionResult.Append($"MT models available for following language pairs: {String.Join(", ", serviceLanguagePairs)}");
                 }
                 
-
                 //Get a list of model tags that are supported for these language pairs
                 List<string> modelTags = new List<string>();
                 foreach (var languagePair in modelTagLanguagePairs)
@@ -85,25 +95,40 @@ namespace FiskmoTranslationProvider
                     modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(host, port, languagePair.ToString()));
                 }
 
-                Dispatcher.Invoke(() => UpdateModelTags(modelTags));
+                Dispatcher.Invoke(() => UpdateModelTags(modelTags,modeltag));
             }
             catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
             {
-                connectionResult = $"No connection to Fiskmö MT service at {host}:{port}.";
+                connectionResult.Append($"No connection to Fiskmö MT service at {host}:{port}.");
             }
 
-            Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult);
+            Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult.ToString());
         }
 
 
 
-        private void UpdateModelTags(List<string> tags)
+        private void UpdateModelTags(List<string> tags, string currentModelTag)
         {
-            this.AllModelTags.Clear();
+            //Include currently selected tag, if it's already not included
+            if (!tags.Contains(currentModelTag))
+            {
+                tags.Add(currentModelTag);
+            }
+
+            foreach (var tag in this.AllModelTags)
+            {
+                if (!tags.Contains(tag))
+                {
+                    this.AllModelTags.Remove(tag);
+                }
+            }
 
             foreach (var tag in tags)
             {
-                this.AllModelTags.Add(tag);
+                if (!this.AllModelTags.Contains(tag))
+                {
+                    this.AllModelTags.Add(tag);
+                }
             }
 
         }
@@ -132,8 +157,7 @@ namespace FiskmoTranslationProvider
         public List<string> LanguagePairs { get; set; }
 
         public void AddModelTag(string tag)
-        {
-            
+        {            
             //It's possible that the options contain a tag which is not present
             //at the service. Include that tag in the list, since the omission might
             //be due to the service not being up properly etc.
@@ -152,15 +176,27 @@ namespace FiskmoTranslationProvider
             this.AllModelTags = new ObservableCollection<string>();
             InitializeComponent();
 
+            this.DataContextChanged += ConnectionControl_DataContextChanged;
+
             //Fetch data only after data context has been set and the bindings have been resolved.
             Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
 
+        private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is IHasFiskmoOptions)
+            {
+
+                this.options = ((IHasFiskmoOptions)e.NewValue).Options;
+            }
+        }
+
         private void StartFetch()
         {
-            var host = this.ServiceAddressBoxElement.Text;
-            var port = this.ServicePortBoxElement.Text;
-            Task.Run(() => this.FetchServiceData(host, port));
+            var host = this.options.mtServiceAddress;
+            var port = this.options.mtServicePort;
+            var modeltag = this.options.modelTag;
+            Task.Run(() => this.FetchServiceData(host, port, modeltag));
         }
 
         private void RetryConnection_Click(object sender, RoutedEventArgs e)
@@ -173,6 +209,11 @@ namespace FiskmoTranslationProvider
             FiskmoTpSettings.Default.MtServicePort = this.ServicePortBoxElement.Text;
             FiskmoTpSettings.Default.MtServiceAddress = this.ServiceAddressBoxElement.Text;
             FiskmoTpSettings.Default.Save();
+        }
+
+        public void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.StartFetch();
         }
     }
 }

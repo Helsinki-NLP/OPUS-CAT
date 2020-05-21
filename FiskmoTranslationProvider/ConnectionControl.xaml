@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="270">
+             d:DesignHeight="450" d:DesignWidth="270"
+             x:Name="_this">
     <StackPanel Background="White">
         <Border BorderThickness="1" BorderBrush="Black">
             <StackPanel Margin="10,10,10,10">
@@ -19,6 +20,12 @@
                     <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)">MT service host address</Label>
                     <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServiceAddressBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServiceAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
                 </DockPanel>
+
+                <!--<DockPanel Margin="0,0,0,5">
+                    <Label>Model tag</Label>
+                    <ComboBox Name="TagBox" SelectedItem="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ItemsSource="{Binding ElementName=_this, Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                </DockPanel>-->
+
                 <DockPanel LastChildFill="False">
                     <Button Padding="5"  DockPanel.Dock="Left" Name="SaveAsDefaultButton" Click="SaveAsDefault_Click">Save as default</Button>
                     <Button Padding="5" DockPanel.Dock="Right" Name="RetryConnectionButton" Click="RetryConnection_Click">Retry connection</Button>

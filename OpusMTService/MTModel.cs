@@ -19,11 +19,19 @@ namespace FiskmoMTEngine
         Customizing
     }
 
+    public enum TagMethod
+    {
+        Remove,
+        IncludePlaceholders
+    }
+
     public class MTModel : INotifyPropertyChanged
     {
         private List<string> sourceLanguages;
         private List<string> targetLanguages;
         private string name;
+
+        private TagMethod tagMethod;
 
         private MarianProcess marianProcess;
 
@@ -62,8 +70,11 @@ namespace FiskmoMTEngine
         }
 
         public List<string> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
+
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
+        
         public List<string> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
+
         public string Name { get => name; set => name = value; }
 
         public int InstallProgress { get => installProgress; set { installProgress = value; NotifyPropertyChanged(); } }
@@ -85,31 +96,37 @@ namespace FiskmoMTEngine
             this.ParseModelPath(modelPath);
 
 
-            var modelTagFilePath = Path.Combine(this.InstallDir, "modeltags.txt");
-            if (File.Exists(modelTagFilePath))
+            var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
+            if (File.Exists(modelConfigPath))
             {
-                using (var sr = new StreamReader(modelTagFilePath))
+                var deserializer = new Deserializer();
+                using (var reader = new StreamReader(modelConfigPath))
                 {
-                    while (!sr.EndOfStream)
-                    {
-                        this.ModelTags.Add(sr.ReadLine());
-                    }
+                    this.ModelConfig = deserializer.Deserialize<MTModelConfig>(reader);
                 }
             }
+            else
+            {
+                this.ModelConfig = new MTModelConfig();
+                this.SaveModelConfig();
+            }
 
-            this.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
+            this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
+        }
+
+        private void SaveModelConfig()
+        {
+            var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
+            var serializer = new Serializer();
+            using (var writer = File.CreateText(modelConfigPath))
+            {
+                serializer.Serialize(writer, this.ModelConfig, typeof(MTModelConfig));
+            }
         }
 
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            var modelTagFilePath = Path.Combine(this.InstallDir, "modeltags.txt");
-            using (var sw = new StreamWriter(modelTagFilePath))
-            {
-                foreach (var tag in this.ModelTags)
-                {
-                    sw.WriteLine(tag);
-                }
-            }
+            this.SaveModelConfig();
         }
 
         private void ParseModelPath(string modelPath)
@@ -158,9 +175,10 @@ namespace FiskmoMTEngine
         public string InstallDir { get; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
 
-        public ObservableCollection<string> ModelTags = new ObservableCollection<string>();
-        private bool customizationOngoing;
+        public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
+
         private MTModelStatus status;
+        private MTModelConfig modelConfig;
 
         internal void PreTranslateBatch(List<string> input)
         {

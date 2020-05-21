@@ -97,6 +97,7 @@
       <DependentUpon>ModelCustomizerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MarianCustomizer.cs" />
+    <Compile Include="MTModelConfig.cs" />
     <Compile Include="OnlineModelSelection.xaml.cs">
       <DependentUpon>OnlineModelSelection.xaml</DependentUpon>
     </Compile>

@@ -37,10 +37,10 @@
                             </CheckBox>
                         </StackPanel>
                     </Border>
-                    <DockPanel>
+                    <!--<DockPanel>
                         <Label>Model tag</Label>
-                        <ComboBox Margin="0,0,0,5" SelectedItem="{Binding Path=Options.modelTag}" Name="TagBox" IsEditable="True" ItemsSource="{Binding ElementName=ConnectionControl,Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                    </DockPanel>
+                        <ComboBox Margin="0,0,0,5" SelectedValue="{Binding Path=Options.modelTag}" Name="TagBox" IsEditable="True" ItemsSource="{Binding ElementName=ConnectionControl,Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                    </DockPanel>-->
                 </StackPanel>
             </TabItem>
             <TabItem Header="Connection">

@@ -1,4 +1,5 @@
 ﻿using OpusMTInterface;
+using Sdl.LanguagePlatform.TranslationMemory.EditScripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Windows;
 
 namespace FiskmoTranslationProvider
 {
-    
+
     internal class FiskmöMTServiceHelper
     {
         private static Random rng = new Random();
@@ -66,8 +67,18 @@ namespace FiskmoTranslationProvider
             var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
             {
-                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(host,port), languagePair);
+                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(host, port), languagePair);
                 return modelTags;
+            }
+        }
+
+        public static string CheckModelStatus(string host, string port, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            var proxy = getNewProxy(host, port);
+            using (proxy as IDisposable)
+            {
+                string status = proxy.CheckModelStatus(GetTokenCode(host, port),srcLangCode,trgLangCode, modelTag);
+                return status;
             }
         }
 

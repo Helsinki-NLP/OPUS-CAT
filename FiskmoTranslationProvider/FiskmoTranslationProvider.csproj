@@ -162,6 +162,7 @@
     <Compile Include="FiskmoProviderLanguageDirection.cs" />
     <Compile Include="FiskmoProviderWinFormsUI.cs" />
     <Compile Include="FiskmöMTServiceHelper.cs" />
+    <Compile Include="IHasFiskmoOptions.cs" />
     <Compile Include="MarianProcess.cs" />
     <Compile Include="ModelManager.cs" />
     <Compile Include="FinetuneBatchTask.cs" />

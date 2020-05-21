@@ -31,7 +31,7 @@ namespace FiskmoMTEngine
             this.DataContext = selectedModel;
             this.Title = $"Edit tags for {Model.Name}";
             InitializeComponent();
-            this.TagList.ItemsSource = selectedModel.ModelTags;
+            this.TagList.ItemsSource = selectedModel.ModelConfig.ModelTags;
         }
 
         public MTModel Model { get => model; set => model = value; }
@@ -39,13 +39,13 @@ namespace FiskmoMTEngine
  
         private void add_Click(object sender, RoutedEventArgs e)
         {
-            this.Model.ModelTags.Add(this.TagTextBox.Text);
+            this.Model.ModelConfig.ModelTags.Add(this.TagTextBox.Text);
         }
 
         private void DeleteTag_Click(object sender, RoutedEventArgs e)
         {
             string tag = (string)((Button)sender).Tag;
-            this.Model.ModelTags.Remove(tag);
+            this.Model.ModelConfig.ModelTags.Remove(tag);
         }
     }
 }
