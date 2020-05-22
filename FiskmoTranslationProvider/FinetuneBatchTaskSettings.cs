@@ -88,6 +88,21 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
         }
-        
+
+        public bool ExtractFuzzies
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(ExtractFuzzies));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(ExtractFuzzies)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int FuzzyMinPercentage { get; set; }
+        public int FuzzyMaxResults { get; set; }
     }
 }

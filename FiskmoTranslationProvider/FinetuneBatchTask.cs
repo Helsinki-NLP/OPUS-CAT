@@ -110,11 +110,7 @@ namespace FiskmoTranslationProvider
             var projectGuid = projectInfo.Id;
             var sourceCode = projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
 
-            if (settings.ExtractFuzzies)
-            {
-                this.ProcessFuzzies();
-            }
-
+            
             if (settings.AddFiskmoProvider)
             {
                 //Add Fiskmö MT provider to the project
@@ -135,6 +131,13 @@ namespace FiskmoTranslationProvider
                     //Remove duplicates
                     var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
                     var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
+
+                    if (this.settings.ExtractFuzzies)
+                    {
+                        var fuzzies = this.ProcessFuzzies(this.ProjectFuzzies[targetLang]);
+                        uniqueProjectTranslations.AddRange(fuzzies);
+                    }
+
                     //Send the tuning set to MT service
                     FiskmöMTServiceHelper.Customize(
                         this.fiskmoOptions.mtServiceAddress,
@@ -160,41 +163,37 @@ namespace FiskmoTranslationProvider
 
         }
 
-        private void ProcessFuzzies()
+        private List<Tuple<string,string>> ProcessFuzzies(List<TranslationUnit> fuzzyResults)
         {
-            SearchSettings searchSettings = new SearchSettings();
-            searchSettings.Mode = SearchMode.NormalSearch;
-            searchSettings.MinScore = settings.FuzzyMinPercentage;
-            searchSettings.MaxResults = settings.FuzzyMaxResults;
+            var projectInfo = this.Project.GetProjectInfo();
 
-            var sourceVisitor = new FiskmoProviderElementVisitor(this.options);
-            var targetVisitor = new FiskmoProviderElementVisitor(this.options);
+            var fuzzies = new List<Tuple<string, string>>();
 
-            foreach (var tmLangDir in this.tmLanguageDirections)
+            var sourceVisitor = new FiskmoProviderElementVisitor(this.fiskmoOptions);
+            var targetVisitor = new FiskmoProviderElementVisitor(this.fiskmoOptions);
+            foreach (var res in fuzzyResults)
             {
-                var results = tmLangDir.SearchText(searchSettings, segmentPair.Source.ToString());
-
-                foreach (var res in results)
+                sourceVisitor.Reset();
+                foreach (var element in res.SourceSegment.Elements)
                 {
-                    sourceVisitor.Reset();
-                    foreach (var element in res.TranslationProposal.SourceSegment.Elements)
-                    {
-                        element.AcceptSegmentElementVisitor(sourceVisitor);
-                    }
-
-                    targetVisitor.Reset();
-                    foreach (var element in res.TranslationProposal.TargetSegment.Elements)
-                    {
-                        element.AcceptSegmentElementVisitor(targetVisitor);
-                    }
-
-                    this.TmFuzzies.Add(
-                        new Tuple<string, string>(
-                            sourceVisitor.PlainText, targetVisitor.PlainText));
-
+                    element.AcceptSegmentElementVisitor(sourceVisitor);
                 }
+
+                targetVisitor.Reset();
+                foreach (var element in res.TargetSegment.Elements)
+                {
+                    element.AcceptSegmentElementVisitor(targetVisitor);
+                }
+
+                fuzzies.Add(
+                    new Tuple<string, string>(
+                        sourceVisitor.PlainText, targetVisitor.PlainText));
+
+                
             }
+            return fuzzies;
+
         }
-    }
+    
     }
 }

@@ -55,8 +55,16 @@ namespace FiskmoTranslationProvider
                     //If segment does not have translation, add it to new strings and look for fuzzies
                     FileNewSegments.Add(FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source));
 
-                    
+                    SearchSettings searchSettings = new SearchSettings();
+                    searchSettings.Mode = SearchMode.NormalSearch;
+                    searchSettings.MinScore = settings.FuzzyMinPercentage;
+                    searchSettings.MaxResults = settings.FuzzyMaxResults;
 
+                    foreach (var tmLangDir in this.tmLanguageDirections)
+                    {
+                        var results = tmLangDir.SearchText(searchSettings, segmentPair.Source.ToString());
+                        this.TmFuzzies.AddRange(results.Select(x => x.MemoryTranslationUnit));
+                    }
 
                 }
             }

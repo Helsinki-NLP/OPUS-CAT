@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <Control.Resources>
@@ -22,7 +23,8 @@
                         </StackPanel>
                     </Border>
 
-                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Options.includePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
                     <CheckBox Name="AddProvider" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.AddFiskmoProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add Fiskmo MT provider to project</CheckBox>
                     <Border IsEnabled="{Binding IsChecked,ElementName=AddProvider}" BorderThickness="1" BorderBrush="Black">
                         <StackPanel Margin="5">
@@ -35,6 +37,21 @@
                                 IsChecked="{Binding Path=Options.showMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 Show MT as suggestion origin
                             </CheckBox>
+                        </StackPanel>
+                    </Border>
+                    <CheckBox Name="ExtractFuzzies" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractFuzzies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract fuzzies to use as fine-tuning material</CheckBox>
+                    <Border IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel Margin="5">
+                            <Label Margin="0,-5,0,0">Fuzzy settings</Label>
+                            <DockPanel>
+                                <Label HorizontalAlignment="Right">Minimum fuzzy percentage</Label>
+                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMinPercentage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            </DockPanel>
+
+                            <DockPanel>
+                                <Label>Maximum fuzzies per segment</Label>
+                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Name="ServiceAddressBoxElement" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                            </DockPanel>
                         </StackPanel>
                     </Border>
                     <!--<DockPanel>
