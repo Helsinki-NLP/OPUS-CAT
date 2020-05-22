@@ -26,16 +26,19 @@ namespace FiskmoMTEngine
         
         private StreamWriter utf8Writer;
         private DirectoryInfo modelDir;
-
-        public string SystemName { get; }
         
-        public MarianBatchTranslator(string modelDir, string sourceCode, string targetCode)
+        public string SystemName { get; }
+
+        private TagMethod tagMethod;
+
+        public MarianBatchTranslator(string modelDir, string sourceCode, string targetCode, TagMethod tagMethod)
         {
             this.langpair = $"{sourceCode}-{targetCode}";
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
             this.modelDir = new DirectoryInfo(modelDir);
             this.SystemName = $"{sourceCode}-{targetCode}_" + this.modelDir.Name;
+            this.tagMethod = tagMethod;
 
             //Check if batch.yml exists, if not create it from decode.yml
             var batchYaml = this.modelDir.GetFiles("batch.yml");
@@ -67,7 +70,7 @@ namespace FiskmoMTEngine
                 spInput.FullName.Replace($".{SourceCode}", $".{TargetCode}"));
             
             var args = $"{this.modelDir.FullName} {spInput.FullName} {spOutput.FullName}";
-            var batchProcess = MarianHelper.StartProcessWithCmd(cmd, args);
+            var batchProcess = MarianHelper.StartProcessInWindow(cmd, args);
 
             batchProcess.Exited += (x,y)=> BatchProcess_Exited(input, spOutput,x,y);
         }
@@ -102,7 +105,7 @@ namespace FiskmoMTEngine
             }
 
             var spmModel = this.modelDir.GetFiles("source.spm").Single();
-            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel);
+            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.tagMethod);
             return spSrcFile;
         }
 

@@ -31,8 +31,6 @@ namespace FiskmoMTEngine
         private List<string> targetLanguages;
         private string name;
 
-        private TagMethod tagMethod;
-
         private MarianProcess marianProcess;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -58,7 +56,7 @@ namespace FiskmoMTEngine
         {
             if (this.marianProcess == null)
             {
-                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString);
+                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.TagMethod);
             }
 
             return this.marianProcess.Translate(input);
@@ -182,7 +180,7 @@ namespace FiskmoMTEngine
 
         internal void PreTranslateBatch(List<string> input)
         {
-            var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString);
+            var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.TagMethod);
             batchProcess.BatchTranslate(input);
         }
     }

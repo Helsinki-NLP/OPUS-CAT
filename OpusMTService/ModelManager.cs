@@ -305,6 +305,16 @@ namespace FiskmoMTEngine
             //add an event for that in the Marian process startup code
             //(but make sure that non-temp customization files are not removed).
 
+            TagMethod tagMethod;
+            if (includePlaceholderTags)
+            {
+                tagMethod = TagMethod.IncludePlaceholders;
+            }
+            else
+            {
+                tagMethod = TagMethod.Remove;
+            }
+
             var customizer = new MarianCustomizer(
                 primaryModel,
                 new FileInfo(srcFile),
@@ -312,7 +322,7 @@ namespace FiskmoMTEngine
                 new FileInfo(validSrcFile),
                 new FileInfo(validTrgFile),
                 modelTag,
-                includePlaceholderTags
+                tagMethod
                 );
             
             customizer.Customize(
@@ -323,7 +333,7 @@ namespace FiskmoMTEngine
                     uniqueNewSegments,
                     srcLangCode,
                     trgLangCode,
-                    includePlaceholderTags));
+                    tagMethod));
 
             //Add an entry for an incomplete model to the model list
             this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", srcLangCode, trgLangCode, MTModelStatus.Customizing));
@@ -338,22 +348,15 @@ namespace FiskmoMTEngine
             List<string> uniqueNewSegments,
             string srcLangCode,
             string trgLangCode,
-            bool includePlaceholderTags)
+            TagMethod tagMethod)
         {
             Application.Current.Dispatcher.Invoke(() =>
                 {
                     this.GetLocalModels();
                     var customModel = this.LocalModels.Single(x => x.InstallDir == customDir.FullName);
 
-                    if (includePlaceholderTags)
-                    {
-                        customModel.ModelConfig.TagMethod = TagMethod.IncludePlaceholders;
-                    }
-                    else
-                    {
-                        customModel.ModelConfig.TagMethod = TagMethod.Remove;
-                    }
-
+                    customModel.ModelConfig.TagMethod = tagMethod;
+                    
                     //The model config is saved when tags are added
                     customModel.ModelConfig.ModelTags.Add(modelTag);
                 }

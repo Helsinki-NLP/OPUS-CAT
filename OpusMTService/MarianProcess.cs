@@ -35,6 +35,7 @@ namespace FiskmoMTEngine
 
         public string SystemName { get; }
 
+        private TagMethod tagMethod;
         private string mtPipeCmds;
         private bool sentencePiecePostProcess;
         private static readonly Object lockObj = new Object();
@@ -67,7 +68,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        public MarianProcess(string modelDir, string sourceCode, string targetCode)
+        public MarianProcess(string modelDir, string sourceCode, string targetCode, TagMethod tagMethod)
         {
             this.Faulted = false;
             this.langpair = $"{sourceCode}-{targetCode}";
@@ -75,7 +76,7 @@ namespace FiskmoMTEngine
             this.TargetCode = targetCode;
             this.modelDir = modelDir;
             this.SystemName = $"{sourceCode}-{targetCode}_" + (new DirectoryInfo(this.modelDir)).Name;
-            
+            this.tagMethod = tagMethod;
             Log.Information($"Starting MT pipe for model {this.SystemName}.");
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
@@ -89,7 +90,7 @@ namespace FiskmoMTEngine
                 this.sentencePiecePostProcess = false;
             }
 
-            this.MtPipe = this.StartProcessWithCmd(this.mtPipeCmds, this.modelDir);
+            this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
 
             this.utf8Writer = new StreamWriter(this.MtPipe.StandardInput.BaseStream, new UTF8Encoding(false));
 
@@ -101,60 +102,12 @@ namespace FiskmoMTEngine
             this.ShutdownMtPipe();
         }
 
-        private Process StartProcessWithCmd(string fileName, string args)
-        {
-            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Process ExternalProcess = new Process();
-
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {fileName} {args}";
-            ExternalProcess.StartInfo.UseShellExecute = false;
-            //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-
-            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
-            ExternalProcess.StartInfo.RedirectStandardInput = true;
-            ExternalProcess.StartInfo.RedirectStandardOutput = true;
-            ExternalProcess.StartInfo.RedirectStandardError = true;
-            ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-
-            ExternalProcess.ErrorDataReceived += errorDataHandler;
-            
-            ExternalProcess.StartInfo.CreateNoWindow = true;
-            //ExternalProcess.StartInfo.CreateNoWindow = false;
-            
-            ExternalProcess.Start();
-            ExternalProcess.BeginErrorReadLine();
-
-            ExternalProcess.StandardInput.AutoFlush = true;
-
-            return ExternalProcess;
-        }
-
         internal List<string> BatchTranslate(List<string> input)
         {
             throw new NotImplementedException();
         }
 
-        private Process StartProcessWithRedirects(string fileName, string args)
-        {
-            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            Process ExternalProcess = new Process();
- 
-            ExternalProcess.StartInfo.FileName = Path.Combine(pluginDir, fileName);
-            ExternalProcess.StartInfo.Arguments = args;
-            ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            ExternalProcess.StartInfo.UseShellExecute = false;
-
-            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
-            ExternalProcess.StartInfo.RedirectStandardInput = true;
-            ExternalProcess.StartInfo.RedirectStandardOutput = true;
-            ExternalProcess.StartInfo.RedirectStandardError = true;
-
-            ExternalProcess.Start();
-            
-            return ExternalProcess;
-        }
-
+        
         private void errorDataHandler(object sender, DataReceivedEventArgs e)
         {
             Log.Information(e.Data);
@@ -175,15 +128,11 @@ namespace FiskmoMTEngine
             //${ TOKENIZER}/ remove - non - printing - char.perl |
             //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
             //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
-            var sourceSentence = MosesPreprocessor.RunMosesPreprocessing(rawSourceSentence,this.TargetCode);
-            sourceSentence = MosesPreprocessor.PreprocessSpaces(sourceSentence);
-            
+
+            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.TargetCode, this.tagMethod);
+
             this.utf8Writer.WriteLine(sourceSentence);
             this.utf8Writer.Flush();
-            //this.MtPipe.StandardInput.BaseStream.Flush();
-            //This inputs UTF16 by default, but models expect utf8
-            //this.MtPipe.StandardInput.WriteLine(sourceSentence);
-            //this.MtPipe.StandardInput.Flush();
 
             //There should only ever be a single line in the stdout, since there's only one line of
             //input per stdout readline, and marian decoder will never insert line breaks into translations.

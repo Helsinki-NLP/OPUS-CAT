@@ -41,7 +41,7 @@ namespace FiskmoMTEngine
                 new FileInfo(this.ValidSourceFileBox.Text),
                 new FileInfo(this.ValidTargetFileBox.Text),
                 this.LabelBox.Text,
-                false
+                TagMethod.Remove
                 );
 
             customizer.Customize(null);
