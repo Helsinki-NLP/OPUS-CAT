@@ -2,6 +2,7 @@
 
 using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
+using Sdl.LanguagePlatform.TranslationMemory;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System;
 using System.Collections.Generic;
@@ -14,19 +15,19 @@ namespace FiskmoTranslationProvider
     {
         internal List<Tuple<string,string>> FileTranslations;
         internal List<string> FileNewSegments;
-        internal List<Tuple<string, string>> TmFuzzies;
+        internal List<TranslationUnit> TmFuzzies;
         private FinetuneBatchTaskSettings settings;
         private FiskmoOptions options;
-        List<ITranslationProvider> tms;
+        IEnumerable<ITranslationProviderLanguageDirection> tmLanguageDirections;
 
-        public FileReader(List<ITranslationProvider> tms, FinetuneBatchTaskSettings settings)
+        public FileReader(IEnumerable<ITranslationProviderLanguageDirection> tms, FinetuneBatchTaskSettings settings)
         {
             this.settings = settings;
             this.options = new FiskmoOptions(new Uri(settings.ProviderOptions));
             this.FileTranslations = new List<Tuple<string, string>>();
             this.FileNewSegments = new List<string>();
-            this.TmFuzzies = new List<Tuple<string, string>>();
-            this.tms = tms;
+            this.TmFuzzies = new List<TranslationUnit>();
+            this.tmLanguageDirections = tms;
         }
 
         
@@ -54,10 +55,9 @@ namespace FiskmoTranslationProvider
                     //If segment does not have translation, add it to new strings and look for fuzzies
                     FileNewSegments.Add(FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source));
 
-                    /*foreach (var tm in this.tms[this)
-                    {
-                        tm
-                    }*/
+                    
+
+
                 }
             }
         }

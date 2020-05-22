@@ -11,6 +11,7 @@ using System.Net;
 using Sdl.Core.Globalization;
 using System.Windows.Forms;
 using Sdl.Core.Settings;
+using Sdl.LanguagePlatform.TranslationMemory;
 
 namespace FiskmoTranslationProvider
 {
@@ -32,6 +33,7 @@ namespace FiskmoTranslationProvider
         internal Dictionary<Language,List<Tuple<string, string>>> ProjectTranslations;
 
         public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
+        public Dictionary<Language,List<TranslationUnit>> ProjectFuzzies { get; private set; }
 
         protected override void OnInitializeTask()
         {
@@ -46,9 +48,11 @@ namespace FiskmoTranslationProvider
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter multiFileConverter)
         {
             //Get instances of the translation memories included in the project.
-            
-            var language = projectFile.GetLanguageDirection().TargetLanguage;
-            FileReader _task = new FileReader(tms[language],settings);
+
+            var languageDirection = projectFile.GetLanguageDirection();
+            var targetLanguage = languageDirection.TargetLanguage;
+            var tmLanguageDirections = tms[targetLanguage].Select(x => x.GetLanguageDirection(new Sdl.LanguagePlatform.Core.LanguagePair(languageDirection.SourceLanguage.CultureInfo, languageDirection.TargetLanguage.CultureInfo)));
+            FileReader _task = new FileReader(tmLanguageDirections,settings);
             multiFileConverter.AddBilingualProcessor(_task);
             multiFileConverter.Parse();
 
@@ -57,11 +61,13 @@ namespace FiskmoTranslationProvider
             {
                 this.ProjectTranslations[targetLang].AddRange(_task.FileTranslations);
                 this.ProjectNewSegments[targetLang].AddRange(_task.FileNewSegments);
+                this.ProjectFuzzies[targetLang].AddRange(_task.TmFuzzies);
             }
             else
             {
                 this.ProjectTranslations[targetLang] = _task.FileTranslations;
                 this.ProjectNewSegments[targetLang] = _task.FileNewSegments;
+                this.ProjectFuzzies[targetLang] = _task.TmFuzzies;
             }
             
         }
@@ -104,7 +110,10 @@ namespace FiskmoTranslationProvider
             var projectGuid = projectInfo.Id;
             var sourceCode = projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
 
-            
+            if (settings.ExtractFuzzies)
+            {
+                this.ProcessFuzzies();
+            }
 
             if (settings.AddFiskmoProvider)
             {
@@ -150,5 +159,42 @@ namespace FiskmoTranslationProvider
             }
 
         }
+
+        private void ProcessFuzzies()
+        {
+            SearchSettings searchSettings = new SearchSettings();
+            searchSettings.Mode = SearchMode.NormalSearch;
+            searchSettings.MinScore = settings.FuzzyMinPercentage;
+            searchSettings.MaxResults = settings.FuzzyMaxResults;
+
+            var sourceVisitor = new FiskmoProviderElementVisitor(this.options);
+            var targetVisitor = new FiskmoProviderElementVisitor(this.options);
+
+            foreach (var tmLangDir in this.tmLanguageDirections)
+            {
+                var results = tmLangDir.SearchText(searchSettings, segmentPair.Source.ToString());
+
+                foreach (var res in results)
+                {
+                    sourceVisitor.Reset();
+                    foreach (var element in res.TranslationProposal.SourceSegment.Elements)
+                    {
+                        element.AcceptSegmentElementVisitor(sourceVisitor);
+                    }
+
+                    targetVisitor.Reset();
+                    foreach (var element in res.TranslationProposal.TargetSegment.Elements)
+                    {
+                        element.AcceptSegmentElementVisitor(targetVisitor);
+                    }
+
+                    this.TmFuzzies.Add(
+                        new Tuple<string, string>(
+                            sourceVisitor.PlainText, targetVisitor.PlainText));
+
+                }
+            }
+        }
+    }
     }
 }
