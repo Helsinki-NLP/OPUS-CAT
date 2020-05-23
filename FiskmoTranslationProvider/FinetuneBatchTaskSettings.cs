@@ -49,6 +49,19 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        public bool IncludeTagPairs
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(IncludeTagPairs));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(IncludeTagPairs)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public bool BatchTranslate
         {
             get
@@ -102,7 +115,70 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public int FuzzyMinPercentage { get; set; }
-        public int FuzzyMaxResults { get; set; }
+        public int FuzzyMinPercentage
+        {
+            get
+            {
+                var settingValue = GetSetting<int>(nameof(FuzzyMinPercentage));
+                if (settingValue == 0)
+                {
+                    return FiskmoTpSettings.Default.FinetuningMinFuzzyPercentage;
+                }
+                else
+                {
+                    return settingValue;
+                }
+
+            }
+            set
+            {
+                GetSetting<int>(nameof(FuzzyMinPercentage)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int FuzzyMaxResults
+        {
+            get
+            {
+                var settingValue = GetSetting<int>(nameof(FuzzyMaxResults));
+                if (settingValue == 0)
+                {
+                    return FiskmoTpSettings.Default.FinetuningMaxFuzzyResults;
+                }
+                else
+                {
+                    return settingValue;
+                }
+            }
+            set
+            {
+                GetSetting<int>(nameof(FuzzyMaxResults)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int MaxFinetuningSentences
+        {
+            get
+            {
+                var settingValue = GetSetting<int>(nameof(MaxFinetuningSentences));
+                if (settingValue == 0)
+                {
+                    return FiskmoTpSettings.Default.FinetuningMaxSentencePairs;
+                }
+                else
+                {
+                    return settingValue;
+                }
+            }
+            set
+            {
+                GetSetting<int>(nameof(MaxFinetuningSentences)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
     }
 }

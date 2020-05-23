@@ -14,6 +14,7 @@ using System.Data.SQLite;
 using System.Data;
 using System.Windows.Controls.Primitives;
 using YamlDotNet.Serialization;
+using Microsoft.Win32;
 
 namespace FiskmoMTEngine
 {
@@ -30,12 +31,21 @@ namespace FiskmoMTEngine
         public string SystemName { get; }
 
         private TagMethod tagMethod;
+        private bool includePlaceholderTags;
+        private bool includeTagPairs;
 
-        public MarianBatchTranslator(string modelDir, string sourceCode, string targetCode, TagMethod tagMethod)
+        public MarianBatchTranslator(
+            string modelDir, 
+            string sourceCode, 
+            string targetCode, 
+            bool includePlaceholderTags, 
+            bool includeTagPairs)
         {
             this.langpair = $"{sourceCode}-{targetCode}";
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
+            this.includePlaceholderTags = includePlaceholderTags;
+            this.includeTagPairs = includeTagPairs;
             this.modelDir = new DirectoryInfo(modelDir);
             this.SystemName = $"{sourceCode}-{targetCode}_" + this.modelDir.Name;
             this.tagMethod = tagMethod;
@@ -105,7 +115,7 @@ namespace FiskmoMTEngine
             }
 
             var spmModel = this.modelDir.GetFiles("source.spm").Single();
-            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.tagMethod);
+            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel);
             return spSrcFile;
         }
 

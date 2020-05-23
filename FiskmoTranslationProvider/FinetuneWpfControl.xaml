@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FiskmoTranslationProvider"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <Control.Resources>
@@ -23,8 +24,11 @@
                         </StackPanel>
                     </Border>
 
-                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
-                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
+                    <Border  BorderThickness="1" BorderBrush="Black">
+                        
+                    </Border>
+                    
+                    
                     <CheckBox Name="AddProvider" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.AddFiskmoProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add Fiskmo MT provider to project</CheckBox>
                     <Border IsEnabled="{Binding IsChecked,ElementName=AddProvider}" BorderThickness="1" BorderBrush="Black">
                         <StackPanel Margin="5">
@@ -39,6 +43,23 @@
                             </CheckBox>
                         </StackPanel>
                     </Border>
+                    
+                    <DockPanel>
+                        <Label>Model tag</Label>
+                        <ComboBox IsEditable="{Binding Path=Settings.Finetune}" Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ItemsSource="{Binding ElementName=ConnectionControl, Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                    </DockPanel>
+
+                </StackPanel>
+            </TabItem>
+            <TabItem IsEnabled="{Binding Path=Settings.Finetune}" Header="Fine-tuning settings">
+                <StackPanel Margin="5">
+                    
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
+                    <DockPanel>
+                        <xctk:MaskedTextBox Mask="0000009" ValueDataType="{x:Type s:Int32}" IsEnabled="{Binding Path=Settings.Finetune}" VerticalAlignment="Center" Text="{Binding Path=Settings.MaxFinetuningSentences, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        <Label>Maximum amount of sentences for fine-tuning</Label>
+                    </DockPanel>
                     <CheckBox Name="ExtractFuzzies" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractFuzzies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract fuzzies to use as fine-tuning material</CheckBox>
                     <Border IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" BorderThickness="1" BorderBrush="Black">
                         <StackPanel Margin="5">
@@ -50,14 +71,10 @@
 
                             <DockPanel>
                                 <Label>Maximum fuzzies per segment</Label>
-                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Name="ServiceAddressBoxElement" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
-                    <!--<DockPanel>
-                        <Label>Model tag</Label>
-                        <ComboBox Margin="0,0,0,5" SelectedValue="{Binding Path=Options.modelTag}" Name="TagBox" IsEditable="True" ItemsSource="{Binding ElementName=ConnectionControl,Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
-                    </DockPanel>-->
                 </StackPanel>
             </TabItem>
             <TabItem Header="Connection">

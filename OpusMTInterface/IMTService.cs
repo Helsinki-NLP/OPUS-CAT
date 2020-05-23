@@ -42,7 +42,8 @@ namespace OpusMTInterface
             string srcLangCode,
             string trgLangCode,
             string modelTag,
-            bool includePlaceholderTags);
+            bool includePlaceholderTags,
+            bool includeTagPairs);
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]

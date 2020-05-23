@@ -22,17 +22,22 @@ namespace FiskmoMTEngine
             }
         }
 
-        [YamlMember(Alias = "tag-method", ApplyNamingConventions = false)]
-        public TagMethod TagMethod { get => tagMethod; set => tagMethod = value; }
 
         [YamlMember(Alias = "model-tags", ApplyNamingConventions = false)]
         public ObservableCollection<string> ModelTags = new ObservableCollection<string>();
-        private TagMethod tagMethod;
+        
+        [YamlMember(Alias = "include-placeholder-tags", ApplyNamingConventions = false)]
+        public bool IncludePlaceholderTags { get => includePlaceholderTags; set => includePlaceholderTags = value; }
+        private bool includePlaceholderTags;
+
+        [YamlMember(Alias = "include-tag-pairs", ApplyNamingConventions = false)]
+        public bool IncludeTagPairs { get => includeTagPairs; set => includeTagPairs = value; }
+        private bool includeTagPairs;
 
         public MTModelConfig()
         {
-            this.TagMethod = TagMethod.Remove;
             this.ModelTags = new ObservableCollection<string>();
         }
+
     }
 }

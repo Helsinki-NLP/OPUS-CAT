@@ -171,13 +171,14 @@ namespace FiskmoMTEngine
             string srcLangCode,
             string trgLangCode,
             string modelTag,
-            bool includePlaceholderTags)
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
             this.ModelManager.Customize(
-                input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags);
+                input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs);
 
             return "tuning set received";
         }

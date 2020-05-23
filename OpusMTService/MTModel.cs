@@ -56,7 +56,7 @@ namespace FiskmoMTEngine
         {
             if (this.marianProcess == null)
             {
-                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.TagMethod);
+                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
             }
 
             return this.marianProcess.Translate(input);
@@ -180,7 +180,7 @@ namespace FiskmoMTEngine
 
         internal void PreTranslateBatch(List<string> input)
         {
-            var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.TagMethod);
+            var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags,this.modelConfig.IncludeTagPairs);
             batchProcess.BatchTranslate(input);
         }
     }

@@ -32,10 +32,11 @@ namespace FiskmoMTEngine
 
         private StreamWriter utf8Writer;
         private string modelDir;
+        private readonly bool includePlaceholderTags;
+        private readonly bool includeTagPairs;
 
         public string SystemName { get; }
 
-        private TagMethod tagMethod;
         private string mtPipeCmds;
         private bool sentencePiecePostProcess;
         private static readonly Object lockObj = new Object();
@@ -68,15 +69,22 @@ namespace FiskmoMTEngine
             }
         }
 
-        public MarianProcess(string modelDir, string sourceCode, string targetCode, TagMethod tagMethod)
+        public MarianProcess(
+            string modelDir, 
+            string sourceCode, 
+            string targetCode, 
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             this.Faulted = false;
             this.langpair = $"{sourceCode}-{targetCode}";
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
+            this.includePlaceholderTags = includePlaceholderTags;
+            this.includeTagPairs = includeTagPairs;
             this.modelDir = modelDir;
             this.SystemName = $"{sourceCode}-{targetCode}_" + (new DirectoryInfo(this.modelDir)).Name;
-            this.tagMethod = tagMethod;
+         
             Log.Information($"Starting MT pipe for model {this.SystemName}.");
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
@@ -129,7 +137,7 @@ namespace FiskmoMTEngine
             //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
             //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
 
-            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.TargetCode, this.tagMethod);
+            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.TargetCode, this.includePlaceholderTags, this.includeTagPairs);
 
             this.utf8Writer.WriteLine(sourceSentence);
             this.utf8Writer.Flush();

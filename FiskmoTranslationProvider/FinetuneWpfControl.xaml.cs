@@ -118,7 +118,7 @@ namespace FiskmoTranslationProvider
 
         private void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            this.ConnectionControl.TagBox_SelectionChanged(sender, e);
         }
     }
 }

@@ -16,12 +16,14 @@ namespace FiskmoTranslationProvider
         internal List<Tuple<string,string>> FileTranslations;
         internal List<string> FileNewSegments;
         internal List<TranslationUnit> TmFuzzies;
+        private int collectedSentencePairCount;
         private FinetuneBatchTaskSettings settings;
         private FiskmoOptions options;
         IEnumerable<ITranslationProviderLanguageDirection> tmLanguageDirections;
 
-        public FileReader(IEnumerable<ITranslationProviderLanguageDirection> tms, FinetuneBatchTaskSettings settings)
+        public FileReader(IEnumerable<ITranslationProviderLanguageDirection> tms, FinetuneBatchTaskSettings settings, int collectedSentencePairCount)
         {
+            this.CollectedSentencePairCount = collectedSentencePairCount;
             this.settings = settings;
             this.options = new FiskmoOptions(new Uri(settings.ProviderOptions));
             this.FileTranslations = new List<Tuple<string, string>>();
@@ -30,10 +32,16 @@ namespace FiskmoTranslationProvider
             this.tmLanguageDirections = tms;
         }
 
-        
+        public int CollectedSentencePairCount { get => collectedSentencePairCount; set => collectedSentencePairCount = value; }
 
         public override void ProcessParagraphUnit(IParagraphUnit paragraphUnit)
         {
+            //If hard limit of fine tuning sentence pair collection has been reached, stop collecting
+            if (this.collectedSentencePairCount > FiskmoTpSettings.Default.FinetuningSentencePairsHardLimit)
+            {
+                return;
+            }
+
             // Check if this paragraph actually contains segments 
             // If not, it is just a structure tag content, which is not processed
             if (paragraphUnit.IsStructure)
@@ -49,6 +57,7 @@ namespace FiskmoTranslationProvider
                     FileTranslations.Add(new Tuple<string, string>(
                         FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source),
                         FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Target)));
+                    this.collectedSentencePairCount++;
                 }
                 else
                 {
@@ -57,13 +66,25 @@ namespace FiskmoTranslationProvider
 
                     SearchSettings searchSettings = new SearchSettings();
                     searchSettings.Mode = SearchMode.NormalSearch;
-                    searchSettings.MinScore = settings.FuzzyMinPercentage;
-                    searchSettings.MaxResults = settings.FuzzyMaxResults;
 
+                    //If max number of fine-tuning sentences has been reached, restrict the
+                    //fuzzy collection to only collect a few high fuzzies / exact matches.
+                    //This is to prevent TM searches of taking too much time in case of too many fuzzies
+                    if (this.collectedSentencePairCount > this.settings.MaxFinetuningSentences)
+                    {
+                        searchSettings.MinScore = 95;
+                        searchSettings.MaxResults = 5;
+                    }
+                    else
+                    {    
+                        searchSettings.MinScore = settings.FuzzyMinPercentage;
+                        searchSettings.MaxResults = settings.FuzzyMaxResults;
+                    }
                     foreach (var tmLangDir in this.tmLanguageDirections)
                     {
                         var results = tmLangDir.SearchText(searchSettings, segmentPair.Source.ToString());
                         this.TmFuzzies.AddRange(results.Select(x => x.MemoryTranslationUnit));
+                        this.collectedSentencePairCount += results.Count;
                     }
 
                 }

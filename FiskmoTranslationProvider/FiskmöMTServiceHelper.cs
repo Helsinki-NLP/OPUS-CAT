@@ -178,6 +178,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
+
         /// <summary>
         /// Stores a single string pair as translation with the help of the dummy MT service.
         /// </summary>
@@ -204,7 +205,8 @@ namespace FiskmoTranslationProvider
             string sourceCode,
             string targetCode,
             string modelTag,
-            bool includePlaceholderTags)
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             var proxy = getNewProxy(host, mtServicePort);
 
@@ -215,7 +217,7 @@ namespace FiskmoTranslationProvider
 
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag, includePlaceholderTags);
+                proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag, includePlaceholderTags, includeTagPairs);
             }
         }
         

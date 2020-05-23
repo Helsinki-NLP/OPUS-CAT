@@ -70,5 +70,53 @@ namespace FiskmoTranslationProvider2017 {
                 this["MtServiceAddress"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300000")]
+        public int FinetuningSentencePairsHardLimit {
+            get {
+                return ((int)(this["FinetuningSentencePairsHardLimit"]));
+            }
+            set {
+                this["FinetuningSentencePairsHardLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100000")]
+        public int FinetuningMaxSentencePairs {
+            get {
+                return ((int)(this["FinetuningMaxSentencePairs"]));
+            }
+            set {
+                this["FinetuningMaxSentencePairs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int FinetuningMaxFuzzyResults {
+            get {
+                return ((int)(this["FinetuningMaxFuzzyResults"]));
+            }
+            set {
+                this["FinetuningMaxFuzzyResults"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
+        public int FinetuningMinFuzzyPercentage {
+            get {
+                return ((int)(this["FinetuningMinFuzzyPercentage"]));
+            }
+            set {
+                this["FinetuningMinFuzzyPercentage"] = value;
+            }
+        }
     }
 }

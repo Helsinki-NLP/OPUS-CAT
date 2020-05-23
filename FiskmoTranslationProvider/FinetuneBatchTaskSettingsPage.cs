@@ -10,7 +10,7 @@ namespace FiskmoTranslationProvider
 {
     public class FinetuneBatchTaskSettingsPage : DefaultSettingsPage<FinetuneBatchTaskControl, FinetuneBatchTaskSettings>
     {
-        //TODO: assign settings to control here
+
         private FinetuneBatchTaskSettings settings;
 		
 		private FinetuneBatchTaskControl control;

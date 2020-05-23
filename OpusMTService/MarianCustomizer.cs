@@ -25,7 +25,6 @@ namespace FiskmoMTEngine
         private string customLabel;
         private string sourceCode;
         private string targetCode;
-        private TagMethod tagMethod;
         private FileInfo spSource;
         private FileInfo spTarget;
         private FileInfo spValidSource;
@@ -117,7 +116,7 @@ namespace FiskmoMTEngine
             var sourceSpm = this.customDir.GetFiles("source.spm").Single();
             var targetSpm = this.customDir.GetFiles("target.spm").Single();
 
-            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm, this.tagMethod);
+            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm,);
             this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.tagMethod);
 
             this.spValidSource = MarianHelper.PreprocessLanguage(this.validationSource, this.customDir, this.sourceCode, sourceSpm, this.tagMethod);
@@ -132,7 +131,8 @@ namespace FiskmoMTEngine
             FileInfo validationSource,
             FileInfo validationTarget,
             string customLabel,
-            TagMethod tagMethod)
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customDir = new DirectoryInfo($"{modelDir.FullName}_{customLabel}");
@@ -143,7 +143,6 @@ namespace FiskmoMTEngine
             this.validationTarget = validationTarget;
             this.sourceCode = model.SourceLanguageString;
             this.targetCode = model.TargetLanguageString;
-            this.tagMethod= tagMethod;
         }
 
     }

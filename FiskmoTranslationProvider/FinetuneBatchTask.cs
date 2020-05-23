@@ -16,10 +16,9 @@ using Sdl.LanguagePlatform.TranslationMemory;
 namespace FiskmoTranslationProvider
 {
      
-    [AutomaticTask("My_Custom_Batch_Task_ID",
-                   "My_Custom_Batch_Task_Name",
-                   "My_Custom_Batch_Task_Description",
-                   //[TODO] You can change the file type according to your needs
+    [AutomaticTask("FiskmoBatchTask",
+                   "Fiskmo fine-tune and translate",
+                   "Task for fine-tuning Fiskmo models with project data, also support batch translation",
                    GeneratedFileType = AutomaticTaskFileType.None)]
     //[TODO] You can change the file type according to your needs
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
@@ -35,8 +34,13 @@ namespace FiskmoTranslationProvider
         public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
         public Dictionary<Language,List<TranslationUnit>> ProjectFuzzies { get; private set; }
 
+        //Keep track of sentences collected. Stop fuzzy collecting once max limit is reached to
+        //prevent slowdown (fuzzies are secondary, exact match translation pairs are still collected).
+        private int collectedSentencePairCount;
+
         protected override void OnInitializeTask()
         {
+            this.collectedSentencePairCount = 0;
             this.settings = GetSetting<FinetuneBatchTaskSettings>();
             this.fiskmoOptions = new FiskmoOptions(new Uri(this.settings.ProviderOptions));
             this.tms = this.InstantiateProjectTms();
@@ -52,7 +56,7 @@ namespace FiskmoTranslationProvider
             var languageDirection = projectFile.GetLanguageDirection();
             var targetLanguage = languageDirection.TargetLanguage;
             var tmLanguageDirections = tms[targetLanguage].Select(x => x.GetLanguageDirection(new Sdl.LanguagePlatform.Core.LanguagePair(languageDirection.SourceLanguage.CultureInfo, languageDirection.TargetLanguage.CultureInfo)));
-            FileReader _task = new FileReader(tmLanguageDirections,settings);
+            FileReader _task = new FileReader(tmLanguageDirections,settings,this.collectedSentencePairCount);
             multiFileConverter.AddBilingualProcessor(_task);
             multiFileConverter.Parse();
 
@@ -147,7 +151,8 @@ namespace FiskmoTranslationProvider
                         sourceCode, 
                         targetCode, 
                         this.fiskmoOptions.modelTag,
-                        this.settings.IncludePlaceholderTags);
+                        this.settings.IncludePlaceholderTags,
+                        this.settings.IncludeTagPairs);
                 }
             }
 
@@ -158,7 +163,7 @@ namespace FiskmoTranslationProvider
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
                 var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                 //Send the new segments to MT service
-                FiskmöMTServiceHelper.PreTranslateBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, projectGuid.ToString());
+                FiskmöMTServiceHelper.PreTranslateBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, fiskmoOptions.modelTag);
             }
 
         }
@@ -189,7 +194,6 @@ namespace FiskmoTranslationProvider
                     new Tuple<string, string>(
                         sourceVisitor.PlainText, targetVisitor.PlainText));
 
-                
             }
             return fuzzies;
 

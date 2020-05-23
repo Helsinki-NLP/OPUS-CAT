@@ -287,7 +287,8 @@ namespace FiskmoMTEngine
             string srcLangCode, 
             string trgLangCode, 
             string modelTag,
-            bool includePlaceholderTags)
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
 
@@ -305,16 +306,6 @@ namespace FiskmoMTEngine
             //add an event for that in the Marian process startup code
             //(but make sure that non-temp customization files are not removed).
 
-            TagMethod tagMethod;
-            if (includePlaceholderTags)
-            {
-                tagMethod = TagMethod.IncludePlaceholders;
-            }
-            else
-            {
-                tagMethod = TagMethod.Remove;
-            }
-
             var customizer = new MarianCustomizer(
                 primaryModel,
                 new FileInfo(srcFile),
@@ -322,7 +313,8 @@ namespace FiskmoMTEngine
                 new FileInfo(validSrcFile),
                 new FileInfo(validTrgFile),
                 modelTag,
-                tagMethod
+                includePlaceholderTags,
+                includeTagPairs
                 );
             
             customizer.Customize(
@@ -333,7 +325,8 @@ namespace FiskmoMTEngine
                     uniqueNewSegments,
                     srcLangCode,
                     trgLangCode,
-                    tagMethod));
+                    includePlaceholderTags,
+                    includeTagPairs));
 
             //Add an entry for an incomplete model to the model list
             this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", srcLangCode, trgLangCode, MTModelStatus.Customizing));
@@ -348,15 +341,17 @@ namespace FiskmoMTEngine
             List<string> uniqueNewSegments,
             string srcLangCode,
             string trgLangCode,
-            TagMethod tagMethod)
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             Application.Current.Dispatcher.Invoke(() =>
                 {
                     this.GetLocalModels();
                     var customModel = this.LocalModels.Single(x => x.InstallDir == customDir.FullName);
 
-                    customModel.ModelConfig.TagMethod = tagMethod;
-                    
+                    customModel.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
+                    customModel.ModelConfig.IncludeTagPairs = includeTagPairs;
+
                     //The model config is saved when tags are added
                     customModel.ModelConfig.ModelTags.Add(modelTag);
                 }

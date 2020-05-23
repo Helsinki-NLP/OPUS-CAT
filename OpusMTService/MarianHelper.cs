@@ -106,11 +106,21 @@ namespace FiskmoMTEngine
             Log.Information(e.Data);
         }
 
-        internal static string PreprocessLine(string line, string languageCode, TagMethod tagMethod)
+        internal static string PreprocessLine(
+            string line, 
+            string languageCode, 
+            bool includePlaceholderTags, 
+            bool includeTagPairs)
         {
-            if (tagMethod == TagMethod.Remove)
+            if (!includePlaceholderTags)
             {
                 line = Regex.Replace(line, @"PLACEHOLDER\d+", "");
+            }
+
+            if (!includeTagPairs)
+            {
+                line = Regex.Replace(line, @"TAGPAIRSTART\d+", "");
+                line = Regex.Replace(line, @"TAGPAIREND\d+", "");
             }
 
             var preprocessedLine =
@@ -124,8 +134,7 @@ namespace FiskmoMTEngine
             FileInfo languageFile,
             DirectoryInfo directory, 
             string languageCode, 
-            FileInfo spmModel,
-            TagMethod tagMethod)
+            FileInfo spmModel)
         {
             var preprocessedFile = new FileInfo(Path.Combine(directory.FullName, $"preprocessed_{languageFile.Name}"));
             var spFile = new FileInfo(Path.Combine(directory.FullName, $"sp_{languageFile.Name}"));
