@@ -1,7 +1,17 @@
-# fiskmo-trados
+# Fiskmo MT Engine and CAT plugins
 
-A self-contained MarianNMT plugin for SDL Trados Studio
+Fiskmo MT Engine is a Windows-based machine translation system built on the Marian NMT framework. Fiskmo MT Engine makes it possible to use a large selection of advanced neural machine translation models natively on Windows computers. The primary purpose of Fiskmo MT Engine is to provide professional translator local, secure, and confidential neural machine translation in computer-assisted translation tools (CAT tools), which are usually Windows-based. To that end, there are plugins available for two of the most popular CAT tools, SDL Trados Studio and memoQ.
 
+## Quickstart for translators
+
+1. Download the installer for Fiskmo MT Engine and install to your computer.
+2. Download the plugin for your translation software and install it:
+  - Trados 2017/2019: double-click plugin file to install.
+  - memoQ: Copy the plugin file to the Addins subfolder in the memoQ installation folder.
+3. Start the Fiskmo MT Engine application, and install models from the Fiskmo model repository for the language pairs that you require.
+4. Start your CAT tool, and add the Fiskmo plugin to a translation project.
+
+NOTE: Fiskmo MT Engine application needs to be running on the computer, when the plugins are used.
 
 ## About
 
