@@ -156,6 +156,7 @@
     <Compile Include="FinetuneWpfControl.xaml.cs">
       <DependentUpon>FinetuneWpfControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FiskmoMarkupDataVisitor.cs" />
     <Compile Include="FiskmoOptionControl.xaml.cs">
       <DependentUpon>FiskmoOptionControl.xaml</DependentUpon>
     </Compile>

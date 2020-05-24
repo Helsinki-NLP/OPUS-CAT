@@ -81,12 +81,15 @@ namespace FiskmoTranslationProvider
         //this feature appears to be buggy with TMs etc., so it's better to rely on a custom caching system.
         private static void TranslateDocumentSegments(Document doc, LanguageDirection langPair, FiskmoOptions options)
         {
+            var visitor = new FiskmoMarkupDataVisitor();
             EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
             foreach (var segmentPair in doc.SegmentPairs)
             {
                 if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified)
                 {
-                    var sourceText = FiskmoProviderElementVisitor.ExtractSegmentText(segmentPair.Source);
+                    visitor.Reset();
+                    segmentPair.Source.AcceptVisitor(visitor);
+                    var sourceText = visitor.PlainText;
 
                     var sourceCode = langPair.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
                     var targetCode = langPair.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;

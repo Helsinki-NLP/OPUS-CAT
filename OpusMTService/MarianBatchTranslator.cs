@@ -25,7 +25,6 @@ namespace FiskmoMTEngine
         public string SourceCode { get; }
         public string TargetCode { get; }
         
-        private StreamWriter utf8Writer;
         private DirectoryInfo modelDir;
         
         public string SystemName { get; }
@@ -87,16 +86,20 @@ namespace FiskmoMTEngine
 
         private void BatchProcess_Exited(List<string> input, FileInfo spOutput,object sender, EventArgs e)
         {
+            
             Log.Information($"Batch translation process for model {this.SystemName} exited. Saving results.");
             Queue<string> inputQueue = new Queue<string>(input);
-            using (var reader = spOutput.OpenText())
+            if (spOutput.Exists)
             {
-                while (!reader.EndOfStream)
+                using (var reader = spOutput.OpenText())
                 {
-                    var line = reader.ReadLine();
-                    var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
-                    var sourceLine = inputQueue.Dequeue();
-                    TranslationDbHelper.WriteTranslationToDb(sourceLine, nonSpLine, this.SystemName);
+                    while (!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine();
+                        var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
+                        var sourceLine = inputQueue.Dequeue();
+                        TranslationDbHelper.WriteTranslationToDb(sourceLine, nonSpLine, this.SystemName);
+                    }
                 }
             }
         }
@@ -115,7 +118,7 @@ namespace FiskmoMTEngine
             }
 
             var spmModel = this.modelDir.GetFiles("source.spm").Single();
-            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel);
+            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.includePlaceholderTags, this.includeTagPairs);
             return spSrcFile;
         }
 

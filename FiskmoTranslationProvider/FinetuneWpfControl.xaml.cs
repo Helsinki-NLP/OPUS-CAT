@@ -79,6 +79,7 @@ namespace FiskmoTranslationProvider
             //Whenever the options change, also update the option URI string in settings
             this.Options.PropertyChanged += Options_PropertyChanged;
             InitializeComponent();
+            this.TagBox.ItemsSource = new ObservableCollection<string>() { "<new tag>" };
         }
 
         private void Options_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -86,7 +87,6 @@ namespace FiskmoTranslationProvider
             this.settings.ProviderOptions = this.Options.Uri.ToString();
         }
 
-        
         private void ModeButton_Checked(object sender, RoutedEventArgs e)
         {
             var radioButton = ((RadioButton)sender);
@@ -98,7 +98,7 @@ namespace FiskmoTranslationProvider
                         this.Settings.BatchTranslate = true;
                         this.Settings.Finetune = true;
                         break;
-                    case "FinetuneOnly:":
+                    case "FinetuneOnly":
                         this.Settings.Finetune = true;
                         this.Settings.BatchTranslate = false;
                         break;
@@ -107,6 +107,20 @@ namespace FiskmoTranslationProvider
                         this.Settings.BatchTranslate = true;
                         break;
                 }
+
+                if (this.ConnectionControl != null && this.ConnectionControl.AllModelTags != null)
+                {
+                    if (this.Settings.Finetune)
+                    {
+                        this.TagBox.ItemsSource = new ObservableCollection<string>() { "<new tag>" };
+                        this.TagBox.SelectedIndex = 0;
+                    }
+                    else
+                    {
+                        this.TagBox.ItemsSource = this.ConnectionControl.AllModelTags;
+                    }
+                }
+                
             }
         }
 
@@ -118,7 +132,19 @@ namespace FiskmoTranslationProvider
 
         private void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ConnectionControl.TagBox_SelectionChanged(sender, e);
+            if (this.settings.Finetune)
+            { 
+            }
+            else
+            {
+                this.ConnectionControl.TagBox_SelectionChanged(sender, e);
+            }
+        }
+
+        private void NumberBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 }

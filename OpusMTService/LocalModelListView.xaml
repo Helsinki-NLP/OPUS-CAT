@@ -23,8 +23,8 @@
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Test selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                 </StackPanel>
-                    <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
-                        <ListView.ItemContainerStyle>
+                <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
+                    <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="BorderBrush" Value="LightGray" />
                                 <Setter Property="BorderThickness" Value="1,1,1,1" />

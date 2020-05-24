@@ -48,7 +48,7 @@ namespace FiskmoTranslationProvider
             _languageDirection = languages;
             _options = _provider.Options;
 
-            _visitor = new FiskmoProviderElementVisitor(_options);
+            _visitor = new FiskmoProviderElementVisitor();
 
             var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
@@ -126,18 +126,45 @@ namespace FiskmoTranslationProvider
             if (mode == SearchMode.FullSearch || mode == SearchMode.NormalSearch)
             {
                 Segment translation = new Segment(_languageDirection.TargetCulture);
-                if (_visitor.Placeholders.Any())
+                if (_visitor.Placeholders.Any() || _visitor.TagStarts.Any() || _visitor.TagEnds.Any())
                 {
-                    var split = Regex.Split(translatedSentence,@"\b(PLACEHOLDER\d+)\b");
+                    
+                    //var split = Regex.Split(translatedSentence,@"\b(PLACEHOLDER\d+)\b");
+                    var split = Regex.Split(translatedSentence, @"\b(PLACEHOLDER|TAGPAIRSTART|TAGPAIREND)\b");
+                    bool tagPairStarted = false;
                     foreach (var part in split)
                     {
+                        /*
                         if (_visitor.Placeholders.ContainsKey(part))
                         {
                             translation.Add(_visitor.Placeholders[part]);
-                        }
-                        else
+                        }*/
+                        
+                        switch (part)
                         {
-                            translation.Add(part);
+                            case "PLACEHOLDER":
+                                if (_visitor.Placeholders.Peek() != null)
+                                {
+                                    translation.Add(_visitor.Placeholders.Dequeue());
+                                }
+                                break;
+                            case "TAGPAIRSTART":
+                                if (_visitor.TagStarts.Peek() != null)
+                                {
+                                    translation.Add(_visitor.TagStarts.Dequeue());
+                                }
+                                tagPairStarted = true;
+                                break;
+                            case "TAGPAIREND":
+                                if (_visitor.TagEnds.Peek() != null && tagPairStarted)
+                                {
+                                    translation.Add(_visitor.TagEnds.Dequeue());
+                                    tagPairStarted = false;
+                                }
+                                break;
+                            default:
+                                translation.Add(part);
+                                break;
                         }
                     }
                 }

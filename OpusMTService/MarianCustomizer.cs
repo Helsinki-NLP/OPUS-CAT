@@ -23,6 +23,8 @@ namespace FiskmoMTEngine
         private FileInfo validationSource;
         private FileInfo validationTarget;
         private string customLabel;
+        private readonly bool includePlaceholderTags;
+        private readonly bool includeTagPairs;
         private string sourceCode;
         private string targetCode;
         private FileInfo spSource;
@@ -102,8 +104,7 @@ namespace FiskmoMTEngine
             //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config {configPath}";
 
-
-            var trainProcess = MarianHelper.StartProcessInWindow("marian.exe",trainingArgs);
+            var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects("marian.exe",trainingArgs);
 
             if (exitHandler != null)
             {
@@ -116,11 +117,11 @@ namespace FiskmoMTEngine
             var sourceSpm = this.customDir.GetFiles("source.spm").Single();
             var targetSpm = this.customDir.GetFiles("target.spm").Single();
 
-            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm,);
-            this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.tagMethod);
+            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags,this.includeTagPairs);
+            this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
 
-            this.spValidSource = MarianHelper.PreprocessLanguage(this.validationSource, this.customDir, this.sourceCode, sourceSpm, this.tagMethod);
-            this.spValidTarget = MarianHelper.PreprocessLanguage(this.validationTarget, this.customDir, this.targetCode, targetSpm, this.tagMethod);
+            this.spValidSource = MarianHelper.PreprocessLanguage(this.validationSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
+            this.spValidTarget = MarianHelper.PreprocessLanguage(this.validationTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
         }
 
 
@@ -139,6 +140,8 @@ namespace FiskmoMTEngine
             this.customSource = customSource;
             this.customTarget = customTarget;
             this.customLabel = customLabel;
+            this.includePlaceholderTags = includePlaceholderTags;
+            this.includeTagPairs = includeTagPairs;
             this.validationSource = validationSource;
             this.validationTarget = validationTarget;
             this.sourceCode = model.SourceLanguageString;

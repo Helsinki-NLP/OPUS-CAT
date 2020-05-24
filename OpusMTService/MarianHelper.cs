@@ -114,13 +114,13 @@ namespace FiskmoMTEngine
         {
             if (!includePlaceholderTags)
             {
-                line = Regex.Replace(line, @"PLACEHOLDER\d+", "");
+                line = Regex.Replace(line, @"PLACEHOLDER\d*", "");
             }
 
             if (!includeTagPairs)
             {
-                line = Regex.Replace(line, @"TAGPAIRSTART\d+", "");
-                line = Regex.Replace(line, @"TAGPAIREND\d+", "");
+                line = Regex.Replace(line, @"TAGPAIRSTART\d*", "");
+                line = Regex.Replace(line, @"TAGPAIREND\d*", "");
             }
 
             var preprocessedLine =
@@ -134,7 +134,9 @@ namespace FiskmoMTEngine
             FileInfo languageFile,
             DirectoryInfo directory, 
             string languageCode, 
-            FileInfo spmModel)
+            FileInfo spmModel,
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             var preprocessedFile = new FileInfo(Path.Combine(directory.FullName, $"preprocessed_{languageFile.Name}"));
             var spFile = new FileInfo(Path.Combine(directory.FullName, $"sp_{languageFile.Name}"));
@@ -146,7 +148,7 @@ namespace FiskmoMTEngine
                 String line;
                 while ((line = rawFile.ReadLine()) != null)
                 {
-                    var preprocessedLine = MarianHelper.PreprocessLine(line, languageCode, tagMethod);
+                    var preprocessedLine = MarianHelper.PreprocessLine(line, languageCode, includePlaceholderTags, includeTagPairs);
                     preprocessedWriter.WriteLine(preprocessedLine);
                 }
             }

@@ -74,9 +74,9 @@ namespace FiskmoTranslationProvider {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("300000")]
-        public int FinetuningSentencePairsHardLimit {
+        public string FinetuningSentencePairsHardLimit {
             get {
-                return ((int)(this["FinetuningSentencePairsHardLimit"]));
+                return ((string)(this["FinetuningSentencePairsHardLimit"]));
             }
             set {
                 this["FinetuningSentencePairsHardLimit"] = value;
@@ -86,9 +86,9 @@ namespace FiskmoTranslationProvider {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100000")]
-        public int FinetuningMaxSentencePairs {
+        public string FinetuningMaxSentencePairs {
             get {
-                return ((int)(this["FinetuningMaxSentencePairs"]));
+                return ((string)(this["FinetuningMaxSentencePairs"]));
             }
             set {
                 this["FinetuningMaxSentencePairs"] = value;
@@ -116,6 +116,18 @@ namespace FiskmoTranslationProvider {
             }
             set {
                 this["FinetuningMinFuzzyPercentage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public string FinetuningMinSentencePairs {
+            get {
+                return ((string)(this["FinetuningMinSentencePairs"]));
+            }
+            set {
+                this["FinetuningMinSentencePairs"] = value;
             }
         }
     }

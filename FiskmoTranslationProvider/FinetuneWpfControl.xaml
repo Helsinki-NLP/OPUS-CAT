@@ -23,12 +23,7 @@
                             <RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Mode">Batch translate only</RadioButton>
                         </StackPanel>
                     </Border>
-
-                    <Border  BorderThickness="1" BorderBrush="Black">
-                        
-                    </Border>
-                    
-                    
+     
                     <CheckBox Name="AddProvider" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.AddFiskmoProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add Fiskmo MT provider to project</CheckBox>
                     <Border IsEnabled="{Binding IsChecked,ElementName=AddProvider}" BorderThickness="1" BorderBrush="Black">
                         <StackPanel Margin="5">
@@ -43,12 +38,12 @@
                             </CheckBox>
                         </StackPanel>
                     </Border>
-                    
+
                     <DockPanel>
                         <Label>Model tag</Label>
-                        <ComboBox IsEditable="{Binding Path=Settings.Finetune}" Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ItemsSource="{Binding ElementName=ConnectionControl, Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                        <ComboBox IsEnabled="{Binding IsChecked,ElementName=TranslateOnly}" Visibility="{Binding IsChecked,ElementName=TranslateOnly, Converter={StaticResource BoolToVis}}" Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                        <TextBox IsEnabled="{Binding Path=Settings.Finetune}" Visibility="{Binding Path=Settings.Finetune, Converter={StaticResource BoolToVis}}" Text="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     </DockPanel>
-
                 </StackPanel>
             </TabItem>
             <TabItem IsEnabled="{Binding Path=Settings.Finetune}" Header="Fine-tuning settings">
@@ -57,7 +52,7 @@
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
                     <DockPanel>
-                        <xctk:MaskedTextBox Mask="0000009" ValueDataType="{x:Type s:Int32}" IsEnabled="{Binding Path=Settings.Finetune}" VerticalAlignment="Center" Text="{Binding Path=Settings.MaxFinetuningSentences, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                        <TextBox PreviewTextInput="NumberBox_PreviewTextInput" IsEnabled="{Binding Path=Settings.Finetune}" VerticalAlignment="Center" Text="{Binding Path=Settings.MaxFinetuningSentences, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
                         <Label>Maximum amount of sentences for fine-tuning</Label>
                     </DockPanel>
                     <CheckBox Name="ExtractFuzzies" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractFuzzies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract fuzzies to use as fine-tuning material</CheckBox>
@@ -65,13 +60,13 @@
                         <StackPanel Margin="5">
                             <Label Margin="0,-5,0,0">Fuzzy settings</Label>
                             <DockPanel>
-                                <Label HorizontalAlignment="Right">Minimum fuzzy percentage</Label>
                                 <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMinPercentage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <Label>Minimum fuzzy percentage</Label>
                             </DockPanel>
 
                             <DockPanel>
-                                <Label>Maximum fuzzies per segment</Label>
                                 <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <Label>Maximum fuzzies per segment</Label>
                             </DockPanel>
                         </StackPanel>
                     </Border>

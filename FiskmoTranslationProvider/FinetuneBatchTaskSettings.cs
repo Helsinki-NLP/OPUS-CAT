@@ -9,8 +9,48 @@ using System.Threading.Tasks;
 
 namespace FiskmoTranslationProvider
 {
-    public class FinetuneBatchTaskSettings : SettingsGroup, INotifyPropertyChanged
+    public class FinetuneBatchTaskSettings : SettingsGroup, INotifyPropertyChanged, IDataErrorInfo
     {
+
+        public string this[string columnName]
+        {
+            get
+            {
+                return Validate(columnName);
+            }
+        }
+
+        public string Error
+        {
+            get { return "...."; }
+        }
+
+        private string Validate(string propertyName)
+        {
+            // Return error message if there is error on else return empty or null string
+            string validationMessage = string.Empty;
+            switch (propertyName)
+            {
+                case "MaxFinetuningSentences":
+                    if (this.MaxFinetuningSentences != null && this.MaxFinetuningSentences != "")
+                    {
+                        var maxSent = Int32.Parse(this.MaxFinetuningSentences);
+                        if (maxSent < Int32.Parse(FiskmoTpSettings.Default.FinetuningMinSentencePairs) ||
+                            maxSent > Int32.Parse(FiskmoTpSettings.Default.FinetuningSentencePairsHardLimit))
+                        {
+                            validationMessage = "Error";
+                        }
+                    }
+                    else
+                    {
+                        validationMessage = "Error";
+                    }
+
+                    break;
+            }
+
+            return validationMessage;
+        }
 
         public new event PropertyChangedEventHandler PropertyChanged;
 
@@ -80,7 +120,15 @@ namespace FiskmoTranslationProvider
         {
             get
             {
-                return GetSetting<string>(nameof(ProviderOptions));
+                var settingValue = GetSetting<string>(nameof(ProviderOptions));
+                if (settingValue == null || settingValue == "")
+                {
+                    return (new FiskmoOptions()).Uri.ToString();
+                }
+                else
+                {
+                    return settingValue;
+                }
             }
             set
             {
@@ -158,12 +206,12 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public int MaxFinetuningSentences
+        public string MaxFinetuningSentences
         {
             get
             {
-                var settingValue = GetSetting<int>(nameof(MaxFinetuningSentences));
-                if (settingValue == 0)
+                var settingValue = GetSetting<string>(nameof(MaxFinetuningSentences));
+                if (settingValue == null || settingValue == "")
                 {
                     return FiskmoTpSettings.Default.FinetuningMaxSentencePairs;
                 }
@@ -174,7 +222,7 @@ namespace FiskmoTranslationProvider
             }
             set
             {
-                GetSetting<int>(nameof(MaxFinetuningSentences)).Value = value;
+                GetSetting<string>(nameof(MaxFinetuningSentences)).Value = value;
                 NotifyPropertyChanged();
             }
         }

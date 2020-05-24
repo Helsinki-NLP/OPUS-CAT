@@ -59,6 +59,7 @@ namespace FiskmoMTEngine
             var relevantModels = from m in this.LocalModels
                                  where m.SourceLanguages.Contains(sourceLang)
                                  where m.TargetLanguages.Contains(targetLang)
+                                 where m.ModelConfig != null
                                  select m.ModelConfig.ModelTags;
 
             return relevantModels.SelectMany(x => x).ToList();
@@ -132,8 +133,12 @@ namespace FiskmoMTEngine
             
             this.LocalModels.Remove(selectedModel);
             selectedModel.Shutdown();
-            FileSystem.DeleteDirectory(
-                Path.Combine(this.opusModelDir.FullName,selectedModel.ModelPath),UIOption.OnlyErrorDialogs,RecycleOption.SendToRecycleBin);
+            
+            if (Directory.Exists(Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath)))
+            {
+                FileSystem.DeleteDirectory(
+                    Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath), UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+            }
         }
 
         public ModelManager()
@@ -164,7 +169,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag)
+        private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag, bool includeIncomplete=false)
         {
             MTModel mtModel;
 
@@ -174,7 +179,7 @@ namespace FiskmoMTEngine
             }
             else
             {
-                mtModel = this.GetModelByTag(srcLangCode, trgLangCode, modelTag);
+                mtModel = this.GetModelByTag(modelTag, srcLangCode, trgLangCode, includeIncomplete);
                 if (mtModel == null)
                 {
                     mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
@@ -185,8 +190,11 @@ namespace FiskmoMTEngine
 
         internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
-            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag);
-            mtModel.PreTranslateBatch(input);
+            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag,true);
+            if (mtModel.Status == MTModelStatus.OK)
+            {
+                mtModel.PreTranslateBatch(input);
+            }
         }
 
         private MTModel GetModelByTag(string tag, string srcLangCode, string trgLangCode, bool includeIncomplete = false)
@@ -329,7 +337,8 @@ namespace FiskmoMTEngine
                     includeTagPairs));
 
             //Add an entry for an incomplete model to the model list
-            this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", srcLangCode, trgLangCode, MTModelStatus.Customizing));
+            var modelPath = Regex.Match(customizer.customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
+            this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", modelPath, srcLangCode, trgLangCode, MTModelStatus.Customizing, modelTag));
 
         }
 
@@ -351,6 +360,7 @@ namespace FiskmoMTEngine
 
                     customModel.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
                     customModel.ModelConfig.IncludeTagPairs = includeTagPairs;
+                    customModel.ModelConfig.Finetuned = true;
 
                     //The model config is saved when tags are added
                     customModel.ModelConfig.ModelTags.Add(modelTag);
@@ -452,7 +462,13 @@ namespace FiskmoMTEngine
                 }
                 else
                 {
-                    primaryModel = languagePairModels.First();
+                    //Pick a model that is not fine-tuned
+                    primaryModel = languagePairModels.FirstOrDefault(x => !x.ModelConfig.Finetuned);
+                    if (primaryModel == null)
+                    {
+                        //As a fallback pick any model
+                        primaryModel = languagePairModels.First();
+                    }
                 }
 
                 return primaryModel;

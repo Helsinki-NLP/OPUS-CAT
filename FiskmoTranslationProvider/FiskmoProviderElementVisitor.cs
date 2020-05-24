@@ -1,6 +1,8 @@
 ﻿using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.LanguagePlatform.Core;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace FiskmoTranslationProvider
@@ -8,98 +10,68 @@ namespace FiskmoTranslationProvider
     class FiskmoProviderElementVisitor : ISegmentElementVisitor
     {
 
-        /// <summary>
-        /// This static class is for working with ISegment objects from the BilingualApi,
-        /// which is not the same as the segments in LanguagePlatform.Core, they segments
-        /// have different constituents (e.g. IPlaceHolderTag in BilingualApi and more generic Tag
-        /// for LanguagePlatform.Core). Both need to be processed identically, so the static method
-        /// for converting BilingualApi ISegments is included here in the LanguagaPlatform.Core visitor
-        /// class.
-        /// </summary>
-        /// <param name="segment"></param>
-        /// <param name="includePlaceholderTags"></param>
-        /// <returns></returns>
-        public static string ExtractSegmentText(ISegment segment)
-        {
-            StringBuilder segmentText = new StringBuilder();
-            int placeholderIndex = 0;
-            foreach (var item in segment.AllSubItems)
-            {
-                if (item is IText)
-                {
-                    //Segments with line breaks might cause trouble, remove the line breaks
-                    var itemText = item.ToString();
-                    
-                    if (itemText.Contains("\n"))
-                    {
-                        itemText.Replace("\n", " ");
-                    }
+        private StringBuilder plainText;
+        private Dictionary<string, Tag> sourceTagStarts;
+        private Dictionary<string, Tag> sourceTagEnds;
 
-                    segmentText.Append(itemText);
-                }
-                else if (item is IPlaceholderTag)
-                {
-                    //segmentText.Append(((IPlaceholderTag)item).TagProperties.DisplayText);
-                    segmentText.Append($"PLACEHOLDER{placeholderIndex}");
-                    placeholderIndex++;
-                }
-            }
-
-            return segmentText.ToString();
-        }
-
-        private FiskmoOptions _options;
-        private string _plainText;
         public string PlainText
         {
             get 
             {
-                if (_plainText == null)
+                if (plainText == null)
                 {
-                    _plainText = "";
+                    return "";
                 }
-                return _plainText;
-            }
-            set 
-            {
-                _plainText = value;
+
+                return plainText.ToString();
             }
         }
 
-        public Dictionary<string,Tag> Placeholders { get; set;}
+        //public Dictionary<string,Tag> Placeholders { get; set;}
+
+        public Queue<Tag> Placeholders { get; set; }
+
+        //public Dictionary<string, Tag> TagStarts { get; set; }
+        public Queue<Tag> TagStarts { get; set; }
+        //public Dictionary<string, Tag> TagEnds { get; set; }
+        public Queue<Tag> TagEnds { get; set; }
 
         public void Reset()
         {
-            _plainText = "";
-            this.Placeholders = new Dictionary<string, Tag>();
+            plainText = new StringBuilder();
+            this.Placeholders = new Queue<Tag>();
+            this.TagStarts = new Queue<Tag>();
+            this.TagEnds = new Queue<Tag>();
         }
 
-        public FiskmoProviderElementVisitor(FiskmoOptions options)
+
+        public FiskmoProviderElementVisitor()
         {
-            _options = options;
-            this.Placeholders = new Dictionary<string, Tag>();
+            this.Placeholders = new Queue<Tag>();
+            this.TagStarts = new Queue<Tag>();
+            this.TagEnds = new Queue<Tag>();
         }
 
         #region ISegmentElementVisitor Members
 
         public void VisitDateTimeToken(Sdl.LanguagePlatform.Core.Tokenization.DateTimeToken token)
         {
-            _plainText += token.Text;
+            this.plainText.Append(token.Text);
         }
 
         public void VisitMeasureToken(Sdl.LanguagePlatform.Core.Tokenization.MeasureToken token)
         {
-            _plainText += token.Text;
+            this.plainText.Append(token.Text);
         }
 
         public void VisitNumberToken(Sdl.LanguagePlatform.Core.Tokenization.NumberToken token)
         {
-            _plainText += token.Text;
+            this.plainText.Append(token.Text);
         }
 
         public void VisitSimpleToken(Sdl.LanguagePlatform.Core.Tokenization.SimpleToken token)
         {
-            _plainText += token.Text;
+            this.plainText.Append(token.Text);
         }
 
         public void VisitTag(Tag tag)
@@ -107,20 +79,64 @@ namespace FiskmoTranslationProvider
             //Only include standalone/placeholder tags, include as PLACEHOLDER{n}
             if (tag.Type == TagType.Standalone || tag.Type == TagType.TextPlaceholder)
             {
-                var placeholder = $"PLACEHOLDER{this.Placeholders.Keys.Count}";
-                _plainText += placeholder;
-                this.Placeholders[placeholder] = tag;
+                //var placeholder = $" PLACEHOLDER{this.Placeholders.Keys.Count} ";
+                var placeholder = $" PLACEHOLDER ";
+                this.plainText.Append(placeholder);
+                //this.Placeholders[placeholder] = tag;
+                this.Placeholders.Enqueue(tag);
+            }
+            else if (tag.Type == TagType.Start)
+            {
+                /*
+                string startTag;
+                if (this.sourceTagStarts.Values.Any(x => x.TagID == tag.TagID))
+                {
+                    startTag = this.sourceTagStarts.First(x => x.Value.TagID == tag.TagID).Key;
+                }
+                else
+                {
+                    startTag = $" TAGPAIRSTART{this.TagStarts.Keys.Count} ";
+                }
+
+                this.plainText.Append(startTag);
+                this.TagStarts[startTag] = tag;*/
+                this.plainText.Append(" TAGPAIRSTART ");
+                this.TagStarts.Enqueue(tag);
+            }
+            else if (tag.Type == TagType.End)
+            {
+                /*string endTag;
+                if (this.sourceTagEnds.Values.Any(x => x.TagID == tag.TagID))
+                {
+                    endTag = this.sourceTagEnds.First(x => x.Value.TagID == tag.TagID).Key;
+                }
+                else
+                {
+                    endTag = $" TAGPAIREND{this.TagEnds.Keys.Count} ";
+                }
+                
+                this.plainText.Append(endTag);
+                this.TagEnds[endTag] = tag;*/
+                this.plainText.Append(" TAGPAIREND ");
+                this.TagEnds.Enqueue(tag);
             }
         }
 
         public void VisitTagToken(Sdl.LanguagePlatform.Core.Tokenization.TagToken token)
         {
-            _plainText += token.Text;
+            this.plainText.Append(token.Text);
         }
 
         public void VisitText(Text text)
         {
-            _plainText += text;
+            this.plainText.Append(text);
+        }
+
+        internal void Reset(Dictionary<string, Tag> tagStarts, Dictionary<string, Tag> tagEnds)
+        {
+            /*this.sourceTagStarts = TagStarts;
+            this.sourceTagEnds = TagEnds;
+            this.Reset();*/
         }
 
         #endregion

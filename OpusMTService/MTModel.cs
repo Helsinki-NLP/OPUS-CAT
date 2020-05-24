@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data.Entity.Migrations.History;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -146,12 +147,16 @@ namespace FiskmoMTEngine
             this.ModelPath = modelPath;
         }
 
-        public MTModel(string name, string sourceCode, string targetCode, MTModelStatus status)
+        public MTModel(string name, string modelPath, string sourceCode, string targetCode, MTModelStatus status, string modelTag)
         {
             this.Name = name;
             this.SourceLanguages = new List<string>() { sourceCode };
             this.TargetLanguages = new List<string>() { targetCode };
             this.Status = status;
+            this.ModelConfig = new MTModelConfig();
+            this.ModelConfig.ModelTags.Add(modelTag);
+            this.ModelPath = modelPath;
+
         }
 
         public MTModel(string modelPath)

@@ -32,6 +32,10 @@ namespace FiskmoTranslationProvider
         internal Dictionary<Language,List<Tuple<string, string>>> ProjectTranslations;
 
         public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
+
+        private FiskmoProviderElementVisitor sourceVisitor;
+        private FiskmoProviderElementVisitor targetVisitor;
+
         public Dictionary<Language,List<TranslationUnit>> ProjectFuzzies { get; private set; }
 
         //Keep track of sentences collected. Stop fuzzy collecting once max limit is reached to
@@ -43,9 +47,18 @@ namespace FiskmoTranslationProvider
             this.collectedSentencePairCount = 0;
             this.settings = GetSetting<FinetuneBatchTaskSettings>();
             this.fiskmoOptions = new FiskmoOptions(new Uri(this.settings.ProviderOptions));
+
+            //Use project guid in case no model tag specified
+            if (this.fiskmoOptions.modelTag == "")
+            {
+                this.fiskmoOptions.modelTag = this.Project.GetProjectInfo().Id.ToString();
+            }
             this.tms = this.InstantiateProjectTms();
             this.ProjectTranslations = new Dictionary<Language, List<Tuple<string, string>>>();
             this.ProjectNewSegments = new Dictionary<Language, List<string>>();
+            this.ProjectFuzzies = new Dictionary<Language, List<TranslationUnit>>();
+            this.sourceVisitor = new FiskmoProviderElementVisitor();
+            this.targetVisitor = new FiskmoProviderElementVisitor();
             base.OnInitializeTask();
         }
 
@@ -59,19 +72,26 @@ namespace FiskmoTranslationProvider
             FileReader _task = new FileReader(tmLanguageDirections,settings,this.collectedSentencePairCount);
             multiFileConverter.AddBilingualProcessor(_task);
             multiFileConverter.Parse();
+            this.collectedSentencePairCount = _task.CollectedSentencePairCount;
 
             var targetLang = projectFile.GetLanguageDirection().TargetLanguage;
             if (this.ProjectTranslations.ContainsKey(targetLang))
             {
                 this.ProjectTranslations[targetLang].AddRange(_task.FileTranslations);
                 this.ProjectNewSegments[targetLang].AddRange(_task.FileNewSegments);
-                this.ProjectFuzzies[targetLang].AddRange(_task.TmFuzzies);
+                if (this.settings.ExtractFuzzies)
+                {
+                    this.ProjectFuzzies[targetLang].AddRange(_task.TmFuzzies);
+                }
             }
             else
             {
                 this.ProjectTranslations[targetLang] = _task.FileTranslations;
                 this.ProjectNewSegments[targetLang] = _task.FileNewSegments;
-                this.ProjectFuzzies[targetLang] = _task.TmFuzzies;
+                if (this.settings.ExtractFuzzies)
+                {
+                    this.ProjectFuzzies[targetLang] = _task.TmFuzzies;
+                }
             }
             
         }
@@ -86,6 +106,11 @@ namespace FiskmoTranslationProvider
             foreach (var lang in this.Project.GetProjectInfo().TargetLanguages)
             {
                 var tpConfig = this.Project.GetTranslationProviderConfiguration(lang);
+                
+                if (!tpConfig.OverrideParent)
+                {
+                    tpConfig = this.Project.GetTranslationProviderConfiguration();
+                }
                 List<ITranslationProvider> tps = new List<ITranslationProvider>();
                 foreach (var entry in tpConfig.Entries)
                 {
@@ -120,11 +145,15 @@ namespace FiskmoTranslationProvider
                 //Add Fiskmö MT provider to the project
                 var tpConfig = this.Project.GetTranslationProviderConfiguration();
 
-                var fiskmoRef = new TranslationProviderReference(fiskmoOptions.Uri);
-                tpConfig.Entries.Add(
-                    new TranslationProviderCascadeEntry(fiskmoRef, false, true, false));
-
-                this.Project.UpdateTranslationProviderConfiguration(tpConfig);
+                //Don't add another Fiskmo provider
+                if (!tpConfig.Entries.Any(x => x.MainTranslationProvider.Uri.Scheme == FiskmoProvider.FiskmoTranslationProviderScheme))
+                {
+                    var fiskmoRef = new TranslationProviderReference(fiskmoOptions.Uri);
+                    tpConfig.Entries.Add(
+                        new TranslationProviderCascadeEntry(fiskmoRef, false, true, false));
+                
+                    this.Project.UpdateTranslationProviderConfiguration(tpConfig);
+                }
             }
 
             if (settings.Finetune)
@@ -134,12 +163,22 @@ namespace FiskmoTranslationProvider
                     var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
                     //Remove duplicates
                     var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
-                    var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
+                    List<string> uniqueNewSegments = new List<string>();
+                    if (this.settings.BatchTranslate)
+                    {
+                        uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
+                    }
 
                     if (this.settings.ExtractFuzzies)
                     {
                         var fuzzies = this.ProcessFuzzies(this.ProjectFuzzies[targetLang]);
                         uniqueProjectTranslations.AddRange(fuzzies);
+                    }
+
+                    if (uniqueProjectTranslations.Count < Int32.Parse(FiskmoTpSettings.Default.FinetuningMinSentencePairs))
+                    {
+                        throw new Exception(
+                            $"Not enough sentence pairs for fine-tuning. Found {uniqueProjectTranslations.Count}, minimum is {FiskmoTpSettings.Default.FinetuningMinSentencePairs}");
                     }
 
                     //Send the tuning set to MT service
@@ -157,7 +196,10 @@ namespace FiskmoTranslationProvider
             }
 
             
-            //Send the new segments to MT engine for pretranslation
+            //Send the new segments to MT engine for pretranslation.
+            //If finetuning is selected, the new segments are translated after
+            //customization finished, so this is only for BatchTranslateOnly
+            if (settings.BatchTranslate == true && settings.Finetune == false)
             foreach (var targetLang in projectInfo.TargetLanguages)
             {
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
@@ -174,8 +216,6 @@ namespace FiskmoTranslationProvider
 
             var fuzzies = new List<Tuple<string, string>>();
 
-            var sourceVisitor = new FiskmoProviderElementVisitor(this.fiskmoOptions);
-            var targetVisitor = new FiskmoProviderElementVisitor(this.fiskmoOptions);
             foreach (var res in fuzzyResults)
             {
                 sourceVisitor.Reset();
@@ -184,6 +224,7 @@ namespace FiskmoTranslationProvider
                     element.AcceptSegmentElementVisitor(sourceVisitor);
                 }
 
+                //targetVisitor.Reset(sourceVisitor.TagStarts, sourceVisitor.TagEnds);
                 targetVisitor.Reset();
                 foreach (var element in res.TargetSegment.Elements)
                 {
@@ -196,7 +237,6 @@ namespace FiskmoTranslationProvider
 
             }
             return fuzzies;
-
         }
     
     }
