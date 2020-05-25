@@ -37,6 +37,7 @@ namespace FiskmoMTEngine
             //ExternalProcess.StartInfo.CreateNoWindow = false;
 
             ExternalProcess.Start();
+            ExternalProcess.EnableRaisingEvents = true;
             ExternalProcess.BeginErrorReadLine();
 
             ExternalProcess.StandardInput.AutoFlush = true;
@@ -154,8 +155,8 @@ namespace FiskmoMTEngine
             }
 
             var spArgs = $"{preprocessedFile.FullName} --model {spmModel.FullName} --output {spFile.FullName}";
-            MarianHelper.StartProcessInWindow("spm_encode.exe", spArgs);
-
+            var spmProcess = MarianHelper.StartProcessInBackgroundWithRedirects("spm_encode.exe", spArgs);
+            spmProcess.WaitForExit();
             return spFile;
         }
     }

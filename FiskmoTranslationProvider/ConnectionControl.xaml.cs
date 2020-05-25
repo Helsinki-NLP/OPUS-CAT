@@ -193,9 +193,18 @@ namespace FiskmoTranslationProvider
 
         private void StartFetch()
         {
+            
             var host = this.options.mtServiceAddress;
             var port = this.options.mtServicePort;
-            var modeltag = this.options.modelTag;
+
+            //If connection details are custom, check the custom checkbox, this is for start-up
+            this.UseCustomConnection.IsChecked =
+                host != FiskmoTpSettings.Default.MtServiceAddress ||
+                port != FiskmoTpSettings.Default.MtServicePort;
+            
+
+
+                var modeltag = this.options.modelTag;
             Task.Run(() => this.FetchServiceData(host, port, modeltag));
         }
 
@@ -214,6 +223,12 @@ namespace FiskmoTranslationProvider
         public void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.StartFetch();
+        }
+
+        private void UseCustomConnection_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.ServicePortBoxElement.Text = FiskmoTpSettings.Default.MtServicePort;
+            this.ServiceAddressBoxElement.Text = FiskmoTpSettings.Default.MtServiceAddress;
         }
     }
 }

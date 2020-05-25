@@ -186,7 +186,7 @@ namespace FiskmoMTEngine
         internal void PreTranslateBatch(List<string> input)
         {
             var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags,this.modelConfig.IncludeTagPairs);
-            batchProcess.BatchTranslate(input);
+            Task.Run(() => batchProcess.BatchTranslate(input));
         }
     }
 }

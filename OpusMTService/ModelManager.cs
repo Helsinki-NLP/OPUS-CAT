@@ -68,6 +68,7 @@ namespace FiskmoMTEngine
         private DirectoryInfo opusModelDir;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
+        public bool CustomizationOngoing { get; private set; }
 
         internal string CheckModelStatus(string sourceCode, string targetCode, string modelTag)
         {
@@ -171,6 +172,7 @@ namespace FiskmoMTEngine
 
         private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag, bool includeIncomplete=false)
         {
+
             MTModel mtModel;
 
             if (modelTag == null)
@@ -191,9 +193,15 @@ namespace FiskmoMTEngine
         internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag,true);
+
+            Log.Information($"Pretranslating a batch of translations with model tag {modelTag}, model {mtModel.Name} will be used.");
             if (mtModel.Status == MTModelStatus.OK)
             {
                 mtModel.PreTranslateBatch(input);
+            }
+            else
+            {
+                Log.Information($"Model {mtModel.Name} was not ready for translation, batch translation canceled.");
             }
         }
 
@@ -277,13 +285,16 @@ namespace FiskmoMTEngine
 
         private void SplitToFiles(List<Tuple<string, string>> biText,string srcPath, string trgPath)
         {
+            Regex linebreakRegex = new Regex(@"\r\n?|\n");
             using (var srcStream = new StreamWriter(srcPath, true, Encoding.UTF8))
             using (var trgStream = new StreamWriter(trgPath, true, Encoding.UTF8))
             {
                 foreach (var pair in biText)
                 {
-                    srcStream.WriteLine(pair.Item1);
-                    trgStream.WriteLine(pair.Item2);
+                    //Make sure to remove line breaks from the items before writing them, otherwise the line
+                    //breaks can mess marian processing up
+                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1," "));
+                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2," "));
                 }
             }
         }
@@ -299,7 +310,7 @@ namespace FiskmoMTEngine
             bool includeTagPairs)
         {
             var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
-
+            Log.Information($"Customizing a new model with model tag {modelTag} from base model {primaryModel.Name}.");
             //Write the tuning set as two files
             var fileGuid = Guid.NewGuid();
             var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLangCode}");
@@ -336,10 +347,11 @@ namespace FiskmoMTEngine
                     includePlaceholderTags,
                     includeTagPairs));
 
+            this.CustomizationOngoing = true;
+
             //Add an entry for an incomplete model to the model list
             var modelPath = Regex.Match(customizer.customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
             this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", modelPath, srcLangCode, trgLangCode, MTModelStatus.Customizing, modelTag));
-
         }
 
         private void TrainProcess_Exited(
@@ -353,8 +365,11 @@ namespace FiskmoMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
+            Log.Information($"Customization process with model tag {modelTag} finished.");
+            
             Application.Current.Dispatcher.Invoke(() =>
                 {
+                    Log.Information($"Updating model list.");
                     this.GetLocalModels();
                     var customModel = this.LocalModels.Single(x => x.InstallDir == customDir.FullName);
 
@@ -362,10 +377,15 @@ namespace FiskmoMTEngine
                     customModel.ModelConfig.IncludeTagPairs = includeTagPairs;
                     customModel.ModelConfig.Finetuned = true;
 
+                    //Clear the tags to get rid of the base model tags
+                    customModel.ModelConfig.ModelTags.Clear();
                     //The model config is saved when tags are added
                     customModel.ModelConfig.ModelTags.Add(modelTag);
                 }
             );
+
+            this.CustomizationOngoing = false;
+
             if (uniqueNewSegments.Count > 0)
             {
                 this.PreTranslateBatch(uniqueNewSegments, srcLangCode, trgLangCode, modelTag);

@@ -47,8 +47,7 @@ namespace FiskmoMTEngine
             this.includeTagPairs = includeTagPairs;
             this.modelDir = new DirectoryInfo(modelDir);
             this.SystemName = $"{sourceCode}-{targetCode}_" + this.modelDir.Name;
-            this.tagMethod = tagMethod;
-
+            
             //Check if batch.yml exists, if not create it from decode.yml
             var batchYaml = this.modelDir.GetFiles("batch.yml");
             if (batchYaml.Length == 0)
@@ -79,7 +78,7 @@ namespace FiskmoMTEngine
                 spInput.FullName.Replace($".{SourceCode}", $".{TargetCode}"));
             
             var args = $"{this.modelDir.FullName} {spInput.FullName} {spOutput.FullName}";
-            var batchProcess = MarianHelper.StartProcessInWindow(cmd, args);
+            var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args);
 
             batchProcess.Exited += (x,y)=> BatchProcess_Exited(input, spOutput,x,y);
         }
@@ -88,7 +87,8 @@ namespace FiskmoMTEngine
         {
             
             Log.Information($"Batch translation process for model {this.SystemName} exited. Saving results.");
-            Queue<string> inputQueue = new Queue<string>(input);
+            Queue<string> inputQueue
+                = new Queue<string>(input);
             if (spOutput.Exists)
             {
                 using (var reader = spOutput.OpenText())

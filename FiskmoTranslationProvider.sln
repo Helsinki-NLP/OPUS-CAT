@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Trados", "Trados", "{7A01F5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpusService", "OpusService", "{05D6D17C-DFCC-4E76-AE07-0F22FD38F3B7}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "OpusMTInstaller", "OpusMTInstaller\OpusMTInstaller.wixproj", "{9A9A584C-4435-4354-BBEA-331CE2DF443B}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "FiskmoMTInstaller", "OpusMTInstaller\FiskmoMTInstaller.wixproj", "{9A9A584C-4435-4354-BBEA-331CE2DF443B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

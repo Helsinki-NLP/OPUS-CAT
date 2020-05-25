@@ -34,14 +34,14 @@ namespace FiskmoTranslationProvider
         //public Dictionary<string, Tag> TagStarts { get; set; }
         public Queue<Tag> TagStarts { get; set; }
         //public Dictionary<string, Tag> TagEnds { get; set; }
-        public Queue<Tag> TagEnds { get; set; }
+        public Dictionary<string,Tag> TagEnds { get; set; }
 
         public void Reset()
         {
             plainText = new StringBuilder();
             this.Placeholders = new Queue<Tag>();
             this.TagStarts = new Queue<Tag>();
-            this.TagEnds = new Queue<Tag>();
+            this.TagEnds = new Dictionary<string, Tag>();
         }
 
 
@@ -49,7 +49,7 @@ namespace FiskmoTranslationProvider
         {
             this.Placeholders = new Queue<Tag>();
             this.TagStarts = new Queue<Tag>();
-            this.TagEnds = new Queue<Tag>();
+            this.TagEnds = new Dictionary<string, Tag>();
         }
 
         #region ISegmentElementVisitor Members
@@ -118,7 +118,7 @@ namespace FiskmoTranslationProvider
                 this.plainText.Append(endTag);
                 this.TagEnds[endTag] = tag;*/
                 this.plainText.Append(" TAGPAIREND ");
-                this.TagEnds.Enqueue(tag);
+                this.TagEnds[tag.TagID] = tag;
             }
         }
 

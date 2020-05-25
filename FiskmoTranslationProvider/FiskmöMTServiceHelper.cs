@@ -18,9 +18,10 @@ namespace FiskmoTranslationProvider
         public static IMTService getNewProxy(string host, string port)
         {
             NetTcpBinding myBinding = new NetTcpBinding();
-            myBinding.Security.Mode = SecurityMode.Transport;
-            myBinding.Security.Transport.ClientCredentialType =
-                TcpClientCredentialType.Windows;
+            myBinding.Security.Mode = SecurityMode.None;
+            //myBinding.Security.Mode = SecurityMode.Transport;
+            //myBinding.Security.Transport.ClientCredentialType =
+            //    TcpClientCredentialType.Windows;
 
             var epAddr = new EndpointAddress($"net.tcp://{host}:{port}/MTService");
             var proxy = ChannelFactory<IMTService>.CreateChannel(myBinding, epAddr);
@@ -197,7 +198,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal static void Customize(
+        internal static string Customize(
             string host,
             string mtServicePort,
             List<Tuple<string, string>> projectTranslations,
@@ -214,11 +215,12 @@ namespace FiskmoTranslationProvider
             var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
             var trainingSet = projectTranslations.Skip(200).ToList();
             var validSet = projectTranslations.Take(200).ToList();
-
+            string result;
             using (proxy as IDisposable)
             {
-                proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag, includePlaceholderTags, includeTagPairs);
+                result = proxy.Customize(GetTokenCode(host,mtServicePort), trainingSet, validSet, uniqueNewSegments, sourceCode, targetCode, modelTag, includePlaceholderTags, includeTagPairs);
             }
+            return result;
         }
         
         /// <summary>

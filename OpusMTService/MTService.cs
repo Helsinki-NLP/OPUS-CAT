@@ -177,10 +177,18 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            this.ModelManager.Customize(
-                input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs);
+            if (!this.ModelManager.CustomizationOngoing)
+            {
+                this.ModelManager.Customize(
+                    input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs);
+                return "fine-tuning started";
+            }
+            else
+            {
+                return "fine-tuning already in process";
+            }
 
-            return "tuning set received";
+            
         }
 
     }

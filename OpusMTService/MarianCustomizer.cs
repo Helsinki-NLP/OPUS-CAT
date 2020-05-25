@@ -56,7 +56,7 @@ namespace FiskmoMTEngine
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Customization failed: {ex.Message}", "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.Information($"Customization failed: {ex.Message}");
                 return;
             }
             //Preprocess input files

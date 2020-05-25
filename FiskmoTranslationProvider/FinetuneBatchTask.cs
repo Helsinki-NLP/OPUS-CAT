@@ -181,8 +181,9 @@ namespace FiskmoTranslationProvider
                             $"Not enough sentence pairs for fine-tuning. Found {uniqueProjectTranslations.Count}, minimum is {FiskmoTpSettings.Default.FinetuningMinSentencePairs}");
                     }
 
+
                     //Send the tuning set to MT service
-                    FiskmöMTServiceHelper.Customize(
+                    var result = FiskmöMTServiceHelper.Customize(
                         this.fiskmoOptions.mtServiceAddress,
                         this.fiskmoOptions.mtServicePort,
                         uniqueProjectTranslations,
@@ -192,6 +193,14 @@ namespace FiskmoTranslationProvider
                         this.fiskmoOptions.modelTag,
                         this.settings.IncludePlaceholderTags,
                         this.settings.IncludeTagPairs);
+
+                    switch (result)
+                    {
+                        case "fine-tuning already in process":
+                            throw new Exception("MT engine is currently fine-tuning a model, wait for previous fine-tuning to finish (or cancel it by restarting MT engine).");
+                        default:
+                            break;
+                    }
                 }
             }
 

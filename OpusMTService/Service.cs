@@ -48,9 +48,10 @@ namespace FiskmoMTEngine
             );
 
             var nettcpBinding = new NetTcpBinding();
-            nettcpBinding.Security.Mode = SecurityMode.Transport;
+            nettcpBinding.Security.Mode = SecurityMode.None;
+            /*nettcpBinding.Security.Mode = SecurityMode.Transport;
             nettcpBinding.Security.Transport.ClientCredentialType =
-                TcpClientCredentialType.Windows;
+                TcpClientCredentialType.Windows;*/
 
             //Customization tuning sets tend to be big
             nettcpBinding.MaxReceivedMessageSize = 20000000;

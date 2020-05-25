@@ -10,7 +10,7 @@
     <StackPanel Background="White">
         <Border BorderThickness="1" BorderBrush="Black">
             <StackPanel Margin="10,10,10,10">
-                <CheckBox Name="UseCustomConnection">Use custom connection</CheckBox>
+                <CheckBox Name="UseCustomConnection" Unchecked="UseCustomConnection_Unchecked">Use custom connection</CheckBox>
                 <DockPanel>
                     <Label ToolTip="The port used by the Fiskmö MT engine" HorizontalAlignment="Right">MT service port (1024-65535)</Label>
                     <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServicePortBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServicePort, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput"/>
@@ -18,7 +18,7 @@
 
                 <DockPanel>
                     <Label ToolTip="The address of the host machine of the Fiskmö MT engine (IP address or domain name)">MT service host address</Label>
-                    <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServiceAddressBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServiceAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
+                    <TextBox IsEnabled="{Binding IsChecked,ElementName=UseCustomConnection}" Name="ServiceAddressBoxElement" VerticalAlignment="Center" Text="{Binding Path=Options.mtServiceAddress, UpdateSourceTrigger=LostFocus,Mode=TwoWay}" />
                 </DockPanel>
 
                 <!--<DockPanel Margin="0,0,0,5">

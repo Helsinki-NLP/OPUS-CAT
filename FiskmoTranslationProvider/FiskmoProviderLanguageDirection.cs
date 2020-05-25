@@ -14,6 +14,7 @@ using Sdl.FileTypeSupport.Framework.BilingualApi;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using System.Runtime.InteropServices;
 
 namespace FiskmoTranslationProvider
 {
@@ -131,15 +132,14 @@ namespace FiskmoTranslationProvider
                     
                     //var split = Regex.Split(translatedSentence,@"\b(PLACEHOLDER\d+)\b");
                     var split = Regex.Split(translatedSentence, @"\b(PLACEHOLDER|TAGPAIRSTART|TAGPAIREND)\b");
-                    bool tagPairStarted = false;
+                
+                    //Tag starts and ends must match, so need a stack to keep track of what tags
+                    //have been applied
+                    var tagStack = new Stack<Tag>();
+
                     foreach (var part in split)
                     {
-                        /*
-                        if (_visitor.Placeholders.ContainsKey(part))
-                        {
-                            translation.Add(_visitor.Placeholders[part]);
-                        }*/
-                        
+                                                
                         switch (part)
                         {
                             case "PLACEHOLDER":
@@ -151,15 +151,17 @@ namespace FiskmoTranslationProvider
                             case "TAGPAIRSTART":
                                 if (_visitor.TagStarts.Peek() != null)
                                 {
-                                    translation.Add(_visitor.TagStarts.Dequeue());
+                                    var startTag = _visitor.TagStarts.Dequeue();
+                                    tagStack.Push(startTag);
+                                    translation.Add(startTag);
                                 }
-                                tagPairStarted = true;
                                 break;
                             case "TAGPAIREND":
-                                if (_visitor.TagEnds.Peek() != null && tagPairStarted)
+                                if (tagStack.Peek() != null)
                                 {
-                                    translation.Add(_visitor.TagEnds.Dequeue());
-                                    tagPairStarted = false;
+                                    var correspondingStartTag = tagStack.Pop();
+                                    var endTag = _visitor.TagEnds[correspondingStartTag.TagID];
+                                    translation.Add(endTag);
                                 }
                                 break;
                             default:
@@ -167,11 +169,28 @@ namespace FiskmoTranslationProvider
                                 break;
                         }
                     }
+
+                    //Insert missing end tags
+                    foreach (var excessStartTag in tagStack)
+                    {
+                        var nonEndedTagIndex = translation.Elements.IndexOf(excessStartTag);
+                        var endTag = _visitor.TagEnds[excessStartTag.TagID];
+                        translation.Elements.Insert(nonEndedTagIndex+1, endTag);
+                    }
                 }
                 else
                 {
                     translation.Add(translatedSentence);
                 }
+
+                
+
+                //There might be some problematic tags after the tag stack treatment, this should
+                //handle those.
+                //TODO: Ideally the tag issues would be resolved already in the NMT decoder, i.e. only
+                //insertion of matched tags would be allowed.
+                var fillresult = translation.FillUnmatchedStartAndEndTags();
+                var removeresult = translation.RemoveUnmatchedStartAndEndTags();
 
                 systemResults.Add(CreateSearchResult(segment, translation, segment.HasTags,"fiskmö"));
             }
@@ -199,7 +218,16 @@ namespace FiskmoTranslationProvider
             
             tu.SourceSegment = searchSegment;
             tu.TargetSegment = translation;
-            
+
+
+            var error = tu.Validate(Segment.ValidationMode.ReportAllErrors);
+
+            //This is a fallback for tag errors
+            if (!error.HasFlag(ErrorCode.OK))
+            {
+                tu.TargetSegment.DeleteTags();
+            }
+
             tu.ResourceId = new PersistentObjectToken(tu.GetHashCode(), Guid.Empty);
             tu.FieldValues.Add(new SingleStringFieldValue("mtSystem", mtSystem));
             
