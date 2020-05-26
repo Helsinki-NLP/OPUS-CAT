@@ -4,11 +4,11 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the Mari
 
 ## Quickstart for translators
 
-1. Download the installer for Fiskmo MT Engine and install to your computer.
+1. Download the [Fiskmo MT Engine](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTEngine.zip) and install it to your computer by extracting it in a folder on your computer.
 2. Download the plugin for your translation software and install it:
-  - Trados 2017/2019: double-click plugin file to install.
-  - memoQ: Copy the plugin file to the Addins subfolder in the memoQ installation folder.
-3. Start the Fiskmo MT Engine application, and install models from the Fiskmo model repository for the language pairs that you require.
+  - [Trados 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTEngine.zip): double-click plugin file to install.
+  - [memoQ](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder.
+3. Start the Fiskmo MT Engine application by clicking FiskmoMTEngine.exe in the extraction folder, and install models from the Fiskmo model repository for the language pairs that you require.
 4. Start your CAT tool, and add the Fiskmo plugin to a translation project.
 
 NOTE: Fiskmo MT Engine application needs to be running on the computer, when the plugins are used.
@@ -16,15 +16,6 @@ NOTE: Fiskmo MT Engine application needs to be running on the computer, when the
 ## About
 
 This work is part of the [fiskmö project](https://blogs.helsinki.fi/fiskmo-project/). It implements a self-contained MT plugin for SDL Trados Studio that runs a translation engine based on [MarianNMT](https://marian-nmt.github.io) locally within the plugin. Please acknowledge the project if you use our tools and resources.
-
-
-## Download
-
-The latest compiled plugin:
-
-* [SDL Trados Studio 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/master/build/2019-10-22/FiskmoTranslationProvider.sdlplugin)
-* [SDL Trados Studio 2017](https://github.com/Helsinki-NLP/fiskmo-trados/raw/master/build/2019-10-22/FiskmoTranslationProvider2017.sdlplugin)
-
 
 Source:
 
