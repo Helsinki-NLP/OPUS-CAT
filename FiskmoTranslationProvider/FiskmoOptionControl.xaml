@@ -43,8 +43,9 @@
         <Border Margin="5" BorderThickness="1" BorderBrush="Black">
             <StackPanel>
                 <Label FontWeight="Bold">Connection status</Label>
-                <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
-                <TextBlock Margin="5" Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}"><Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate">
+                <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBlock>
+                <TextBlock Margin="5"  TextWrapping="Wrap"  Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}">Make sure Fiskmo MT Engine application is running and that it uses the same connection settings as the plugin (default settings should work).</TextBlock>
+                <TextBlock Margin="5"><Hyperlink NavigateUri="https://github.com/Helsinki-NLP/fiskmo-trados/blob/master/README.md" RequestNavigate="Hyperlink_RequestNavigate">
                     Fiskmö MT online documentation
                 </Hyperlink></TextBlock>
             </StackPanel>

@@ -42,6 +42,8 @@ namespace FiskmoMTEngine
 
             ExternalProcess.StandardInput.AutoFlush = true;
 
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+
             return ExternalProcess;
         }
 
@@ -67,7 +69,7 @@ namespace FiskmoMTEngine
             ExternalProcess.EnableRaisingEvents = true;
             //ExternalProcess.BeginErrorReadLine();
 
-            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess) ;
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
 
             return ExternalProcess;
         }

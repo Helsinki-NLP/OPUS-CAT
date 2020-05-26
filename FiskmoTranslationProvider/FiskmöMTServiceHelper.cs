@@ -18,7 +18,13 @@ namespace FiskmoTranslationProvider
         public static IMTService getNewProxy(string host, string port)
         {
             NetTcpBinding myBinding = new NetTcpBinding();
-            myBinding.Security.Mode = SecurityMode.None;
+
+            //Use default net.tcp security, which is based on Windows authentication:
+            //can only contact services in the same domain.
+            //TODO: add a checkbox (with warning) in the UI for using security mode None,
+            //to allow connections from IP range (also add same checkbox to service UI).
+
+            //myBinding.Security.Mode = SecurityMode.None;
             //myBinding.Security.Mode = SecurityMode.Transport;
             //myBinding.Security.Transport.ClientCredentialType =
             //    TcpClientCredentialType.Windows;
@@ -150,13 +156,13 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        internal static void PreTranslateBatch(string host, string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
+        internal static string PreTranslateBatch(string host, string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
         {
             var proxy = getNewProxy(host, mtServicePort);
 
             using (proxy as IDisposable)
             {
-                proxy.PreTranslateBatch(GetTokenCode(host, mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
+                return proxy.PreTranslateBatch(GetTokenCode(host, mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
             }
         }
 

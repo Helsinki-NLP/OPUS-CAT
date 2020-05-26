@@ -5,6 +5,7 @@ namespace FiskmoMTEngine
 {
     public class MarianDecoderConfig
     {
+        public string log { get; set; }
         public List<string> models { get; set; }
         public List<string> vocabs { get; set; }
         [YamlMember(Alias = "relative-paths", ApplyNamingConventions = false)]

@@ -15,7 +15,8 @@ namespace FiskmoTranslationProvider
 {
     class PluginUI
     {
-        [Action("RunSRAction", Icon = "MyAction_Icon")]
+        /* Disabled, need to fix this to copy the suggestion from MT language direction to segment directly.
+         * [Action("RunSRAction", Icon = "MyAction_Icon")]
         [Shortcut(Keys.Alt | Keys.F8)]
         public class MyMainIconAction : AbstractAction
         {
@@ -37,6 +38,6 @@ namespace FiskmoTranslationProvider
                 activeSegmentPair.Target.Add(firstText);
                 editorController.ActiveDocument.UpdateSegmentPair(activeSegmentPair);
             }
-        }
+        }*/
     }
 }

@@ -33,13 +33,13 @@ namespace FiskmoMTEngine
         private ObservableCollection<MTModel> filteredOnlineModels = new ObservableCollection<MTModel>();
 
         public ObservableCollection<MTModel> FilteredOnlineModels
-        { get => filteredOnlineModels; set { filteredOnlineModels= value; NotifyPropertyChanged(); } }
+        { get => filteredOnlineModels; set { filteredOnlineModels = value; NotifyPropertyChanged(); } }
 
         private ObservableCollection<MTModel> localModels;
 
         public ObservableCollection<MTModel> LocalModels
         { get => localModels; set { localModels = value; NotifyPropertyChanged(); } }
-        
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -66,9 +66,13 @@ namespace FiskmoMTEngine
         }
 
         private DirectoryInfo opusModelDir;
+        private FileSystemWatcher watcher;
+        private bool batchTranslationOngoing;
+        private bool customizationOngoing;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
-        public bool CustomizationOngoing { get; private set; }
+        public bool CustomizationOngoing { get => customizationOngoing; set { customizationOngoing = value; NotifyPropertyChanged(); } }
+        public bool BatchTranslationOngoing { get => batchTranslationOngoing; set { batchTranslationOngoing = value; NotifyPropertyChanged(); } }
 
         internal string CheckModelStatus(string sourceCode, string targetCode, string modelTag)
         {
@@ -125,16 +129,16 @@ namespace FiskmoMTEngine
         internal void UninstallModel(MTModel selectedModel)
         {
             var onlineModel = this.onlineModels.SingleOrDefault(
-                x => x.ModelPath.Replace("/","\\") == selectedModel.ModelPath);
+                x => x.ModelPath.Replace("/", "\\") == selectedModel.ModelPath);
             if (onlineModel != null)
             {
                 onlineModel.InstallStatus = "";
                 onlineModel.InstallProgress = 0;
             }
-            
+
             this.LocalModels.Remove(selectedModel);
             selectedModel.Shutdown();
-            
+
             if (Directory.Exists(Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath)))
             {
                 FileSystem.DeleteDirectory(
@@ -144,7 +148,7 @@ namespace FiskmoMTEngine
 
         public ModelManager()
         {
-             
+
             this.GetOnlineModels();
             this.opusModelDir = new DirectoryInfo(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -170,12 +174,12 @@ namespace FiskmoMTEngine
             }
         }
 
-        private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag, bool includeIncomplete=false)
+        private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag, bool includeIncomplete = false)
         {
 
             MTModel mtModel;
 
-            if (modelTag == null)
+            if (modelTag == null || modelTag == "")
             {
                 mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
             }
@@ -192,17 +196,24 @@ namespace FiskmoMTEngine
 
         internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
-            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag,true);
+            this.BatchTranslationOngoing = true;
+            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag, true);
 
             Log.Information($"Pretranslating a batch of translations with model tag {modelTag}, model {mtModel.Name} will be used.");
             if (mtModel.Status == MTModelStatus.OK)
             {
-                mtModel.PreTranslateBatch(input);
+                var batchProcess = mtModel.PreTranslateBatch(input);
+                batchProcess.Exited += BatchProcess_Exited;
             }
             else
             {
                 Log.Information($"Model {mtModel.Name} was not ready for translation, batch translation canceled.");
             }
+        }
+
+        private void BatchProcess_Exited(object sender, EventArgs e)
+        {
+            Application.Current.Dispatcher.Invoke(() => this.BatchTranslationOngoing = false);
         }
 
         private MTModel GetModelByTag(string tag, string srcLangCode, string trgLangCode, bool includeIncomplete = false)
@@ -226,7 +237,7 @@ namespace FiskmoMTEngine
                     x.Status == MTModelStatus.OK);
             }
 
-            
+
         }
 
         private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
@@ -242,7 +253,7 @@ namespace FiskmoMTEngine
 
                 return;
             }
-            
+
             var ns = bucket.Root.Name.Namespace;
             var files = bucket.Descendants(ns + "Key").Select(x => x.Value);
             var models = files.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
@@ -283,7 +294,7 @@ namespace FiskmoMTEngine
             return this.LocalModels.Single(x => x.Name == modelName).Translate(input);
         }
 
-        private void SplitToFiles(List<Tuple<string, string>> biText,string srcPath, string trgPath)
+        private void SplitToFiles(List<Tuple<string, string>> biText, string srcPath, string trgPath)
         {
             Regex linebreakRegex = new Regex(@"\r\n?|\n");
             using (var srcStream = new StreamWriter(srcPath, true, Encoding.UTF8))
@@ -293,24 +304,56 @@ namespace FiskmoMTEngine
                 {
                     //Make sure to remove line breaks from the items before writing them, otherwise the line
                     //breaks can mess marian processing up
-                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1," "));
-                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2," "));
+                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1, " "));
+                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2, " "));
                 }
             }
         }
 
-        internal void Customize(
-            List<Tuple<string, string>> input, 
-            List<Tuple<string, string>> validation, 
-            List<string> uniqueNewSegments, 
-            string srcLangCode, 
-            string trgLangCode, 
+        internal void StartCustomization(List<Tuple<string, string>> input,
+            List<Tuple<string, string>> validation,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
-            var primaryModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
-            Log.Information($"Customizing a new model with model tag {modelTag} from base model {primaryModel.Name}.");
+            var baseModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+            var customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
+
+            /* this.watcher = new FileSystemWatcher(customDir.FullName, "valid.log");
+             this.watcher.EnableRaisingEvents = true;
+             this.watcher.Changed += finetuningProgressChanged;*/
+
+            Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+        }
+
+
+        /// <summary>
+        /// this monitors the progress of finetuning based on the 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /*private void finetuningProgressChanged(object sender, FileSystemEventArgs e)
+        {
+            ;
+        }*/
+
+        internal void Customize(
+            List<Tuple<string, string>> input,
+            List<Tuple<string, string>> validation,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
+            string modelTag,
+            bool includePlaceholderTags,
+            bool includeTagPairs,
+            DirectoryInfo customDir,
+            MTModel baseModel)
+        {
+
+            Log.Information($"Customizing a new model with model tag {modelTag} from base model {baseModel.Name}.");
             //Write the tuning set as two files
             var fileGuid = Guid.NewGuid();
             var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLangCode}");
@@ -326,21 +369,22 @@ namespace FiskmoMTEngine
             //(but make sure that non-temp customization files are not removed).
 
             var customizer = new MarianCustomizer(
-                primaryModel,
+                baseModel,
                 new FileInfo(srcFile),
                 new FileInfo(trgFile),
                 new FileInfo(validSrcFile),
                 new FileInfo(validTrgFile),
                 modelTag,
                 includePlaceholderTags,
-                includeTagPairs
+                includeTagPairs,
+                customDir
                 );
-            
+
             customizer.Customize(
-                (x,y)=> TrainProcess_Exited(
-                    x,y,
-                    customizer.customDir,
-                    modelTag, 
+                (x, y) => TrainProcess_Exited(
+                    x, y,
+                    customDir,
+                    modelTag,
                     uniqueNewSegments,
                     srcLangCode,
                     trgLangCode,
@@ -350,8 +394,9 @@ namespace FiskmoMTEngine
             this.CustomizationOngoing = true;
 
             //Add an entry for an incomplete model to the model list
-            var modelPath = Regex.Match(customizer.customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
-            this.LocalModels.Add(new MTModel($"{primaryModel.Name}_{modelTag}", modelPath, srcLangCode, trgLangCode, MTModelStatus.Customizing, modelTag));
+            var modelPath = Regex.Match(customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
+            Application.Current.Dispatcher.Invoke(() =>
+                this.LocalModels.Add(new MTModel($"{baseModel.Name}_{modelTag}", modelPath, srcLangCode, trgLangCode, MTModelStatus.Customizing, modelTag, customDir)));
         }
 
         private void TrainProcess_Exited(
@@ -366,7 +411,7 @@ namespace FiskmoMTEngine
             bool includeTagPairs)
         {
             Log.Information($"Customization process with model tag {modelTag} finished.");
-            
+
             Application.Current.Dispatcher.Invoke(() =>
                 {
                     Log.Information($"Updating model list.");
@@ -505,8 +550,8 @@ namespace FiskmoMTEngine
             foreach (var model in this.LocalModels)
             {
                 var modelLanguagePairs = from sourceLang in model.SourceLanguages
-                                    from targetLang in model.TargetLanguages
-                                    select $"{sourceLang}-{targetLang}";
+                                         from targetLang in model.TargetLanguages
+                                         select $"{sourceLang}-{targetLang}";
                 languagePairs.AddRange(modelLanguagePairs);
             }
 
@@ -532,7 +577,7 @@ namespace FiskmoMTEngine
             DownloadProgressChangedEventHandler wc_DownloadProgressChanged,
             AsyncCompletedEventHandler wc_DownloadComplete)
         {
-            var downloadPath = Path.Combine(this.OpusModelDir.FullName, newerModel+".zip");
+            var downloadPath = Path.Combine(this.OpusModelDir.FullName, newerModel + ".zip");
 
             using (var client = new WebClient())
             {
@@ -546,11 +591,11 @@ namespace FiskmoMTEngine
 
         //This is used with automatic downloads from the object storage, where the
         //language pair is contained in the object storage path
-        internal void ExtractModel(string modelPath,bool deleteZip=false)
+        internal void ExtractModel(string modelPath, bool deleteZip = false)
         {
             string modelFolder = Path.Combine(this.OpusModelDir.FullName, modelPath);
-            string zipPath = modelFolder+".zip";
-            
+            string zipPath = modelFolder + ".zip";
+
             ZipFile.ExtractToDirectory(zipPath, modelFolder);
             if (deleteZip)
             {
@@ -565,7 +610,7 @@ namespace FiskmoMTEngine
             var tempExtractionPath = Path.Combine(Path.GetTempPath(), zipFile.Name);
             if (Directory.Exists(tempExtractionPath))
             {
-                Directory.Delete(tempExtractionPath,true);
+                Directory.Delete(tempExtractionPath, true);
             }
 
             try
@@ -579,7 +624,7 @@ namespace FiskmoMTEngine
             }
 
             string languagePairs;
-            using (var readme = new StreamReader(Path.Combine(tempExtractionPath, "README.md"),Encoding.UTF8))
+            using (var readme = new StreamReader(Path.Combine(tempExtractionPath, "README.md"), Encoding.UTF8))
             {
                 var readmeText = readme.ReadToEnd();
                 var regex = @"\* download.+/([a-z]{2,3}-[a-z]{2,3})/.+\.zip\)";
@@ -597,13 +642,13 @@ namespace FiskmoMTEngine
             if (Directory.Exists(modelDir))
             {
                 MessageBox.Show($"A model with this name and language direction has already been installed.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                Directory.Delete(tempExtractionPath,true);
+                Directory.Delete(tempExtractionPath, true);
             }
             else
             {
                 Directory.Move(tempExtractionPath, modelDir);
             }
-            
+
 
             this.GetLocalModels();
         }
@@ -640,6 +685,6 @@ namespace FiskmoMTEngine
 
             return newerModel;
         }
-        
+
     }
 }

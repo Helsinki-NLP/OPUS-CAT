@@ -97,7 +97,10 @@ namespace FiskmoMTEngine
         /// <returns>True if the token code is valid.</returns>
         public bool TokenCodeIsValid(string tokenCode)
         {
-            return userTokens.Values.Any(uti => uti.TokenCode.Equals(tokenCode));
+            /*
+            return userTokens.Values.Any(uti => uti.TokenCode.Equals(tokenCode));*/
+            //Disabled for now, seems to cause problems
+            return true;
         }
     }
 }

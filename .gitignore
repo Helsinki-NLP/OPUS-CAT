@@ -20,3 +20,5 @@
 *.cache
 /.vs/FiskmoTranslationProvider/v16
 /UpgradeLog.htm
+/*/bin
+/*/obj

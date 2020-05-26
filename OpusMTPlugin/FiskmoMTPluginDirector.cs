@@ -15,7 +15,7 @@ namespace FiskmoMTPlugin
         /// <summary>
         /// The identifier of the plugin.
         /// </summary>
-        public const string PluginId = "FiskmöMT";
+        public const string PluginId = "FiskmoMT";
 
         /// <summary>
         /// The memoQ's application environment; e.g., to provide UI language settings etc. to the plugin.
@@ -76,7 +76,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override string PluginID
         {
-            get { return "FiskmöMT"; }
+            get { return "FiskmoMT"; }
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace FiskmoMTPlugin
         {
             get
             {
-                return Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("FiskmöMTPlugin.fiskmö_medium.png"));
+                return Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("FiskmoMTPlugin.fiskmo_medium.png"));
             }
         }
 

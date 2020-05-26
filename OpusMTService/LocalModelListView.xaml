@@ -18,10 +18,11 @@
                         </StackPanel.Resources>
                         <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Install OPUS model from Web</Button>
                         <Button Name="addZipModel" Click="btnAddZipModel_Click">Install model from zip</Button>
-                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
+                    <!--<Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>-->
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Test selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
+                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
                 </StackPanel>
                 <ListView Name="LocalModelList" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}">
                     <ListView.ItemContainerStyle>

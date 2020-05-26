@@ -197,26 +197,35 @@ namespace FiskmoTranslationProvider
                     switch (result)
                     {
                         case "fine-tuning already in process":
-                            throw new Exception("MT engine is currently fine-tuning a model, wait for previous fine-tuning to finish (or cancel it by restarting MT engine).");
+                            throw new Exception("MT engine is currently batch translating or fine-tuning, wait for previous job to finish (or cancel it by restarting MT engine).");
                         default:
                             break;
                     }
                 }
             }
 
-            
+
             //Send the new segments to MT engine for pretranslation.
             //If finetuning is selected, the new segments are translated after
             //customization finished, so this is only for BatchTranslateOnly
             if (settings.BatchTranslate == true && settings.Finetune == false)
-            foreach (var targetLang in projectInfo.TargetLanguages)
             {
-                var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
-                var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
-                //Send the new segments to MT service
-                FiskmöMTServiceHelper.PreTranslateBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, fiskmoOptions.modelTag);
-            }
+                foreach (var targetLang in projectInfo.TargetLanguages)
+                {
+                    var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
+                    var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
+                    //Send the new segments to MT service
+                    var result = FiskmöMTServiceHelper.PreTranslateBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, fiskmoOptions.modelTag);
 
+                    switch (result)
+                    {
+                        case "batch translation or customization already in process":
+                            throw new Exception("MT engine is currently batch translating or fine-tuning, wait for previous job to finish (or cancel it by restarting MT engine).");
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
         private List<Tuple<string,string>> ProcessFuzzies(List<TranslationUnit> fuzzyResults)

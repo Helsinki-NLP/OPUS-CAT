@@ -29,7 +29,6 @@ namespace FiskmoMTEngine
         
         public string SystemName { get; }
 
-        private TagMethod tagMethod;
         private bool includePlaceholderTags;
         private bool includeTagPairs;
 
@@ -56,7 +55,7 @@ namespace FiskmoMTEngine
                 var deserializer = new Deserializer();
                 var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
                 decoderSettings.miniBatch = "16";
-
+                
                 var serializer = new Serializer();
                 var configPath = Path.Combine(this.modelDir.FullName, "batch.yml");
                 using (var writer = File.CreateText(configPath))
@@ -67,7 +66,7 @@ namespace FiskmoMTEngine
 
         }
 
-        internal void BatchTranslate(List<string> input)
+        internal Process BatchTranslate(List<string> input)
         {
             Log.Information($"Starting batch translator for model {this.SystemName}.");
             
@@ -81,6 +80,7 @@ namespace FiskmoMTEngine
             var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args);
 
             batchProcess.Exited += (x,y)=> BatchProcess_Exited(input, spOutput,x,y);
+            return batchProcess;
         }
 
         private void BatchProcess_Exited(List<string> input, FileInfo spOutput,object sender, EventArgs e)

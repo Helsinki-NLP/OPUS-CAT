@@ -125,13 +125,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>FiskmoTpSettings.settings</DependentUpon>
     </Compile>
-    <Compile Include="..\FiskmoTranslationProvider\FiskmoConfDialog.cs">
-      <Link>FiskmoConfDialog.cs</Link>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\FiskmoTranslationProvider\FiskmoConfDialog.Designer.cs">
-      <Link>FiskmoConfDialog.Designer.cs</Link>
-    </Compile>
     <Compile Include="..\FiskmoTranslationProvider\FiskmoOptions.cs">
       <Link>FiskmoOptions.cs</Link>
     </Compile>
@@ -171,67 +164,12 @@
     <Compile Include="Properties\PluginProperties.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\FiskmoTranslationProvider\FiskmoConfDialog.resx">
-      <Link>FiskmoConfDialog.resx</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="PluginResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PluginResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\FiskmoTranslationProvider\apply_bpe.exe">
-      <Link>apply_bpe.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\boost_chrono-vc140-mt-1_60.dll">
-      <Link>boost_chrono-vc140-mt-1_60.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\boost_iostreams-vc140-mt-1_60.dll">
-      <Link>boost_iostreams-vc140-mt-1_60.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\boost_system-vc140-mt-1_60.dll">
-      <Link>boost_system-vc140-mt-1_60.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\boost_timer-vc140-mt-1_60.dll">
-      <Link>boost_timer-vc140-mt-1_60.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\boost_zlib-vc140-mt-1_60.dll">
-      <Link>boost_zlib-vc140-mt-1_60.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\lgpl-3.0.txt">
-      <Link>lgpl-3.0.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\libbz2.dll">
-      <Link>libbz2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\LICENSE_1_0.txt">
-      <Link>LICENSE_1_0.txt</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\marian-decoder.exe">
-      <Link>marian-decoder.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\msvcp140.dll">
-      <Link>msvcp140.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\process.exe">
-      <Link>process.exe</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\FiskmoTranslationProvider\vcruntime140.dll">
-      <Link>vcruntime140.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="pluginpackage.manifest.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -240,24 +178,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FiskmoTpSettings2.Designer.cs</LastGenOutput>
     </None>
-    <None Include="..\FiskmoTranslationProvider\LICENSE.rtf">
-      <Link>LICENSE.rtf</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\FiskmoTranslationProvider\MIT_LICENSE">
-      <Link>MIT_LICENSE</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\fiskmo_zIQ_icon.ico" />
     <None Include="Resources\fiskmo_icon.ico" />
     <None Include="Resources\fiskmo_7sA_icon.ico" />
     <None Include="Resources\fiskmo.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\FiskmoTranslationProvider\StartMtPipe.bat">
-      <Link>StartMtPipe.bat</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="app.config" />
     <None Include="key.snk" />
     <None Include="packages.config" />

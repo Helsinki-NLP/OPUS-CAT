@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Entity.Migrations.History;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -147,7 +148,7 @@ namespace FiskmoMTEngine
             this.ModelPath = modelPath;
         }
 
-        public MTModel(string name, string modelPath, string sourceCode, string targetCode, MTModelStatus status, string modelTag)
+        public MTModel(string name, string modelPath, string sourceCode, string targetCode, MTModelStatus status, string modelTag, DirectoryInfo customDir)
         {
             this.Name = name;
             this.SourceLanguages = new List<string>() { sourceCode };
@@ -156,7 +157,7 @@ namespace FiskmoMTEngine
             this.ModelConfig = new MTModelConfig();
             this.ModelConfig.ModelTags.Add(modelTag);
             this.ModelPath = modelPath;
-
+            this.InstallDir = customDir.FullName;
         }
 
         public MTModel(string modelPath)
@@ -183,10 +184,15 @@ namespace FiskmoMTEngine
         private MTModelStatus status;
         private MTModelConfig modelConfig;
 
-        internal void PreTranslateBatch(List<string> input)
+        internal Process PreTranslateBatch(List<string> input)
         {
-            var batchProcess = new MarianBatchTranslator(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags,this.modelConfig.IncludeTagPairs);
-            Task.Run(() => batchProcess.BatchTranslate(input));
+            var batchTranslator = new MarianBatchTranslator(
+                this.InstallDir, 
+                this.SourceLanguageString, 
+                this.TargetLanguageString, 
+                this.modelConfig.IncludePlaceholderTags,
+                this.modelConfig.IncludeTagPairs);
+            return batchTranslator.BatchTranslate(input);
         }
     }
 }

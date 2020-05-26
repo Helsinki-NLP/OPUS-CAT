@@ -129,9 +129,8 @@ namespace FiskmoTranslationProvider
                 Segment translation = new Segment(_languageDirection.TargetCulture);
                 if (_visitor.Placeholders.Any() || _visitor.TagStarts.Any() || _visitor.TagEnds.Any())
                 {
-                    
-                    //var split = Regex.Split(translatedSentence,@"\b(PLACEHOLDER\d+)\b");
-                    var split = Regex.Split(translatedSentence, @"\b(PLACEHOLDER|TAGPAIRSTART|TAGPAIREND)\b");
+
+                    var split = Regex.Split(translatedSentence, @"\b(PLACEHOLDER|TAGPAIRSTART ?| ?TAGPAIREND)\b");
                 
                     //Tag starts and ends must match, so need a stack to keep track of what tags
                     //have been applied
@@ -139,17 +138,20 @@ namespace FiskmoTranslationProvider
 
                     foreach (var part in split)
                     {
-                                                
-                        switch (part)
+                        //Remove potential spaces from after TAGPAIRSTARTS and before TAGPAIREND
+                        var normalpart = part.Replace("TAGPAIRSTART ", "TAGPAIRSTART");
+                        normalpart = normalpart.Replace(" TAGPAIREND", "TAGPAIREND");
+
+                        switch (normalpart)
                         {
                             case "PLACEHOLDER":
-                                if (_visitor.Placeholders.Peek() != null)
+                                if (_visitor.Placeholders.Count != 0)
                                 {
                                     translation.Add(_visitor.Placeholders.Dequeue());
                                 }
                                 break;
                             case "TAGPAIRSTART":
-                                if (_visitor.TagStarts.Peek() != null)
+                                if (_visitor.TagStarts.Count != 0)
                                 {
                                     var startTag = _visitor.TagStarts.Dequeue();
                                     tagStack.Push(startTag);
@@ -157,7 +159,7 @@ namespace FiskmoTranslationProvider
                                 }
                                 break;
                             case "TAGPAIREND":
-                                if (tagStack.Peek() != null)
+                                if (tagStack.Count != 0)
                                 {
                                     var correspondingStartTag = tagStack.Pop();
                                     var endTag = _visitor.TagEnds[correspondingStartTag.TagID];

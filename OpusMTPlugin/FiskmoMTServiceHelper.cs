@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpusMTInterface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -101,7 +102,7 @@ namespace FiskmoMTPlugin
             var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
             using (proxy as IDisposable)
             {
-                string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode);
+                string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode,"");
                 return result;
             }
         }
@@ -120,7 +121,7 @@ namespace FiskmoMTPlugin
             var proxy = getNewProxy(options.GeneralSettings.MtServicePort);
             using (proxy as IDisposable)
             {
-                string[] result = proxy.BatchTranslate(GetTokenCode(options), input, srcLangCode, trgLangCode).ToArray();
+                string[] result = proxy.BatchTranslate(GetTokenCode(options), input, srcLangCode, trgLangCode,"").ToArray();
                 return result.ToList();
             }
         }

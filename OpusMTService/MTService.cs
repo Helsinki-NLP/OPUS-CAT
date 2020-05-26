@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading;
+using System.Threading.Tasks;
 using OpusMTInterface;
 
 namespace FiskmoMTEngine
@@ -132,15 +133,20 @@ namespace FiskmoMTEngine
         /// <param name="input"></param>
         /// <param name="srcLangCode"></param>
         /// <param name="trgLangCode"></param>
-        public void PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        public string PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
 
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
-                return;
-
-            this.ModelManager.PreTranslateBatch(input, srcLangCode, trgLangCode, modelTag);
-
-            return;
+                return "";
+            if (!this.ModelManager.BatchTranslationOngoing && !this.ModelManager.CustomizationOngoing)
+            {
+                this.ModelManager.PreTranslateBatch(input, srcLangCode, trgLangCode, modelTag);
+                return "batch translation started";
+            }
+            else
+            {
+                return "batch translation or customization already in process";
+            }
         }
 
 
@@ -177,15 +183,15 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            if (!this.ModelManager.CustomizationOngoing)
+            if (!this.ModelManager.CustomizationOngoing && !this.ModelManager.BatchTranslationOngoing)
             {
-                this.ModelManager.Customize(
+                this.ModelManager.StartCustomization(
                     input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs);
                 return "fine-tuning started";
             }
             else
             {
-                return "fine-tuning already in process";
+                return "batch translation or customization already in process";
             }
 
             

@@ -95,11 +95,14 @@ namespace FiskmoTranslationProvider
                     modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(host, port, languagePair.ToString()));
                 }
 
+                this.NoConnection = false;
+
                 Dispatcher.Invoke(() => UpdateModelTags(modelTags,modeltag));
             }
             catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
             {
                 connectionResult.Append($"No connection to Fiskmö MT service at {host}:{port}.");
+                this.NoConnection = true;
             }
 
             Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult.ToString());
@@ -110,12 +113,12 @@ namespace FiskmoTranslationProvider
         private void UpdateModelTags(List<string> tags, string currentModelTag)
         {
             //Include currently selected tag, if it's already not included
-            if (!tags.Contains(currentModelTag))
+            /*if (!tags.Contains(currentModelTag))
             {
                 tags.Add(currentModelTag);
-            }
+            }*/
 
-            foreach (var tag in this.AllModelTags)
+            foreach (var tag in new List<string>(this.AllModelTags))
             {
                 if (!tags.Contains(tag))
                 {

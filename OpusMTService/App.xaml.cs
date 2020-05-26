@@ -42,6 +42,8 @@ namespace FiskmoMTEngine
 
         private void SetupTranslationDb()
         {
+
+
             var translationDb = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 FiskmoMTEngineSettings.Default.LocalFiskmoDir,
@@ -66,6 +68,15 @@ namespace FiskmoMTEngine
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
+            //Create appdata dir
+            var fiskmoAppdataDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                FiskmoMTEngineSettings.Default.LocalFiskmoDir);
+            if (!Directory.Exists(fiskmoAppdataDir))
+            {
+                Directory.CreateDirectory(fiskmoAppdataDir);
+            }
 
             this.SetupTranslationDb();
             this.SetupLogging();

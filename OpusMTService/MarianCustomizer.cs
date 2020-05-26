@@ -102,7 +102,7 @@ namespace FiskmoMTEngine
             }
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
-            var trainingArgs = $"--config {configPath}";
+            var trainingArgs = $"--config {configPath} --log-level=error";
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects("marian.exe",trainingArgs);
 
@@ -133,10 +133,11 @@ namespace FiskmoMTEngine
             FileInfo validationTarget,
             string customLabel,
             bool includePlaceholderTags,
-            bool includeTagPairs)
+            bool includeTagPairs,
+            DirectoryInfo customDir)
         {
             this.modelDir = new DirectoryInfo(model.InstallDir);
-            this.customDir = new DirectoryInfo($"{modelDir.FullName}_{customLabel}");
+            this.customDir = customDir;
             this.customSource = customSource;
             this.customTarget = customTarget;
             this.customLabel = customLabel;

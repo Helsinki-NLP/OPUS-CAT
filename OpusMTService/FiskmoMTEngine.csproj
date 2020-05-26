@@ -196,9 +196,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="LICENSE.rtf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="FiskmoMTEngineSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FiskmoMTEngineSettings.Designer.cs</LastGenOutput>
@@ -244,13 +241,7 @@
     <None Include="customize.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="marian-decoder.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="marian.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="msvcp140.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="process.exe">
@@ -264,9 +255,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="ThirdPartyNotices.txt" />
-    <Content Include="vcruntime140.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="lgpl-3.0.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

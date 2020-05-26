@@ -112,7 +112,7 @@ namespace FiskmoTranslationProvider
                 {
                     if (this.Settings.Finetune)
                     {
-                        this.TagBox.ItemsSource = new ObservableCollection<string>() { "<new tag>" };
+                        this.TagBox.ItemsSource = new ObservableCollection<string>() { "" };
                         this.TagBox.SelectedIndex = 0;
                     }
                     else

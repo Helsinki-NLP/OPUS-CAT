@@ -8,6 +8,9 @@
         Title="Fiskmö MT service" Height="450" Width="800" Icon="fiskmo_zIQ_icon.ico"
         Name="FiskmoWindow"
         Closing="Window_Closing">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
     <StackPanel>
         <local:LocalModelListView>
             <local:LocalModelListView DataContext="{Binding .}" />
@@ -21,5 +24,7 @@
                 <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=FiskmoWindow, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
             </DockPanel>
         </Border>
+        <TextBlock Visibility="{Binding Path=BatchTranslationOngoing, Converter={StaticResource BoolToVis}}">Batch translation in progress</TextBlock>
+        <TextBlock Visibility="{Binding Path=CustomizationOngoing, Converter={StaticResource BoolToVis}}">Fine-tuning in progress</TextBlock>
     </StackPanel>
 </Window>

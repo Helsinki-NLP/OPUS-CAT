@@ -90,7 +90,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\SDL\SDL Trados Studio\Studio15\Sdl.ProjectAutomation.AutomaticTasks.dll</HintPath>
     </Reference>
-    <Reference Include="Sdl.ProjectAutomation.Core, Version=15.0.0.0, Culture=neutral, PublicKeyToken=c28cdb26c445c888" />
+    <Reference Include="Sdl.ProjectAutomation.Core, Version=15.0.0.0, Culture=neutral, PublicKeyToken=c28cdb26c445c888, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\SDL\SDL Trados Studio\Studio15\Sdl.ProjectAutomation.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Sdl.ProjectAutomation.FileBased, Version=15.0.0.0, Culture=neutral, PublicKeyToken=c28cdb26c445c888" />
     <Reference Include="Sdl.TranslationStudioAutomation.IntegrationApi">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\SDL\SDL Trados Studio\Studio15\Sdl.TranslationStudioAutomation.IntegrationApi.dll</HintPath>
@@ -200,9 +203,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FiskmoTpSettings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="LICENSE.rtf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\fiskmo_zIQ_icon.ico" />
     <None Include="Resources\fiskmo_7sA_icon.ico" />
     <None Include="Resources\fiskmo_icon.ico" />
@@ -217,6 +217,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PluginResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="License.txt" />
     <Content Include="pluginpackage.manifest.xml">
       <SubType>Designer</SubType>
     </Content>

@@ -48,7 +48,13 @@ namespace FiskmoMTEngine
             );
 
             var nettcpBinding = new NetTcpBinding();
-            nettcpBinding.Security.Mode = SecurityMode.None;
+
+            //Use default net.tcp security, which is based on Windows authentication:
+            //using the service is only possible from other computers in the same domain.
+            //TODO: add a checkbox (with warning) in the UI for using security mode None,
+            //to allow connections from IP range (also add same checkbox to clients). 
+
+            //nettcpBinding.Security.Mode = SecurityMode.None;
             /*nettcpBinding.Security.Mode = SecurityMode.Transport;
             nettcpBinding.Security.Transport.ClientCredentialType =
                 TcpClientCredentialType.Windows;*/

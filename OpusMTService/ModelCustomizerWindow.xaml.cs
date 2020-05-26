@@ -34,7 +34,7 @@ namespace FiskmoMTEngine
 
         private void customize_Click(object sender, RoutedEventArgs e)
         {
-            var customizer = new MarianCustomizer(
+            /*var customizer = new MarianCustomizer(
                 this.selectedModel,
                 new FileInfo(this.SourceFileBox.Text),
                 new FileInfo(this.TargetFileBox.Text),
@@ -42,10 +42,10 @@ namespace FiskmoMTEngine
                 new FileInfo(this.ValidTargetFileBox.Text),
                 this.LabelBox.Text,
                 false,
-                false
-                );
+                false,
 
-            customizer.Customize(null);
+                );
+            customizer.Customize(null);*/
         }
 
         private void browse_Click(object sender, RoutedEventArgs e)

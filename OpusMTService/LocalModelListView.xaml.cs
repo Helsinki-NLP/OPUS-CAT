@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,8 +35,15 @@ namespace FiskmoMTEngine
         {
             
         }
-        
-        
+
+
+        private void btnOpenModelDir_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            Process.Start(selectedModel.InstallDir);
+        }
+
+
         private void btnAddOnlineModel_Click(object sender, RoutedEventArgs e)
         {
             OnlineModelSelection onlineSelection = new OnlineModelSelection();

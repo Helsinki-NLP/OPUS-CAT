@@ -47,7 +47,7 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.wpfHost);
             this.Name = "FiskmoOptionsFormWPF";
-            this.Text = "FiskmoOptionsFormWPF";
+            this.Text = "Fiskmo settings";
             this.ResumeLayout(false);
 
         }

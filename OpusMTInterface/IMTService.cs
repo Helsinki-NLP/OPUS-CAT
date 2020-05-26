@@ -51,7 +51,7 @@ namespace OpusMTInterface
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]
-        void PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, String modelId);
+        string PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, String modelId);
         
 
         [OperationContract]
