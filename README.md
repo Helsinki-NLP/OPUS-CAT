@@ -6,7 +6,7 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the Mari
 
 1. Download the [Fiskmo MT Engine](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTEngine.zip) and install it to your computer by extracting it in a folder on your computer.
 2. Download the plugin for your translation software and install it:
-  - [Trados 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTEngine.zip): double-click plugin file to install.
+  - [Trados 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoTranslationProvider.sdlplugin): double-click plugin file to install.
   - [memoQ](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder.
 3. Start the Fiskmo MT Engine application by clicking FiskmoMTEngine.exe in the extraction folder, and install models from the Fiskmo model repository for the language pairs that you require.
 4. Start your CAT tool, and add the Fiskmo plugin to a translation project.
