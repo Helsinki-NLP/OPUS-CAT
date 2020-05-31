@@ -103,7 +103,7 @@ namespace FiskmoMTEngine
             }
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
-            var trainingArgs = $"--config {configPath} --log-level=info";
+            var trainingArgs = $"--config {configPath} --log-level=info --quiet";
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects("marian.exe",trainingArgs);
 

@@ -138,6 +138,12 @@ namespace FiskmoMTEngine
 
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return "";
+
+            if (input.Count == 0)
+            {
+                return "input was empty";
+            }
+
             if (!this.ModelManager.BatchTranslationOngoing && !this.ModelManager.CustomizationOngoing)
             {
                 this.ModelManager.PreTranslateBatch(input, srcLangCode, trgLangCode, modelTag);

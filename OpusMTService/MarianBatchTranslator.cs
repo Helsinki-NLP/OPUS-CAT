@@ -55,7 +55,8 @@ namespace FiskmoMTEngine
                 var deserializer = new Deserializer();
                 var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
                 decoderSettings.miniBatch = "16";
-                
+                decoderSettings.log = Path.Combine(this.modelDir.FullName,"batch.log");
+
                 var serializer = new Serializer();
                 var configPath = Path.Combine(this.modelDir.FullName, "batch.yml");
                 using (var writer = File.CreateText(configPath))
@@ -76,7 +77,7 @@ namespace FiskmoMTEngine
             FileInfo spOutput = new FileInfo(
                 spInput.FullName.Replace($".{SourceCode}", $".{TargetCode}"));
             
-            var args = $"{this.modelDir.FullName} {spInput.FullName} {spOutput.FullName}";
+            var args = $"{this.modelDir.FullName} {spInput.FullName} {spOutput.FullName} --log-level=info --quiet";
             var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args);
 
             batchProcess.Exited += (x,y)=> BatchProcess_Exited(input, spOutput,x,y);

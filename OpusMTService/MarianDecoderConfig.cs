@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using YamlDotNet.Serialization;
+using YamlDotNet.RepresentationModel;
+using YamlDotNet.Helpers;
+using YamlDotNet.Core;
 
 namespace FiskmoMTEngine
 {
