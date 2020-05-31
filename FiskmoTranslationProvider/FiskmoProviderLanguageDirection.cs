@@ -27,8 +27,7 @@ namespace FiskmoTranslationProvider
         private FiskmoProviderElementVisitor _visitor;
       
         private string langpair;
-        internal static string _segmentTranslation;
-
+        
         #endregion
 
  
@@ -118,7 +117,6 @@ namespace FiskmoTranslationProvider
         {
             List<SearchResult> systemResults = new List<SearchResult>();
             string translatedSentence = FiskmöMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this._options.modelTag);
-            _segmentTranslation = translatedSentence;
 
             if (String.IsNullOrEmpty(translatedSentence))
                 return systemResults;
@@ -186,14 +184,6 @@ namespace FiskmoTranslationProvider
                 }
 
                 
-
-                //There might be some problematic tags after the tag stack treatment, this should
-                //handle those.
-                //TODO: Ideally the tag issues would be resolved already in the NMT decoder, i.e. only
-                //insertion of matched tags would be allowed.
-                var fillresult = translation.FillUnmatchedStartAndEndTags();
-                var removeresult = translation.RemoveUnmatchedStartAndEndTags();
-
                 systemResults.Add(CreateSearchResult(segment, translation, segment.HasTags,"fiskmö"));
             }
             return systemResults;
@@ -221,14 +211,19 @@ namespace FiskmoTranslationProvider
             tu.SourceSegment = searchSegment;
             tu.TargetSegment = translation;
 
-
+            //There might be some problematic tags after the tag stack treatment, this should
+            //handle those.
+            //TODO: Ideally the tag issues would be resolved already in the NMT decoder, i.e. only
+            //insertion of matched tags would be allowed.
             var error = tu.Validate(Segment.ValidationMode.ReportAllErrors);
-
+            
             //This is a fallback for tag errors
             if (!error.HasFlag(ErrorCode.OK))
             {
                 tu.TargetSegment.DeleteTags();
             }
+
+            FiskmoProviderLanguageDirection.CurrentTranslation = tu.TargetSegment;
 
             tu.ResourceId = new PersistentObjectToken(tu.GetHashCode(), Guid.Empty);
             tu.FieldValues.Add(new SingleStringFieldValue("mtSystem", mtSystem));
@@ -254,6 +249,8 @@ namespace FiskmoTranslationProvider
         {
             get { return false; }
         }
+
+        public static Segment CurrentTranslation { get; private set; }
 
         public SearchResults[] SearchSegments(SearchSettings settings, Segment[] segments)
         {

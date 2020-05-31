@@ -91,6 +91,7 @@ namespace FiskmoMTEngine
                     };
 
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
+            trainingConfig.log = Path.Combine(this.customDir.FullName, "train.log");
 
             trainingConfig.model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single());
 
@@ -102,7 +103,7 @@ namespace FiskmoMTEngine
             }
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
-            var trainingArgs = $"--config {configPath} --log-level=error";
+            var trainingArgs = $"--config {configPath} --log-level=info";
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects("marian.exe",trainingArgs);
 

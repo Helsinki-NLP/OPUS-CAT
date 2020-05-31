@@ -20,6 +20,7 @@ namespace FiskmoMTEngine
 
         [YamlMember(Alias = "valid-log", ApplyNamingConventions = false)]
         public string validLog { get; set; }
+        public string log { get; set; }
 
         [YamlMember(Alias = "disp-freq", ApplyNamingConventions = false)]
         public string dispFreq { get; set; }

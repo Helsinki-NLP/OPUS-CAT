@@ -15,8 +15,7 @@ namespace FiskmoTranslationProvider
 {
     class PluginUI
     {
-        /* Disabled, need to fix this to copy the suggestion from MT language direction to segment directly.
-         * [Action("RunSRAction", Icon = "MyAction_Icon")]
+        [Action("InsertTranslation", Icon = "fiskmo_icon.ico", Description = "Insert the current Fiskmo translation")]
         [Shortcut(Keys.Alt | Keys.F8)]
         public class MyMainIconAction : AbstractAction
         {
@@ -29,15 +28,15 @@ namespace FiskmoTranslationProvider
 
                 //Create an instance of the document item factory that is needed to create segment elements
                 IDocumentItemFactory documentItemFactory = DefaultDocumentItemFactory.CreateInstance();
-                //Create the text element
+                
                 ITextProperties firstTextProp = documentItemFactory
                     .PropertiesFactory
-                    .CreateTextProperties(FiskmoProviderLanguageDirection._segmentTranslation);
+                    .CreateTextProperties(FiskmoProviderLanguageDirection.CurrentTranslation.ToPlain());
                 IText firstText = documentItemFactory.CreateText(firstTextProp);
 
                 activeSegmentPair.Target.Add(firstText);
                 editorController.ActiveDocument.UpdateSegmentPair(activeSegmentPair);
             }
-        }*/
+        }
     }
 }

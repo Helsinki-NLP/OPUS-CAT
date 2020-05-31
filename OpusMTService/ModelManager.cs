@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using static System.Environment;
@@ -326,9 +327,14 @@ namespace FiskmoMTEngine
              this.watcher.EnableRaisingEvents = true;
              this.watcher.Changed += finetuningProgressChanged;*/
 
-            Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+            var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+            customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
+        private void taskExceptionHandler(Task obj)
+        {
+            Log.Error($"Task failed due to the following exception: {obj.Exception}");
+        }
 
         /// <summary>
         /// this monitors the progress of finetuning based on the 

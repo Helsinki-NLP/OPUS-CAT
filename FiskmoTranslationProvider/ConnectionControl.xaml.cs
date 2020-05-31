@@ -27,7 +27,7 @@ namespace FiskmoTranslationProvider
     {
         private string connectionStatus;
         private ObservableCollection<string> allModelTags;
-        private bool connectionExists;
+        private bool noConnection;
         private FiskmoOptions options;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -150,14 +150,35 @@ namespace FiskmoTranslationProvider
 
         public bool NoConnection
         {
-            get => connectionExists;
+            get => noConnection;
             set
             {
-                connectionExists = value; NotifyPropertyChanged();
+                noConnection = value;
+                NotifyPropertyChanged("NoConnection");
+                NotifyPropertyChanged("ConnectionExists");
+                if (value)
+                {
+                    Dispatcher.Invoke(
+                        () => this.ConnectionColor = new RadialGradientBrush(Colors.Red,Colors.DarkRed));
+                }
+                else
+                {
+                    Dispatcher.Invoke(() => this.ConnectionColor = new RadialGradientBrush(Colors.LightGreen, Colors.Green));
+                }
             }
         }
 
+        public bool ConnectionExists
+        {
+            get => !noConnection;
+        }
+
         public List<string> LanguagePairs { get; set; }
+        public Brush ConnectionColor 
+        { 
+            get => connectionColor;
+            set { connectionColor = value; NotifyPropertyChanged(); }
+        }
 
         public void AddModelTag(string tag)
         {            
@@ -199,6 +220,8 @@ namespace FiskmoTranslationProvider
             
             var host = this.options.mtServiceAddress;
             var port = this.options.mtServicePort;
+            this.ConnectionColor = new RadialGradientBrush(Colors.Yellow, Colors.DarkGoldenrod);
+            this.ConnectionStatus = $"Connecting to Fiskmö MT service at {host}:{port}.";
 
             //If connection details are custom, check the custom checkbox, this is for start-up
             this.UseCustomConnection.IsChecked =
@@ -210,6 +233,8 @@ namespace FiskmoTranslationProvider
                 var modeltag = this.options.modelTag;
             Task.Run(() => this.FetchServiceData(host, port, modeltag));
         }
+
+        private Brush connectionColor;
 
         private void RetryConnection_Click(object sender, RoutedEventArgs e)
         {
@@ -225,6 +250,7 @@ namespace FiskmoTranslationProvider
 
         public void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            this.ConnectionStatus = "";
             this.StartFetch();
         }
 

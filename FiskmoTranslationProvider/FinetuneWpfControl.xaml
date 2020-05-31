@@ -13,7 +13,7 @@
     </Control.Resources>
     <DockPanel Background="White">
         <TabControl DockPanel.Dock="Top">
-            <TabItem Header="Task settings">
+            <TabItem Header="Task settings" IsSelected="{Binding ElementName=ConnectionControl, Path=ConnectionExists, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
                 <StackPanel>
                     <Border BorderBrush="Black" BorderThickness="1">
                         <StackPanel Margin="5,0,0,5">
@@ -72,16 +72,19 @@
                     </Border>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Connection">
+            <TabItem Header="Connection" IsSelected="{Binding ElementName=ConnectionControl, Path=NoConnection, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
                 <local:ConnectionControl x:Name="ConnectionControl" />
             </TabItem>
 
         </TabControl>
         <Border BorderThickness="1" BorderBrush="Black">
             <StackPanel>
-                <Label FontWeight="Bold">Connection status</Label>
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="15" Height="15" StrokeThickness="2" Stroke="Black" Fill="{Binding ElementName=ConnectionControl, Path=ConnectionColor, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Ellipse>
+                    <Label FontWeight="Bold">Connection status</Label>
+                </StackPanel>
                 <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
-                <TextBlock Margin="5" Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}"><Hyperlink NavigateUri="http://www.google.com" RequestNavigate="Hyperlink_RequestNavigate">
+                <TextBlock Margin="5"><Hyperlink NavigateUri="https://github.com/Helsinki-NLP/fiskmo-trados/blob/develop/README.md" RequestNavigate="Hyperlink_RequestNavigate">
                     Fiskmö MT online documentation
                 </Hyperlink></TextBlock>
             </StackPanel>
