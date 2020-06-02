@@ -16,7 +16,7 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the Mari
    ![Model download](/images/ModelList.PNG?raw=true "Model download")
 
 5. After the model has been downloaded and installed, test that it works. 
-    - Select model and click **Test model**.
+    - Select model and click **Test selected model**.
     ![MT Engine home screen](/images/TestModel.PNG?raw=true "Home screen")
     - Enter translation in the **Source text** area, click **Translate** and wait for a translation to appear in the **Translation** area (producing the first translation may take some time, as the model needs to be initialized, subsequent translations are faster). 
     ![Test translation screen](/images/TestTranslation.PNG?raw=true "Test screen")
