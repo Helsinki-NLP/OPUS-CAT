@@ -69,19 +69,29 @@ namespace FiskmoMTEngine
         private void nameFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.nameFilter = ((TextBox)sender).Text;
-            this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            if (this.modelManager != null)
+            {
+                this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            }
         }
 
         private void sourceLangFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.sourceFilter = ((TextBox)sender).Text;
-            this.modelManager.FilterOnlineModels(this.sourceFilter,this.targetFilter,this.nameFilter);
+            if (this.modelManager != null)
+            {
+                this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            }
         }
 
         private void targetLangFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.targetFilter = ((TextBox)sender).Text;
-            this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            if (this.modelManager != null)
+            {
+                this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+            }
+            
         }
     }
 

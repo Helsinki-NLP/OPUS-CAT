@@ -286,6 +286,8 @@ namespace FiskmoMTEngine
                     }
                 }
 
+                //Remove multilanguage models from the list, they aren't supported yet
+                this.onlineModels = this.onlineModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1).ToList();
                 this.FilterOnlineModels("", "", "");
             }
         }
