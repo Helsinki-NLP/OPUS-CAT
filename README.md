@@ -9,14 +9,18 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the Mari
   - [Trados 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoTranslationProvider.sdlplugin): double-click plugin file to install.
   - [memoQ](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder.
 3. Start the Fiskmo MT Engine application by clicking FiskmoMTEngine.exe in the extraction folder. 
-4. Install models from the Fiskmo model repository for the language pairs that you require, as shown in the images below.
+4. Install models from the Fiskmo model repository for the language pairs that you require.
+   - Click **Install OPUS model from Web**.
+   ![MT Engine home screen](/images/InstallOnlineModel.PNG?raw=true "Home screen")
+   - Enter source and target language codes in the filtering boxes on the top row, select a model (usually the one with latest date suffix) and then click **Install locally**.
+   ![Model download](/images/ModelList.PNG?raw=true "Model download")
 
-  Click **Install OPUS model from Web**.
-  ![MT Engine home screen](/images/InstallOnlineModel.PNG?raw=true "Home screen")
-  Enter source and target language codes in the filtering boxes on the top row, select a model (usually the one with latest date suffix) and then click **Install locally**.
-  ![Model download](/images/ModelList.PNG?raw=true "Model download")
-
-5. Start your CAT tool, and add the Fiskmo plugin to a translation project.
+5. After the model has been downloaded and installed, test that it works. 
+    - Select model and click **Test model**.
+    ![MT Engine home screen](/images/TestModel.PNG?raw=true "Home screen")
+    - Enter translation in the **Source text** area, click **Translate** and wait for a translation to appear in the **Translation** area (producing the first translation may take some time, as the model needs to be initialized, subsequent translations are faster). 
+    ![Test translation screen](/images/TestTranslation.PNG?raw=true "Test screen")
+6. Start your CAT tool, and add the Fiskmo plugin to a translation project.
 
 NOTE: Fiskmo MT Engine application needs to be running on the computer, when the plugins are used.
 
