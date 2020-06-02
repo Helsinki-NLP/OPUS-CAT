@@ -1,6 +1,6 @@
 # Fiskmo MT Engine and CAT plugins
 
-Fiskmo MT Engine is a Windows-based machine translation system built on the Marian NMT framework. Fiskmo MT Engine makes it possible to use a large selection of advanced neural machine translation models natively on Windows computers. The primary purpose of Fiskmo MT Engine is to provide professional translator local, secure, and confidential neural machine translation in computer-assisted translation tools (CAT tools), which are usually Windows-based. To that end, there are plugins available for two of the most popular CAT tools, SDL Trados Studio and memoQ.
+Fiskmo MT Engine is a Windows-based machine translation system built on the Marian NMT framework. Fiskmo MT Engine makes it possible to use a large selection of advanced neural machine translation models natively on Windows computers. The primary purpose of Fiskmo MT Engine is to provide professional translators local, secure, and confidential neural machine translation in computer-assisted translation tools (CAT tools), which are usually Windows-based. To that end, there are plugins available for two of the most popular CAT tools, SDL Trados Studio and memoQ.
 
 ## Quickstart for translators
 
