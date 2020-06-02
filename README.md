@@ -11,11 +11,10 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the Mari
 3. Start the Fiskmo MT Engine application by clicking FiskmoMTEngine.exe in the extraction folder. 
 4. Install models from the Fiskmo model repository for the language pairs that you require, as shown in the images below.
 
-![MT Engine home screen](/images/InstallOnlineModel.PNG?raw=true "Home screen")
-Click **Install OPUS model from Web**.
-
-![Model download](/images/ModelList.PNG?raw=true "Model download")
-Enter source and target language codes in the filtering boxes on the top row, select a model (usually the one with latest date suffix) and then click **Install locally**. 
+  Click **Install OPUS model from Web**.
+  ![MT Engine home screen](/images/InstallOnlineModel.PNG?raw=true "Home screen")
+  Enter source and target language codes in the filtering boxes on the top row, select a model (usually the one with latest date suffix) and then click **Install locally**.
+  ![Model download](/images/ModelList.PNG?raw=true "Model download")
 
 5. Start your CAT tool, and add the Fiskmo plugin to a translation project.
 
