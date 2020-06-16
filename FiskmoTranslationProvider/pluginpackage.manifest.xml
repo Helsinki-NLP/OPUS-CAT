@@ -6,7 +6,6 @@
   <Author></Author>
   <RequiredProduct name="SDLTradosStudio" minversion="15.0" />
   <Include>
-	  <File>LICENSE.rtf</File>
     <File>Xceed.Wpf.Toolkit.dll</File>
   </Include>
 </PluginPackage>
