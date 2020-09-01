@@ -219,8 +219,8 @@ namespace FiskmoTranslationProvider
 
             //Pick out 200 sentence pairs randomly to use as tuning set
             var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
-            var trainingSet = projectTranslations.Skip(200).ToList();
-            var validSet = projectTranslations.Take(200).ToList();
+            var trainingSet = randomTranslations.Skip(200).ToList();
+            var validSet = randomTranslations.Take(200).ToList();
             string result;
             using (proxy as IDisposable)
             {
