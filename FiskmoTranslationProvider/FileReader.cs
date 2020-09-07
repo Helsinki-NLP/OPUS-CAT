@@ -41,7 +41,8 @@ namespace FiskmoTranslationProvider
             //If hard limit of fine tuning sentence pair collection has been reached, stop collecting
             if (this.collectedSentencePairCount > Int32.Parse(FiskmoTpSettings.Default.FinetuningSentencePairsHardLimit))
             {
-                return;
+                //Don't actually stop collecting, since new segments should be collected for possible batch translation
+                //return;
             }
 
             // Check if this paragraph actually contains segments 
@@ -50,7 +51,7 @@ namespace FiskmoTranslationProvider
             {
                 return;
             }
-
+            
             foreach (ISegmentPair segmentPair in paragraphUnit.SegmentPairs)
             {
                 if (segmentPair.Properties.ConfirmationLevel == ConfirmationLevel.Translated ||

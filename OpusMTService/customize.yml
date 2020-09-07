@@ -3,7 +3,7 @@ save-freq: 100u
 mini-batch-words: 400
 cpu-threads: 1
 overwrite: true
-after-epochs: 3
+after-epochs: 2
 workspace: 1024
 valid-freq: 100u
 valid-metrics:

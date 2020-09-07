@@ -111,19 +111,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MarianBatchTranslator.cs" />
-    <Compile Include="MarianHelper.cs" />
-    <Compile Include="MarianTrainerConfig.cs" />
-    <Compile Include="MarianDecoderConfig.cs" />
-    <Compile Include="ModelCustomizerWindow.xaml.cs">
+    <Compile Include="HelperFunctions.cs" />
+    <Compile Include="Marian\MarianBatchTranslator.cs" />
+    <Compile Include="Marian\MarianHelper.cs" />
+    <Compile Include="Marian\MarianTrainerConfig.cs" />
+    <Compile Include="Marian\MarianDecoderConfig.cs" />
+    <Compile Include="UI\ModelCustomizerWindow.xaml.cs">
       <DependentUpon>ModelCustomizerWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MarianCustomizer.cs" />
+    <Compile Include="Marian\MarianCustomizer.cs" />
     <Compile Include="MTModelConfig.cs" />
-    <Compile Include="OnlineModelSelection.xaml.cs">
+    <Compile Include="UI\OnlineModelSelection.xaml.cs">
       <DependentUpon>OnlineModelSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LocalModelListView.xaml.cs">
+    <Compile Include="UI\LocalModelListView.xaml.cs">
       <DependentUpon>LocalModelListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MTModel.cs" />
@@ -136,23 +137,29 @@
     <Compile Include="TagEditWindow.xaml.cs">
       <DependentUpon>TagEditWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TranslateWindow.xaml.cs">
+    <Compile Include="UI\TestWindow.xaml.cs">
+      <DependentUpon>TestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TranslateWindow.xaml.cs">
       <DependentUpon>TranslateWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="TranslationDbHelper.cs" />
-    <Page Include="ModelCustomizerWindow.xaml">
+    <Compile Include="UI\MarianSettingsView.xaml.cs">
+      <DependentUpon>MarianSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="UI\ModelCustomizerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="OnlineModelSelection.xaml">
+    <Page Include="UI\OnlineModelSelection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="LocalModelListView.xaml">
+    <Page Include="UI\LocalModelListView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -160,7 +167,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
@@ -168,15 +175,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="TranslateWindow.xaml">
+    <Page Include="UI\TestWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\TranslateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MarianSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MarianProcess.cs" />
+    <Compile Include="Marian\MarianProcess.cs" />
     <Compile Include="ModelManager.cs" />
-    <Compile Include="MosesPreprocess.cs" />
+    <Compile Include="Preprocessing\MosesPreprocess.cs" />
     <Compile Include="MTService.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -196,6 +211,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Evaluate.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="FiskmoMTEngineSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FiskmoMTEngineSettings.Designer.cs</LastGenOutput>
@@ -219,58 +237,51 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="apply_bpe.exe">
+    <Content Include="Evaluation\sacrebleu_wrapper.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="boost_chrono-vc140-mt-1_60.dll">
+    <Content Include="Preprocessing\apply_bpe.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="boost_iostreams-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_system-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_timer-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="boost_zlib-vc140-mt-1_60.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+   
+    <Resource Include="UI\fiskmo_zIQ_icon.ico" />
     <Resource Include="fiskmo_zIQ_icon.ico" />
     <None Include="customize.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="marian.exe">
+    <Content Include="Marian\marian.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="process.exe">
+    <Content Include="Preprocessing\process.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="process.py" />
-    <Content Include="spm_decode.exe">
+    <Content Include="Preprocessing\process.py" />
+    <Content Include="Preprocessing\spm_decode.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="spm_encode.exe">
+    <Content Include="Preprocessing\spm_encode.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="ThirdPartyNotices.txt" />
     <Resource Include="lgpl-3.0.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="libbz2.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="LICENSE_1_0.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="TatoebaTestsets\**">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj">
       <Project>{8f60b71d-d796-4b35-a7fb-42b9c90cd943}</Project>
       <Name>OpusMTInterface</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

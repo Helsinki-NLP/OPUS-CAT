@@ -12,7 +12,7 @@ namespace FiskmoMTEngine {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class FiskmoMTEngineSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static FiskmoMTEngineSettings defaultInstance = ((FiskmoMTEngineSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new FiskmoMTEngineSettings())));
@@ -92,6 +92,30 @@ namespace FiskmoMTEngine {
             }
             set {
                 this["LogDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Marian")]
+        public string MarianDir {
+            get {
+                return ((string)(this["MarianDir"]));
+            }
+            set {
+                this["MarianDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Preprocessing")]
+        public string PreprocessingDir {
+            get {
+                return ((string)(this["PreprocessingDir"]));
+            }
+            set {
+                this["PreprocessingDir"] = value;
             }
         }
     }

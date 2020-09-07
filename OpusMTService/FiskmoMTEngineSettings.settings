@@ -20,5 +20,11 @@
     <Setting Name="LogDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">logs</Value>
     </Setting>
+    <Setting Name="MarianDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Marian</Value>
+    </Setting>
+    <Setting Name="PreprocessingDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Preprocessing</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

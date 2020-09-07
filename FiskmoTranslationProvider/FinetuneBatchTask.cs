@@ -18,7 +18,7 @@ namespace FiskmoTranslationProvider
      
     [AutomaticTask("FiskmoBatchTask",
                    "Fiskmo fine-tune and translate",
-                   "Task for fine-tuning Fiskmo models with project data, also support batch translation",
+                   "Task for fine-tuning Fiskmo models with project data, also support batch translation. IMPORTANT: Segment the files before running this task by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
                    GeneratedFileType = AutomaticTaskFileType.None)]
     //[TODO] You can change the file type according to your needs
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
@@ -63,7 +63,7 @@ namespace FiskmoTranslationProvider
         }
 
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter multiFileConverter)
-        {
+        {            
             //Get instances of the translation memories included in the project.
 
             var languageDirection = projectFile.GetLanguageDirection();

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1231
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FiskmoTranslationProvider", "FiskmoTranslationProvider\FiskmoTranslationProvider.csproj", "{2A35CCB8-0405-4BDF-BA7B-7B9E87BC4D60}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OpusService", "OpusService", "{05D6D17C-DFCC-4E76-AE07-0F22FD38F3B7}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "FiskmoMTInstaller", "OpusMTInstaller\FiskmoMTInstaller.wixproj", "{9A9A584C-4435-4354-BBEA-331CE2DF443B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TatoebaTestsetExtractor", "TatoebaTestsetExtractor\TatoebaTestsetExtractor.csproj", "{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,6 +115,18 @@ Global
 		{9A9A584C-4435-4354-BBEA-331CE2DF443B}.Release|x64.ActiveCfg = Release|x86
 		{9A9A584C-4435-4354-BBEA-331CE2DF443B}.Release|x86.ActiveCfg = Release|x86
 		{9A9A584C-4435-4354-BBEA-331CE2DF443B}.Release|x86.Build.0 = Release|x86
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Debug|x64.Build.0 = Debug|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Debug|x86.Build.0 = Debug|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Release|x64.ActiveCfg = Release|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Release|x64.Build.0 = Release|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Release|x86.ActiveCfg = Release|Any CPU
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -125,6 +139,7 @@ Global
 		{77FC0E92-A49B-4650-BE0E-5779B29A3244} = {AFE9D936-9C76-46D3-85DB-DB68EAD8B353}
 		{29FA4881-4CFC-4A4E-AF21-17DB1669C05F} = {AFE9D936-9C76-46D3-85DB-DB68EAD8B353}
 		{9A9A584C-4435-4354-BBEA-331CE2DF443B} = {05D6D17C-DFCC-4E76-AE07-0F22FD38F3B7}
+		{98D76C79-36D0-4F80-B936-B35BE3BFF1B5} = {05D6D17C-DFCC-4E76-AE07-0F22FD38F3B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F143A32-2D24-488F-AD4C-CD6D074641C6}

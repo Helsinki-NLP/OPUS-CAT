@@ -78,6 +78,7 @@ namespace FiskmoMTEngine
                 Directory.CreateDirectory(fiskmoAppdataDir);
             }
 
+            this.CopyConfigs();
             this.SetupTranslationDb();
             this.SetupLogging();
 
@@ -91,6 +92,21 @@ namespace FiskmoMTEngine
             MainWindow wnd = new MainWindow();
             // Show the window
             wnd.Show();
+        }
+
+        /// <summary>
+        /// Copy customization config file from the executable dir (those are kept as default which you can revert to)
+        /// </summary>
+        private void CopyConfigs()
+        {
+            FileInfo baseCustomizeYml = new FileInfo(
+                HelperFunctions.GetLocalAppDataPath(FiskmoMTEngineSettings.Default.CustomizationBaseConfig));
+            FileInfo defaultCustomizeYml = new FileInfo(FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+            //There might be a previous customize.yml file present, don't overwrite it unless it's older
+            if (!baseCustomizeYml.Exists || (defaultCustomizeYml.LastWriteTime > baseCustomizeYml.LastWriteTime))
+            {
+                File.Copy(FiskmoMTEngineSettings.Default.CustomizationBaseConfig, baseCustomizeYml.FullName,true);
+            }
         }
 
         protected override void OnStartup(StartupEventArgs e)
