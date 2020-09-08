@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,9 +18,84 @@ using System.Windows.Shapes;
 
 namespace FiskmoMTEngine
 {
-    public partial class ModelCustomizerWindow : Window
+    public partial class ModelCustomizerWindow : Window, IDataErrorInfo, INotifyPropertyChanged
     {
         private MTModel selectedModel;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                return Validate(columnName);
+            }
+        }
+
+        public string Error
+        {
+            get { return "...."; }
+        }
+        
+
+        public string ModelTag
+        {
+            get => modelTag;
+            set
+            {
+                modelTag = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string modelTag;
+
+        private string Validate(string propertyName)
+        {
+            // Return error message if there is error on else return empty or null string
+            string validationMessage = string.Empty;
+            switch (propertyName)
+            {
+                case "ModelTag":
+
+                    if (this.ModelTag == null || this.ModelTag == "")
+                    {
+                        validationMessage = "Model tag not specified.";
+                    }
+                    else if (this.ModelTag.Length > FiskmoMTEngineSettings.Default.ModelTagMaxLength)
+                    {
+                        validationMessage = "Model tag is too long.";
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
+                            if (customDir.Exists)
+                            {
+                                validationMessage = "Model tag is already in use for this base model";
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            validationMessage = "Error";
+                        }
+                    }
+
+                    break;
+            }
+
+            return validationMessage;
+        }
+
 
         public ModelCustomizerWindow(MTModel selectedModel)
         {
@@ -26,6 +103,7 @@ namespace FiskmoMTEngine
             this.Title = $"Customize model {this.selectedModel.Name}";
             InitializeComponent();
         }
+        
 
         private void CloseCommandHandler(object sender, ExecutedRoutedEventArgs e)
         {
@@ -34,7 +112,10 @@ namespace FiskmoMTEngine
 
         private void customize_Click(object sender, RoutedEventArgs e)
         {
-            /*var customizer = new MarianCustomizer(
+
+            var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
+
+            var customizer = new MarianCustomizer(
                 this.selectedModel,
                 new FileInfo(this.SourceFileBox.Text),
                 new FileInfo(this.TargetFileBox.Text),
@@ -43,9 +124,9 @@ namespace FiskmoMTEngine
                 this.LabelBox.Text,
                 false,
                 false,
-
+                customDir
                 );
-            customizer.Customize(null);*/
+            customizer.Customize(null);
         }
 
         private void browse_Click(object sender, RoutedEventArgs e)

@@ -5,35 +5,68 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FiskmoMTEngine"
         mc:Ignorable="d"
+        x:Name="_this"
         Height="450" Width="800" Icon="fiskmo_zIQ_icon.ico">
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
                         Executed="CloseCommandHandler"/>
     </Window.CommandBindings>
+    <Window.Resources>
+        <Style x:Key="StackStyle" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,15"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Validation.ErrorTemplate">
+        <Setter.Value>
+            <ControlTemplate>
+                <StackPanel>
+                    <Border BorderThickness="2" BorderBrush="DarkRed">
+                        <StackPanel>
+                            <AdornedElementPlaceholder
+                                x:Name="errorControl" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock FontSize="8" Text="{Binding AdornedElement.ToolTip
+                        , ElementName=errorControl}" Foreground="Red" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+    <Style.Triggers>
+        <Trigger Property="Validation.HasError" Value="true">
+            <Setter Property="BorderBrush" Value="Red" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="ToolTip"
+                Value="{Binding RelativeSource={RelativeSource Self}
+                    , Path=(Validation.Errors)[0].ErrorContent}" />
+        </Trigger>
+    </Style.Triggers>
+    </Style>
+    </Window.Resources>
     <StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Style="{StaticResource StackStyle}" Orientation="Horizontal">
             <Label>Source file</Label>
             <TextBox Name="SourceFileBox" Width="400"></TextBox>
             <Button DataContext="{Binding ElementName=SourceFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Target file</Label>
             <TextBox Name="TargetFileBox" Width="400"></TextBox>
             <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Validation source file</Label>
             <TextBox Name="ValidSourceFileBox" Width="400"></TextBox>
             <Button DataContext="{Binding ElementName=ValidSourceFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Validation target file</Label>
             <TextBox Name="ValidTargetFileBox" Width="400"></TextBox>
             <Button DataContext="{Binding ElementName=ValidTargetFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Custom model label</Label>
-            <TextBox Name="LabelBox" Width="400"></TextBox>
+            <TextBox Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button Click="customize_Click">Customize</Button>

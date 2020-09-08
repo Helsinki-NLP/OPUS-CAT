@@ -31,7 +31,6 @@ namespace FiskmoMTEngine
         private FileInfo spTarget;
         private FileInfo spValidSource;
         private FileInfo spValidTarget;
-        private MTModel selectedModel;
         
         private void CopyModelDir(DirectoryInfo modelDir,string customLabel)
         {
@@ -85,7 +84,7 @@ namespace FiskmoMTEngine
                 trainingConfig = deserializer.Deserialize<MarianTrainerConfig>(reader);
             }
                 
-            trainingConfig.TrainSets = new List<string>
+            trainingConfig.trainSets = new List<string>
                     {
                         spSource.FullName,
                         spTarget.FullName
@@ -102,6 +101,9 @@ namespace FiskmoMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0]),
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
+
+            trainingConfig.validScriptArgs = trainingConfig.ValidSets;
+            trainingConfig.validTranslationOutput = "valid.out.txt";
 
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
             trainingConfig.log = Path.Combine(this.customDir.FullName, "train.log");

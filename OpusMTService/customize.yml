@@ -5,8 +5,9 @@ cpu-threads: 1
 overwrite: true
 after-epochs: 2
 workspace: 1024
-valid-freq: 100u
+valid-freq: 1u
+valid-script-path: Validate.bat
 valid-metrics:
-- bleu
+- translation
 gradient-checkpointing: true
 shuffle-in-ram: true

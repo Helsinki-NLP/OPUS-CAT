@@ -118,5 +118,29 @@ namespace FiskmoMTEngine {
                 this["PreprocessingDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int ModelTagMaxLength {
+            get {
+                return ((int)(this["ModelTagMaxLength"]));
+            }
+            set {
+                this["ModelTagMaxLength"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartHttpService {
+            get {
+                return ((bool)(this["StartHttpService"]));
+            }
+            set {
+                this["StartHttpService"] = value;
+            }
+        }
     }
 }

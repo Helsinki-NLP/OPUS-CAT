@@ -85,16 +85,23 @@ namespace FiskmoMTEngine
             //Launching the http service requires that the program is run with
             //administrator privileges or that the port has been enabled for http 
             //with netsh http add urlacl
-
-            Log.Information("Starting Fiskmö MT service's net.tcp and HTTP APIs");
-            try
+            if (FiskmoMTEngineSettings.Default.StartHttpService)
             {
-                host = this.StartNetTcpAndHttpService(modelManager,false);
-                Log.Information("net.tcp and HTTP APIs were started");
+                Log.Information("Starting Fiskmö MT service's net.tcp and HTTP APIs");
+                try
+                {
+                    host = this.StartNetTcpAndHttpService(modelManager, false);
+                    Log.Information("net.tcp and HTTP APIs were started");
+                }
+                catch (System.ServiceModel.AddressAccessDeniedException ex)
+                {
+                    Log.Information("HTTP API could not be started, starting Net.tcp API. If HTTP API is required, add the relevant URL to the urlacl list with netsh.");
+                    host = this.StartNetTcpAndHttpService(modelManager, true);
+                }
             }
-            catch (System.ServiceModel.AddressAccessDeniedException ex)
+            else
             {
-                Log.Information("HTTP API could not be started, starting Net.tcp API. If HTTP API is required, add the relevant URL to the urlacl list with netsh.");
+                Log.Information("Starting Net.tcp API only, HTTP API can be enabled in the settings.");
                 host = this.StartNetTcpAndHttpService(modelManager, true);
             }
 

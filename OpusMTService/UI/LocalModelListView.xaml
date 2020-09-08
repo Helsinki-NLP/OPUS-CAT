@@ -18,7 +18,7 @@
                         </StackPanel.Resources>
                         <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Install OPUS model from Web</Button>
                         <Button Name="addZipModel" Click="btnAddZipModel_Click">Install model from zip</Button>
-                    <!--<Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>-->
+                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Translate with model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="testModel" Click="btnTestModel_Click">Test model</Button>

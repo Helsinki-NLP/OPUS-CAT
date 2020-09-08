@@ -26,5 +26,11 @@
     <Setting Name="PreprocessingDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">Preprocessing</Value>
     </Setting>
+    <Setting Name="ModelTagMaxLength" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="StartHttpService" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

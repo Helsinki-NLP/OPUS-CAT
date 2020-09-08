@@ -11,9 +11,18 @@ namespace FiskmoMTEngine
         [YamlMember(Alias = "valid-sets", ApplyNamingConventions = false)]
         public List<string> ValidSets { get; set; }
         [YamlMember(Alias = "train-sets", ApplyNamingConventions = false)]
-        public List<string> TrainSets { get; set; }
+        public List<string> trainSets { get; set; }
         [YamlMember(Alias = "valid-freq", ApplyNamingConventions = false)]
         public string validFreq { get; set; }
+
+        [YamlMember(Alias = "valid-script-args", ApplyNamingConventions = false)]
+        public List<string> validScriptArgs { get; set; }
+
+        [YamlMember(Alias = "valid-script-path", ApplyNamingConventions = false)]
+        public string validScriptPath { get; set; }
+
+        [YamlMember(Alias = "valid-translation-output", ApplyNamingConventions = false)]
+        public string validTranslationOutput { get; set; }
 
         [YamlMember(Alias = "valid-metrics", ApplyNamingConventions = false)]
         public List<string> validMetrics { get; set; }

@@ -223,6 +223,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Validate.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="StartMosesBpeMtPipe.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -243,7 +246,6 @@
     <Content Include="Preprocessing\apply_bpe.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-   
     <Resource Include="UI\fiskmo_zIQ_icon.ico" />
     <Resource Include="fiskmo_zIQ_icon.ico" />
     <None Include="customize.yml">
@@ -272,9 +274,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TatoebaTestsets\**">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-</ItemGroup>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj">
       <Project>{8f60b71d-d796-4b35-a7fb-42b9c90cd943}</Project>
