@@ -102,8 +102,8 @@ namespace FiskmoMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            trainingConfig.validScriptArgs = trainingConfig.ValidSets;
-            trainingConfig.validTranslationOutput = "valid.out.txt";
+            trainingConfig.validScriptArgs = new List<string> { spValidTarget.FullName };
+            trainingConfig.validTranslationOutput = "valid.{U}.txt";
 
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
             trainingConfig.log = Path.Combine(this.customDir.FullName, "train.log");

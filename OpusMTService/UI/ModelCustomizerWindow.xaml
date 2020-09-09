@@ -46,22 +46,22 @@
     <StackPanel>
         <StackPanel Style="{StaticResource StackStyle}" Orientation="Horizontal">
             <Label>Source file</Label>
-            <TextBox Name="SourceFileBox" Width="400"></TextBox>
+            <TextBox Name="SourceFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\strings.en</TextBox>
             <Button DataContext="{Binding ElementName=SourceFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Target file</Label>
-            <TextBox Name="TargetFileBox" Width="400"></TextBox>
+            <TextBox Name="TargetFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\strings.fi</TextBox>
             <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Validation source file</Label>
-            <TextBox Name="ValidSourceFileBox" Width="400"></TextBox>
+            <TextBox Name="ValidSourceFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\valid.en</TextBox>
             <Button DataContext="{Binding ElementName=ValidSourceFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Validation target file</Label>
-            <TextBox Name="ValidTargetFileBox" Width="400"></TextBox>
+            <TextBox Name="ValidTargetFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\valid.fi</TextBox>
             <Button DataContext="{Binding ElementName=ValidTargetFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
