@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.ServiceModel;
+using System.ServiceModel.Web;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using OpusMTInterface;
@@ -83,7 +87,27 @@ namespace FiskmoMTEngine
 
             return this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
         }
-        
+
+        public Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            var translation = this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
+            return new Translation(translation);
+        }
+
+        public Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            WebOperationContext.Current.OutgoingResponse.ContentType = "text/plain; charset=utf-8";
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Connection: close");
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin: *");
+
+            //This is for Wordfast Anywhere (probably other versions as well) compatibility, for some reason it doesn't accept a response with
+            //the default Server header.
+            WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Server.ToString(), string.Empty);
+            
+            var translation = this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
+            return new MemoryStream(Encoding.UTF8.GetBytes(translation));
+        }
+
         /// <summary>
         /// Call this method to get the translation for a single string with the named model.
         /// </summary>

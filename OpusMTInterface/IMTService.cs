@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 
@@ -23,6 +24,14 @@ namespace OpusMTInterface
         [OperationContract]
         [WebGet]
         string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
+
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
+
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
         [WebGet]

@@ -69,6 +69,8 @@ namespace FiskmoMTEngine
                 WebHttpBehavior helpBehavior = new WebHttpBehavior();
                 helpBehavior.HelpEnabled = true;
                 selfHost.Description.Endpoints[2].Behaviors.Add(helpBehavior);
+
+
             }
             
             Log.Information($"Opening the service host");
