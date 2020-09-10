@@ -9,6 +9,7 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the Mari
   - [Trados 2017](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoTranslationProvider2017.sdlplugin): double-click plugin file to install.
   - [Trados 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoTranslationProvider.sdlplugin): double-click plugin file to install.
   - [memoQ](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder.
+  - Wordfast: there is currently no plugin for Wordfast, but Fiskmo MT can be used in Wordfast as a custom MT provider (this requires some configuration work, so contact Fiskmo project for assistance if you wish to use Fiskmo with Wordfast). 
 3. Start the Fiskmo MT Engine application by clicking FiskmoMTEngine.exe in the extraction folder. 
 4. Install models from the Fiskmo model repository for the language pairs that you require.
    - Click **Install OPUS model from Web**.
