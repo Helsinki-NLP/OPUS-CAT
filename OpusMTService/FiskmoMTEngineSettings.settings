@@ -32,5 +32,8 @@
     <Setting Name="StartHttpService" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="TatoebaDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TatoebaTestsets</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

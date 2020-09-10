@@ -15,11 +15,6 @@ del %split2_2%
 CALL :Split %1 , %3
 CALL :Split %2 , %3
 
-FOR /F "tokens=* USEBACKQ" %%F IN (`command`) DO (
-SET var=%%F
-)
-ECHO %var%
-
 Evaluation\sacrebleu_wrapper.exe --score-only --input %split1_1% %split2_1% 2> nul > score.1
 Evaluation\sacrebleu_wrapper.exe --score-only --input %split1_2% %split2_2% 2> nul > score.2
 
@@ -35,16 +30,18 @@ echo %combinedscore%
 EXIT /B %ERRORLEVEL%
 
 :Split
-	setlocal enableextensions disabledelayedexpansion
+	setlocal enabledelayedexpansion
 
     set "nLines=%~2"
     set "line=0"
 
     for /f "usebackq delims=" %%a in (%~1) do (
-        set /a "file=line/%nLines%", "line+=1"
-        setlocal enabledelayedexpansion
-        for %%b in (!file!) do (
-            endlocal
+        set /a file=!line!/%nLines%
+		if !line! LEQ !nLines! (set /a line+=1)
+		
+		echo !line!
+		echo !file!
+        for %%b in (!file!) do (   
             >>"%~1_%%b.txt" echo(%%a
         )
     )

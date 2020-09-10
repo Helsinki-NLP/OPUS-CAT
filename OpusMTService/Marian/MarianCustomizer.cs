@@ -103,7 +103,7 @@ namespace FiskmoMTEngine
                     };
 
             trainingConfig.validScriptArgs = new List<string> { spValidTarget.FullName };
-            trainingConfig.validTranslationOutput = "valid.{U}.txt";
+            trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
             trainingConfig.log = Path.Combine(this.customDir.FullName, "train.log");
@@ -136,6 +136,12 @@ namespace FiskmoMTEngine
 
             this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags,this.includeTagPairs);
             this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
+
+            //concatenate the out-of-domain validation set with the in-domain validation set
+
+            var tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
+
+
 
             this.spValidSource = MarianHelper.PreprocessLanguage(this.validationSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
             this.spValidTarget = MarianHelper.PreprocessLanguage(this.validationTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);

@@ -142,5 +142,17 @@ namespace FiskmoMTEngine {
                 this["StartHttpService"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TatoebaTestsets")]
+        public string TatoebaDir {
+            get {
+                return ((string)(this["TatoebaDir"]));
+            }
+            set {
+                this["TatoebaDir"] = value;
+            }
+        }
     }
 }
