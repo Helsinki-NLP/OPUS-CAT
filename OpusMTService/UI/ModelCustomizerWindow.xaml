@@ -43,13 +43,22 @@
     </Style.Triggers>
     </Style>
     </Window.Resources>
-    <StackPanel>
+    <StackPanel Margin="5">
+        <Border BorderBrush="Black" BorderThickness="1">
+        <StackPanel Margin="5,0,0,5">
+            <Label>
+                    <Bold>Input file format</Bold></Label>
+            <RadioButton IsChecked="True" Name="TextFiles" Checked="ModeButton_Checked" GroupName="Format">Text (separate files for source and target)</RadioButton>
+            <RadioButton Name="TmxFiles" Checked="ModeButton_Checked" GroupName="Format">TMX translation memory</RadioButton>
+            <!--<RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Format">Batch translate only</RadioButton>-->
+        </StackPanel>
+        </Border>
         <StackPanel Style="{StaticResource StackStyle}" Orientation="Horizontal">
             <Label>Source file</Label>
             <TextBox Name="SourceFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\strings.en</TextBox>
             <Button DataContext="{Binding ElementName=SourceFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
+        <StackPanel IsEnabled="{Binding IsChecked,ElementName=TextFiles}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Target file</Label>
             <TextBox Name="TargetFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\strings.fi</TextBox>
             <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>

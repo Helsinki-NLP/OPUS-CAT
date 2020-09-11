@@ -112,13 +112,25 @@ namespace FiskmoMTEngine
 
         private void customize_Click(object sender, RoutedEventArgs e)
         {
-
+            ParallelFilePair filePair = null;
+            switch (this.inputType)
+            {
+                case InputFileType.TxtFile:
+                    filePair = new ParallelFilePair(this.SourceFileBox.Text, this.TargetFileBox.Text); 
+                    break;
+                case InputFileType.TmxFile:
+                    filePair = TmxToTxtParser.ParseTmxToParallelFiles(
+                        this.SourceFileBox.Text, this.selectedModel.SourceLanguages.Single(), this.selectedModel.TargetLanguages.Single());
+                    break;
+                default:
+                    break;
+            }
             var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
 
             var customizer = new MarianCustomizer(
                 this.selectedModel,
-                new FileInfo(this.SourceFileBox.Text),
-                new FileInfo(this.TargetFileBox.Text),
+                filePair.Source,
+                filePair.Target,
                 new FileInfo(this.ValidSourceFileBox.Text),
                 new FileInfo(this.ValidTargetFileBox.Text),
                 this.LabelBox.Text,
@@ -141,6 +153,27 @@ namespace FiskmoMTEngine
             if (result == true)
             {
                 pathBox.Text = dlg.FileName;
+            }   
+        }
+
+        enum InputFileType { TxtFile, TmxFile};
+        private InputFileType inputType;
+
+        private void ModeButton_Checked(object sender, RoutedEventArgs e)
+        {
+            var radioButton = ((RadioButton)sender);
+            if (radioButton.IsChecked.Value)
+            {
+                switch (radioButton.Name)
+                {
+                    case "TxtFiles":
+                        this.inputType = InputFileType.TxtFile;
+                        break;
+                    case "TmxFiles":
+                        this.inputType = InputFileType.TmxFile;
+                        break;
+                }
+                
             }
         }
     }

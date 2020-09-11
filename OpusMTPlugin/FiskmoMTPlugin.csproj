@@ -77,6 +77,9 @@
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
     </Compile>
+    <Compile Include="..\OpusMTInterface\Translation.cs">
+      <Link>Translation.cs</Link>
+    </Compile>
     <Compile Include="FiskmoMTEngine.cs" />
     <Compile Include="FiskmoMTOptions.cs" />
     <Compile Include="FiskmoMTOptionsForm.cs">

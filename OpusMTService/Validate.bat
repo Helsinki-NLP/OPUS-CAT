@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 
 REM setlocal EnableExtensions DisableDelayedExpansion
 set "split1_1=%1_0.txt"
@@ -39,8 +39,6 @@ EXIT /B %ERRORLEVEL%
         set /a file=!line!/%nLines%
 		if !line! LEQ !nLines! (set /a line+=1)
 		
-		echo !line!
-		echo !file!
         for %%b in (!file!) do (   
             >>"%~1_%%b.txt" echo(%%a
         )
