@@ -154,5 +154,17 @@ namespace FiskmoMTEngine {
                 this["TatoebaDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int OODValidSetSize {
+            get {
+                return ((int)(this["OODValidSetSize"]));
+            }
+            set {
+                this["OODValidSetSize"] = value;
+            }
+        }
     }
 }

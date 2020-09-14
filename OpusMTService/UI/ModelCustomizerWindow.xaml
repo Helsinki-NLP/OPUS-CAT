@@ -12,6 +12,8 @@
                         Executed="CloseCommandHandler"/>
     </Window.CommandBindings>
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        
         <Style x:Key="StackStyle" TargetType="StackPanel">
             <Setter Property="Margin" Value="0,0,0,15"/>
         </Style>
@@ -48,17 +50,26 @@
         <StackPanel Margin="5,0,0,5">
             <Label>
                     <Bold>Input file format</Bold></Label>
-            <RadioButton IsChecked="True" Name="TextFiles" Checked="ModeButton_Checked" GroupName="Format">Text (separate files for source and target)</RadioButton>
+            <RadioButton IsChecked="True" Name="TxtFiles" Checked="ModeButton_Checked" GroupName="Format">Text (separate files for source and target)</RadioButton>
             <RadioButton Name="TmxFiles" Checked="ModeButton_Checked" GroupName="Format">TMX translation memory</RadioButton>
             <!--<RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Format">Batch translate only</RadioButton>-->
         </StackPanel>
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="1">
+            <StackPanel Margin="5,0,0,5">
+                <Label>
+                    <Bold>Tag processing</Bold>
+                </Label>
+                <CheckBox Margin="0,5,0,0" Name="IncludePlaceholderTagsBox">Include placeholder tags as text</CheckBox>
+                <CheckBox Margin="0,5,0,0" Name="IncludeTagPairBox">Include tag pairs as text</CheckBox>
+            </StackPanel>
         </Border>
         <StackPanel Style="{StaticResource StackStyle}" Orientation="Horizontal">
             <Label>Source file</Label>
             <TextBox Name="SourceFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\strings.en</TextBox>
             <Button DataContext="{Binding ElementName=SourceFileBox}" Click="browse_Click">Browse</Button>
         </StackPanel>
-        <StackPanel IsEnabled="{Binding IsChecked,ElementName=TextFiles}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
+        <StackPanel IsEnabled="{Binding IsChecked,ElementName=TextFiles}" Visibility="{Binding IsChecked,ElementName=TextFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
             <Label>Target file</Label>
             <TextBox Name="TargetFileBox" Width="400">C:\Users\niemi\Documents\Testing\customize_test\strings.fi</TextBox>
             <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>

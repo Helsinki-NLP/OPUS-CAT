@@ -120,7 +120,12 @@ namespace FiskmoMTEngine
                     break;
                 case InputFileType.TmxFile:
                     filePair = TmxToTxtParser.ParseTmxToParallelFiles(
-                        this.SourceFileBox.Text, this.selectedModel.SourceLanguages.Single(), this.selectedModel.TargetLanguages.Single());
+                        this.SourceFileBox.Text,
+                        this.selectedModel.SourceLanguages.Single(), 
+                        this.selectedModel.TargetLanguages.Single(),
+                        this.IncludePlaceholderTagsBox.IsChecked.Value,
+                        this.IncludeTagPairBox.IsChecked.Value
+                        );
                     break;
                 default:
                     break;

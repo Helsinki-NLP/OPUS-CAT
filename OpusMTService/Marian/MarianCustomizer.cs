@@ -20,8 +20,8 @@ namespace FiskmoMTEngine
         private DirectoryInfo modelDir;
         private FileInfo customSource;
         private FileInfo customTarget;
-        private FileInfo validationSource;
-        private FileInfo validationTarget;
+        private FileInfo inDomainValidationSource;
+        private FileInfo inDomainValidationTarget;
         private string customLabel;
         private readonly bool includePlaceholderTags;
         private readonly bool includeTagPairs;
@@ -86,14 +86,14 @@ namespace FiskmoMTEngine
                 
             trainingConfig.trainSets = new List<string>
                     {
-                        spSource.FullName,
-                        spTarget.FullName
+                        this.spSource.FullName,
+                        this.spTarget.FullName
                     };
 
             trainingConfig.ValidSets = new List<string>
                     {
-                        spValidSource.FullName,
-                        spValidTarget.FullName
+                        this.spValidSource.FullName,
+                        this.spValidTarget.FullName
                     };
 
             trainingConfig.vocabs = new List<string>
@@ -102,7 +102,11 @@ namespace FiskmoMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            trainingConfig.validScriptArgs = new List<string> { spValidTarget.FullName };
+            
+            trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Evaluate.bat");
+            File.Copy("Evaluate.bat", trainingConfig.validScriptPath);
+
+            trainingConfig.validScriptArgs = new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
@@ -138,13 +142,15 @@ namespace FiskmoMTEngine
             this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
 
             //concatenate the out-of-domain validation set with the in-domain validation set
+            ParallelFilePair tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
+            ParallelFilePair combinedValid = new ParallelFilePair(
+                tatoebaValidFileInfos,
+                new ParallelFilePair(this.inDomainValidationSource, this.inDomainValidationTarget),
+                this.customDir.FullName,
+                FiskmoMTEngineSettings.Default.OODValidSetSize);
 
-            var tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
-
-
-
-            this.spValidSource = MarianHelper.PreprocessLanguage(this.validationSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
-            this.spValidTarget = MarianHelper.PreprocessLanguage(this.validationTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
+            this.spValidSource = MarianHelper.PreprocessLanguage(combinedValid.Source, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
+            this.spValidTarget = MarianHelper.PreprocessLanguage(combinedValid.Target, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
         }
 
 
@@ -152,8 +158,8 @@ namespace FiskmoMTEngine
             MTModel model,
             FileInfo customSource,
             FileInfo customTarget,
-            FileInfo validationSource,
-            FileInfo validationTarget,
+            FileInfo inDomainValidationSource,
+            FileInfo inDomainValidationTarget,
             string customLabel,
             bool includePlaceholderTags,
             bool includeTagPairs,
@@ -166,8 +172,8 @@ namespace FiskmoMTEngine
             this.customLabel = customLabel;
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
-            this.validationSource = validationSource;
-            this.validationTarget = validationTarget;
+            this.inDomainValidationSource = inDomainValidationSource;
+            this.inDomainValidationTarget = inDomainValidationTarget;
             this.sourceCode = model.SourceLanguageString;
             this.targetCode = model.TargetLanguageString;
         }

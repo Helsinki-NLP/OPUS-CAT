@@ -6,7 +6,6 @@ overwrite: true
 after-epochs: 2
 workspace: 1024
 valid-freq: 1u
-valid-script-path: Validate.bat
 valid-metrics:
 - translation
 gradient-checkpointing: true
