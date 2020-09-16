@@ -110,6 +110,8 @@ namespace FiskmoMTEngine
             return statusMessage.ToString();
         }
 
+        
+
         internal void FilterOnlineModels(string sourceFilter, string targetFilter, string nameFilter)
         {
             var filteredModels = from model in this.onlineModels
@@ -142,8 +144,16 @@ namespace FiskmoMTEngine
 
             if (Directory.Exists(Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath)))
             {
-                FileSystem.DeleteDirectory(
+                try
+                {
+                    FileSystem.DeleteDirectory(
                     Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath), UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Model directory can't be deleted, some other process is using it.", "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                
             }
         }
 
@@ -297,20 +307,20 @@ namespace FiskmoMTEngine
             return this.LocalModels.Single(x => x.Name == modelName).Translate(input);
         }
 
-        private void SplitToFiles(List<Tuple<string, string>> biText, string srcPath, string trgPath)
+        internal void StartCustomization(
+            ParallelFilePair inputPair,
+            ParallelFilePair validationPair,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
+            string modelTag,
+            bool includePlaceholderTags,
+            bool includeTagPairs,
+            DirectoryInfo customDir,
+            MTModel baseModel)
         {
-            Regex linebreakRegex = new Regex(@"\r\n?|\n");
-            using (var srcStream = new StreamWriter(srcPath, true, Encoding.UTF8))
-            using (var trgStream = new StreamWriter(trgPath, true, Encoding.UTF8))
-            {
-                foreach (var pair in biText)
-                {
-                    //Make sure to remove line breaks from the items before writing them, otherwise the line
-                    //breaks can mess marian processing up
-                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1, " "));
-                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2, " "));
-                }
-            }
+            var customTask = Task.Run(() => Customize(inputPair, validationPair, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+            customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         internal void StartCustomization(List<Tuple<string, string>> input,
@@ -320,11 +330,16 @@ namespace FiskmoMTEngine
             string trgLangCode,
             string modelTag,
             bool includePlaceholderTags,
-            bool includeTagPairs)
+            bool includeTagPairs,
+            MTModel baseModel=null)
         {
-            var baseModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
-            var customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
+            if (baseModel == null)
+            {
+                baseModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+            }
 
+            var customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
+            
             /* this.watcher = new FileSystemWatcher(customDir.FullName, "valid.log");
              this.watcher.EnableRaisingEvents = true;
              this.watcher.Changed += finetuningProgressChanged;*/
@@ -360,8 +375,6 @@ namespace FiskmoMTEngine
             DirectoryInfo customDir,
             MTModel baseModel)
         {
-
-            Log.Information($"Customizing a new model with model tag {modelTag} from base model {baseModel.Name}.");
             //Write the tuning set as two files
             var fileGuid = Guid.NewGuid();
             var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLangCode}");
@@ -369,8 +382,37 @@ namespace FiskmoMTEngine
             var validSrcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{srcLangCode}");
             var validTrgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{trgLangCode}");
 
-            this.SplitToFiles(input, srcFile, trgFile);
-            this.SplitToFiles(validation, validSrcFile, validTrgFile);
+            var inputPair = new ParallelFilePair(input, srcFile, trgFile);
+            var validPair = new ParallelFilePair(validation, validSrcFile, validTrgFile);
+
+            this.Customize(
+                inputPair,
+                validPair,
+                uniqueNewSegments,
+                srcLangCode,
+                trgLangCode,
+                modelTag,
+                includePlaceholderTags,
+                includeTagPairs,
+                customDir,
+                baseModel);
+        }
+
+        internal void Customize(
+            ParallelFilePair inputPair,
+            ParallelFilePair validationPair,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
+            string modelTag,
+            bool includePlaceholderTags,
+            bool includeTagPairs,
+            DirectoryInfo customDir,
+            MTModel baseModel)
+        {
+
+            Log.Information($"Customizing a new model with model tag {modelTag} from base model {baseModel.Name}.");
+            
 
             //Note that this does not currently remove the temp files, should
             //add an event for that in the Marian process startup code
@@ -378,10 +420,8 @@ namespace FiskmoMTEngine
 
             var customizer = new MarianCustomizer(
                 baseModel,
-                new FileInfo(srcFile),
-                new FileInfo(trgFile),
-                new FileInfo(validSrcFile),
-                new FileInfo(validTrgFile),
+                inputPair,
+                validationPair,
                 modelTag,
                 includePlaceholderTags,
                 includeTagPairs,
@@ -439,7 +479,7 @@ namespace FiskmoMTEngine
 
             this.CustomizationOngoing = false;
 
-            if (uniqueNewSegments.Count > 0)
+            if (uniqueNewSegments != null && uniqueNewSegments.Count > 0)
             {
                 this.PreTranslateBatch(uniqueNewSegments, srcLangCode, trgLangCode, modelTag);
             }

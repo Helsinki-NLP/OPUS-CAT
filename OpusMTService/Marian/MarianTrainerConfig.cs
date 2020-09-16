@@ -42,6 +42,10 @@ namespace FiskmoMTEngine
         public string overwrite { get; set; }
         [YamlMember(Alias = "after-epochs", ApplyNamingConventions = false)]
         public string afterEpochs { get; set; }
+
+        [YamlMember(Alias = "after-batches", ApplyNamingConventions = false)]
+        public string afterBatches { get; set; }
+
         public string workspace { get; set; }
 
         [YamlMember(Alias = "gradient-checkpointing", ApplyNamingConventions = false)]

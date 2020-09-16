@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -131,21 +132,23 @@ namespace FiskmoMTEngine
                     break;
             }
             var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
+            var validPair = new ParallelFilePair(this.ValidSourceFileBox.Text, this.ValidTargetFileBox.Text);
+            var modelManager = ((ModelManager)this.DataContext);
 
-            var customizer = new MarianCustomizer(
-                this.selectedModel,
-                filePair.Source,
-                filePair.Target,
-                new FileInfo(this.ValidSourceFileBox.Text),
-                new FileInfo(this.ValidTargetFileBox.Text),
-                this.LabelBox.Text,
-                false,
-                false,
-                customDir
-                );
-            customizer.Customize(null);
+            modelManager.StartCustomization(
+                filePair,
+                validPair,
+                null,
+                this.selectedModel.SourceLanguages.Single(),
+                this.selectedModel.TargetLanguages.Single(),
+                this.ModelTag,
+                this.IncludePlaceholderTagsBox.IsChecked.Value,
+                this.IncludeTagPairBox.IsChecked.Value,
+                customDir,
+                this.selectedModel);
+                   
+
         }
-
         private void browse_Click(object sender, RoutedEventArgs e)
         {
             var pathBox = (TextBox)((Button)sender).DataContext;

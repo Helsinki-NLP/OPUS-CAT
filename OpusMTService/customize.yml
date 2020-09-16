@@ -3,9 +3,9 @@ save-freq: 100u
 mini-batch-words: 400
 cpu-threads: 1
 overwrite: true
-after-epochs: 2
+after-epochs: 5
 workspace: 1024
-valid-freq: 1u
+valid-freq: 100u
 valid-metrics:
 - translation
 gradient-checkpointing: true

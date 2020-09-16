@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FiskmoMTEngine
@@ -15,6 +16,22 @@ namespace FiskmoMTEngine
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     FiskmoMTEngineSettings.Default.LocalFiskmoDir,
                     restOfPath);
+        }
+
+        public static void SplitToFiles(List<Tuple<string, string>> biText, string srcPath, string trgPath)
+        {
+            Regex linebreakRegex = new Regex(@"\r\n?|\n");
+            using (var srcStream = new StreamWriter(srcPath, true, Encoding.UTF8))
+            using (var trgStream = new StreamWriter(trgPath, true, Encoding.UTF8))
+            {
+                foreach (var pair in biText)
+                {
+                    //Make sure to remove line breaks from the items before writing them, otherwise the line
+                    //breaks can mess marian processing up
+                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1, " "));
+                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2, " "));
+                }
+            }
         }
 
         internal static ParallelFilePair GetTatoebaFileInfos(string sourceCode, string targetCode)

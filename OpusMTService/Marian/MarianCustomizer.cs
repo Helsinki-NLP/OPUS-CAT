@@ -63,6 +63,7 @@ namespace FiskmoMTEngine
 
             var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
             var deserializer = new Deserializer();
+            
             var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
 
             MarianTrainerConfig trainingConfig;
@@ -103,8 +104,8 @@ namespace FiskmoMTEngine
                     };
 
             
-            trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Evaluate.bat");
-            File.Copy("Evaluate.bat", trainingConfig.validScriptPath);
+            trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Validate.bat");
+            File.Copy("Validate.bat", trainingConfig.validScriptPath);
 
             trainingConfig.validScriptArgs = new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
@@ -114,7 +115,10 @@ namespace FiskmoMTEngine
 
             trainingConfig.model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single());
 
-            var serializer = new Serializer();
+            var builder = new SerializerBuilder();
+            builder.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull);
+            var serializer = builder.Build();
+            
             var configPath = Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
             using (var writer = File.CreateText(configPath))
             {
@@ -156,10 +160,8 @@ namespace FiskmoMTEngine
 
         public MarianCustomizer(
             MTModel model,
-            FileInfo customSource,
-            FileInfo customTarget,
-            FileInfo inDomainValidationSource,
-            FileInfo inDomainValidationTarget,
+            ParallelFilePair inputPair,
+            ParallelFilePair indomainValidPair,
             string customLabel,
             bool includePlaceholderTags,
             bool includeTagPairs,
@@ -167,13 +169,13 @@ namespace FiskmoMTEngine
         {
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customDir = customDir;
-            this.customSource = customSource;
-            this.customTarget = customTarget;
+            this.customSource = inputPair.Source;
+            this.customTarget = inputPair.Target;
             this.customLabel = customLabel;
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
-            this.inDomainValidationSource = inDomainValidationSource;
-            this.inDomainValidationTarget = inDomainValidationTarget;
+            this.inDomainValidationSource = indomainValidPair.Source;
+            this.inDomainValidationTarget = indomainValidPair.Target;
             this.sourceCode = model.SourceLanguageString;
             this.targetCode = model.TargetLanguageString;
         }

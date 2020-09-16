@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FiskmoMTEngine
@@ -38,6 +39,27 @@ namespace FiskmoMTEngine
         {
             this.Source = new FileInfo(sourcePath);
             this.Target = new FileInfo(targetPath);
+        }
+
+        public ParallelFilePair(List<Tuple<string, string>> biText, string srcPath, string trgPath)
+        {
+            Regex linebreakRegex = new Regex(@"\r\n?|\n");
+            FileInfo srcFile = new FileInfo(srcPath);
+            FileInfo trgFile = new FileInfo(trgPath);
+            using (var srcStream = srcFile.CreateText())
+            using (var trgStream = trgFile.CreateText())
+            {
+                foreach (var pair in biText)
+                {
+                    //Make sure to remove line breaks from the items before writing them, otherwise the line
+                    //breaks can mess marian processing up
+                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1, " "));
+                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2, " "));
+                }
+            }
+
+            this.Source = srcFile;
+            this.Target = trgFile;
         }
 
         public FileInfo Source { get; private set; }

@@ -166,5 +166,17 @@ namespace FiskmoMTEngine {
                 this["OODValidSetSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("train.log")]
+        public string TrainLogName {
+            get {
+                return ((string)(this["TrainLogName"]));
+            }
+            set {
+                this["TrainLogName"] = value;
+            }
+        }
     }
 }

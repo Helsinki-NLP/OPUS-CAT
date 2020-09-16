@@ -53,7 +53,7 @@ namespace FiskmoMTEngine
                 this.marianProcess = null;
             }
         }
-
+        
         internal string Translate(string input)
         {
             if (this.marianProcess == null)
@@ -163,6 +163,38 @@ namespace FiskmoMTEngine
         public MTModel(string modelPath)
         {
             this.ParseModelPath(modelPath);
+        }
+
+        //Indicates whether customization is complete, null value is for noncustomized models
+        public Boolean? IsCustomizationFinished
+        {
+            get
+            {
+                FileInfo trainingLog = 
+                    new FileInfo(Path.Combine(
+                        this.ModelPath,
+                        FiskmoMTEngineSettings.Default.TrainLogName));
+
+                if (trainingLog.Exists)
+                {
+                    using (var reader = trainingLog.OpenText())
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            if (line.EndsWith("Training finished"))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
         }
 
         public string SourceLanguageString
