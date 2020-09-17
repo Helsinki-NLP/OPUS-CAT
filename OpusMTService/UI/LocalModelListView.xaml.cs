@@ -15,7 +15,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FiskmoMTEngine
 {
@@ -79,7 +78,24 @@ namespace FiskmoMTEngine
 
         private void LbTodoList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //Some buttons are dependent on the choice of model
+        }
 
+        
+        
+
+        private void btnContinueCustomization_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            selectedModel.ResumeTraining();
+        }
+
+
+        private void btnCustomizationProgress_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            CustomizationProgressWindow customizationProgressWindow = new CustomizationProgressWindow(selectedModel);
+            customizationProgressWindow.Show();
         }
 
         private void btnTranslateWithModel_Click(object sender, RoutedEventArgs e)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity.Migrations.History;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +10,9 @@ using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using YamlDotNet.Serialization;
 
 namespace FiskmoMTEngine
@@ -18,7 +21,31 @@ namespace FiskmoMTEngine
     public enum MTModelStatus
     {
         OK,
-        Customizing
+        Customizing,
+        Customization_suspended
+    }
+
+    public class EnumToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            string EnumString;
+            try
+            {
+                EnumString = Enum.GetName((value.GetType()), value);
+                return Regex.Replace(EnumString,"_"," ");
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        // No need to implement converting back on a one-way binding 
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public enum TagMethod
@@ -53,7 +80,7 @@ namespace FiskmoMTEngine
                 this.marianProcess = null;
             }
         }
-        
+
         internal string Translate(string input)
         {
             if (this.marianProcess == null)
@@ -72,7 +99,39 @@ namespace FiskmoMTEngine
         public List<string> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
-        
+
+        internal void ResumeTraining()
+        {
+            FileInfo customizationConfig =
+                new FileInfo(Path.Combine(
+                    this.InstallDir,
+                    FiskmoMTEngineSettings.Default.CustomizationBaseConfig));
+            var trainingArgs = $"--config {customizationConfig.FullName} --log-level=info --quiet";
+
+            var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir, "marian.exe"),
+                trainingArgs,
+                exitHandler);
+
+            this.FinetuneProcess = trainProcess;
+
+            this.Status = MTModelStatus.Customizing;
+
+            NotifyPropertyChanged("IsCustomizationSuspended");
+        }
+
+        private void exitHandler(object sender, EventArgs e)
+        {
+            if (this.IsCustomizationSuspended.Value)
+            {
+                this.Status = MTModelStatus.Customization_suspended;
+            }
+            else
+            {
+                this.Status = MTModelStatus.OK;
+            }
+        }
+
         public List<string> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
 
         public string Name { get => name; set => name = value; }
@@ -95,7 +154,6 @@ namespace FiskmoMTEngine
             this.InstallDir = installDir;
             this.ParseModelPath(modelPath);
 
-
             var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
             if (File.Exists(modelConfigPath))
             {
@@ -103,6 +161,16 @@ namespace FiskmoMTEngine
                 using (var reader = new StreamReader(modelConfigPath))
                 {
                     this.ModelConfig = deserializer.Deserialize<MTModelConfig>(reader);
+                }
+
+                //Check if the model finetuning has been suspended (because the MT engine has been closed,
+                //or there's been an error)
+                if (this.ModelConfig.Finetuned)
+                {
+                    if (this.IsCustomizationSuspended.Value)
+                    {
+                        this.Status = MTModelStatus.Customization_suspended;
+                    }
                 }
             }
             else
@@ -128,7 +196,7 @@ namespace FiskmoMTEngine
         {
             this.SaveModelConfig();
         }
-
+        
         private void ParseModelPath(string modelPath)
         {
             char separator;
@@ -148,16 +216,31 @@ namespace FiskmoMTEngine
             this.ModelPath = modelPath;
         }
 
-        public MTModel(string name, string modelPath, string sourceCode, string targetCode, MTModelStatus status, string modelTag, DirectoryInfo customDir)
+        //This is mainly for creating finetuned models, hence the process argument (which holds the fine tuning process)
+        public MTModel(
+            string name, 
+            string modelPath, 
+            string sourceCode, 
+            string targetCode, 
+            MTModelStatus status, 
+            string modelTag, 
+            DirectoryInfo customDir,
+            Process finetuneProcess)
         {
             this.Name = name;
             this.SourceLanguages = new List<string>() { sourceCode };
             this.TargetLanguages = new List<string>() { targetCode };
             this.Status = status;
+            this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
             this.ModelConfig.ModelTags.Add(modelTag);
-            this.ModelPath = modelPath;
+            if (status == MTModelStatus.Customizing)
+            {
+                this.ModelConfig.Finetuned = true;
+            }
             this.InstallDir = customDir.FullName;
+            this.ModelPath = modelPath;
+            this.SaveModelConfig();
         }
 
         public MTModel(string modelPath)
@@ -165,34 +248,64 @@ namespace FiskmoMTEngine
             this.ParseModelPath(modelPath);
         }
 
-        //Indicates whether customization is complete, null value is for noncustomized models
-        public Boolean? IsCustomizationFinished
+        public Boolean IsReady
         {
             get
             {
-                FileInfo trainingLog = 
-                    new FileInfo(Path.Combine(
-                        this.ModelPath,
-                        FiskmoMTEngineSettings.Default.TrainLogName));
-
-                if (trainingLog.Exists)
+                if (this.IsCustomizationSuspended == null)
                 {
-                    using (var reader = trainingLog.OpenText())
-                    {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            if (line.EndsWith("Training finished"))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
+                    return true;
                 }
                 else
                 {
-                    return true;
+                    return !this.IsCustomizationSuspended.Value;
+                }
+            }
+        }
+
+        //Indicates whether customization has been suspended, null value is for noncustomized models
+        public Boolean? IsCustomizationSuspended
+        {
+            get
+            {
+                if (!this.ModelConfig.Finetuned)
+                {
+                    return null;
+                }
+
+                if (this.FinetuneProcess == null || this.FinetuneProcess.HasExited)
+                {
+                    //Parse train.log to determine whether training is done
+                    FileInfo trainingLog = new FileInfo(
+                        Path.Combine(
+                            this.InstallDir,
+                            FiskmoMTEngineSettings.Default.TrainLogName));
+
+                    if (trainingLog.Exists)
+                    {
+                        using (var reader = trainingLog.OpenText())
+                        {
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                if (line.EndsWith("Training finished"))
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        //If there's no process and no train.log, this indicates that customization
+                        //has failed before the training has started
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
         }
@@ -212,6 +325,7 @@ namespace FiskmoMTEngine
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
 
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
+        public Process FinetuneProcess { get; private set; }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;

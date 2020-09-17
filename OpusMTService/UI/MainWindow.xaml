@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FiskmoMTEngine"
         mc:Ignorable="d"
-        Title="Fiskmö MT service" Height="500" Width="800" Icon="fiskmo_zIQ_icon.ico"
+        Title="Fiskmö MT service" Height="500" Width="1000" Icon="fiskmo_zIQ_icon.ico"
         Name="FiskmoWindow"
         Closing="Window_Closing">
     <Window.Resources>

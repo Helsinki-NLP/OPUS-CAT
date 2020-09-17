@@ -157,7 +157,15 @@ namespace FiskmoMTEngine
                 while ((line = rawFile.ReadLine()) != null)
                 {
                     var preprocessedLine = MarianHelper.PreprocessLine(line, languageCode, includePlaceholderTags, includeTagPairs);
-                    preprocessedWriter.WriteLine(preprocessedLine);
+                    if (rawFile.Peek() != -1)
+                    {
+                        preprocessedWriter.WriteLine(preprocessedLine);
+                    }
+                    else
+                    {
+                        preprocessedWriter.Write(preprocessedLine);
+                    }
+                    
                 }
             }
 

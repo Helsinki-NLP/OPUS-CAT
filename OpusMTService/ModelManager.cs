@@ -428,7 +428,7 @@ namespace FiskmoMTEngine
                 customDir
                 );
 
-            customizer.Customize(
+            var trainProcess = customizer.Customize(
                 (x, y) => TrainProcess_Exited(
                     x, y,
                     customDir,
@@ -444,7 +444,15 @@ namespace FiskmoMTEngine
             //Add an entry for an incomplete model to the model list
             var modelPath = Regex.Match(customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
             Application.Current.Dispatcher.Invoke(() =>
-                this.LocalModels.Add(new MTModel($"{baseModel.Name}_{modelTag}", modelPath, srcLangCode, trgLangCode, MTModelStatus.Customizing, modelTag, customDir)));
+                this.LocalModels.Add(new MTModel(
+                    $"{baseModel.Name}_{modelTag}", 
+                    modelPath, 
+                    srcLangCode, 
+                    trgLangCode, 
+                    MTModelStatus.Customizing,
+                    modelTag,
+                    customDir,
+                    trainProcess)));
         }
 
         private void TrainProcess_Exited(

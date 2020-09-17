@@ -35,8 +35,9 @@ namespace FiskmoMTEngine
         private bool includeTagPairs;
 
         [YamlMember(Alias = "finetuned", ApplyNamingConventions = false)]
-        public bool Finetuned { get => finetuned; set => finetuned = value; }
+        public bool Finetuned { get => finetuned; set { finetuned = value; NotifyPropertyChanged(); } }
         private bool finetuned;
+
         public MTModelConfig()
         {
             this.ModelTags = new ObservableCollection<string>();

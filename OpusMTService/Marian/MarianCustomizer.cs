@@ -46,7 +46,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        public void Customize(EventHandler exitHandler)
+        public Process Customize(EventHandler exitHandler)
         {
             //First copy the model to new dir
             try
@@ -56,7 +56,7 @@ namespace FiskmoMTEngine
             catch (Exception ex)
             {
                 Log.Information($"Customization failed: {ex.Message}");
-                return;
+                return null;
             }
             //Preprocess input files
             this.PreprocessInput();
@@ -135,6 +135,8 @@ namespace FiskmoMTEngine
             {
                 trainProcess.Exited += exitHandler;
             }
+
+            return trainProcess;
         }
 
         private void PreprocessInput()
