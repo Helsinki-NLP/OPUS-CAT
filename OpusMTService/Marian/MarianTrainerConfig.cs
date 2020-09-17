@@ -46,7 +46,12 @@ namespace FiskmoMTEngine
         [YamlMember(Alias = "after-batches", ApplyNamingConventions = false)]
         public string afterBatches { get; set; }
 
+        [YamlMember(Alias = "early-stopping", ApplyNamingConventions = false)]
+        public string earlyStopping { get; set; }
+
         public string workspace { get; set; }
+
+        public string normalize { get; set; }
 
         [YamlMember(Alias = "gradient-checkpointing", ApplyNamingConventions = false)]
         public string gradientCheckpointing { get; set; }

@@ -17,6 +17,8 @@ namespace FiskmoMTEngine
     class MarianCustomizer
     {
         public DirectoryInfo customDir { get; set; }
+
+        private MTModel model;
         private DirectoryInfo modelDir;
         private FileInfo customSource;
         private FileInfo customTarget;
@@ -58,8 +60,21 @@ namespace FiskmoMTEngine
                 Log.Information($"Customization failed: {ex.Message}");
                 return null;
             }
+            
             //Preprocess input files
             this.PreprocessInput();
+
+            //Do the initial evaluation
+            var initialValidProcess = this.model.TranslateAndEvaluate(
+                this.spValidSource,
+                new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
+                this.spValidTarget,
+                new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
+                FiskmoMTEngineSettings.Default.OODValidSetSize
+                );
+
+            //Wait for the initial valid to finish before starting customization
+            initialValidProcess.WaitForExit();
 
             var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
             var deserializer = new Deserializer();
@@ -107,7 +122,8 @@ namespace FiskmoMTEngine
             trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Validate.bat");
             File.Copy("Validate.bat", trainingConfig.validScriptPath);
 
-            trainingConfig.validScriptArgs = new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};
+            trainingConfig.validScriptArgs = 
+                new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
@@ -127,7 +143,7 @@ namespace FiskmoMTEngine
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config {configPath} --log-level=info --quiet";
-
+            
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(FiskmoMTEngineSettings.Default.MarianDir,"marian.exe"),trainingArgs);
 
@@ -169,6 +185,7 @@ namespace FiskmoMTEngine
             bool includeTagPairs,
             DirectoryInfo customDir)
         {
+            this.model = model;
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customDir = customDir;
             this.customSource = inputPair.Source;

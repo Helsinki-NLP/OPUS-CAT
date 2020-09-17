@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -192,6 +193,34 @@ namespace FiskmoMTEngine
             }
         }
 
+        internal Process TranslateAndEvaluate(
+            FileInfo sourceFile, 
+            FileInfo targetFile, 
+            FileInfo refFile, 
+            FileInfo scoreFile,
+            int outOfDomainSize)
+        {
+            var batchTranslator = new MarianBatchTranslator(
+                this.InstallDir,
+                this.SourceLanguages.Single(),
+                this.TargetLanguages.Single(), false, false);
+            
+            var sourceLines = File.ReadAllLines(sourceFile.FullName);
+            var batchProcess = batchTranslator.BatchTranslate(sourceLines, targetFile, (x, y) => EvaluateTranslation(refFile, outOfDomainSize, x, y));
+            return batchProcess;
+        }
+
+        private void EvaluateTranslation(
+            FileInfo refFile, 
+            int outOfDomainSize, 
+            IEnumerable<string> input, 
+            FileInfo spOutput)
+        {
+            var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                "Validate.bat",
+                $"{refFile.FullName} {outOfDomainSize} {spOutput.FullName}");
+        }
+
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             this.SaveModelConfig();
@@ -332,13 +361,14 @@ namespace FiskmoMTEngine
 
         internal Process PreTranslateBatch(List<string> input)
         {
+            FileInfo output = new FileInfo(Path.Combine(this.InstallDir, "batchoutput.txt"));
             var batchTranslator = new MarianBatchTranslator(
                 this.InstallDir, 
                 this.SourceLanguageString, 
                 this.TargetLanguageString, 
                 this.modelConfig.IncludePlaceholderTags,
                 this.modelConfig.IncludeTagPairs);
-            return batchTranslator.BatchTranslate(input);
+            return batchTranslator.BatchTranslate(input,output);
         }
     }
 }

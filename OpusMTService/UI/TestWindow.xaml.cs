@@ -100,39 +100,38 @@ namespace FiskmoMTEngine
             var sourceLines = File.ReadAllLines(this.SourceFileBox.Text);
             var translationFile = new FileInfo(this.TargetFileBox.Text);
             var refFile = new FileInfo(this.RefFileBox.Text);
-            batchTranslator.BatchTranslate(sourceLines, (x,y) => EvaluateTranslation(translationFile,refFile,x,y));
-            
+            batchTranslator.BatchTranslate(sourceLines, translationFile, (x,y) => EvaluateTranslation(refFile,x,y));
         }
         
-        private void EvaluateTranslation(FileInfo translationFile, FileInfo refFile, IEnumerable<string> input, FileInfo spOutput)
+        private void EvaluateTranslation(FileInfo refFile, IEnumerable<string> input, FileInfo spOutput)
         {
 
             Log.Information($"Batch translation process for model {this.model} exited. Evaluating output against reference translation.");
             //Queue<string> inputQueue
             //    = new Queue<string>(input);
-            
+
+            var detokOutput = new FileInfo($"{spOutput.FullName}.detok");
+
             if (spOutput.Exists)
             {
                 using (var reader = spOutput.OpenText())
-                using (var writer = translationFile.CreateText())
+                using (var writer = detokOutput.CreateText())
                 {
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
                         var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
-                        //var sourceLine = inputQueue.Dequeue();
                         writer.WriteLine(nonSpLine);
                     }
                 }
             }
 
-            var evaluationScoreFilePath = translationFile.FullName + ".score.txt";
+            var evaluationScoreFilePath = detokOutput.FullName + ".score.txt";
 
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 "Evaluate.bat",
-                $"{translationFile.FullName} {refFile.FullName} {evaluationScoreFilePath}",
+                $"{detokOutput.FullName} {refFile.FullName} {evaluationScoreFilePath}",
                 (x,y) => this.DisplayResult(evaluationScoreFilePath));
-            
         }
 
         private void DisplayResult(string evaluationScoreFilePath)

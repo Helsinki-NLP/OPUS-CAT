@@ -68,15 +68,16 @@ namespace FiskmoMTEngine
         }
         
         //Callback can be used to do different things with translation output/input (default is to save in translation cache)
-        internal Process BatchTranslate(IEnumerable<string> input, Action<IEnumerable<string>, FileInfo> callBack=null)
+        internal Process BatchTranslate(
+            IEnumerable<string> input,
+            FileInfo spOutput,
+            Action<IEnumerable<string>, FileInfo> callBack=null)
         {
             Log.Information($"Starting batch translator for model {this.SystemName}.");
             
             var cmd = "TranslateBatchSentencePiece.bat";
                         
             FileInfo spInput = this.PreprocessInput(input);
-            FileInfo spOutput = new FileInfo(
-                spInput.FullName.Replace($".{SourceCode}", $".{TargetCode}"));
             
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for

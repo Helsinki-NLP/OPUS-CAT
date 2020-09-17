@@ -70,11 +70,11 @@ namespace FiskmoMTEngine
 
             this.SeriesCollection = new SeriesCollection();
 
-            var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x));
+            var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
             var inDomainSeries = this.ScoresToSeries(inDomainFiles, "In-domain");
             this.SeriesCollection.Add(inDomainSeries);
 
-            var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x));
+            var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
             var outOfDomainSeries = this.ScoresToSeries(outOfDomainFiles, "Out-of-domain");
             this.SeriesCollection.Add(outOfDomainSeries);
 
