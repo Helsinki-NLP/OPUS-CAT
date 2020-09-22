@@ -124,6 +124,7 @@
     <Compile Include="Marian\MarianDecoderConfig.cs" />
     <Compile Include="Preprocessing\ParallelFilePair.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
+    <Compile Include="UI\Common.cs" />
     <Compile Include="UI\ModelCustomizerWindow.xaml.cs">
       <DependentUpon>ModelCustomizerWindow.xaml</DependentUpon>
     </Compile>

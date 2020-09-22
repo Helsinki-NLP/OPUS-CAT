@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 
 REM switch to script dir, should be custom model dir
 REM cd /D "%~dp0"
@@ -54,6 +54,9 @@ EXIT /B %ERRORLEVEL%
         set /a file=!line!/%nLines%
 		if !line! LEQ !nLines! (set /a line+=1)
 		set "linecontent=%%a"
+		set "linecontent=!linecontent: =!"
+        set "linecontent=!linecontent:▁= !"
+
         for %%b in (!file!) do (   
             >>"%~1_%%b.txt" echo(!linecontent:*:=!
         )

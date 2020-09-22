@@ -59,10 +59,31 @@ namespace FiskmoMTEngine
 
         private string modelTag;
 
+        public string SourceFile { get => sourceFile; set { sourceFile = value; NotifyPropertyChanged(); } }
+ 
+        private string sourceFile;
+
+        public string ValidSourceFile { get => validSourceFile; set { validSourceFile = value; NotifyPropertyChanged(); } }
+
+        private string validSourceFile;
+
+        public string TargetFile { get => targetFile; set { targetFile = value; NotifyPropertyChanged(); } }
+
+        private string targetFile;
+
+        public string TmxFile { get => tmxFile; set { tmxFile = value; NotifyPropertyChanged(); } }
+
+        private string tmxFile;
+
+        public string ValidTargetFile { get => validTargetFile; set { validTargetFile = value; NotifyPropertyChanged(); } }
+
+        private string validTargetFile;
+
         private string Validate(string propertyName)
         {
             // Return error message if there is error on else return empty or null string
             string validationMessage = string.Empty;
+            
             switch (propertyName)
             {
                 case "ModelTag":
@@ -84,6 +105,7 @@ namespace FiskmoMTEngine
                             {
                                 validationMessage = "Model tag is already in use for this base model";
                             }
+
                         }
                         catch (Exception ex)
                         {
@@ -92,11 +114,35 @@ namespace FiskmoMTEngine
                     }
 
                     break;
+                case "ValidSourceFile":
+                    validationMessage = ValidateFilePath(this.ValidSourceFile);
+                    break;
+                case "ValidTargetFile":
+                    validationMessage = ValidateFilePath(this.ValidTargetFile);
+                    break;
+                case "SourceFile":
+                    validationMessage = ValidateFilePath(this.SourceFile);
+                    break;
+                case "TargetFile":
+                    validationMessage = ValidateFilePath(this.TargetFile);
+                    break;
+                case "TmxFile":
+                    validationMessage = ValidateFilePath(this.TmxFile);
+                    break;
             }
-
+            
             return validationMessage;
         }
 
+        private string ValidateFilePath(string filePath)
+        {
+            string validationMessage = String.Empty;
+            if (filePath == null || !File.Exists(filePath))
+            {
+                validationMessage = "File does not exist.";
+            }
+            return validationMessage;
+        }
 
         public ModelCustomizerWindow(MTModel selectedModel)
         {
@@ -104,6 +150,7 @@ namespace FiskmoMTEngine
             this.Title = $"Customize model {this.selectedModel.Name}";
             InitializeComponent();
         }
+ 
         
 
         private void CloseCommandHandler(object sender, ExecutedRoutedEventArgs e)
@@ -167,6 +214,26 @@ namespace FiskmoMTEngine
         enum InputFileType { TxtFile, TmxFile};
         private InputFileType inputType;
 
+        enum ValidationFileType { Split, Separate };
+        private ValidationFileType validationFileType;
+
+        private void ValidationFileTypeButton_Checked(object sender, RoutedEventArgs e)
+        {
+            var radioButton = ((RadioButton)sender);
+            if (radioButton.IsChecked.Value)
+            {
+                switch (radioButton.Name)
+                {
+                    case "SeparateValidationFiles":
+                        this.validationFileType = ValidationFileType.Split;
+                        break;
+                    case "SplitValidationFiles":
+                        this.validationFileType = ValidationFileType.Separate;
+                        break;
+                }
+            }
+        }
+
         private void ModeButton_Checked(object sender, RoutedEventArgs e)
         {
             var radioButton = ((RadioButton)sender);
@@ -181,7 +248,7 @@ namespace FiskmoMTEngine
                         this.inputType = InputFileType.TmxFile;
                         break;
                 }
-                
+
             }
         }
     }
