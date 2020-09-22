@@ -59,23 +59,23 @@ namespace FiskmoMTEngine
 
         private string modelTag;
 
-        public string SourceFile { get => sourceFile; set { sourceFile = value; NotifyPropertyChanged(); } }
+        public string SourceFile { get => sourceFile; set { sourceFile = value.Trim('"'); NotifyPropertyChanged(); } }
  
         private string sourceFile;
 
-        public string ValidSourceFile { get => validSourceFile; set { validSourceFile = value; NotifyPropertyChanged(); } }
+        public string ValidSourceFile { get => validSourceFile; set { validSourceFile = value.Trim('"'); NotifyPropertyChanged(); } }
 
         private string validSourceFile;
 
-        public string TargetFile { get => targetFile; set { targetFile = value; NotifyPropertyChanged(); } }
+        public string TargetFile { get => targetFile; set { targetFile = value.Trim('"'); NotifyPropertyChanged(); } }
 
         private string targetFile;
 
-        public string TmxFile { get => tmxFile; set { tmxFile = value; NotifyPropertyChanged(); } }
+        public string TmxFile { get => tmxFile; set { tmxFile = value.Trim('"'); NotifyPropertyChanged(); } }
 
         private string tmxFile;
 
-        public string ValidTargetFile { get => validTargetFile; set { validTargetFile = value; NotifyPropertyChanged(); } }
+        public string ValidTargetFile { get => validTargetFile; set { validTargetFile = value.Trim('"'); NotifyPropertyChanged(); } }
 
         private string validTargetFile;
 
@@ -232,6 +232,7 @@ namespace FiskmoMTEngine
                         break;
                 }
             }
+            
         }
 
         private void ModeButton_Checked(object sender, RoutedEventArgs e)
@@ -250,6 +251,15 @@ namespace FiskmoMTEngine
                 }
 
             }
+        }
+
+        private void ReValidate(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged("ValidSourceFile");
+            NotifyPropertyChanged("TmxFile");
+            NotifyPropertyChanged("ValidTargetFile");
+            NotifyPropertyChanged("SourceFile");
+            NotifyPropertyChanged("TargetFile");
         }
     }
 }

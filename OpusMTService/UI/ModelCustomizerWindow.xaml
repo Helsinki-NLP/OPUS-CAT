@@ -13,7 +13,7 @@
     </Window.CommandBindings>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <local:BooleanAndConverter x:Key="BoolAnd" />
+        <local:ValidationErrorConverter x:Key="ValidationErrorConverter" />
         <Style x:Key="StackStyle" TargetType="StackPanel">
             <Setter Property="Margin" Value="0,0,0,15"/>
         </Style>
@@ -61,17 +61,17 @@
                         <RadioButton Name="TxtFiles" Checked="ModeButton_Checked" GroupName="Format">Text (separate files for source and target)</RadioButton>
                         <!--<RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Format">Batch translate only</RadioButton>-->
                     </StackPanel>
-                    <StackPanel IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
+                    <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
                         <Label>Source file</Label>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="SourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=SourceFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button DataContext="{Binding ElementName=SourceFileBox}" Click="browse_Click">Browse</Button>
                     </StackPanel>
-                    <StackPanel IsEnabled="{Binding IsChecked,ElementName=TmxFiles}" Visibility="{Binding IsChecked,ElementName=TmxFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
+                    <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TmxFiles}" Visibility="{Binding IsChecked,ElementName=TmxFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
                         <Label>Tmx file</Label>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TmxFileBox" Width="400" Text="{Binding ElementName=_this,Path=TmxFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button DataContext="{Binding ElementName=TmxFileBox}" Click="browse_Click">Browse</Button>
                     </StackPanel>
-                    <StackPanel IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
+                    <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
                         <Label>Target file</Label>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=TargetFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>
@@ -98,12 +98,12 @@
                         <RadioButton IsChecked="True" Name="SplitValidationFiles" Checked="ValidationFileTypeButton_Checked" GroupName="ValidationType">Split validation files from the training files</RadioButton>
                         <RadioButton Name="SeparateValidationFiles" Checked="ValidationFileTypeButton_Checked" GroupName="ValidationType">Select separate files</RadioButton>
                     </StackPanel>
-                    <StackPanel IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
+                    <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
                         <Label>Validation source file</Label>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="ValidSourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidSourceFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button DataContext="{Binding ElementName=ValidSourceFileBox}" Click="browse_Click">Browse</Button>
                     </StackPanel>
-                    <StackPanel IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
+                    <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
                         <Label>Validation target file</Label>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="ValidTargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidTargetFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button DataContext="{Binding ElementName=ValidTargetFileBox}" Click="browse_Click">Browse</Button>
@@ -119,13 +119,13 @@
             <Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>
             <Button Name="CustomizeButton" DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Click="customize_Click">
                 <Button.IsEnabled>
-                    <MultiBinding Converter="{StaticResource BoolAnd}" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
-                        <Binding ElementName="LabelBox" Path="(Validation.Errors)[0].ErrorContent" />
-                        <Binding ElementName="SourceFileBox" Path="(Validation.Errors)[0].ErrorContent" />
-                        <Binding ElementName="TargetFileBox" Path="(Validation.Errors)[0].ErrorContent" />
-                        <Binding ElementName="ValidSourceFileBox" Path="(Validation.Errors)[0].ErrorContent" />
-                        <Binding ElementName="ValidTargetFileBox" Path="(Validation.Errors)[0].ErrorContent" />
-                        <Binding ElementName="TmxFileBox" Path="(Validation.Errors)[0].ErrorContent" />
+                    <MultiBinding Converter="{StaticResource ValidationErrorConverter}" Mode="TwoWay">
+                        <Binding ElementName="LabelBox" Path="(Validation.Errors)[0]"/>
+                        <Binding ElementName="SourceFileBox" Path="(Validation.Errors)[0]"/>
+                        <Binding ElementName="TargetFileBox" Path="(Validation.Errors)[0]"/>
+                        <Binding ElementName="ValidSourceFileBox" Path="(Validation.Errors)[0]" />
+                        <Binding ElementName="ValidTargetFileBox" Path="(Validation.Errors)[0]" />
+                        <Binding ElementName="TmxFileBox" Path="(Validation.Errors)[0]"/>
                     </MultiBinding>
                 </Button.IsEnabled>
                 Customize
