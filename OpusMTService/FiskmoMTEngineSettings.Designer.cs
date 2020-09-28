@@ -178,5 +178,17 @@ namespace FiskmoMTEngine {
                 this["TrainLogName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int IDValidSetSize {
+            get {
+                return ((int)(this["IDValidSetSize"]));
+            }
+            set {
+                this["IDValidSetSize"] = value;
+            }
+        }
     }
 }

@@ -100,7 +100,7 @@ namespace FiskmoMTEngine
             var sourceLines = File.ReadAllLines(this.SourceFileBox.Text);
             var translationFile = new FileInfo(this.TargetFileBox.Text);
             var refFile = new FileInfo(this.RefFileBox.Text);
-            batchTranslator.BatchTranslate(sourceLines, translationFile, (x,y) => EvaluateTranslation(refFile,x,y));
+            batchTranslator.BatchTranslate(sourceLines, translationFile, (x) => EvaluateTranslation(refFile,sourceLines,x));
         }
         
         private void EvaluateTranslation(FileInfo refFile, IEnumerable<string> input, FileInfo spOutput)

@@ -71,13 +71,14 @@ namespace FiskmoMTEngine
         internal Process BatchTranslate(
             IEnumerable<string> input,
             FileInfo spOutput,
-            Action<IEnumerable<string>, FileInfo> callBack=null)
+            Action<FileInfo> callBack=null,
+            Boolean preprocessedInput=false)
         {
             Log.Information($"Starting batch translator for model {this.SystemName}.");
             
             var cmd = "TranslateBatchSentencePiece.bat";
                         
-            FileInfo spInput = this.PreprocessInput(input);
+            FileInfo spInput = this.PreprocessInput(input,preprocessedInput);
             
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for
@@ -88,7 +89,7 @@ namespace FiskmoMTEngine
             EventHandler exitHandler;
             if (callBack != null)
             {
-                exitHandler = (x, y) => callBack(input, spOutput);
+                exitHandler = (x, y) => callBack(spOutput);
             }
             else
             {
@@ -122,7 +123,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        private FileInfo PreprocessInput(IEnumerable<string> input)
+        internal FileInfo PreprocessInput(IEnumerable<string> input, Boolean preprocessedInput=false)
         {
             var fileGuid = Guid.NewGuid();
             var srcFile = new FileInfo(Path.Combine(Path.GetTempPath(), $"{fileGuid}.{this.SourceCode}"));
@@ -135,8 +136,16 @@ namespace FiskmoMTEngine
                 }
             }
 
-            var spmModel = this.modelDir.GetFiles("source.spm").Single();
-            var spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.includePlaceholderTags, this.includeTagPairs);
+            FileInfo spSrcFile;
+            if (preprocessedInput)
+            {
+                var spmModel = this.modelDir.GetFiles("source.spm").Single();
+                spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.includePlaceholderTags, this.includeTagPairs);
+            }
+            else
+            {
+                spSrcFile = srcFile;
+            }
             return spSrcFile;
         }
 

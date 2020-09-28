@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -36,7 +37,8 @@ namespace FiskmoMTEngine
 
         internal static ParallelFilePair GetTatoebaFileInfos(string sourceCode, string targetCode)
         {
-            var testsets = Directory.GetDirectories(FiskmoMTEngineSettings.Default.TatoebaDir);
+            var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var testsets = Directory.GetDirectories(Path.Combine(processDir,FiskmoMTEngineSettings.Default.TatoebaDir));            
             var testsetDir = testsets.Single(
                 x => x.EndsWith($"{sourceCode}-{targetCode}") || x.EndsWith($"{targetCode}-{sourceCode}"));
             var source = Directory.GetFiles(testsetDir, $"tatoeba.{sourceCode}.txt").Select(x => new FileInfo(x)).Single();
@@ -65,6 +67,61 @@ namespace FiskmoMTEngine
             }
 
             return combinedFile;
+        }
+
+        //Split a file pair into two randomly (used for separating a validation set from training set)
+        internal static (ParallelFilePair pair1, ParallelFilePair pair2) SplitFilePair(ParallelFilePair filePair, int pair2Size)
+        {
+            //First need to get the linecount of the file pair
+            var lines = 0;
+            using (var reader = filePair.Source.OpenText())
+            {
+                while (reader.ReadLine() != null)
+                {
+                    lines++;
+                }
+            }
+
+            ParallelFilePair pair1 = 
+                new ParallelFilePair(
+                    $"{filePair.Source.DirectoryName}{Path.DirectorySeparatorChar}split1.{filePair.Source.Name}",
+                    $"{filePair.Target.DirectoryName}{Path.DirectorySeparatorChar}split1.{filePair.Target.Name}");
+            ParallelFilePair pair2 =
+                new ParallelFilePair(
+                    $"{filePair.Source.DirectoryName}{Path.DirectorySeparatorChar}split2.{filePair.Source.Name}",
+                    $"{filePair.Target.DirectoryName}{Path.DirectorySeparatorChar}split2.{filePair.Target.Name}");
+
+            var nthLine = lines / pair2Size;
+
+            var writtenLines = 0;
+            string sourceLine, targetLine;
+            using (var sourcereader = filePair.Source.OpenText())
+            using (var sourcewriter1 = pair1.Source.CreateText())
+            using (var sourcewriter2 = pair2.Source.CreateText())
+            using (var targetreader = filePair.Target.OpenText())
+            using (var targetwriter1 = pair1.Target.CreateText())
+            using (var targetwriter2 = pair2.Target.CreateText())
+            {
+                while
+                    (((sourceLine = sourcereader.ReadLine()) != null) &&
+                    ((targetLine = targetreader.ReadLine()) != null))
+                {
+                    if (writtenLines % nthLine == 0)
+                    {
+                        sourcewriter2.WriteLine(sourceLine);
+                        targetwriter2.WriteLine(targetLine);
+                    }
+                    else
+                    {
+                        sourcewriter1.WriteLine(sourceLine);
+                        targetwriter1.WriteLine(targetLine);
+                    }
+                    writtenLines++;
+                }
+            }
+
+            return (pair1, pair2);
+
         }
     }
 }

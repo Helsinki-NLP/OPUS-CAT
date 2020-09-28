@@ -412,7 +412,20 @@ namespace FiskmoMTEngine
         {
 
             Log.Information($"Customizing a new model with model tag {modelTag} from base model {baseModel.Name}.");
-            
+            //Add an entry for an incomplete model to the model list
+            var modelPath = Regex.Match(customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
+            var incompleteModel = new MTModel(
+                    $"{baseModel.Name}_{modelTag}",
+                    modelPath,
+                    srcLangCode,
+                    trgLangCode,
+                    MTModelStatus.Customizing,
+                    modelTag,
+                    customDir,
+                    null);
+
+            Application.Current.Dispatcher.Invoke(() =>
+                this.LocalModels.Add(incompleteModel));
 
             //Note that this does not currently remove the temp files, should
             //add an event for that in the Marian process startup code
@@ -439,11 +452,16 @@ namespace FiskmoMTEngine
                     includePlaceholderTags,
                     includeTagPairs));
 
+            //Add process to model and save its config (the directory exists at this point, 
+            //so config can be saved).
+            incompleteModel.FinetuneProcess = trainProcess;
+            incompleteModel.SaveModelConfig();
+
             this.CustomizationOngoing = true;
 
             //Add an entry for an incomplete model to the model list
-            var modelPath = Regex.Match(customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
-            Application.Current.Dispatcher.Invoke(() =>
+            
+            /*Application.Current.Dispatcher.Invoke(() =>
                 this.LocalModels.Add(new MTModel(
                     $"{baseModel.Name}_{modelTag}", 
                     modelPath, 
@@ -452,7 +470,7 @@ namespace FiskmoMTEngine
                     MTModelStatus.Customizing,
                     modelTag,
                     customDir,
-                    trainProcess)));
+                    trainProcess)));*/
         }
 
         private void TrainProcess_Exited(

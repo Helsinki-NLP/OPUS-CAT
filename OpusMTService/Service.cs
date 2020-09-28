@@ -38,7 +38,7 @@ namespace FiskmoMTEngine
             // If not, add one
             if (smb == null)
                 smb = new ServiceMetadataBehavior();
-            smb.HttpGetEnabled = true;
+            //smb.HttpGetEnabled = true;
             smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
             selfHost.Description.Behaviors.Add(smb);
             // Add MEX endpoint

@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 
 REM switch to script dir, should be custom model dir
 REM cd /D "%~dp0"
@@ -54,11 +54,13 @@ EXIT /B %ERRORLEVEL%
         set /a file=!line!/%nLines%
 		if !line! LEQ !nLines! (set /a line+=1)
 		set "linecontent=%%a"
+		REM Remove spaces between sentencepiece tokens
 		set "linecontent=!linecontent: =!"
+		REM Conver sentencepiece space marker into actual space
         set "linecontent=!linecontent:▁= !"
-
-        for %%b in (!file!) do (   
-            >>"%~1_%%b.txt" echo(!linecontent:*:=!
+		REM The space after colon removes the leading space left after sentencepiece detok
+		for %%b in (!file!) do (   
+            >>"%~1_%%b.txt" echo(!linecontent:*: =!
         )
     )
 

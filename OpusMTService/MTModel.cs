@@ -183,13 +183,18 @@ namespace FiskmoMTEngine
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
-        private void SaveModelConfig()
+        internal void SaveModelConfig()
         {
-            var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
-            var serializer = new Serializer();
-            using (var writer = File.CreateText(modelConfigPath))
+            //The directory might not exists yet in case of customized models (i.e. copying of the base model
+            //is not complete)
+            if (Directory.Exists(this.InstallDir))
             {
-                serializer.Serialize(writer, this.ModelConfig, typeof(MTModelConfig));
+                var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
+                var serializer = new Serializer();
+                using (var writer = File.CreateText(modelConfigPath))
+                {
+                    serializer.Serialize(writer, this.ModelConfig, typeof(MTModelConfig));
+                }
             }
         }
 
@@ -198,22 +203,23 @@ namespace FiskmoMTEngine
             FileInfo targetFile, 
             FileInfo refFile, 
             FileInfo scoreFile,
-            int outOfDomainSize)
+            int outOfDomainSize,
+            Boolean preprocessedInput=false)
         {
             var batchTranslator = new MarianBatchTranslator(
                 this.InstallDir,
                 this.SourceLanguages.Single(),
                 this.TargetLanguages.Single(), false, false);
-            
+
             var sourceLines = File.ReadAllLines(sourceFile.FullName);
-            var batchProcess = batchTranslator.BatchTranslate(sourceLines, targetFile, (x, y) => EvaluateTranslation(refFile, outOfDomainSize, x, y));
+            var batchProcess = batchTranslator.BatchTranslate(sourceLines, targetFile, (x) => EvaluateTranslation(refFile, outOfDomainSize, x),preprocessedInput);
+            
             return batchProcess;
         }
 
         private void EvaluateTranslation(
             FileInfo refFile, 
             int outOfDomainSize, 
-            IEnumerable<string> input, 
             FileInfo spOutput)
         {
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
@@ -312,18 +318,26 @@ namespace FiskmoMTEngine
 
                     if (trainingLog.Exists)
                     {
-                        using (var reader = trainingLog.OpenText())
+                        try
                         {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
+                            using (var reader = trainingLog.OpenText())
                             {
-                                if (line.EndsWith("Training finished"))
+                                string line;
+                                while ((line = reader.ReadLine()) != null)
                                 {
-                                    return false;
+                                    if (line.EndsWith("Training finished"))
+                                    {
+                                        return false;
+                                    }
                                 }
                             }
+                            return true;
                         }
-                        return true;
+                        catch (IOException ex)
+                        {
+                            Log.Information($"Train.log for customized system {this.Name} has been locked by another process. The previous training process is probably stil running in the background (wait for it to finish or end it). Exception: {ex.Message}");
+                            return true;
+                        }
                     }
                     else
                     {
@@ -354,7 +368,7 @@ namespace FiskmoMTEngine
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
 
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
-        public Process FinetuneProcess { get; private set; }
+        public Process FinetuneProcess { get; set; }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;

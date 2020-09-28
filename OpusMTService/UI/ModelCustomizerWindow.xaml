@@ -112,12 +112,15 @@
             </Border>
             <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
                 <Label>Custom model label</Label>
-                <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
+                <TextBox IsEnabled="{Binding ElementName=_this,Path=CustomizationNotStarted, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ValidatedTextBoxStyle}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
             </StackPanel>
         </StackPanel>
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
             <Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>
             <Button Name="CustomizeButton" DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Click="customize_Click">
+                <Button.Visibility>
+                    <Binding ElementName="_this" Path="CustomizationNotStarted"  UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource BoolToVis}"/>
+                </Button.Visibility>
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource ValidationErrorConverter}" Mode="TwoWay">
                         <Binding ElementName="LabelBox" Path="(Validation.Errors)[0]"/>

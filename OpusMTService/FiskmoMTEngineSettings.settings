@@ -41,5 +41,8 @@
     <Setting Name="TrainLogName" Type="System.String" Scope="User">
       <Value Profile="(Default)">train.log</Value>
     </Setting>
+    <Setting Name="IDValidSetSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

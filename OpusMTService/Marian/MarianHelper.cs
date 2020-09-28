@@ -146,9 +146,11 @@ namespace FiskmoMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
+            
             var preprocessedFile = new FileInfo(Path.Combine(directory.FullName, $"preprocessed_{languageFile.Name}"));
-            var spFile = new FileInfo(Path.Combine(directory.FullName, $"sp_{languageFile.Name}"));
 
+            //Marian doesn't like spaces in names
+            var spFile = new FileInfo(Path.Combine(directory.FullName, $"sp_{languageFile.Name.Replace(" ", "_")}"));
 
             using (var rawFile = languageFile.OpenText())
             using (var preprocessedWriter = new StreamWriter(preprocessedFile.FullName))
@@ -157,19 +159,11 @@ namespace FiskmoMTEngine
                 while ((line = rawFile.ReadLine()) != null)
                 {
                     var preprocessedLine = MarianHelper.PreprocessLine(line, languageCode, includePlaceholderTags, includeTagPairs);
-                    if (rawFile.Peek() != -1)
-                    {
-                        preprocessedWriter.WriteLine(preprocessedLine);
-                    }
-                    else
-                    {
-                        preprocessedWriter.Write(preprocessedLine);
-                    }
-                    
+                    preprocessedWriter.WriteLine(preprocessedLine);
                 }
             }
 
-            var spArgs = $"{preprocessedFile.FullName} --model {spmModel.FullName} --output {spFile.FullName}";
+            var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{spmModel.FullName}\" --output \"{spFile.FullName}\"";
             var spmProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
             spmProcess.WaitForExit();
             return spFile;

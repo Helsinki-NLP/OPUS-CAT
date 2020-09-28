@@ -1,6 +1,7 @@
 ﻿using LiveCharts;
 using LiveCharts.Wpf;
 using OpusMTInterface;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -47,12 +48,19 @@ namespace FiskmoMTEngine
                         series.Values.Add(score);
                     }
                 }
-                catch (IOException)
+                catch (IOException ex)
                 {
                     //the file is unavailable because it is:
                     //still being written to
                     //or being processed by another thread
                     //or does not exist (has already been processed1,2,3,4,5)
+                    Log.Information($"Error in reading score file {file.Name}: {ex.Message}");
+                }
+                catch (FormatException ex)
+                {
+                    //Parsing the score file content as double may fail (possibly some problem with
+                    //sacrebleu output or execution)
+                    Log.Information($"Error in reading score file {file.Name}: {ex.Message}");
                 }
             }
 

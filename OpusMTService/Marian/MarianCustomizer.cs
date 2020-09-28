@@ -60,7 +60,11 @@ namespace FiskmoMTEngine
                 Log.Information($"Customization failed: {ex.Message}");
                 return null;
             }
-            
+
+            //Copy raw files to model dir
+            this.customSource = this.customSource.CopyTo(Path.Combine(this.customDir.FullName, "custom.source"));
+            this.customTarget= this.customTarget.CopyTo(Path.Combine(this.customDir.FullName, "custom.target"));
+
             //Preprocess input files
             this.PreprocessInput();
 
@@ -70,7 +74,8 @@ namespace FiskmoMTEngine
                 new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
                 this.spValidTarget,
                 new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
-                FiskmoMTEngineSettings.Default.OODValidSetSize
+                FiskmoMTEngineSettings.Default.OODValidSetSize,
+                true
                 );
 
             //Wait for the initial valid to finish before starting customization
@@ -88,10 +93,15 @@ namespace FiskmoMTEngine
                 HelperFunctions.GetLocalAppDataPath(
                     FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
 
+            var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
             //Make sure there's a customization file.
             if (!File.Exists(baseCustomizeYmlPath))
             {
-                File.Copy(FiskmoMTEngineSettings.Default.CustomizationBaseConfig, baseCustomizeYmlPath);
+                
+                File.Copy(
+                    Path.Combine(processDir,FiskmoMTEngineSettings.Default.CustomizationBaseConfig), 
+                    baseCustomizeYmlPath);
             }
 
             //deserialize yaml file
@@ -120,7 +130,8 @@ namespace FiskmoMTEngine
 
             
             trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Validate.bat");
-            File.Copy("Validate.bat", trainingConfig.validScriptPath);
+            File.Copy(
+                Path.Combine(processDir,"Validate.bat"), trainingConfig.validScriptPath);
 
             trainingConfig.validScriptArgs = 
                 new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};

@@ -45,7 +45,7 @@ namespace FiskmoMTEngine
         {
             get { return "...."; }
         }
-        
+
 
         public string ModelTag
         {
@@ -60,7 +60,7 @@ namespace FiskmoMTEngine
         private string modelTag;
 
         public string SourceFile { get => sourceFile; set { sourceFile = value.Trim('"'); NotifyPropertyChanged(); } }
- 
+
         private string sourceFile;
 
         public string ValidSourceFile { get => validSourceFile; set { validSourceFile = value.Trim('"'); NotifyPropertyChanged(); } }
@@ -77,13 +77,24 @@ namespace FiskmoMTEngine
 
         public string ValidTargetFile { get => validTargetFile; set { validTargetFile = value.Trim('"'); NotifyPropertyChanged(); } }
 
+        public bool CustomizationNotStarted
+        {
+            get => _customizationNotStarted;
+            set
+            {
+                _customizationNotStarted = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private string validTargetFile;
+
 
         private string Validate(string propertyName)
         {
             // Return error message if there is error on else return empty or null string
             string validationMessage = string.Empty;
-            
+
             switch (propertyName)
             {
                 case "ModelTag":
@@ -130,7 +141,7 @@ namespace FiskmoMTEngine
                     validationMessage = ValidateFilePath(this.TmxFile);
                     break;
             }
-            
+
             return validationMessage;
         }
 
@@ -146,12 +157,13 @@ namespace FiskmoMTEngine
 
         public ModelCustomizerWindow(MTModel selectedModel)
         {
+            this.CustomizationNotStarted = true;
             this.selectedModel = selectedModel;
             this.Title = $"Customize model {this.selectedModel.Name}";
             InitializeComponent();
         }
- 
-        
+
+
 
         private void CloseCommandHandler(object sender, ExecutedRoutedEventArgs e)
         {
@@ -161,15 +173,16 @@ namespace FiskmoMTEngine
         private void customize_Click(object sender, RoutedEventArgs e)
         {
             ParallelFilePair filePair = null;
+            ParallelFilePair validPair = null;
             switch (this.inputType)
             {
                 case InputFileType.TxtFile:
-                    filePair = new ParallelFilePair(this.SourceFileBox.Text, this.TargetFileBox.Text); 
+                    filePair = new ParallelFilePair(this.SourceFile, this.TargetFile);
                     break;
                 case InputFileType.TmxFile:
                     filePair = TmxToTxtParser.ParseTmxToParallelFiles(
-                        this.SourceFileBox.Text,
-                        this.selectedModel.SourceLanguages.Single(), 
+                        this.TmxFile,
+                        this.selectedModel.SourceLanguages.Single(),
                         this.selectedModel.TargetLanguages.Single(),
                         this.IncludePlaceholderTagsBox.IsChecked.Value,
                         this.IncludeTagPairBox.IsChecked.Value
@@ -179,7 +192,16 @@ namespace FiskmoMTEngine
                     break;
             }
             var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
-            var validPair = new ParallelFilePair(this.ValidSourceFileBox.Text, this.ValidTargetFileBox.Text);
+
+            if (this.SeparateValidationFiles.IsChecked.Value)
+            {
+                validPair = new ParallelFilePair(this.ValidSourceFileBox.Text, this.ValidTargetFileBox.Text);
+            }
+            else
+            {
+                (filePair, validPair) = HelperFunctions.SplitFilePair(filePair, FiskmoMTEngineSettings.Default.IDValidSetSize);
+            }
+
             var modelManager = ((ModelManager)this.DataContext);
 
             modelManager.StartCustomization(
@@ -193,7 +215,8 @@ namespace FiskmoMTEngine
                 this.IncludeTagPairBox.IsChecked.Value,
                 customDir,
                 this.selectedModel);
-                   
+
+            this.CustomizationNotStarted = false;
 
         }
         private void browse_Click(object sender, RoutedEventArgs e)
@@ -201,21 +224,22 @@ namespace FiskmoMTEngine
             var pathBox = (TextBox)((Button)sender).DataContext;
 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            
+
             // Show open file dialog box
             bool? result = dlg.ShowDialog();
 
             if (result == true)
             {
                 pathBox.Text = dlg.FileName;
-            }   
+            }
         }
 
-        enum InputFileType { TxtFile, TmxFile};
+        enum InputFileType { TxtFile, TmxFile };
         private InputFileType inputType;
 
         enum ValidationFileType { Split, Separate };
         private ValidationFileType validationFileType;
+        private bool _customizationNotStarted ;
 
         private void ValidationFileTypeButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -232,7 +256,7 @@ namespace FiskmoMTEngine
                         break;
                 }
             }
-            
+
         }
 
         private void ModeButton_Checked(object sender, RoutedEventArgs e)

@@ -17,33 +17,60 @@ namespace FiskmoMTEngine
             bool includeTagPairs)
         {
             StringBuilder segText = new StringBuilder();
-            foreach (var descendant in seg.DescendantNodes())
+
+            var nodeStack = new Stack<XNode>();
+            nodeStack.Push(seg);
+
+            while (nodeStack.Count > 0)
             {
-                if (descendant is XText)
+                XNode top = nodeStack.Pop();
+
+                if (top is XText)
                 {
-                    segText.Append(descendant);
+                    segText.Append(top);
+                    continue;
                 }
 
-                var descendantElement = descendant as XElement;
-                if (descendantElement != null)
+                var topElement = top as XElement;
+                if (topElement != null)
                 {
-                    if (includeTagPairs)
+                    if (topElement.Name == "bpt")
                     {
-                        if (descendantElement.Name == "bpt")
+                        if (includeTagPairs)
                         {
                             segText.Append(" TAGPAIRSTART ");
                         }
-                        if (descendantElement.Name == "ept")
+                    }
+                    else if (topElement.Name == "ept")
+                    {
+                        if (includeTagPairs)
                         {
                             segText.Append(" TAGPAIREND ");
                         }
                     }
-
-                    if (includePlaceholderTags && descendantElement.Name == "ph")
+                    else if ((topElement.Name == "ph") ||
+                            (topElement.Name == "it") ||
+                            (topElement.Name == "ut"))
                     {
-                        segText.Append(" PLACEHOLDER ");
+                        if (includePlaceholderTags)
+                        {
+                            segText.Append(" PLACEHOLDER ");
+                        }
+                        else
+                        {
+                            //Placeholder tags may be attached to neighboring tokens
+                            //Add space to avoid concatenation. Extra spaces should be
+                            //cleaned up during preprocessing anyway.
+                            segText.Append(" ");
+                        }
                     }
-
+                    else
+                    {
+                        foreach (var node in topElement.Nodes().Reverse())
+                        {
+                            nodeStack.Push(node);
+                        }
+                    }
                 }
             }
 
