@@ -42,6 +42,11 @@ namespace FiskmoMTEngine
             }
 
             ExternalProcess.Start();
+            
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+            ChildProcessTracker.AddProcess(ExternalProcess);
+
             ExternalProcess.EnableRaisingEvents = true;
             ExternalProcess.BeginErrorReadLine();
 
@@ -71,6 +76,11 @@ namespace FiskmoMTEngine
 
             ExternalProcess.StartInfo.CreateNoWindow = false;
             ExternalProcess.Start();
+
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+            ChildProcessTracker.AddProcess(ExternalProcess);
+
             ExternalProcess.EnableRaisingEvents = true;
             //ExternalProcess.BeginErrorReadLine();
 

@@ -144,6 +144,12 @@ namespace FiskmoMTEngine
         private string installStatus = "";
         private bool _prioritized;
 
+        public int CustomizationProgress { get => customizationProgress; set { customizationProgress = value; NotifyPropertyChanged(); } }
+        private int customizationProgress = 0;
+
+        public string CustomizationStatus { get => customizationStatus; set { customizationStatus = value; NotifyPropertyChanged(); } }
+        private string customizationStatus = "";
+        
 
         void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {

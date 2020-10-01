@@ -58,5 +58,8 @@ namespace FiskmoMTEngine
         [YamlMember(Alias = "shuffle-in-ram", ApplyNamingConventions = false)]
         public string shuffleInRam { get; set; }
 
+        [YamlMember(Alias = "keep-best", ApplyNamingConventions = false)]
+        public string keepBest { get; set; }
+
     }
 }

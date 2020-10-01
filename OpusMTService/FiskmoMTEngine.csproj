@@ -117,6 +117,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChildProcessTracker.cs" />
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="Marian\MarianBatchTranslator.cs" />
     <Compile Include="Marian\MarianHelper.cs" />

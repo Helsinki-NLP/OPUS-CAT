@@ -137,7 +137,7 @@ namespace FiskmoMTEngine
             }
 
             FileInfo spSrcFile;
-            if (preprocessedInput)
+            if (!preprocessedInput)
             {
                 var spmModel = this.modelDir.GetFiles("source.spm").Single();
                 spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.includePlaceholderTags, this.includeTagPairs);
