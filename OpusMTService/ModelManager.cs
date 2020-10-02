@@ -450,7 +450,9 @@ namespace FiskmoMTEngine
                     srcLangCode,
                     trgLangCode,
                     includePlaceholderTags,
-                    includeTagPairs));
+                    includeTagPairs),
+                incompleteModel.CustomizationProgressHandler
+                );
 
             //Add process to model and save its config (the directory exists at this point, 
             //so config can be saved).

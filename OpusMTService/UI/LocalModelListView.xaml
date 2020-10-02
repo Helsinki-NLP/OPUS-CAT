@@ -45,6 +45,16 @@
                             <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
                             <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
                             <GridViewColumn DisplayMemberBinding="{Binding Path=Status, Mode=OneWay, Converter={StaticResource DefaultEnumToStringConverter}}" Header="Status" Width="200"/>
+                            <GridViewColumn Width="140" Header="Installation progress">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <ProgressBar Width="200" Maximum="100" Value="{Binding Path=CustomizationProgress, Mode=OneWay}"/>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=CustomizationStatus, Mode=OneWay}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                             <GridViewColumn Width="60" Header="Prioritized">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>

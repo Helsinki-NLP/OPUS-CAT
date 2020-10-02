@@ -15,7 +15,11 @@ namespace FiskmoMTEngine
     class MarianHelper
     {
 
-        internal static Process StartProcessInBackgroundWithRedirects(string fileName, string args, EventHandler exitCallback=null)
+        internal static Process StartProcessInBackgroundWithRedirects(
+            string fileName, 
+            string args, 
+            EventHandler exitCallback=null,
+            DataReceivedEventHandler errorDataHandler=null)
         {
             var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process ExternalProcess = new Process();
@@ -31,10 +35,17 @@ namespace FiskmoMTEngine
             ExternalProcess.StartInfo.RedirectStandardError = true;
             ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
 
-            ExternalProcess.ErrorDataReceived += errorDataHandler;
-
+            //Async error data handler is used for tracking progress
+            if (errorDataHandler != null)
+            {
+                ExternalProcess.ErrorDataReceived += errorDataHandler;
+            }
+            else
+            {
+                ExternalProcess.ErrorDataReceived += defaultErrorDataHandler;
+            }
+            
             ExternalProcess.StartInfo.CreateNoWindow = true;
-            //ExternalProcess.StartInfo.CreateNoWindow = false;
 
             if (exitCallback != null)
             {
@@ -49,12 +60,17 @@ namespace FiskmoMTEngine
 
             ExternalProcess.EnableRaisingEvents = true;
             ExternalProcess.BeginErrorReadLine();
-
+            
             ExternalProcess.StandardInput.AutoFlush = true;
 
             AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
 
             return ExternalProcess;
+        }
+
+        private static void outputHandler(object sender, DataReceivedEventArgs e)
+        {
+            //throw new NotImplementedException();
         }
 
         internal static Process StartProcessInWindow(string fileName, string args)
@@ -119,7 +135,7 @@ namespace FiskmoMTEngine
             KillProcessAndChildren(externalProcess.Id);
         }
 
-        private static void errorDataHandler(object sender, DataReceivedEventArgs e)
+        private static void defaultErrorDataHandler(object sender, DataReceivedEventArgs e)
         {
             Log.Information(e.Data);
         }
@@ -178,5 +194,7 @@ namespace FiskmoMTEngine
             spmProcess.WaitForExit();
             return spFile;
         }
+
+
     }
 }

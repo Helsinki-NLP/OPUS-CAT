@@ -278,6 +278,7 @@ namespace FiskmoMTEngine
             if (status == MTModelStatus.Customizing)
             {
                 this.ModelConfig.Finetuned = true;
+                this.TrainingLog = new MarianLog();
             }
             this.InstallDir = customDir.FullName;
             this.ModelPath = modelPath;
@@ -373,6 +374,8 @@ namespace FiskmoMTEngine
         public string InstallDir { get; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
 
+        private MarianLog TrainingLog;
+
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
         public Process FinetuneProcess { get; set; }
 
@@ -390,5 +393,13 @@ namespace FiskmoMTEngine
                 this.modelConfig.IncludeTagPairs);
             return batchTranslator.BatchTranslate(input,output);
         }
+
+        internal void CustomizationProgressHandler(object sender, DataReceivedEventArgs e)
+        {
+            this.TrainingLog.ParseTrainLogLine(e.Data);
+        }
+
+        
+
     }
 }

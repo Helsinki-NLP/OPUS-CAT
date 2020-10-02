@@ -48,7 +48,7 @@ namespace FiskmoMTEngine
             }
         }
 
-        public Process Customize(EventHandler exitHandler)
+        public Process Customize(EventHandler exitHandler=null, DataReceivedEventHandler errorDataHandler=null)
         {
             //First copy the model to new dir
             try
@@ -153,15 +153,10 @@ namespace FiskmoMTEngine
             }
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
-            var trainingArgs = $"--config {configPath} --log-level=info --quiet";
+            var trainingArgs = $"--config {configPath} --log-level=info"; // --quiet";
             
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir,"marian.exe"),trainingArgs);
-
-            if (exitHandler != null)
-            {
-                trainProcess.Exited += exitHandler;
-            }
+                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir,"marian.exe"),trainingArgs,exitHandler,errorDataHandler);
 
             return trainProcess;
         }
