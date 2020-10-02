@@ -65,7 +65,7 @@ If the project contains a lot tags, it's possible to include textual representat
 
 ### Installing the memoQ plugin
 
-1. First download the [memoQ plugin zip package](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll).
+1. First download the [memoQ plugin file](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll).
 2. **IMPORTANT**: Unblock the *FiskmoMTPlugin.dll* file:
   - Right-click the file and choose **Properties**.
 
