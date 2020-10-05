@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Entity.Migrations.History;
 using System.Diagnostics;
 using System.IO;
@@ -16,7 +17,16 @@ namespace FiskmoMTEngine
 
     class MarianCustomizer
     {
+        public event ProgressChangedEventHandler ProgressChanged;
+
+        protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
+        {
+            ProgressChangedEventHandler handler = ProgressChanged;
+            handler?.Invoke(this, e);
+        }
+
         public DirectoryInfo customDir { get; set; }
+        public MarianLog TrainingLog { get; private set; }
 
         private MTModel model;
         private DirectoryInfo modelDir;
@@ -48,8 +58,30 @@ namespace FiskmoMTEngine
             }
         }
 
-        public Process Customize(EventHandler exitHandler=null, DataReceivedEventHandler errorDataHandler=null)
+        //This parses Marian log file to detect finetuning progress
+        internal void MarianProgressHandler(object sender, DataReceivedEventArgs e)
         {
+            this.TrainingLog.ParseTrainLogLine(e.Data);
+
+            //Here convert the amount of processed lines / total lines into estimated progress
+            //The progress start from five, so normalize it
+            int newProgress;
+            if (this.TrainingLog.TotalLines > 0)
+            {
+                newProgress = (95 / (this.TrainingLog.LinesSoFar / this.TrainingLog.TotalLines)) * 100;
+            }
+            else
+            {
+                newProgress = 5;
+            }
+            this.ProgressChanged(this, new ProgressChangedEventArgs(newProgress, CustomizationStep.Customizing));
+        }
+
+        public enum CustomizationStep { CopyingModel, CopyingTrainingFiles, PreprocessingTrainingFiles, InitialEvaluation, Customizing };
+
+        public Process Customize(EventHandler exitHandler=null)
+        {
+            this.ProgressChanged(this, new ProgressChangedEventArgs(1, CustomizationStep.CopyingModel));
             //First copy the model to new dir
             try
             {
@@ -60,14 +92,17 @@ namespace FiskmoMTEngine
                 Log.Information($"Customization failed: {ex.Message}");
                 return null;
             }
-
+            
+            this.ProgressChanged(this, new ProgressChangedEventArgs(2, CustomizationStep.CopyingTrainingFiles));
             //Copy raw files to model dir
             this.customSource = this.customSource.CopyTo(Path.Combine(this.customDir.FullName, "custom.source"));
             this.customTarget= this.customTarget.CopyTo(Path.Combine(this.customDir.FullName, "custom.target"));
 
+            this.ProgressChanged(this, new ProgressChangedEventArgs(3, CustomizationStep.PreprocessingTrainingFiles));
             //Preprocess input files
             this.PreprocessInput();
 
+            this.ProgressChanged(this, new ProgressChangedEventArgs(4, CustomizationStep.InitialEvaluation));
             //Do the initial evaluation
             var initialValidProcess = this.model.TranslateAndEvaluate(
                 this.spValidSource,
@@ -78,7 +113,9 @@ namespace FiskmoMTEngine
                 true
                 );
 
+            this.ProgressChanged(this, new ProgressChangedEventArgs(5, CustomizationStep.Customizing));
             //Wait for the initial valid to finish before starting customization
+            //(TODO: make sure this is not done on UI thread)
             initialValidProcess.WaitForExit();
 
             var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
@@ -156,7 +193,7 @@ namespace FiskmoMTEngine
             var trainingArgs = $"--config {configPath} --log-level=info"; // --quiet";
             
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir,"marian.exe"),trainingArgs,exitHandler,errorDataHandler);
+                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir,"marian.exe"),trainingArgs,exitHandler,this.MarianProgressHandler);
 
             return trainProcess;
         }
@@ -192,6 +229,7 @@ namespace FiskmoMTEngine
             DirectoryInfo customDir)
         {
             this.model = model;
+            this.TrainingLog = new MarianLog();
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customDir = customDir;
             this.customSource = inputPair.Source;

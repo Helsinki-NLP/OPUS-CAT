@@ -441,6 +441,8 @@ namespace FiskmoMTEngine
                 customDir
                 );
 
+            customizer.ProgressChanged += incompleteModel.CustomizationProgressHandler;
+
             var trainProcess = customizer.Customize(
                 (x, y) => TrainProcess_Exited(
                     x, y,
@@ -450,8 +452,7 @@ namespace FiskmoMTEngine
                     srcLangCode,
                     trgLangCode,
                     includePlaceholderTags,
-                    includeTagPairs),
-                incompleteModel.CustomizationProgressHandler
+                    includeTagPairs)
                 );
 
             //Add process to model and save its config (the directory exists at this point, 
@@ -460,19 +461,7 @@ namespace FiskmoMTEngine
             incompleteModel.SaveModelConfig();
 
             this.CustomizationOngoing = true;
-
-            //Add an entry for an incomplete model to the model list
             
-            /*Application.Current.Dispatcher.Invoke(() =>
-                this.LocalModels.Add(new MTModel(
-                    $"{baseModel.Name}_{modelTag}", 
-                    modelPath, 
-                    srcLangCode, 
-                    trgLangCode, 
-                    MTModelStatus.Customizing,
-                    modelTag,
-                    customDir,
-                    trainProcess)));*/
         }
 
         private void TrainProcess_Exited(

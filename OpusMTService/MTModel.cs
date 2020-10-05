@@ -144,12 +144,8 @@ namespace FiskmoMTEngine
         private string installStatus = "";
         private bool _prioritized;
 
-        public int CustomizationProgress { get => customizationProgress; set { customizationProgress = value; NotifyPropertyChanged(); } }
-        private int customizationProgress = 0;
-
-        public string CustomizationStatus { get => customizationStatus; set { customizationStatus = value; NotifyPropertyChanged(); } }
-        private string customizationStatus = "";
-        
+        public int StatusProgress { get => statusProgress; set { statusProgress = value; NotifyPropertyChanged(); } }
+        private int statusProgress = 0;
 
         void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -394,12 +390,9 @@ namespace FiskmoMTEngine
             return batchTranslator.BatchTranslate(input,output);
         }
 
-        internal void CustomizationProgressHandler(object sender, DataReceivedEventArgs e)
+        internal void CustomizationProgressHandler(object sender, ProgressChangedEventArgs e)
         {
-            this.TrainingLog.ParseTrainLogLine(e.Data);
+            this.StatusProgress = e.ProgressPercentage;
         }
-
-        
-
     }
 }
