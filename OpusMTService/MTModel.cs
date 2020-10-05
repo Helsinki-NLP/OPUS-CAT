@@ -103,25 +103,16 @@ namespace FiskmoMTEngine
 
         internal void ResumeTraining()
         {
-            FileInfo customizationConfig =
-                new FileInfo(Path.Combine(
-                    this.InstallDir,
-                    FiskmoMTEngineSettings.Default.CustomizationBaseConfig));
-            var trainingArgs = $"--config {customizationConfig.FullName} --log-level=info --quiet";
-
-            var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir, "marian.exe"),
-                trainingArgs,
-                exitHandler);
-
-            this.FinetuneProcess = trainProcess;
+            var customizer = new MarianCustomizer(new DirectoryInfo(this.InstallDir));
+            customizer.ProgressChanged += this.CustomizationProgressHandler;
+            this.FinetuneProcess = customizer.ResumeCustomization();
 
             this.Status = MTModelStatus.Customizing;
 
             NotifyPropertyChanged("IsCustomizationSuspended");
         }
 
-        private void exitHandler(object sender, EventArgs e)
+        internal void ExitHandler(object sender, EventArgs e)
         {
             if (this.IsCustomizationSuspended.Value)
             {
@@ -130,6 +121,21 @@ namespace FiskmoMTEngine
             else
             {
                 this.Status = MTModelStatus.OK;
+                FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.InstallDir, FiskmoMTEngineSettings.Default.PostFinetuneBatchName));
+                if (postCustomizationBatchFile.Exists)
+                {
+                    List<string> newSegments = new List<string>();
+                    using (var reader = postCustomizationBatchFile.OpenText())
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            newSegments.Add(line);
+                        }
+                    }
+
+                    this.PreTranslateBatch(newSegments);
+                }
             }
         }
 
@@ -203,8 +209,7 @@ namespace FiskmoMTEngine
         internal Process TranslateAndEvaluate(
             FileInfo sourceFile, 
             FileInfo targetFile, 
-            FileInfo refFile, 
-            FileInfo scoreFile,
+            FileInfo refFile,
             int outOfDomainSize,
             Boolean preprocessedInput=false)
         {
@@ -262,7 +267,9 @@ namespace FiskmoMTEngine
             MTModelStatus status, 
             string modelTag, 
             DirectoryInfo customDir,
-            Process finetuneProcess)
+            Process finetuneProcess,
+            bool includePlaceholderTags,
+            bool includeTagPairs)
         {
             this.Name = name;
             this.SourceLanguages = new List<string>() { sourceCode };
@@ -271,6 +278,8 @@ namespace FiskmoMTEngine
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
             this.ModelConfig.ModelTags.Add(modelTag);
+            this.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
+            this.ModelConfig.IncludeTagPairs = includeTagPairs;
             if (status == MTModelStatus.Customizing)
             {
                 this.ModelConfig.Finetuned = true;
@@ -285,6 +294,7 @@ namespace FiskmoMTEngine
         {
             this.ParseModelPath(modelPath);
         }
+
 
         public Boolean IsReady
         {
@@ -377,6 +387,13 @@ namespace FiskmoMTEngine
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;
+        private string srcLangCode;
+        private string trgLangCode;
+        private MTModelStatus customizing;
+        private string modelTag;
+        
+        private object includePlaceholderTags;
+        private object includeTagPairs;
 
         internal Process PreTranslateBatch(List<string> input)
         {

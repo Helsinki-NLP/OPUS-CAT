@@ -190,5 +190,17 @@ namespace FiskmoMTEngine {
                 this["IDValidSetSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("postfinetune.txt")]
+        public string PostFinetuneBatchName {
+            get {
+                return ((string)(this["PostFinetuneBatchName"]));
+            }
+            set {
+                this["PostFinetuneBatchName"] = value;
+            }
+        }
     }
 }

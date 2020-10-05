@@ -19,16 +19,20 @@ namespace FiskmoMTEngine
         private int totalLines;
         public int TotalLines { get => totalLines; set => totalLines = value; }
         List<int> translationDurations = new List<int>();
+        List<int> updateDurations = new List<int>();
+
+        MarianTrainerConfig trainingConfig;
 
         Regex totalLineCountRegex = new Regex(@".*Done reading (?<totalLineCount>[\d,]+) sentences$");
-        Regex updateRegex = new Regex(@".*\: Sen\. (?<linesSoFar>[\d,]+) \: Cost");
+        Regex updateRegex = new Regex(@".*\: Sen\. (?<linesSoFar>[\d,]+) \: Cost.*: Time (?<duration>[\d,]+).*");
         Regex translationDurationRegex = new Regex(@".*Total translation time: (?<translationDuration>\d+).*");
 
         private int linesSoFar;
         public int LinesSoFar { get => linesSoFar; set => linesSoFar = value; }
         
-        private int avgTranslationDuration;
-        public int AvgTranslationDuration { get => avgTranslationDuration; set => avgTranslationDuration = value; }
+        public int EstimatedTranslationDuration { get; internal set; }
+        public int EstimatedRemainingTotalTime { get; private set; }
+        public MarianTrainerConfig TrainingConfig { get => trainingConfig; set => trainingConfig = value; }
 
         internal void ParseTrainLogLine(string data)
         {
@@ -51,11 +55,14 @@ namespace FiskmoMTEngine
                     Match translationDurationMatch;
                     if ((updateLineMatch = this.updateRegex.Match(data)).Success)
                     {
-                        this.LinesSoFar = Int32.Parse(updateLineMatch.Groups["linesSoFar"].Value);
+                        //The value might contain comma as thousand separator
+                        this.LinesSoFar = Convert.ToInt32(updateLineMatch.Groups["linesSoFar"].Value.Replace(",",""));
+                        this.updateDurations.Add(Convert.ToInt32(updateLineMatch.Groups["duration"].Value));
                     }
                     else if ((translationDurationMatch = this.translationDurationRegex.Match(data)).Success)
                     {
-                        this.translationDurations.Add(Int32.Parse(translationDurationMatch.Groups["translationDuration"].Value));
+                        this.translationDurations.Add(Convert.ToInt32(translationDurationMatch.Groups["translationDuration"].Value));
+                        this.EstimatedTranslationDuration = Convert.ToInt32(this.translationDurations.Average());
                     }
                 }
             }
@@ -63,8 +70,36 @@ namespace FiskmoMTEngine
             {
                 
             }
+
+            if (this.updateDurations.Count > 0)
+            {
+                this.EstimatedRemainingTotalTime = this.EstimateRemainingTime();
+            }
+            else
+            {
+                this.EstimatedRemainingTotalTime = 0;
+            }
         }
 
+        //Estimate remaining time based on update and validation durations
+        private int EstimateRemainingTime()
+        {
+            var sentencesLeft = (this.TotalLines - this.LinesSoFar);
+            var avgUpdateTime = this.updateDurations.Average();
+            var avgSentencesPerUpdate = this.LinesSoFar / this.updateDurations.Count;
+            var estimatedBatchesLeft = sentencesLeft / avgSentencesPerUpdate;
+            var estimatedUpdateTimeLeft = Convert.ToInt32(avgUpdateTime * estimatedBatchesLeft);
 
+            //Currently only batch based valid freq supported
+            int estimatedValidationTimeLeft = 0;
+            if (this.TrainingConfig.validFreq.EndsWith("u"))
+            {
+                var validFreq = Convert.ToInt32(this.TrainingConfig.validFreq.TrimEnd('u'));
+                estimatedValidationTimeLeft = (estimatedBatchesLeft / validFreq) * this.EstimatedTranslationDuration;
+            }
+            return estimatedUpdateTimeLeft + estimatedValidationTimeLeft;
+
+            //TODO: estimate to for multiple epochs and other stopping conditions (after-batches)
+        }
     }
 }

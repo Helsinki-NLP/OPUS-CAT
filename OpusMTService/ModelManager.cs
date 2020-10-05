@@ -422,8 +422,10 @@ namespace FiskmoMTEngine
                     MTModelStatus.Customizing,
                     modelTag,
                     customDir,
-                    null);
-
+                    null,
+                    includePlaceholderTags,
+                    includeTagPairs);
+            
             Application.Current.Dispatcher.Invoke(() =>
                 this.LocalModels.Add(incompleteModel));
 
@@ -438,68 +440,21 @@ namespace FiskmoMTEngine
                 modelTag,
                 includePlaceholderTags,
                 includeTagPairs,
-                customDir
+                customDir,
+                uniqueNewSegments
                 );
 
             customizer.ProgressChanged += incompleteModel.CustomizationProgressHandler;
-
-            var trainProcess = customizer.Customize(
-                (x, y) => TrainProcess_Exited(
-                    x, y,
-                    customDir,
-                    modelTag,
-                    uniqueNewSegments,
-                    srcLangCode,
-                    trgLangCode,
-                    includePlaceholderTags,
-                    includeTagPairs)
-                );
+            customizer.ProcessExited += incompleteModel.ExitHandler;
+            
+            var trainProcess = customizer.Customize();
 
             //Add process to model and save its config (the directory exists at this point, 
             //so config can be saved).
             incompleteModel.FinetuneProcess = trainProcess;
             incompleteModel.SaveModelConfig();
 
-            this.CustomizationOngoing = true;
-            
-        }
-
-        private void TrainProcess_Exited(
-            object sender,
-            EventArgs e,
-            DirectoryInfo customDir,
-            string modelTag,
-            List<string> uniqueNewSegments,
-            string srcLangCode,
-            string trgLangCode,
-            bool includePlaceholderTags,
-            bool includeTagPairs)
-        {
-            Log.Information($"Customization process with model tag {modelTag} finished.");
-
-            Application.Current.Dispatcher.Invoke(() =>
-                {
-                    Log.Information($"Updating model list.");
-                    this.GetLocalModels();
-                    var customModel = this.LocalModels.Single(x => x.InstallDir == customDir.FullName);
-
-                    customModel.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
-                    customModel.ModelConfig.IncludeTagPairs = includeTagPairs;
-                    customModel.ModelConfig.Finetuned = true;
-
-                    //Clear the tags to get rid of the base model tags
-                    customModel.ModelConfig.ModelTags.Clear();
-                    //The model config is saved when tags are added
-                    customModel.ModelConfig.ModelTags.Add(modelTag);
-                }
-            );
-
-            this.CustomizationOngoing = false;
-
-            if (uniqueNewSegments != null && uniqueNewSegments.Count > 0)
-            {
-                this.PreTranslateBatch(uniqueNewSegments, srcLangCode, trgLangCode, modelTag);
-            }
+            this.CustomizationOngoing = true;    
         }
 
         internal void GetLocalModels()

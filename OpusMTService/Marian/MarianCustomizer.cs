@@ -25,8 +25,16 @@ namespace FiskmoMTEngine
             handler?.Invoke(this, e);
         }
 
+        public event EventHandler ProcessExited;
+
+        protected virtual void OnProcessExited(EventArgs e)
+        {
+            EventHandler handler = ProcessExited;
+            handler?.Invoke(this, e);
+        }
+
         public DirectoryInfo customDir { get; set; }
-        public MarianLog TrainingLog { get; private set; }
+        public MarianLog trainingLog = new MarianLog();
 
         private MTModel model;
         private DirectoryInfo modelDir;
@@ -39,6 +47,7 @@ namespace FiskmoMTEngine
         private readonly bool includeTagPairs;
         private string sourceCode;
         private string targetCode;
+        private List<string> postCustomizationBatch;
         private FileInfo spSource;
         private FileInfo spTarget;
         private FileInfo spValidSource;
@@ -58,17 +67,22 @@ namespace FiskmoMTEngine
             }
         }
 
+        internal void MarianExitHandler(object sender, EventArgs e)
+        {
+            this.ProcessExited(sender, e);
+        }
+
         //This parses Marian log file to detect finetuning progress
         internal void MarianProgressHandler(object sender, DataReceivedEventArgs e)
         {
-            this.TrainingLog.ParseTrainLogLine(e.Data);
+            this.trainingLog.ParseTrainLogLine(e.Data);
 
             //Here convert the amount of processed lines / total lines into estimated progress
             //The progress start from five, so normalize it
             int newProgress;
-            if (this.TrainingLog.TotalLines > 0)
+            if (this.trainingLog.TotalLines > 0 && this.trainingLog.LinesSoFar > 0)
             {
-                newProgress = (95 / (this.TrainingLog.LinesSoFar / this.TrainingLog.TotalLines)) * 100;
+                newProgress = 5 + Convert.ToInt32(0.95 * ((100 *this.trainingLog.LinesSoFar) / this.trainingLog.TotalLines));
             }
             else
             {
@@ -78,8 +92,8 @@ namespace FiskmoMTEngine
         }
 
         public enum CustomizationStep { CopyingModel, CopyingTrainingFiles, PreprocessingTrainingFiles, InitialEvaluation, Customizing };
-
-        public Process Customize(EventHandler exitHandler=null)
+        
+        public Process Customize()
         {
             this.ProgressChanged(this, new ProgressChangedEventArgs(1, CustomizationStep.CopyingModel));
             //First copy the model to new dir
@@ -91,6 +105,19 @@ namespace FiskmoMTEngine
             {
                 Log.Information($"Customization failed: {ex.Message}");
                 return null;
+            }
+
+            //Save the batch to translate after customization to a file (to be batch translated after succesful exit)
+            if (this.postCustomizationBatch != null && this.postCustomizationBatch.Count > 0)
+            {
+                FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.PostFinetuneBatchName));
+                using (var writer = postCustomizationBatchFile.CreateText())
+                {
+                    foreach (var sourceString in this.postCustomizationBatch)
+                    {
+                        writer.WriteLine(sourceString);
+                    }
+                }
             }
             
             this.ProgressChanged(this, new ProgressChangedEventArgs(2, CustomizationStep.CopyingTrainingFiles));
@@ -108,7 +135,6 @@ namespace FiskmoMTEngine
                 this.spValidSource,
                 new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
                 this.spValidTarget,
-                new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
                 FiskmoMTEngineSettings.Default.OODValidSetSize,
                 true
                 );
@@ -117,6 +143,10 @@ namespace FiskmoMTEngine
             //Wait for the initial valid to finish before starting customization
             //(TODO: make sure this is not done on UI thread)
             initialValidProcess.WaitForExit();
+
+            //Use the initial translation time as basis for estimating the duration of validation file
+            //translation
+            this.trainingLog.EstimatedTranslationDuration = Convert.ToInt32((initialValidProcess.ExitTime - initialValidProcess.StartTime).TotalSeconds);
 
             var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
             var deserializer = new Deserializer();
@@ -178,7 +208,7 @@ namespace FiskmoMTEngine
             trainingConfig.log = Path.Combine(this.customDir.FullName, "train.log");
 
             trainingConfig.model = Path.Combine(this.customDir.FullName, decoderSettings.models.Single());
-
+            
             var builder = new SerializerBuilder();
             builder.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull);
             var serializer = builder.Build();
@@ -189,13 +219,36 @@ namespace FiskmoMTEngine
                 serializer.Serialize(writer, trainingConfig, typeof(MarianTrainerConfig));
             }
 
+            Process trainProcess = this.StartTraining();
+            
+            return trainProcess;
+        }
+
+        private Process StartTraining()
+        {
+            var configPath = Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+
+            var deserializer = new Deserializer();
+            MarianTrainerConfig trainingConfig;
+            using (var reader = new StreamReader(configPath))
+            {
+                trainingConfig = deserializer.Deserialize<MarianTrainerConfig>(reader);
+            }
+
+            this.trainingLog.TrainingConfig = trainingConfig;
+
             //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config {configPath} --log-level=info"; // --quiet";
-            
-            var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir,"marian.exe"),trainingArgs,exitHandler,this.MarianProgressHandler);
 
+            var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
             return trainProcess;
+        }
+
+        internal Process ResumeCustomization()
+        {
+            var process = this.StartTraining();
+            return process;
         }
 
         private void PreprocessInput()
@@ -217,8 +270,7 @@ namespace FiskmoMTEngine
             this.spValidSource = MarianHelper.PreprocessLanguage(combinedValid.Source, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
             this.spValidTarget = MarianHelper.PreprocessLanguage(combinedValid.Target, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
         }
-
-
+        
         public MarianCustomizer(
             MTModel model,
             ParallelFilePair inputPair,
@@ -226,10 +278,10 @@ namespace FiskmoMTEngine
             string customLabel,
             bool includePlaceholderTags,
             bool includeTagPairs,
-            DirectoryInfo customDir)
+            DirectoryInfo customDir,
+            List<string> postCustomizationBatch)
         {
             this.model = model;
-            this.TrainingLog = new MarianLog();
             this.modelDir = new DirectoryInfo(model.InstallDir);
             this.customDir = customDir;
             this.customSource = inputPair.Source;
@@ -243,5 +295,9 @@ namespace FiskmoMTEngine
             this.targetCode = model.TargetLanguageString;
         }
 
+        public MarianCustomizer(DirectoryInfo customDir)
+        {
+            this.customDir = customDir;
+        }
     }
 }
