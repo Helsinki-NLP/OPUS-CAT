@@ -133,6 +133,22 @@ You can pretranslate documents with the Fiskmo MT plugin in memoQ by performing 
 3. Click **OK** to start pretranslation. When you open the document again, each segment with no TM matches should contain a machine translation with a match percentage of 0.
 - <img src="/images/Pretranslate3.PNG?raw=true" alt="drawing" width="75%"/>
 
+## Using the HTTP API for integrations 
+
+It's possible to obtain translations from the Fiskmo MT engine via an HTTP API. Note that the HTTP API is not enabled by default, as doing so requires system administrator permissions. To enable the HTTP API, open the command prompt as an administrator and use the **netsh** utility: 
+
+*netsh http add urlacl url=http://+:8500/ user=DOMAIN\user*
+
+(Substitute your domain and username for *DOMAIN\user*. 8500 is the port number used by the HTTP API.)
+
+Translations can be fetched from a local Fiskmo MT engine instance with requests using the following format:
+
+http://localhost:8500/MTRestService/Translate?&input=Source%20sentence%20goes%20here&srcLangCode=en&trgLangCode=fi&modelTag=
+
+A list of available language pairs can be fetched with requests using the following format:
+
+http://localhost:8500/MTRestService/ListSupportedLanguagePairs
+
 ## About
 
 This work is part of the [fiskmö project](https://blogs.helsinki.fi/fiskmo-project/). It implements a self-contained MT plugin for SDL Trados Studio that runs a translation engine based on [MarianNMT](https://marian-nmt.github.io) locally within the plugin. Please acknowledge the project if you use our tools and resources.
