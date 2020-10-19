@@ -14,9 +14,9 @@
     <TabControl>
         <TabItem Header="Models">
             <StackPanel>
-                <local:LocalModelListView>
-                    <local:LocalModelListView DataContext="{Binding .}" />
-                </local:LocalModelListView>
+                <local:TaskListView>
+                    <local:TaskListView DataContext="{Binding .}" />
+                </local:TaskListView>
                 <TextBlock Visibility="{Binding Path=BatchTranslationOngoing, Converter={StaticResource BoolToVis}}">Batch translation in progress</TextBlock>
                 <TextBlock Visibility="{Binding Path=CustomizationOngoing, Converter={StaticResource BoolToVis}}">Fine-tuning in progress</TextBlock>
             </StackPanel>

@@ -21,10 +21,10 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for ListBoxWithControls.xaml
     /// </summary>
-    public partial class LocalModelListView : UserControl
+    public partial class TaskListView : UserControl
     {
         
-        public LocalModelListView()
+        public TaskListView()
         {
             InitializeComponent();
             this.DataContextChanged += dataContextChanged;

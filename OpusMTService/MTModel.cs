@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity.Migrations.History;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -101,6 +102,32 @@ namespace FiskmoMTEngine
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
 
+        
+
+        public string StatusAndEstimateString
+        {
+            get
+            {
+                string statusAndEstimate;
+                if (this.CustomizationStatus != null)
+                {
+                    
+                    statusAndEstimate = HelperFunctions.EnumToString(this.CustomizationStatus.CustomizationStep);
+                    if (this.CustomizationStatus.EstimatedSecondsRemaining != null)
+                    {
+                        var estimatedTimeSpan = TimeSpan.FromSeconds(
+                                this.CustomizationStatus.EstimatedSecondsRemaining.Value);
+                        statusAndEstimate = $"{statusAndEstimate}, ready in {estimatedTimeSpan.Hours} h {estimatedTimeSpan.Minutes} min";
+                    }
+                }
+                else
+                {
+                    statusAndEstimate = this.Status.ToString();
+                }
+                return statusAndEstimate;
+            }
+        }
+
         internal void ResumeTraining()
         {
             var customizer = new MarianCustomizer(new DirectoryInfo(this.InstallDir));
@@ -151,6 +178,10 @@ namespace FiskmoMTEngine
         private bool _prioritized;
 
         public int StatusProgress { get => statusProgress; set { statusProgress = value; NotifyPropertyChanged(); } }
+
+        public MarianCustomizationStatus CustomizationStatus { get; private set; }
+        public int? CustomizationEstimatedSecondsRemaining { get; private set; }
+
         private int statusProgress = 0;
 
         void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -410,6 +441,8 @@ namespace FiskmoMTEngine
         internal void CustomizationProgressHandler(object sender, ProgressChangedEventArgs e)
         {
             this.StatusProgress = e.ProgressPercentage;
+            this.CustomizationStatus = (MarianCustomizationStatus)e.UserState;
+            this.NotifyPropertyChanged("StatusAndEstimateString");
         }
     }
 }

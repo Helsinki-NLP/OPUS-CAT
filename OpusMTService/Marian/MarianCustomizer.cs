@@ -15,7 +15,7 @@ using YamlDotNet.Serialization;
 namespace FiskmoMTEngine
 {
 
-    class MarianCustomizer
+    public class MarianCustomizer
     {
         public event ProgressChangedEventHandler ProgressChanged;
 
@@ -88,14 +88,19 @@ namespace FiskmoMTEngine
             {
                 newProgress = 5;
             }
-            this.ProgressChanged(this, new ProgressChangedEventArgs(newProgress, CustomizationStep.Customizing));
+            this.ProgressChanged(this, new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Customizing,this.trainingLog.EstimatedRemainingTotalTime)));
         }
 
-        public enum CustomizationStep { CopyingModel, CopyingTrainingFiles, PreprocessingTrainingFiles, InitialEvaluation, Customizing };
+        public enum CustomizationStep {
+            Copying_model,
+            Copying_training_files,
+            Preprocessing_training_files,
+            Initial_evaluation,
+            Customizing };
         
         public Process Customize()
         {
-            this.ProgressChanged(this, new ProgressChangedEventArgs(1, CustomizationStep.CopyingModel));
+            this.ProgressChanged(this, new ProgressChangedEventArgs(1, new MarianCustomizationStatus(CustomizationStep.Copying_model,null)));
             //First copy the model to new dir
             try
             {
@@ -120,16 +125,16 @@ namespace FiskmoMTEngine
                 }
             }
             
-            this.ProgressChanged(this, new ProgressChangedEventArgs(2, CustomizationStep.CopyingTrainingFiles));
+            this.ProgressChanged(this, new ProgressChangedEventArgs(2, new MarianCustomizationStatus(CustomizationStep.Copying_training_files, null)));
             //Copy raw files to model dir
             this.customSource = this.customSource.CopyTo(Path.Combine(this.customDir.FullName, "custom.source"));
             this.customTarget= this.customTarget.CopyTo(Path.Combine(this.customDir.FullName, "custom.target"));
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(3, CustomizationStep.PreprocessingTrainingFiles));
+            this.ProgressChanged(this, new ProgressChangedEventArgs(3, new MarianCustomizationStatus(CustomizationStep.Preprocessing_training_files, null)));
             //Preprocess input files
             this.PreprocessInput();
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(4, CustomizationStep.InitialEvaluation));
+            this.ProgressChanged(this, new ProgressChangedEventArgs(4, new MarianCustomizationStatus(CustomizationStep.Initial_evaluation, null)));
             //Do the initial evaluation
             var initialValidProcess = this.model.TranslateAndEvaluate(
                 this.spValidSource,
@@ -139,10 +144,11 @@ namespace FiskmoMTEngine
                 true
                 );
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(5, CustomizationStep.Customizing));
             //Wait for the initial valid to finish before starting customization
             //(TODO: make sure this is not done on UI thread)
             initialValidProcess.WaitForExit();
+
+            this.ProgressChanged(this, new ProgressChangedEventArgs(5, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
 
             //Use the initial translation time as basis for estimating the duration of validation file
             //translation

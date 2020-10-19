@@ -82,23 +82,34 @@ namespace FiskmoMTEngine
         }
 
         //Estimate remaining time based on update and validation durations
-        private int EstimateRemainingTime()
+        private int EstimateRemainingTime(Boolean updateTimeIncludesValidationTime=true)
         {
             var sentencesLeft = (this.TotalLines - this.LinesSoFar);
-            var avgUpdateTime = this.updateDurations.Average();
-            var avgSentencesPerUpdate = this.LinesSoFar / this.updateDurations.Count;
+            //This time will actually include validation translation time as well, since the update time for the first
+            //update since translation will include translation time.
+            var avgUpdateTime = this.updateDurations.Average(); 
+            var avgSentencesPerUpdate = this.LinesSoFar / (this.updateDurations.Count * Int32.Parse(this.trainingConfig.dispFreq));
             var estimatedBatchesLeft = sentencesLeft / avgSentencesPerUpdate;
             var estimatedUpdateTimeLeft = Convert.ToInt32(avgUpdateTime * estimatedBatchesLeft);
 
+            //Update time already includes validation time, no need to add it. That seems like a bug, though, so
+            //it might be changed in future Marian versions, so keep this code here.
             //Currently only batch based valid freq supported
-            int estimatedValidationTimeLeft = 0;
-            if (this.TrainingConfig.validFreq.EndsWith("u"))
+            if (!updateTimeIncludesValidationTime)
             {
-                var validFreq = Convert.ToInt32(this.TrainingConfig.validFreq.TrimEnd('u'));
-                estimatedValidationTimeLeft = (estimatedBatchesLeft / validFreq) * this.EstimatedTranslationDuration;
+                int estimatedValidationTimeLeft = 0;
+                if (this.TrainingConfig.validFreq.EndsWith("u"))
+                {
+                    var validFreq = Convert.ToInt32(this.TrainingConfig.validFreq.TrimEnd('u'));
+                    estimatedValidationTimeLeft = (estimatedBatchesLeft / validFreq) * this.EstimatedTranslationDuration;
+                }
+                return estimatedUpdateTimeLeft + estimatedValidationTimeLeft;
             }
-            return estimatedUpdateTimeLeft + estimatedValidationTimeLeft;
-
+            else
+            {
+                return estimatedUpdateTimeLeft;
+            }
+            
             //TODO: estimate to for multiple epochs and other stopping conditions (after-batches)
         }
     }

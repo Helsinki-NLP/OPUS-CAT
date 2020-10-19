@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="FiskmoMTEngine.LocalModelListView"
+﻿<UserControl x:Class="FiskmoMTEngine.TaskListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -50,7 +50,7 @@
                                     <DataTemplate>
                                         <Grid>
                                             <ProgressBar Width="200" Maximum="100" Value="{Binding Path=StatusProgress, Mode=OneWay}"/>
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Status, Mode=OneWay, Converter={StaticResource DefaultEnumToStringConverter}}"/>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=StatusAndEstimateString, Mode=OneWay}"/>
                                         </Grid>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>

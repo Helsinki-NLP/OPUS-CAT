@@ -11,6 +11,20 @@ namespace FiskmoMTEngine
 {
     class HelperFunctions
     {
+        public static string EnumToString(object value)
+        {
+            string EnumString;
+            try
+            {
+                EnumString = Enum.GetName((value.GetType()), value);
+                return Regex.Replace(EnumString, "_", " ");
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
         public static string GetLocalAppDataPath(string restOfPath)
         {
             return Path.Combine(

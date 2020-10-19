@@ -122,6 +122,7 @@
     <Compile Include="Marian\MarianBatchTranslator.cs" />
     <Compile Include="Marian\MarianHelper.cs" />
     <Compile Include="Marian\MarianLog.cs" />
+    <Compile Include="Marian\MarianCustomizationStatus.cs" />
     <Compile Include="Marian\MarianTrainerConfig.cs" />
     <Compile Include="Marian\MarianDecoderConfig.cs" />
     <Compile Include="Preprocessing\ParallelFilePair.cs" />
