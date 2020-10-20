@@ -52,7 +52,8 @@ namespace FiskmoMTEngine
         private FileInfo spTarget;
         private FileInfo spValidSource;
         private FileInfo spValidTarget;
-        
+        private FileInfo alignmentFile;
+
         private void CopyModelDir(DirectoryInfo modelDir,string customLabel)
         {
             if (this.customDir.Exists)
@@ -80,9 +81,9 @@ namespace FiskmoMTEngine
             //Here convert the amount of processed lines / total lines into estimated progress
             //The progress start from five, so normalize it
             int newProgress;
-            if (this.trainingLog.TotalLines > 0 && this.trainingLog.LinesSoFar > 0)
+            if (this.trainingLog.TotalLines > 0 && this.trainingLog.SentencesSoFar > 0)
             {
-                newProgress = 5 + Convert.ToInt32(0.95 * ((100 *this.trainingLog.LinesSoFar) / this.trainingLog.TotalLines));
+                newProgress = 5 + Convert.ToInt32(0.95 * ((100 *this.trainingLog.SentencesSoFar) / this.trainingLog.TotalLines));
             }
             else
             {
@@ -112,7 +113,7 @@ namespace FiskmoMTEngine
                 return null;
             }
 
-            //Save the batch to translate after customization to a file (to be batch translated after succesful exit)
+            //Save the batch to translate after customization to a file (to be batch translated after successful exit)
             if (this.postCustomizationBatch != null && this.postCustomizationBatch.Count > 0)
             {
                 FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.PostFinetuneBatchName));
@@ -134,6 +135,14 @@ namespace FiskmoMTEngine
             //Preprocess input files
             this.PreprocessInput();
 
+            //Generate alignments for the training data
+            var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
+            var deserializer = new Deserializer();
+
+            var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+
+            this.GenerateAlignments(decoderSettings);
+
             this.ProgressChanged(this, new ProgressChangedEventArgs(4, new MarianCustomizationStatus(CustomizationStep.Initial_evaluation, null)));
             //Do the initial evaluation
             var initialValidProcess = this.model.TranslateAndEvaluate(
@@ -148,17 +157,14 @@ namespace FiskmoMTEngine
             //(TODO: make sure this is not done on UI thread)
             initialValidProcess.WaitForExit();
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(5, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
+            
+
+            this.ProgressChanged(this, new ProgressChangedEventArgs(6, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
 
             //Use the initial translation time as basis for estimating the duration of validation file
             //translation
             this.trainingLog.EstimatedTranslationDuration = Convert.ToInt32((initialValidProcess.ExitTime - initialValidProcess.StartTime).TotalSeconds);
-
-            var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
-            var deserializer = new Deserializer();
             
-            var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-
             MarianTrainerConfig trainingConfig;
 
             
@@ -228,6 +234,17 @@ namespace FiskmoMTEngine
             Process trainProcess = this.StartTraining();
             
             return trainProcess;
+        }
+
+        private void GenerateAlignments(MarianDecoderConfig decoderSettings)
+        {
+            this.alignmentFile = new FileInfo(Path.Combine(this.modelDir.FullName, "alignment.txt"));
+            var modelFile = new FileInfo(Path.Combine(this.modelDir.FullName, decoderSettings.models.Single()));
+            var srcVocabFile = new FileInfo(Path.Combine(this.modelDir.FullName, decoderSettings.vocabs[0]));
+            var trgVocabFile = new FileInfo(Path.Combine(this.modelDir.FullName, decoderSettings.vocabs[1]));
+            var alignmentProcess = MarianHelper.GenerateAlignments(
+                this.spSource,this.spTarget,this.alignmentFile,modelFile,srcVocabFile,trgVocabFile);
+            alignmentProcess.WaitForExit();
         }
 
         private Process StartTraining()

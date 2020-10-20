@@ -45,12 +45,12 @@
                             <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
                             <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
                             
-                            <GridViewColumn Width="140" Header="Status">
+                            <GridViewColumn Width="220" Header="Status">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid>
-                                            <ProgressBar Width="200" Maximum="100" Value="{Binding Path=StatusProgress, Mode=OneWay}"/>
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=StatusAndEstimateString, Mode=OneWay}"/>
+                                            <ProgressBar Width="220" Maximum="100" Value="{Binding Path=StatusProgress, Mode=OneWay}"/>
+                                            <TextBlock HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=StatusAndEstimateString, Mode=OneWay}"/>
                                         </Grid>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>

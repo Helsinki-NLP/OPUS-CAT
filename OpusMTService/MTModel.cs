@@ -113,11 +113,21 @@ namespace FiskmoMTEngine
                 {
                     
                     statusAndEstimate = HelperFunctions.EnumToString(this.CustomizationStatus.CustomizationStep);
-                    if (this.CustomizationStatus.EstimatedSecondsRemaining != null)
+                    if (!(this.CustomizationStatus.EstimatedSecondsRemaining == null))
                     {
                         var estimatedTimeSpan = TimeSpan.FromSeconds(
                                 this.CustomizationStatus.EstimatedSecondsRemaining.Value);
-                        statusAndEstimate = $"{statusAndEstimate}, ready in {estimatedTimeSpan.Hours} h {estimatedTimeSpan.Minutes} min";
+
+                        if (this.CustomizationStatus.EstimatedSecondsRemaining.Value == 0)
+                        {
+                            statusAndEstimate = $"{statusAndEstimate}\nWaiting for time estimate";
+                        }
+                        else
+                        {
+                            statusAndEstimate = $"{statusAndEstimate}\nEstimated time remaining {estimatedTimeSpan.Hours} h {estimatedTimeSpan.Minutes} min";
+                        }
+                        
+        
                     }
                 }
                 else
@@ -180,7 +190,6 @@ namespace FiskmoMTEngine
         public int StatusProgress { get => statusProgress; set { statusProgress = value; NotifyPropertyChanged(); } }
 
         public MarianCustomizationStatus CustomizationStatus { get; private set; }
-        public int? CustomizationEstimatedSecondsRemaining { get; private set; }
 
         private int statusProgress = 0;
 

@@ -195,6 +195,19 @@ namespace FiskmoMTEngine
             return spFile;
         }
 
-
+        internal static Process GenerateAlignments(
+            FileInfo spSource,
+            FileInfo spTarget,
+            FileInfo alignmentFile,
+            FileInfo modelFile,
+            FileInfo srcVocabFile,
+            FileInfo trgVocabFile
+            )
+        {
+            var spArgs = $"score --train-sets {spSource.FullName} {spTarget.FullName} --model {modelFile.FullName} --vocabs {srcVocabFile.FullName} {trgVocabFile.FullName} --output {alignmentFile.FullName} --alignment hard --quiet 1>&2";
+            var spmProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Marian\\marian.exe", spArgs);
+            return spmProcess;
+        }
+        
     }
 }

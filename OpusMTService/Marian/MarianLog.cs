@@ -28,7 +28,13 @@ namespace FiskmoMTEngine
         Regex translationDurationRegex = new Regex(@".*Total translation time: (?<translationDuration>\d+).*");
 
         private int linesSoFar;
-        public int LinesSoFar { get => linesSoFar; set => linesSoFar = value; }
+        public int SentencesSoFar { get => linesSoFar; set => linesSoFar = value; }
+
+        //When continuing training, the training starts from the middle, and it's not immediately
+        //apparent what sentence the count starts from. So record the sentence count of the first
+        //update and use that as zero (effectively this means the sentence count will always be one
+        //update behind, but it's only used for generating the remaining time estimate).
+        private int? firstBatchSentenceCount;
         
         public int EstimatedTranslationDuration { get; internal set; }
         public int EstimatedRemainingTotalTime { get; private set; }
@@ -55,9 +61,17 @@ namespace FiskmoMTEngine
                     Match translationDurationMatch;
                     if ((updateLineMatch = this.updateRegex.Match(data)).Success)
                     {
-                        //The value might contain comma as thousand separator
-                        this.LinesSoFar = Convert.ToInt32(updateLineMatch.Groups["linesSoFar"].Value.Replace(",",""));
-                        this.updateDurations.Add(Convert.ToInt32(updateLineMatch.Groups["duration"].Value));
+                        var sentenceCount = Convert.ToInt32(updateLineMatch.Groups["linesSoFar"].Value.Replace(",", ""));
+                        if (this.firstBatchSentenceCount == null)
+                        {
+                            this.firstBatchSentenceCount = sentenceCount;
+                        }
+                        else
+                        {
+                            //The value might contain comma as thousand separator
+                            this.SentencesSoFar = sentenceCount;
+                            this.updateDurations.Add(Convert.ToInt32(updateLineMatch.Groups["duration"].Value));
+                        }
                     }
                     else if ((translationDurationMatch = this.translationDurationRegex.Match(data)).Success)
                     {
@@ -84,13 +98,26 @@ namespace FiskmoMTEngine
         //Estimate remaining time based on update and validation durations
         private int EstimateRemainingTime(Boolean updateTimeIncludesValidationTime=true)
         {
-            var sentencesLeft = (this.TotalLines - this.LinesSoFar);
+            var validFreq = Convert.ToInt32(this.TrainingConfig.validFreq.TrimEnd('u'));
+            var sentencesSoFarForThisRun = this.SentencesSoFar - this.firstBatchSentenceCount.Value;
+            var sentencesLeft = (this.TotalLines - sentencesSoFarForThisRun);
             //This time will actually include validation translation time as well, since the update time for the first
             //update since translation will include translation time.
-            var avgUpdateTime = this.updateDurations.Average(); 
-            var avgSentencesPerUpdate = this.LinesSoFar / (this.updateDurations.Count * Int32.Parse(this.trainingConfig.dispFreq));
+            var updatesPerUpdateLine = Int32.Parse(this.trainingConfig.dispFreq);
+            var avgUpdateTime = this.updateDurations.Average() / updatesPerUpdateLine; 
+            var avgSentencesPerUpdate = sentencesSoFarForThisRun / (this.updateDurations.Count * updatesPerUpdateLine);
             var estimatedBatchesLeft = sentencesLeft / avgSentencesPerUpdate;
             var estimatedUpdateTimeLeft = Convert.ToInt32(avgUpdateTime * estimatedBatchesLeft);
+
+            //When the training starts, the completion time appears optimistic due to validation time
+            //not being included. To counter this, add some extra time to the first estimates, and
+            //remove it gradually once there's enough data to make a good estimate.
+
+            if (this.updateDurations.Count * updatesPerUpdateLine < (validFreq * 5))
+            {
+                estimatedUpdateTimeLeft = estimatedUpdateTimeLeft * (1 + (1 / (this.updateDurations.Count*updatesPerUpdateLine)));
+            }
+
 
             //Update time already includes validation time, no need to add it. That seems like a bug, though, so
             //it might be changed in future Marian versions, so keep this code here.
@@ -100,7 +127,6 @@ namespace FiskmoMTEngine
                 int estimatedValidationTimeLeft = 0;
                 if (this.TrainingConfig.validFreq.EndsWith("u"))
                 {
-                    var validFreq = Convert.ToInt32(this.TrainingConfig.validFreq.TrimEnd('u'));
                     estimatedValidationTimeLeft = (estimatedBatchesLeft / validFreq) * this.EstimatedTranslationDuration;
                 }
                 return estimatedUpdateTimeLeft + estimatedValidationTimeLeft;
