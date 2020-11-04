@@ -20,6 +20,14 @@ namespace FiskmoMTEngine
 {
     public class MarianBatchTranslator
     {
+        public event EventHandler OutputReady;
+
+        protected virtual void OnOutputReady(EventArgs e)
+        {
+            EventHandler handler = OutputReady;
+            handler?.Invoke(this, e);
+        }
+
         private string langpair;
 
         public string SourceCode { get; }
@@ -31,6 +39,27 @@ namespace FiskmoMTEngine
 
         private bool includePlaceholderTags;
         private bool includeTagPairs;
+
+        private void WriteToTranslationDb(object sender, EventArgs e, IEnumerable<string> input, FileInfo spOutput)
+        {
+            Queue<string> inputQueue
+                = new Queue<string>(input);
+
+            if (spOutput.Exists)
+            {
+                using (var reader = spOutput.OpenText())
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine();
+                        var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
+                        var sourceLine = inputQueue.Dequeue();
+                        TranslationDbHelper.WriteTranslationToDb(sourceLine, nonSpLine, this.SystemName);
+                    }
+                }
+            }
+            
+        }
 
         public MarianBatchTranslator(
             string modelDir, 
@@ -56,6 +85,7 @@ namespace FiskmoMTEngine
                 var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
                 decoderSettings.miniBatch = "16";
                 decoderSettings.log = Path.Combine(this.modelDir.FullName,"batch.log");
+                decoderSettings.alignment = "hard";
 
                 var serializer = new Serializer();
                 var configPath = Path.Combine(this.modelDir.FullName, "batch.yml");
@@ -71,57 +101,69 @@ namespace FiskmoMTEngine
         internal Process BatchTranslate(
             IEnumerable<string> input,
             FileInfo spOutput,
-            Action<FileInfo> callBack=null,
-            Boolean preprocessedInput=false)
+            Boolean preprocessedInput=false,
+            Boolean storeTranslations=false)
         {
+            if (storeTranslations)
+            {
+                this.OutputReady += (x, y) => this.WriteToTranslationDb(x, y, input, spOutput);
+            }
+
             Log.Information($"Starting batch translator for model {this.SystemName}.");
             
             var cmd = "TranslateBatchSentencePiece.bat";
                         
             FileInfo spInput = this.PreprocessInput(input,preprocessedInput);
-            
+
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for
             //same systems, i.e. keep track of decoder settings)
 
-            var args = $"{this.modelDir.FullName} {spInput.FullName} {spOutput.FullName} --log-level=info --quiet";
+            FileInfo transAndAlign = new FileInfo($"{spOutput.FullName}.transandalign");
+            var args = $"{this.modelDir.FullName} {spInput.FullName} {transAndAlign.FullName} --log-level=info --quiet";
 
-            EventHandler exitHandler;
-            if (callBack != null)
-            {
-                exitHandler = (x, y) => callBack(spOutput);
-            }
-            else
-            {
-                //default callback, saves translation to translation cache
-                exitHandler = (x, y) => BatchProcess_Exited(input, spOutput, x, y);
-            }
+            EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
+            
             var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args, exitHandler);
             
 
             return batchProcess;
         }
 
-        private void BatchProcess_Exited(IEnumerable<string> input, FileInfo spOutput,object sender, EventArgs e)
+        private void BatchProcess_Exited(
+            
+            FileInfo transAndAlignOutput,
+            FileInfo spOutput,
+            object sender,
+            EventArgs e)
         {
             
-            Log.Information($"Batch translation process for model {this.SystemName} exited. Saving results.");
-            Queue<string> inputQueue
-                = new Queue<string>(input);
-            if (spOutput.Exists)
+            Log.Information($"Batch translation process for model {this.SystemName} exited. Processing output.");
+            
+            if (transAndAlignOutput.Exists)
             {
-                using (var reader = spOutput.OpenText())
+                FileInfo alignmentFile = new FileInfo($"{spOutput.FullName}.alignments");
+                using (var reader = transAndAlignOutput.OpenText())
+                using (var alignmentWriter = alignmentFile.CreateText())
+                using (var translationWriter = spOutput.CreateText())
                 {
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
-                        var sourceLine = inputQueue.Dequeue();
-                        TranslationDbHelper.WriteTranslationToDb(sourceLine, nonSpLine, this.SystemName);
+                        //Output is translation ||| alignments
+                        var transAndAlign = line.Split(new string[] { " ||| " }, StringSplitOptions.None);
+                        var transline = transAndAlign[0];
+                        translationWriter.WriteLine(transline);
+                        alignmentWriter.WriteLine(transAndAlign[1]);
+                        
                     }
                 }
             }
+
+            this.OnOutputReady(e);
         }
+
+
 
         internal FileInfo PreprocessInput(IEnumerable<string> input, Boolean preprocessedInput=false)
         {
@@ -155,11 +197,6 @@ namespace FiskmoMTEngine
         }
         
     }
-
-    internal class MarianBatchArgs : EventArgs
-    {
-        internal IEnumerable<string> Input;
-        internal FileInfo SpOutput;
-    }
+    
 }
     

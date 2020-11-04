@@ -13,7 +13,6 @@ namespace FiskmoMTEngine
     {
         public MarianLog()
         {
-
         }
 
         private int totalLines;
@@ -22,9 +21,10 @@ namespace FiskmoMTEngine
         List<int> updateDurations = new List<int>();
 
         MarianTrainerConfig trainingConfig;
-
+        private int epochLines;
+        private int totalEpochs;
         Regex totalLineCountRegex = new Regex(@".*Done reading (?<totalLineCount>[\d,]+) sentences$");
-        Regex updateRegex = new Regex(@".*\: Sen\. (?<linesSoFar>[\d,]+) \: Cost.*: Time (?<duration>[\d,]+).*");
+        Regex updateRegex = new Regex(@".*Ep\. (?<epoch>\d+) .*\: Sen\. (?<linesSoFar>[\d,]+) \: Cost.*: Time (?<duration>[\d,]+).*");
         Regex translationDurationRegex = new Regex(@".*Total translation time: (?<translationDuration>\d+).*");
 
         private int linesSoFar;
@@ -35,11 +35,19 @@ namespace FiskmoMTEngine
         //update and use that as zero (effectively this means the sentence count will always be one
         //update behind, but it's only used for generating the remaining time estimate).
         private int? firstBatchSentenceCount;
-        
+        private int epoch;
+
         public int EstimatedTranslationDuration { get; internal set; }
         public int EstimatedRemainingTotalTime { get; private set; }
-        public MarianTrainerConfig TrainingConfig { get => trainingConfig; set => trainingConfig = value; }
+        public MarianTrainerConfig TrainingConfig
+        {
+            get => this.trainingConfig;
+            set
+            {
 
+                this.trainingConfig = value;
+            }
+        }
         internal void ParseTrainLogLine(string data)
         {
 
@@ -51,8 +59,9 @@ namespace FiskmoMTEngine
                     var totalLinesMatch = this.totalLineCountRegex.Match(data);
                     if (totalLinesMatch.Success)
                     {
-                        this.TotalLines = Int32.Parse(totalLinesMatch.Groups["totalLineCount"].Value);
-
+                        this.epochLines = Int32.Parse(totalLinesMatch.Groups["totalLineCount"].Value);
+                        this.totalEpochs = Int32.Parse(trainingConfig.afterEpochs);
+                        this.TotalLines = this.totalEpochs * this.epochLines;
                     }
                 }
                 else
@@ -68,8 +77,9 @@ namespace FiskmoMTEngine
                         }
                         else
                         {
+                            this.epoch = Convert.ToInt32(updateLineMatch.Groups["epoch"].Value);
                             //The value might contain comma as thousand separator
-                            this.SentencesSoFar = sentenceCount;
+                            this.SentencesSoFar = sentenceCount + (this.epochLines * (this.epoch-1));
                             this.updateDurations.Add(Convert.ToInt32(updateLineMatch.Groups["duration"].Value));
                         }
                     }
@@ -104,6 +114,8 @@ namespace FiskmoMTEngine
             //This time will actually include validation translation time as well, since the update time for the first
             //update since translation will include translation time.
             var updatesPerUpdateLine = Int32.Parse(this.trainingConfig.dispFreq);
+
+            //TODO divide by zero here with  multiepoch training
             var avgUpdateTime = this.updateDurations.Average() / updatesPerUpdateLine; 
             var avgSentencesPerUpdate = sentencesSoFarForThisRun / (this.updateDurations.Count * updatesPerUpdateLine);
             var estimatedBatchesLeft = sentencesLeft / avgSentencesPerUpdate;

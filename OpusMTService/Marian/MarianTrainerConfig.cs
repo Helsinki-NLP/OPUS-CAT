@@ -6,6 +6,8 @@ namespace FiskmoMTEngine
     public class MarianTrainerConfig
     {
         public string model { get; set; }
+        public string sqlite { get; set; }
+
         public List<string> vocabs { get; set; }
 
         [YamlMember(Alias = "valid-sets", ApplyNamingConventions = false)]
@@ -18,11 +20,20 @@ namespace FiskmoMTEngine
         [YamlMember(Alias = "valid-script-args", ApplyNamingConventions = false)]
         public List<string> validScriptArgs { get; set; }
 
+        [YamlMember(Alias = "learn-rate", ApplyNamingConventions = false)]
+        public string learnRate { get; set; }
+
+        [YamlMember(Alias = "lr-report", ApplyNamingConventions = false)]
+        public string lrReport { get; set; }
+
         [YamlMember(Alias = "valid-script-path", ApplyNamingConventions = false)]
         public string validScriptPath { get; set; }
 
         [YamlMember(Alias = "valid-translation-output", ApplyNamingConventions = false)]
         public string validTranslationOutput { get; set; }
+
+        [YamlMember(Alias = "guided-alignment", ApplyNamingConventions = false)]
+        public string guidedAlignment { get; set; }
 
         [YamlMember(Alias = "valid-metrics", ApplyNamingConventions = false)]
         public List<string> validMetrics { get; set; }

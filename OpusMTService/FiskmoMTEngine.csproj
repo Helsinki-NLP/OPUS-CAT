@@ -230,6 +230,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Alignment\eflomal">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Alignment\python\eflomal\eflomal.pyx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Evaluate.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -259,6 +265,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Alignment\align.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Alignment\atools.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Alignment\python\eflomal\eflomal.c">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Evaluation\sacrebleu_wrapper.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

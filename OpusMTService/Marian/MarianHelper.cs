@@ -195,7 +195,24 @@ namespace FiskmoMTEngine
             return spFile;
         }
 
-        internal static Process GenerateAlignments(
+        internal static void GenerateAlignments(FileInfo spSource, FileInfo spTarget, FileInfo alignmentFile, FileInfo priorsFile)
+        {
+            var alignArgs = $"-s \"{spSource.FullName}\" -t \"{spTarget.FullName}\" -f \"{alignmentFile.FullName}.fwd\" -r \"{alignmentFile.FullName}.rev\"";
+            Log.Information($"Aligning fine-tuning corpus with args {alignArgs}");
+            var alignProcess = MarianHelper.StartProcessInBackgroundWithRedirects("python Alignment\\align.py", alignArgs);
+            alignProcess.WaitForExit();
+
+            var symmetryArgs = $"-c grow-diag-final -i \"{alignmentFile.FullName}.fwd\" -j \"{alignmentFile.FullName}.rev\" > \"{alignmentFile.FullName}\"";
+            Log.Information($"Symmetrisizing alignment with args {symmetryArgs}");
+            var symmetryProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Alignment\\atools.exe", symmetryArgs);
+            symmetryProcess.WaitForExit();
+
+        }
+
+
+
+        /* This uses marian-scorer to generate the alignment, but for some reason it's unstable and very slow
+        internal static void GenerateAlignments(
             FileInfo spSource,
             FileInfo spTarget,
             FileInfo alignmentFile,
@@ -204,10 +221,22 @@ namespace FiskmoMTEngine
             FileInfo trgVocabFile
             )
         {
-            var spArgs = $"score --train-sets {spSource.FullName} {spTarget.FullName} --model {modelFile.FullName} --vocabs {srcVocabFile.FullName} {trgVocabFile.FullName} --output {alignmentFile.FullName} --alignment hard --quiet 1>&2";
+            var scoresAndAlignmentsFile = new FileInfo($"{alignmentFile.FullName}.scores");
+            var spArgs = $"score --train-sets {spSource.FullName} {spTarget.FullName} --model {modelFile.FullName} --vocabs {srcVocabFile.FullName} {trgVocabFile.FullName} --output {scoresAndAlignmentsFile.FullName} --alignment hard --quiet";
             var spmProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Marian\\marian.exe", spArgs);
-            return spmProcess;
-        }
-        
+
+            spmProcess.WaitForExit();
+
+            using (var reader = scoresAndAlignmentsFile.OpenText())
+            using (var writer = alignmentFile.CreateText())
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    writer.WriteLine(line.Split(new string[] { "|||" },StringSplitOptions.None)[1]);
+                }
+            }
+        }*/
+
     }
 }

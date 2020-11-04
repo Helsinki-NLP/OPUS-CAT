@@ -37,6 +37,7 @@ namespace FiskmoMTEngine
         public MarianLog trainingLog = new MarianLog();
 
         private MTModel model;
+        private MTModel customModel;
         private DirectoryInfo modelDir;
         private FileInfo customSource;
         private FileInfo customTarget;
@@ -47,12 +48,14 @@ namespace FiskmoMTEngine
         private readonly bool includeTagPairs;
         private string sourceCode;
         private string targetCode;
+        private bool guidedAlignment;
         private List<string> postCustomizationBatch;
         private FileInfo spSource;
         private FileInfo spTarget;
         private FileInfo spValidSource;
         private FileInfo spValidTarget;
         private FileInfo alignmentFile;
+        private FileInfo validAlignmentFile;
 
         private void CopyModelDir(DirectoryInfo modelDir,string customLabel)
         {
@@ -60,18 +63,31 @@ namespace FiskmoMTEngine
             {
                 throw new Exception("custom model directory exists already");
             }
-            customDir.Create();
+
+            this.customDir.Create();
 
             foreach (FileInfo file in modelDir.GetFiles())
             {
-                file.CopyTo(Path.Combine(customDir.FullName, file.Name));
+                file.CopyTo(Path.Combine(this.customDir.FullName, file.Name));
             }
         }
 
         internal void MarianExitHandler(object sender, EventArgs e)
         {
-            this.ProcessExited(sender, e);
+            
+            var finalValidProcess = this.customModel.TranslateAndEvaluate(
+                this.spValidSource,
+                new FileInfo(Path.Combine(this.customDir.FullName, "valid.final.txt")),
+                this.spValidTarget,
+                FiskmoMTEngineSettings.Default.OODValidSetSize,
+                true
+                );
+
+            finalValidProcess.WaitForExit();
+
+            this.OnProcessExited(e);
         }
+
 
         //This parses Marian log file to detect finetuning progress
         internal void MarianProgressHandler(object sender, DataReceivedEventArgs e)
@@ -83,13 +99,13 @@ namespace FiskmoMTEngine
             int newProgress;
             if (this.trainingLog.TotalLines > 0 && this.trainingLog.SentencesSoFar > 0)
             {
-                newProgress = 5 + Convert.ToInt32(0.95 * ((100 *this.trainingLog.SentencesSoFar) / this.trainingLog.TotalLines));
+                newProgress = 5 + Convert.ToInt32(0.95 * ((100 *this.trainingLog.SentencesSoFar) / (this.trainingLog.TotalLines)));
             }
             else
             {
                 newProgress = 5;
             }
-            this.ProgressChanged(this, new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Customizing,this.trainingLog.EstimatedRemainingTotalTime)));
+            this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Customizing,this.trainingLog.EstimatedRemainingTotalTime)));
         }
 
         public enum CustomizationStep {
@@ -101,7 +117,7 @@ namespace FiskmoMTEngine
         
         public Process Customize()
         {
-            this.ProgressChanged(this, new ProgressChangedEventArgs(1, new MarianCustomizationStatus(CustomizationStep.Copying_model,null)));
+            this.OnProgressChanged(new ProgressChangedEventArgs(1, new MarianCustomizationStatus(CustomizationStep.Copying_model,null)));
             //First copy the model to new dir
             try
             {
@@ -126,12 +142,12 @@ namespace FiskmoMTEngine
                 }
             }
             
-            this.ProgressChanged(this, new ProgressChangedEventArgs(2, new MarianCustomizationStatus(CustomizationStep.Copying_training_files, null)));
+            this.OnProgressChanged(new ProgressChangedEventArgs(2, new MarianCustomizationStatus(CustomizationStep.Copying_training_files, null)));
             //Copy raw files to model dir
             this.customSource = this.customSource.CopyTo(Path.Combine(this.customDir.FullName, "custom.source"));
             this.customTarget= this.customTarget.CopyTo(Path.Combine(this.customDir.FullName, "custom.target"));
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(3, new MarianCustomizationStatus(CustomizationStep.Preprocessing_training_files, null)));
+            this.OnProgressChanged(new ProgressChangedEventArgs(3, new MarianCustomizationStatus(CustomizationStep.Preprocessing_training_files, null)));
             //Preprocess input files
             this.PreprocessInput();
 
@@ -141,9 +157,19 @@ namespace FiskmoMTEngine
 
             var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
 
-            this.GenerateAlignments(decoderSettings);
+            if (this.guidedAlignment)
+            {
+                //Generate alignments for fine-tuning corpus
+                this.alignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "custom.alignments"));
+                MarianHelper.GenerateAlignments(this.spSource, this.spTarget, this.alignmentFile, this.model.AlignmentPriorsFile);
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(4, new MarianCustomizationStatus(CustomizationStep.Initial_evaluation, null)));
+                //
+                //Generate alignments for validation set (for evaluating fine-tuning effect on alignment)
+                this.validAlignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "combined.alignments"));
+                MarianHelper.GenerateAlignments(this.spValidSource, this.spValidTarget, this.validAlignmentFile, this.model.AlignmentPriorsFile);
+            }
+
+            this.OnProgressChanged(new ProgressChangedEventArgs(4, new MarianCustomizationStatus(CustomizationStep.Initial_evaluation, null)));
             //Do the initial evaluation
             var initialValidProcess = this.model.TranslateAndEvaluate(
                 this.spValidSource,
@@ -159,7 +185,7 @@ namespace FiskmoMTEngine
 
             
 
-            this.ProgressChanged(this, new ProgressChangedEventArgs(6, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
+            this.OnProgressChanged(new ProgressChangedEventArgs(6, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
 
             //Use the initial translation time as basis for estimating the duration of validation file
             //translation
@@ -216,6 +242,11 @@ namespace FiskmoMTEngine
                 new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
+            if (this.guidedAlignment)
+            {
+                trainingConfig.guidedAlignment = this.alignmentFile.FullName;
+            }
+
             trainingConfig.validLog = Path.Combine(this.customDir.FullName, "valid.log");
             trainingConfig.log = Path.Combine(this.customDir.FullName, "train.log");
 
@@ -236,16 +267,7 @@ namespace FiskmoMTEngine
             return trainProcess;
         }
 
-        private void GenerateAlignments(MarianDecoderConfig decoderSettings)
-        {
-            this.alignmentFile = new FileInfo(Path.Combine(this.modelDir.FullName, "alignment.txt"));
-            var modelFile = new FileInfo(Path.Combine(this.modelDir.FullName, decoderSettings.models.Single()));
-            var srcVocabFile = new FileInfo(Path.Combine(this.modelDir.FullName, decoderSettings.vocabs[0]));
-            var trgVocabFile = new FileInfo(Path.Combine(this.modelDir.FullName, decoderSettings.vocabs[1]));
-            var alignmentProcess = MarianHelper.GenerateAlignments(
-                this.spSource,this.spTarget,this.alignmentFile,modelFile,srcVocabFile,trgVocabFile);
-            alignmentProcess.WaitForExit();
-        }
+
 
         private Process StartTraining()
         {
@@ -296,17 +318,19 @@ namespace FiskmoMTEngine
         
         public MarianCustomizer(
             MTModel model,
+            MTModel customModel,
             ParallelFilePair inputPair,
             ParallelFilePair indomainValidPair,
             string customLabel,
             bool includePlaceholderTags,
             bool includeTagPairs,
-            DirectoryInfo customDir,
-            List<string> postCustomizationBatch)
+            List<string> postCustomizationBatch,
+            bool guidedAlignment=true)
         {
             this.model = model;
+            this.customModel = customModel;
             this.modelDir = new DirectoryInfo(model.InstallDir);
-            this.customDir = customDir;
+            this.customDir = new DirectoryInfo(this.customModel.InstallDir);
             this.customSource = inputPair.Source;
             this.customTarget = inputPair.Target;
             this.customLabel = customLabel;
@@ -316,6 +340,7 @@ namespace FiskmoMTEngine
             this.inDomainValidationTarget = indomainValidPair.Target;
             this.sourceCode = model.SourceLanguageString;
             this.targetCode = model.TargetLanguageString;
+            this.guidedAlignment = guidedAlignment;
         }
 
         public MarianCustomizer(DirectoryInfo customDir)

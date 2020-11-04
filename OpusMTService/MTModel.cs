@@ -56,11 +56,16 @@ namespace FiskmoMTEngine
         IncludePlaceholders
     }
 
+    
+
     public class MTModel : INotifyPropertyChanged
     {
         private List<string> sourceLanguages;
         private List<string> targetLanguages;
         private string name;
+
+        public FileInfo AlignmentPriorsFile {
+            get { return new FileInfo(Path.Combine(this.InstallDir, "alignmentpriors.txt")); } }
 
         private MarianProcess marianProcess;
 
@@ -134,6 +139,7 @@ namespace FiskmoMTEngine
                 {
                     statusAndEstimate = this.Status.ToString();
                 }
+
                 return statusAndEstimate;
             }
         }
@@ -142,6 +148,7 @@ namespace FiskmoMTEngine
         {
             var customizer = new MarianCustomizer(new DirectoryInfo(this.InstallDir));
             customizer.ProgressChanged += this.CustomizationProgressHandler;
+            customizer.ProcessExited += this.ExitHandler;
             this.FinetuneProcess = customizer.ResumeCustomization();
 
             this.Status = MTModelStatus.Customizing;
@@ -158,6 +165,9 @@ namespace FiskmoMTEngine
             else
             {
                 this.Status = MTModelStatus.OK;
+                this.CustomizationStatus = null;
+                this.StatusProgress = 0;
+                this.NotifyPropertyChanged("StatusAndEstimateString");
                 FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.InstallDir, FiskmoMTEngineSettings.Default.PostFinetuneBatchName));
                 if (postCustomizationBatchFile.Exists)
                 {
@@ -259,7 +269,8 @@ namespace FiskmoMTEngine
                 this.TargetLanguages.Single(), false, false);
 
             var sourceLines = File.ReadAllLines(sourceFile.FullName);
-            var batchProcess = batchTranslator.BatchTranslate(sourceLines, targetFile, (x) => EvaluateTranslation(refFile, outOfDomainSize, x),preprocessedInput);
+            batchTranslator.OutputReady += (x,y) => EvaluateTranslation(refFile, outOfDomainSize, targetFile);
+            var batchProcess = batchTranslator.BatchTranslate(sourceLines, targetFile, preprocessedInput);
             
             return batchProcess;
         }
@@ -444,7 +455,7 @@ namespace FiskmoMTEngine
                 this.TargetLanguageString, 
                 this.modelConfig.IncludePlaceholderTags,
                 this.modelConfig.IncludeTagPairs);
-            return batchTranslator.BatchTranslate(input,output);
+            return batchTranslator.BatchTranslate(input,output,storeTranslations:true);
         }
 
         internal void CustomizationProgressHandler(object sender, ProgressChangedEventArgs e)

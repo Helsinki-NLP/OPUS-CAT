@@ -435,12 +435,12 @@ namespace FiskmoMTEngine
 
             var customizer = new MarianCustomizer(
                 baseModel,
+                incompleteModel,
                 inputPair,
                 validationPair,
                 modelTag,
                 includePlaceholderTags,
                 includeTagPairs,
-                customDir,
                 uniqueNewSegments
                 );
 
