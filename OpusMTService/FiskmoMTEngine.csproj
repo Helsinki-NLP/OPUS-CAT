@@ -149,6 +149,9 @@
     <Compile Include="TagEditWindow.xaml.cs">
       <DependentUpon>TagEditWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\OnlineModelView.xaml.cs">
+      <DependentUpon>OnlineModelView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
@@ -189,6 +192,10 @@
     <Page Include="TagEditWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\OnlineModelView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\TestWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

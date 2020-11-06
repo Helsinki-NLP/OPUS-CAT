@@ -9,6 +9,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -28,7 +29,7 @@ namespace FiskmoMTEngine
     /// </summary>
     public class ModelManager : INotifyPropertyChanged
     {
-
+        
         private List<MTModel> onlineModels;
 
         private ObservableCollection<MTModel> filteredOnlineModels = new ObservableCollection<MTModel>();
@@ -110,7 +111,27 @@ namespace FiskmoMTEngine
             return statusMessage.ToString();
         }
 
-        
+        internal void SortOnlineModels(string header, ListSortDirection direction)
+        {
+            var test = this.FilteredOnlineModels.First()[header];
+            this.FilteredOnlineModels = new ObservableCollection<MTModel>(this.FilteredOnlineModels.OrderBy(x => x[header]));
+            if (direction == ListSortDirection.Descending)
+            {
+                this.FilteredOnlineModels = new ObservableCollection<MTModel>(this.FilteredOnlineModels.Reverse());
+            }
+            NotifyPropertyChanged("FilteredOnlineModels");
+        }
+
+
+        internal void SortLocalModels(string header, ListSortDirection direction)
+        {
+            this.LocalModels = new ObservableCollection<MTModel>(this.LocalModels.OrderBy(x => x[header]));
+            if (direction == ListSortDirection.Descending)
+            {
+                this.LocalModels = new ObservableCollection<MTModel>(this.LocalModels.Reverse());
+            }
+            NotifyPropertyChanged("LocalModels");
+        }
 
         internal void FilterOnlineModels(string sourceFilter, string targetFilter, string nameFilter)
         {

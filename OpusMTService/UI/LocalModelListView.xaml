@@ -31,7 +31,12 @@
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
                 </StackPanel>
-                <ListView Name="LocalModelList" Height="300" ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}" SelectionMode="Single">
+                <ListView 
+                    Name="LocalModelList" 
+                    Height="300" 
+                    ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}" 
+                    SelectionMode="Single"
+                    GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="BorderBrush" Value="LightGray" />

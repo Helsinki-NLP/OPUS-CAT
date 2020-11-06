@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,9 @@ namespace FiskmoMTEngine
     /// </summary>
     public partial class TaskListView : UserControl
     {
-        
+        private GridViewColumnHeader lastHeaderClicked;
+        private ListSortDirection lastDirection;
+
         public TaskListView()
         {
             InitializeComponent();
@@ -127,6 +130,64 @@ namespace FiskmoMTEngine
             ModelCustomizerWindow customizeModel = new ModelCustomizerWindow(selectedModel);
             customizeModel.DataContext = this.DataContext;
             customizeModel.Show();
+        }
+
+        private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
+        {
+            var headerClicked = e.OriginalSource as GridViewColumnHeader;
+            ListSortDirection direction;
+
+            if (headerClicked != null)
+            {
+                if (headerClicked.Role != GridViewColumnHeaderRole.Padding)
+                {
+                    if (headerClicked != this.lastHeaderClicked)
+                    {
+                        direction = ListSortDirection.Ascending;
+                    }
+                    else
+                    {
+                        if (this.lastDirection == ListSortDirection.Ascending)
+                        {
+                            direction = ListSortDirection.Descending;
+                        }
+                        else
+                        {
+                            direction = ListSortDirection.Ascending;
+                        }
+                    }
+
+                    var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
+                    var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
+
+                    if (sortBy == "Installation progress")
+                    {
+                        sortBy = "InstallProgress";
+                    }
+
+                    ((ModelManager)this.DataContext).SortLocalModels(sortBy, direction);
+
+                    if (direction == ListSortDirection.Ascending)
+                    {
+                        headerClicked.Column.HeaderTemplate =
+                          Resources["HeaderTemplateArrowUp"] as DataTemplate;
+                    }
+                    else
+                    {
+                        headerClicked.Column.HeaderTemplate =
+                          Resources["HeaderTemplateArrowDown"] as DataTemplate;
+                    }
+
+                    // Remove arrow from previously sorted header
+                    if (this.lastHeaderClicked != null && this.lastHeaderClicked != headerClicked)
+                    {
+                        this.lastHeaderClicked.Column.HeaderTemplate = null;
+                    }
+
+                    this.lastHeaderClicked = headerClicked;
+                    this.lastDirection = direction;
+                }
+            }
         }
     }
 

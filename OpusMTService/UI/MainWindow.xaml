@@ -35,5 +35,10 @@
             </Border>
             </StackPanel>
         </TabItem>
+        <TabItem Header="Online models">
+            <StackPanel>
+                <local:OnlineModelView />
+            </StackPanel>
+        </TabItem>
     </TabControl>
 </Window>
