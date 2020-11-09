@@ -22,23 +22,17 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for ListBoxWithControls.xaml
     /// </summary>
-    public partial class TaskListView : UserControl
+    public partial class LocalModelListView : UserControl
     {
         private GridViewColumnHeader lastHeaderClicked;
         private ListSortDirection lastDirection;
 
-        public TaskListView()
+        public LocalModelListView(ModelManager modelManager)
         {
+            this.DataContext = modelManager;
             InitializeComponent();
-            this.DataContextChanged += dataContextChanged;
         }
-
-        private void dataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            
-        }
-
-
+        
         private void btnOpenModelDir_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
@@ -48,9 +42,10 @@ namespace FiskmoMTEngine
 
         private void btnAddOnlineModel_Click(object sender, RoutedEventArgs e)
         {
-            OnlineModelSelection onlineSelection = new OnlineModelSelection();
+            OnlineModelView onlineSelection = new OnlineModelView();
             onlineSelection.DataContext = this.DataContext;
-            onlineSelection.Show();
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.UiTabs.Add(new ActionTabItem() { Content = onlineSelection, Header = "Online models" }) ;
         }
 
         private void btnAddZipModel_Click(object sender, RoutedEventArgs e)
@@ -127,9 +122,9 @@ namespace FiskmoMTEngine
         private void btnCustomizeModel_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            ModelCustomizerWindow customizeModel = new ModelCustomizerWindow(selectedModel);
+            ModelCustomizerView customizeModel = new ModelCustomizerView(selectedModel);
             customizeModel.DataContext = this.DataContext;
-            customizeModel.Show();
+            
         }
 
         private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)

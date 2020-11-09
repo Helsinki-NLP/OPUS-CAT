@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -112,16 +113,22 @@ namespace FiskmoMTEngine
         public MainWindow()
         {
             Log.Information("Starting Fiskmö MT service");
-            this.StartService();
+            
+            this.StartEngine();
             InitializeComponent();
             this.ServicePortBox = FiskmoMTEngineSettings.Default.MtServicePort;
         }
 
-        private void StartService()
+        private void StartEngine()
         {
             var service = new Service();
             this.ModelManager = new ModelManager();
-            this.DataContext = this.ModelManager;
+            
+            this.UiTabs = new ObservableCollection<ActionTabItem>();
+            var localModels = new LocalModelListView(this.ModelManager);
+            this.UiTabs.Add(new ActionTabItem { Content = localModels, Header = "Models" });
+
+            this.DataContext = this;
             this.serviceHost = service.StartService(this.ModelManager);
         }
 
@@ -129,7 +136,7 @@ namespace FiskmoMTEngine
         {
             //Abort the service and start it again
             this.serviceHost.Abort();
-            this.StartService();
+            this.StartEngine();
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
@@ -148,6 +155,13 @@ namespace FiskmoMTEngine
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.serviceHost.Close();
+        }
+
+        public ObservableCollection<ActionTabItem> UiTabs { get; set; }
+
+        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

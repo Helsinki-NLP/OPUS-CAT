@@ -11,17 +11,28 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
-    <TabControl>
-        <TabItem Header="Models">
+    <TabControl ItemsSource="{Binding UiTabs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal" Height="21" Width="100">
+                    <TextBlock Width="80" Text="{Binding Header}"/>
+                    <Image Width="20" Height="20" MouseDown="Image_MouseDown"/>
+                </StackPanel>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <UserControl Content="{Binding Content}" Margin="0" />
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+        <!--<TabItem Header="Models">
             <StackPanel>
-                <local:TaskListView>
-                    <local:TaskListView DataContext="{Binding .}" />
-                </local:TaskListView>
+                <local:LocalModelListView DataContext="{Binding .}" />
                 <TextBlock Visibility="{Binding Path=BatchTranslationOngoing, Converter={StaticResource BoolToVis}}">Batch translation in progress</TextBlock>
                 <TextBlock Visibility="{Binding Path=CustomizationOngoing, Converter={StaticResource BoolToVis}}">Fine-tuning in progress</TextBlock>
             </StackPanel>
-        </TabItem>
-        <TabItem Header="Advanced">
+        </TabItem>-->
+        <!--<TabItem Header="Advanced">
             <StackPanel>
             <local:MarianSettingsView />
             <Border Margin="5" BorderThickness="1" BorderBrush="Black">
@@ -34,11 +45,11 @@
                 </DockPanel>
             </Border>
             </StackPanel>
-        </TabItem>
-        <TabItem Header="Online models">
+        </TabItem>-->
+        <!--<TabItem Header="Online models">
             <StackPanel>
                 <local:OnlineModelView />
             </StackPanel>
-        </TabItem>
+        </TabItem>-->
     </TabControl>
 </Window>

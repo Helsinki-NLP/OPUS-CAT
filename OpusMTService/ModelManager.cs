@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -30,13 +31,14 @@ namespace FiskmoMTEngine
     public class ModelManager : INotifyPropertyChanged
     {
         
+
         private List<MTModel> onlineModels;
 
         private ObservableCollection<MTModel> filteredOnlineModels = new ObservableCollection<MTModel>();
 
         public ObservableCollection<MTModel> FilteredOnlineModels
         { get => filteredOnlineModels; set { filteredOnlineModels = value; NotifyPropertyChanged(); } }
-
+        
         private ObservableCollection<MTModel> localModels;
 
         public ObservableCollection<MTModel> LocalModels
