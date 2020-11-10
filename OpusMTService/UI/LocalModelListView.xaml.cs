@@ -45,7 +45,8 @@ namespace FiskmoMTEngine
             OnlineModelView onlineSelection = new OnlineModelView();
             onlineSelection.DataContext = this.DataContext;
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.UiTabs.Add(new ActionTabItem() { Content = onlineSelection, Header = "Online models" }) ;
+            mainWindow.AddTab(new ActionTabItem() { Content = onlineSelection, Header = "Online models", Closable = true });
+            
         }
 
         private void btnAddZipModel_Click(object sender, RoutedEventArgs e)
@@ -92,15 +93,19 @@ namespace FiskmoMTEngine
         private void btnCustomizationProgress_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            CustomizationProgressWindow customizationProgressWindow = new CustomizationProgressWindow(selectedModel);
-            customizationProgressWindow.Show();
+            CustomizationProgressView customizationProgressView = new CustomizationProgressView(selectedModel);
+            
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = customizationProgressView, Header = customizationProgressView.Title, Closable = true });
         }
 
         private void btnTranslateWithModel_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            TranslateWindow translateWindow = new TranslateWindow(selectedModel);
-            translateWindow.Show();
+            TranslateView translateView = new TranslateView(selectedModel);
+            
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = translateView, Header = translateView.Title, Closable = true });
         }
 
         //TODO: Open a window where the test file is translated with the model.
@@ -124,7 +129,9 @@ namespace FiskmoMTEngine
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
             ModelCustomizerView customizeModel = new ModelCustomizerView(selectedModel);
             customizeModel.DataContext = this.DataContext;
-            
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = customizeModel, Header = customizeModel.Title, Closable = true });
         }
 
         private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)

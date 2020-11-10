@@ -20,12 +20,14 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
     /// </summary>
-    public partial class TranslateWindow : Window
+    public partial class TranslateView : UserControl
     {
-        
+
         private MTModel model;
 
-        public TranslateWindow(MTModel selectedModel)
+        internal string Title { get; set; }
+
+        public TranslateView(MTModel selectedModel)
         {
             this.Model = selectedModel;
             this.Title = $"Translating with model {Model.Name}";
@@ -40,7 +42,7 @@ namespace FiskmoMTEngine
             Task<string> translate = new Task<string>(() => this.Model.Translate(source));
             translate.ContinueWith(x => Dispatcher.Invoke(() => this.TargetBox.Text = x.Result));
             translate.Start();
-            
+
         }
     }
 }

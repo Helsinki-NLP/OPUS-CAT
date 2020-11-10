@@ -24,14 +24,15 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
     /// </summary>
-    public partial class CustomizationProgressWindow : Window
+    public partial class CustomizationProgressView : UserControl
     {
-        
+
         private MTModel model;
 
         private LineSeries ScoresToSeries(IEnumerable<FileInfo> scoreFiles, string title)
         {
-            var series = new LineSeries {
+            var series = new LineSeries
+            {
                 Title = title,
                 Values = new ChartValues<double>()
             };
@@ -64,14 +65,14 @@ namespace FiskmoMTEngine
                 }
             }
 
-           
+
             return series;
         }
 
-        public CustomizationProgressWindow(MTModel selectedModel)
+        public CustomizationProgressView(MTModel selectedModel)
         {
             this.DataContext = this;
-            
+
 
             this.Model = selectedModel;
             this.Title = $"Customization progress for model {Model.Name}";
@@ -91,7 +92,7 @@ namespace FiskmoMTEngine
         }
 
         public MTModel Model { get => model; set => model = value; }
-
+        public string Title { get; private set; }
         public SeriesCollection SeriesCollection { get; set; }
         public string[] Labels { get; set; }
         public Func<double, string> YFormatter { get; set; }

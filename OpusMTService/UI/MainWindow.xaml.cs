@@ -63,6 +63,12 @@ namespace FiskmoMTEngine
             }
         }
 
+        internal void AddTab(ActionTabItem actionTabItem)
+        {
+            this.UiTabs.Add(actionTabItem);
+            this.Tabs.SelectedItem = actionTabItem;
+        }
+
         private string Validate(string propertyName)
         {
             // Return error message if there is error on else return empty or null string
@@ -123,10 +129,10 @@ namespace FiskmoMTEngine
         {
             var service = new Service();
             this.ModelManager = new ModelManager();
-            
+
             this.UiTabs = new ObservableCollection<ActionTabItem>();
             var localModels = new LocalModelListView(this.ModelManager);
-            this.UiTabs.Add(new ActionTabItem { Content = localModels, Header = "Models" });
+            this.UiTabs.Add(new ActionTabItem { Content = localModels, Header = "Models", Closable = false });
 
             this.DataContext = this;
             this.serviceHost = service.StartService(this.ModelManager);
@@ -159,9 +165,9 @@ namespace FiskmoMTEngine
 
         public ObservableCollection<ActionTabItem> UiTabs { get; set; }
 
-        private void Image_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Image_MouseUp(object sender, MouseButtonEventArgs e)
         {
-
+            this.UiTabs.RemoveAt(Tabs.SelectedIndex);
         }
     }
 }

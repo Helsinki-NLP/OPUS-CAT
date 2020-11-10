@@ -23,6 +23,8 @@ namespace FiskmoMTEngine
     {
         private MTModel selectedModel;
 
+        public string Title { get; private set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -159,8 +161,8 @@ namespace FiskmoMTEngine
         {
             this.CustomizationNotStarted = true;
             this.selectedModel = selectedModel;
-            //Was used for window
-            //this.Title = $"Customize model {this.selectedModel.Name}";
+            
+            this.Title = $"Customize model {this.selectedModel.Name}";
             InitializeComponent();
         }
 

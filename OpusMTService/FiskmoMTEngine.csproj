@@ -129,11 +129,11 @@
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
     <Compile Include="UI\Common.cs" />
+    <Compile Include="UI\CustomizationProgressView.xaml.cs">
+      <DependentUpon>CustomizationProgressView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ModelCustomizerView.xaml.cs">
       <DependentUpon>ModelCustomizerView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\ModelCustomizerWindow.xaml.cs">
-      <DependentUpon>ModelCustomizerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Marian\MarianCustomizer.cs" />
     <Compile Include="MTModelConfig.cs" />
@@ -159,21 +159,18 @@
     <Compile Include="UI\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\CustomizationProgressWindow.xaml.cs">
-      <DependentUpon>CustomizationProgressWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\TranslateWindow.xaml.cs">
-      <DependentUpon>TranslateWindow.xaml</DependentUpon>
+    <Compile Include="UI\TranslateView.xaml.cs">
+      <DependentUpon>TranslateView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TranslationDbHelper.cs" />
     <Compile Include="UI\MarianSettingsView.xaml.cs">
       <DependentUpon>MarianSettingsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="UI\ModelCustomizerView.xaml">
+    <Page Include="UI\CustomizationProgressView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ModelCustomizerWindow.xaml">
+    <Page Include="UI\ModelCustomizerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -209,11 +206,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\CustomizationProgressWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\TranslateWindow.xaml">
+    <Page Include="UI\TranslateView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -295,6 +288,7 @@
     <Content Include="Preprocessing\apply_bpe.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="UI\cross.png" />
     <Resource Include="UI\fiskmo_zIQ_icon.ico" />
     <Resource Include="fiskmo_zIQ_icon.ico" />
     <None Include="customize.yml">
