@@ -27,7 +27,9 @@
                     <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.ModelConfig.Finetuned, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="customizationProgress" Click="btnCustomizationProgress_Click">Show customization progress</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Translate with model</Button>
-                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
+                    <!-- This is disabled until the testing functionalities can be polished a bit more
+                        <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
+                    -->
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
                 </StackPanel>

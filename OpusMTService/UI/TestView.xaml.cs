@@ -24,7 +24,7 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for TestWindow.xaml
     /// </summary>
-    public partial class TestWindow : Window, INotifyPropertyChanged
+    public partial class TestView : UserControl, INotifyPropertyChanged
     {
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -52,7 +52,7 @@ namespace FiskmoMTEngine
 
         private MTModel model;
 
-        public TestWindow(MTModel selectedModel)
+        public TestView(MTModel selectedModel)
         {
             this.Model = selectedModel;
             this.Title = $"Translating with model {Model.Name}";
@@ -68,6 +68,7 @@ namespace FiskmoMTEngine
         }
 
         public MTModel Model { get => model; set => model = value; }
+        public string Title { get; private set; }
 
         private void DisplayFileDialog()
         {
@@ -80,13 +81,13 @@ namespace FiskmoMTEngine
 
             if (result == true)
             {
-                  
+
             }
         }
 
         private void btnAddSourceFile_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void testButton_Click(object sender, RoutedEventArgs e)
@@ -94,16 +95,16 @@ namespace FiskmoMTEngine
             var batchTranslator = new MarianBatchTranslator(
                 this.model.InstallDir,
                 this.model.SourceLanguages.Single(),
-                this.model.TargetLanguages.Single(),false,false);
+                this.model.TargetLanguages.Single(), false, false);
 
 
             var sourceLines = File.ReadAllLines(this.SourceFileBox.Text);
             var translationFile = new FileInfo(this.TargetFileBox.Text);
             var refFile = new FileInfo(this.RefFileBox.Text);
-            batchTranslator.OutputReady += (x,y) => EvaluateTranslation(refFile, sourceLines, translationFile);
+            batchTranslator.OutputReady += (x, y) => EvaluateTranslation(refFile, sourceLines, translationFile);
             batchTranslator.BatchTranslate(sourceLines, translationFile);
         }
-        
+
         private void EvaluateTranslation(FileInfo refFile, IEnumerable<string> input, FileInfo spOutput)
         {
 
@@ -132,7 +133,7 @@ namespace FiskmoMTEngine
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 "Evaluate.bat",
                 $"{detokOutput.FullName} {refFile.FullName} {evaluationScoreFilePath}",
-                (x,y) => this.DisplayResult(evaluationScoreFilePath));
+                (x, y) => this.DisplayResult(evaluationScoreFilePath));
         }
 
         private void DisplayResult(string evaluationScoreFilePath)
@@ -143,7 +144,7 @@ namespace FiskmoMTEngine
         private void FileBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textbox = (TextBox)sender;
-            textbox.Text = textbox.Text.Replace("\"","");
+            textbox.Text = textbox.Text.Replace("\"", "");
         }
     }
 }

@@ -113,15 +113,19 @@ namespace FiskmoMTEngine
         private void btnTestModel_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            TestWindow translateWindow = new TestWindow(selectedModel);
-            translateWindow.Show();
+            TestView testView = new TestView(selectedModel);
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = testView, Header = testView.Title, Closable = true });
         }
 
         private void btnEditModelTags_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            TagEditWindow tagEditWindow = new TagEditWindow(selectedModel);
-            tagEditWindow.Show();
+            TagEditView tagEditView = new TagEditView(selectedModel);
+        
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = tagEditView, Header = tagEditView.Title, Closable = true });
         }
 
         private void btnCustomizeModel_Click(object sender, RoutedEventArgs e)

@@ -20,12 +20,12 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
     /// </summary>
-    public partial class TagEditWindow : Window
+    public partial class TagEditView: UserControl
     {
-        
+
         private MTModel model;
 
-        public TagEditWindow(MTModel selectedModel)
+        public TagEditView(MTModel selectedModel)
         {
             this.Model = selectedModel;
             this.DataContext = selectedModel;
@@ -35,8 +35,8 @@ namespace FiskmoMTEngine
         }
 
         public MTModel Model { get => model; set => model = value; }
+        public string Title { get; private set; }
 
- 
         private void add_Click(object sender, RoutedEventArgs e)
         {
             this.Model.ModelConfig.ModelTags.Add(this.TagTextBox.Text);

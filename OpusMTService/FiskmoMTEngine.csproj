@@ -137,9 +137,6 @@
     </Compile>
     <Compile Include="Marian\MarianCustomizer.cs" />
     <Compile Include="MTModelConfig.cs" />
-    <Compile Include="UI\OnlineModelSelection.xaml.cs">
-      <DependentUpon>OnlineModelSelection.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\LocalModelListView.xaml.cs">
       <DependentUpon>LocalModelListView.xaml</DependentUpon>
     </Compile>
@@ -150,14 +147,14 @@
       <DependentUpon>FiskmoMTEngineSettings.settings</DependentUpon>
     </Compile>
     <Compile Include="TokenCodeGenerator.cs" />
-    <Compile Include="TagEditWindow.xaml.cs">
-      <DependentUpon>TagEditWindow.xaml</DependentUpon>
+    <Compile Include="UI\TagEditView.xaml.cs">
+      <DependentUpon>TagEditView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\OnlineModelView.xaml.cs">
       <DependentUpon>OnlineModelView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\TestWindow.xaml.cs">
-      <DependentUpon>TestWindow.xaml</DependentUpon>
+    <Compile Include="UI\TestView.xaml.cs">
+      <DependentUpon>TestView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\TranslateView.xaml.cs">
       <DependentUpon>TranslateView.xaml</DependentUpon>
@@ -173,10 +170,6 @@
     <Page Include="UI\ModelCustomizerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\OnlineModelSelection.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\LocalModelListView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -194,17 +187,17 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="TagEditWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="UI\TagEditView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\OnlineModelView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\TestWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="UI\TestView.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\TranslateView.xaml">
       <SubType>Designer</SubType>
