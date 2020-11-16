@@ -81,8 +81,8 @@ namespace FiskmoMTEngine
 
         }
 
-        private List<string> sourceLanguages;
-        private List<string> targetLanguages;
+        private List<IsoLanguage> sourceLanguages;
+        private List<IsoLanguage> targetLanguages;
         private string name;
 
         public FileInfo AlignmentPriorsFile {
@@ -124,7 +124,7 @@ namespace FiskmoMTEngine
             this.InstallProgress = e.ProgressPercentage;
         }
 
-        public List<string> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
+        public List<IsoLanguage> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
 
@@ -202,12 +202,13 @@ namespace FiskmoMTEngine
                         }
                     }
 
-                    this.PreTranslateBatch(newSegments);
+                    //Fine-tuned models are always bilingual models
+                    this.PreTranslateBatch(newSegments,this.sourceLanguages.First(), this.targetLanguages.First());
                 }
             }
         }
 
-        public List<string> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
+        public List<IsoLanguage> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
 
         public string Name { get => name; set => name = value; }
 
@@ -324,8 +325,8 @@ namespace FiskmoMTEngine
             }
             var pathSplit = modelPath.Split(separator);
             //Multiple source languages separated by plus symbols
-            this.SourceLanguages = pathSplit[0].Split('-')[0].Split('+').ToList();
-            this.TargetLanguages = pathSplit[0].Split('-')[1].Split('+').ToList();
+            this.SourceLanguages = pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+            this.TargetLanguages = pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
             this.Name = pathSplit[1];
             this.ModelPath = modelPath;
         }
@@ -334,8 +335,8 @@ namespace FiskmoMTEngine
         public MTModel(
             string name, 
             string modelPath, 
-            string sourceCode, 
-            string targetCode, 
+            List<IsoLanguage> sourceLangs,
+            List<IsoLanguage> targetLangs,
             MTModelStatus status, 
             string modelTag, 
             DirectoryInfo customDir,
@@ -344,8 +345,8 @@ namespace FiskmoMTEngine
             bool includeTagPairs)
         {
             this.Name = name;
-            this.SourceLanguages = new List<string>() { sourceCode };
-            this.TargetLanguages = new List<string>() { targetCode };
+            this.SourceLanguages = sourceLangs;
+            this.TargetLanguages = targetLangs;
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
@@ -459,21 +460,21 @@ namespace FiskmoMTEngine
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;
-        private string srcLangCode;
-        private string trgLangCode;
+        private IsoLanguage srcLang;
+        private IsoLanguage trgLang;
         private MTModelStatus customizing;
         private string modelTag;
         
         private object includePlaceholderTags;
         private object includeTagPairs;
 
-        internal Process PreTranslateBatch(List<string> input)
+        internal Process PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
             FileInfo output = new FileInfo(Path.Combine(this.InstallDir, "batchoutput.txt"));
             var batchTranslator = new MarianBatchTranslator(
                 this.InstallDir, 
-                this.SourceLanguageString, 
-                this.TargetLanguageString, 
+                sourceLang, 
+                targetLang, 
                 this.modelConfig.IncludePlaceholderTags,
                 this.modelConfig.IncludeTagPairs);
             return batchTranslator.BatchTranslate(input,output,storeTranslations:true);

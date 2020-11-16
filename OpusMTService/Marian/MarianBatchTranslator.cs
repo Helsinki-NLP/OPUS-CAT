@@ -63,18 +63,18 @@ namespace FiskmoMTEngine
 
         public MarianBatchTranslator(
             string modelDir, 
-            string sourceCode, 
-            string targetCode, 
+            IsoLanguage sourceLang,
+            IsoLanguage targetLang, 
             bool includePlaceholderTags, 
             bool includeTagPairs)
         {
-            this.langpair = $"{sourceCode}-{targetCode}";
-            this.SourceCode = sourceCode;
-            this.TargetCode = targetCode;
+            this.SourceCode = sourceLang.Iso639_3Code;
+            this.TargetCode = targetLang.Iso639_3Code;
+            
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
             this.modelDir = new DirectoryInfo(modelDir);
-            this.SystemName = $"{sourceCode}-{targetCode}_" + this.modelDir.Name;
+            this.SystemName = $"{this.SourceCode}-{this.TargetCode}_" + this.modelDir.Name;
             
             //Check if batch.yml exists, if not create it from decode.yml
             var batchYaml = this.modelDir.GetFiles("batch.yml");

@@ -79,13 +79,13 @@ namespace FiskmoMTEngine
         
         public static ParallelFilePair ParseTmxToParallelFiles(
             string tmxFile, 
-            string sourceCode, 
-            string targetCode,
+            IsoLanguage sourceLang,
+            IsoLanguage targetLang,
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
-            var sourceFile = new FileInfo($"{tmxFile}.{sourceCode}.txt");
-            var targetFile = new FileInfo($"{tmxFile}.{targetCode}.txt");
+            var sourceFile = new FileInfo($"{tmxFile}.{sourceLang.Iso639_3Code}.txt");
+            var targetFile = new FileInfo($"{tmxFile}.{targetLang.Iso639_3Code}.txt");
             var tmx = XDocument.Load(tmxFile);
             var tus = tmx.Descendants("tu");
 
@@ -96,13 +96,12 @@ namespace FiskmoMTEngine
                 {
                     var sourceSeg =
                         tu.Descendants("seg").FirstOrDefault(
-                            x => x.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower().StartsWith(sourceCode));
+                            x => sourceLang.IsCompatibleTmxLang(x.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower()));
                     var targetSeg =
                         tu.Descendants("seg").FirstOrDefault(
-                            x => x.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower().StartsWith(targetCode));
+                            x => targetLang.IsCompatibleTmxLang(x.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower()));
                     if (sourceSeg != null && targetSeg != null)
                     {
-
                         var sourceText = TmxToTxtParser.FilterTextAndTags(sourceSeg, includePlaceholderTags, includeTagPairs);
                         sourceWriter.WriteLine(sourceText);
                         var targetText = TmxToTxtParser.FilterTextAndTags(targetSeg, includePlaceholderTags, includeTagPairs);

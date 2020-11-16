@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Reflection;
+using MemoQ.Addins.Common.Utils;
 using MemoQ.MTInterfaces;
 
 namespace FiskmoMTPlugin
@@ -32,6 +33,9 @@ namespace FiskmoMTPlugin
 
         public FiskmoMTEngine(string srcLangCode, string trgLangCode, FiskmoMTOptions options)
         {
+            var test = LanguageHelper.GetIsoCode2LetterFromIsoCode3Letter(trgLangCode);
+            var lang = new Language(trgLangCode);
+            
             this.srcLangCode = srcLangCode;
             this.trgLangCode = trgLangCode;
             this.options = options;

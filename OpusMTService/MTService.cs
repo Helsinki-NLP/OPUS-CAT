@@ -42,12 +42,12 @@ namespace FiskmoMTEngine
             return userName.Equals(password) ? TokenCodeGenerator.Instance.GenerateTokenCode(userName) : null;
         }
 
-        public List<string> GetLanguagePairModelTags(string tokenCode, string languagePair)
+        public List<string> GetLanguagePairModelTags(string tokenCode, string srcLangCode, string trgLangCode)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return this.ModelManager.GetLanguagePairModelTags(languagePair);
+            return this.ModelManager.GetLanguagePairModelTags(srcLangCode,trgLangCode);
         }
 
         /// <summary>
@@ -85,17 +85,26 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
+            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
         }
 
         public Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
-            var translation = this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
+            var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
             return new Translation(translation);
         }
 
         public Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
             WebOperationContext.Current.OutgoingResponse.ContentType = "text/plain; charset=utf-8";
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Connection: close");
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin: *");
@@ -104,7 +113,7 @@ namespace FiskmoMTEngine
             //the default Server header.
             WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Server.ToString(), string.Empty);
             
-            var translation = this.ModelManager.Translate(input, srcLangCode, trgLangCode, modelTag);
+            var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
             return new MemoryStream(Encoding.UTF8.GetBytes(translation));
         }
 
@@ -140,10 +149,13 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
             List<string> translations = new List<string>();
             foreach (var sourceSegment in input)
             {
-                translations.Add(this.ModelManager.Translate(sourceSegment, srcLangCode, trgLangCode, modelTag));
+                translations.Add(this.ModelManager.Translate(sourceSegment, sourceLang, targetLang, modelTag));
             }
             
             return translations;
@@ -213,10 +225,13 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
             if (!this.ModelManager.CustomizationOngoing && !this.ModelManager.BatchTranslationOngoing)
             {
                 this.ModelManager.StartCustomization(
-                    input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs);
+                    input, validation, uniqueNewSegments, sourceLang, targetLang, modelTag, includePlaceholderTags, includeTagPairs);
                 return "fine-tuning started";
             }
             else

@@ -55,14 +55,13 @@ namespace FiskmoMTEngine
             }
         }
 
-        internal List<string> GetLanguagePairModelTags(string languagePair)
+        internal List<string> GetLanguagePairModelTags(string sourceCode, string targetCode)
         {
-            var sourceTargetSplit = languagePair.Split('-');
-            var sourceLang = sourceTargetSplit[0];
-            var targetLang = sourceTargetSplit[1];
+            var sourceLang = new IsoLanguage(sourceCode);
+            var targetLang = new IsoLanguage(targetCode);
             var relevantModels = from m in this.LocalModels
-                                 where m.SourceLanguages.Contains(sourceLang)
-                                 where m.TargetLanguages.Contains(targetLang)
+                                 where m.SourceLanguages.Any(x => x.IsCompatibleLanguage(sourceLang))
+                                 where m.TargetLanguages.Any(x => x.IsCompatibleLanguage(targetLang))
                                  where m.ModelConfig != null
                                  select m.ModelConfig.ModelTags;
 
@@ -80,15 +79,18 @@ namespace FiskmoMTEngine
 
         internal string CheckModelStatus(string sourceCode, string targetCode, string modelTag)
         {
+            var sourceLang = new IsoLanguage(sourceCode);
+            var targetLang = new IsoLanguage(targetCode);
+
             StringBuilder statusMessage = new StringBuilder();
-            var primaryModel = this.GetPrimaryModel(sourceCode, targetCode);
+            var primaryModel = this.GetPrimaryModel(sourceLang, targetLang);
             if (primaryModel == null)
             {
                 statusMessage.Append($"No model available for {sourceCode}-{targetCode}. Install a model in the Fiskmö MT engine application.");
             }
             else if (modelTag != null && modelTag != "")
             {
-                var taggedModel = this.GetModelByTag(modelTag, sourceCode, targetCode, true);
+                var taggedModel = this.GetModelByTag(modelTag, sourceLang, targetLang, true);
                 if (taggedModel == null)
                 {
                     statusMessage.Append($"No model with tag {modelTag} available for {sourceCode}-{targetCode}. ");
@@ -208,21 +210,21 @@ namespace FiskmoMTEngine
             }
         }
 
-        private MTModel SelectModel(string srcLangCode, string trgLangCode, string modelTag, bool includeIncomplete = false)
+        private MTModel SelectModel(IsoLanguage srcLang, IsoLanguage trgLang, string modelTag, bool includeIncomplete = false)
         {
-
+            
             MTModel mtModel;
 
             if (modelTag == null || modelTag == "")
             {
-                mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+                mtModel = this.GetPrimaryModel(srcLang, trgLang);
             }
             else
             {
-                mtModel = this.GetModelByTag(modelTag, srcLangCode, trgLangCode, includeIncomplete);
+                mtModel = this.GetModelByTag(modelTag, srcLang, trgLang, includeIncomplete);
                 if (mtModel == null)
                 {
-                    mtModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+                    mtModel = this.GetPrimaryModel(srcLang, trgLang);
                 }
             }
             return mtModel;
@@ -231,12 +233,14 @@ namespace FiskmoMTEngine
         internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             this.BatchTranslationOngoing = true;
-            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag, true);
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+            var mtModel = this.SelectModel(sourceLang, targetLang, modelTag, true);
 
             Log.Information($"Pretranslating a batch of translations with model tag {modelTag}, model {mtModel.Name} will be used.");
             if (mtModel.Status == MTModelStatus.OK)
             {
-                var batchProcess = mtModel.PreTranslateBatch(input);
+                var batchProcess = mtModel.PreTranslateBatch(input,sourceLang,targetLang);
                 batchProcess.Exited += BatchProcess_Exited;
             }
             else
@@ -250,7 +254,7 @@ namespace FiskmoMTEngine
             Application.Current.Dispatcher.Invoke(() => this.BatchTranslationOngoing = false);
         }
 
-        private MTModel GetModelByTag(string tag, string srcLangCode, string trgLangCode, bool includeIncomplete = false)
+        private MTModel GetModelByTag(string tag, IsoLanguage srcLang, IsoLanguage trgLang, bool includeIncomplete = false)
         {
             //There could be multiple models finetuned with the same tag, use the latest.
             if (includeIncomplete)
@@ -258,16 +262,16 @@ namespace FiskmoMTEngine
                 return this.LocalModels.FirstOrDefault(
                 x =>
                     x.ModelConfig.ModelTags.Contains(tag) &&
-                    x.SourceLanguages.Contains(srcLangCode) &&
-                    x.TargetLanguages.Contains(trgLangCode));
+                    x.SourceLanguages.Any(y => y.IsCompatibleLanguage(srcLang)) &&
+                    x.TargetLanguages.Any(y => y.IsCompatibleLanguage(trgLang)));
             }
             else
             {
                 return this.LocalModels.FirstOrDefault(
                 x =>
                     x.ModelConfig.ModelTags.Contains(tag) &&
-                    x.SourceLanguages.Contains(srcLangCode) &&
-                    x.TargetLanguages.Contains(trgLangCode) &&
+                    x.SourceLanguages.Any(y => y.IsCompatibleLanguage(srcLang)) &&
+                    x.TargetLanguages.Any(y => y.IsCompatibleLanguage(trgLang)) &&
                     x.Status == MTModelStatus.OK);
             }
 
@@ -334,40 +338,48 @@ namespace FiskmoMTEngine
             ParallelFilePair inputPair,
             ParallelFilePair validationPair,
             List<string> uniqueNewSegments,
-            string srcLangCode,
-            string trgLangCode,
+            IsoLanguage srcLang,
+            IsoLanguage trgLang,
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
             DirectoryInfo customDir,
             MTModel baseModel)
         {
-            var customTask = Task.Run(() => Customize(inputPair, validationPair, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+            var customTask = Task.Run(() => 
+            Customize(
+                inputPair,
+                validationPair,
+                uniqueNewSegments,
+                srcLang,
+                trgLang,
+                modelTag, 
+                includePlaceholderTags, 
+                includeTagPairs, 
+                customDir, 
+                baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         internal void StartCustomization(List<Tuple<string, string>> input,
             List<Tuple<string, string>> validation,
             List<string> uniqueNewSegments,
-            string srcLangCode,
-            string trgLangCode,
+            IsoLanguage srcLang,
+            IsoLanguage trgLang,
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
             MTModel baseModel=null)
         {
+            
             if (baseModel == null)
             {
-                baseModel = this.GetPrimaryModel(srcLangCode, trgLangCode);
+                baseModel = this.GetPrimaryModel(srcLang, trgLang);
             }
 
             var customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
             
-            /* this.watcher = new FileSystemWatcher(customDir.FullName, "valid.log");
-             this.watcher.EnableRaisingEvents = true;
-             this.watcher.Changed += finetuningProgressChanged;*/
-
-            var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+            var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLang, trgLang, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
@@ -390,8 +402,8 @@ namespace FiskmoMTEngine
             List<Tuple<string, string>> input,
             List<Tuple<string, string>> validation,
             List<string> uniqueNewSegments,
-            string srcLangCode,
-            string trgLangCode,
+            IsoLanguage srcLang,
+            IsoLanguage trgLang,
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
@@ -400,10 +412,10 @@ namespace FiskmoMTEngine
         {
             //Write the tuning set as two files
             var fileGuid = Guid.NewGuid();
-            var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLangCode}");
-            var trgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{trgLangCode}");
-            var validSrcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{srcLangCode}");
-            var validTrgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{trgLangCode}");
+            var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLang.Iso639_3Code}");
+            var trgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{trgLang.Iso639_3Code}");
+            var validSrcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{srcLang.Iso639_3Code}");
+            var validTrgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{trgLang.Iso639_3Code}");
 
             var inputPair = new ParallelFilePair(input, srcFile, trgFile);
             var validPair = new ParallelFilePair(validation, validSrcFile, validTrgFile);
@@ -412,8 +424,8 @@ namespace FiskmoMTEngine
                 inputPair,
                 validPair,
                 uniqueNewSegments,
-                srcLangCode,
-                trgLangCode,
+                srcLang,
+                trgLang,
                 modelTag,
                 includePlaceholderTags,
                 includeTagPairs,
@@ -425,8 +437,8 @@ namespace FiskmoMTEngine
             ParallelFilePair inputPair,
             ParallelFilePair validationPair,
             List<string> uniqueNewSegments,
-            string srcLangCode,
-            string trgLangCode,
+            IsoLanguage srcLang,
+            IsoLanguage trgLang,
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
@@ -440,8 +452,8 @@ namespace FiskmoMTEngine
             var incompleteModel = new MTModel(
                     $"{baseModel.Name}_{modelTag}",
                     modelPath,
-                    srcLangCode,
-                    trgLangCode,
+                    new List<IsoLanguage>() { srcLang },
+                    new List<IsoLanguage>() { trgLang },
                     MTModelStatus.Customizing,
                     modelTag,
                     customDir,
@@ -535,31 +547,22 @@ namespace FiskmoMTEngine
             return null;
         }
 
-        internal string Translate(string input, string srcLangCode, string trgLangCode, string modelTag)
+        internal string Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
         {
 
-            var mtModel = this.SelectModel(srcLangCode, trgLangCode, modelTag);
+
+            var mtModel = this.SelectModel(srcLang, trgLang, modelTag);
 
             return mtModel.Translate(input);
         }
 
-        private MTModel GetPrimaryModel(string srcLangCode, string trgLangCode)
+        private MTModel GetPrimaryModel(IsoLanguage srcLang, IsoLanguage trgLang)
         {
-            //The language codes can be 3 or 2 letter formats, and the code may contain a
-            //region specifier (e.g. swe-FI). Normalize everything as 2 letter codes for now.
-
-            var threeLetterRegex = new Regex("^[a-z]{3}(-[A-Z]{2})?$");
-            if (threeLetterRegex.IsMatch(srcLangCode))
-            {
-                srcLangCode = this.ConvertIsoCode(srcLangCode);
-            }
-
-            if (threeLetterRegex.IsMatch(trgLangCode))
-            {
-                trgLangCode = this.ConvertIsoCode(trgLangCode);
-            }
-
-            var languagePairModels = this.LocalModels.Where(x => x.SourceLanguages.Contains(srcLangCode) && x.TargetLanguages.Contains(trgLangCode));
+            
+            var languagePairModels = 
+                this.LocalModels.Where(x => 
+                    x.SourceLanguages.Any(y => y.IsCompatibleLanguage(srcLang)) && 
+                    x.TargetLanguages.Any(y => y.IsCompatibleLanguage(trgLang)));
             MTModel primaryModel;
             if (languagePairModels.Any())
             {

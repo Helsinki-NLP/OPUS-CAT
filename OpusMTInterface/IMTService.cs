@@ -15,7 +15,7 @@ namespace OpusMTInterface
         
         [OperationContract]
         [WebGet]
-        List<string> GetLanguagePairModelTags(string tokenCode, string languagePair);
+        List<string> GetLanguagePairModelTags(string tokenCode, string srcLangCode, string trgLangCode);
 
         [OperationContract]
         [WebGet]

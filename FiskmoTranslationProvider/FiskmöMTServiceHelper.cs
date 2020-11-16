@@ -64,12 +64,12 @@ namespace FiskmoTranslationProvider
             return TokenCode;
         }
 
-        public static List<string> GetLanguagePairModelTags(FiskmoOptions options, string languagePair)
+        public static List<string> GetLanguagePairModelTags(FiskmoOptions options, string srcLangCode, string trgLangCode)
         {
-            return FiskmöMTServiceHelper.GetLanguagePairModelTags(options.mtServiceAddress, options.mtServicePort, languagePair);
+            return FiskmöMTServiceHelper.GetLanguagePairModelTags(options.mtServiceAddress, options.mtServicePort, srcLangCode, trgLangCode);
         }
 
-        public static List<string> GetLanguagePairModelTags(string host, string port, string languagePair)
+        public static List<string> GetLanguagePairModelTags(string host, string port, string srcLangCode, string trgLangCode)
         {
             var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
