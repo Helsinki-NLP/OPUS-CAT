@@ -84,8 +84,8 @@ namespace FiskmoMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
-            var sourceFile = new FileInfo($"{tmxFile}.{sourceLang.Iso639_3Code}.txt");
-            var targetFile = new FileInfo($"{tmxFile}.{targetLang.Iso639_3Code}.txt");
+            var sourceFile = new FileInfo($"{tmxFile}.{sourceLang.ShortestIsoCode}.txt");
+            var targetFile = new FileInfo($"{tmxFile}.{targetLang.ShortestIsoCode}.txt");
             var tmx = XDocument.Load(tmxFile);
             var tus = tmx.Descendants("tu");
 

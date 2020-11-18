@@ -73,15 +73,26 @@ namespace FiskmoMTEngine
         private bool batchTranslationOngoing;
         private bool customizationOngoing;
 
+        public MTModel OverrideModel
+        {
+            get => overrideModel;
+            set
+            {
+                overrideModel = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private MTModel overrideModel;
+
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
         public bool CustomizationOngoing { get => customizationOngoing; set { customizationOngoing = value; NotifyPropertyChanged(); } }
         public bool BatchTranslationOngoing { get => batchTranslationOngoing; set { batchTranslationOngoing = value; NotifyPropertyChanged(); } }
 
-        internal string CheckModelStatus(string sourceCode, string targetCode, string modelTag)
+        
+        internal string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
-            var sourceLang = new IsoLanguage(sourceCode);
-            var targetLang = new IsoLanguage(targetCode);
-
+            var sourceCode = sourceLang.ShortestIsoCode;
+            var targetCode = targetLang.ShortestIsoCode;
             StringBuilder statusMessage = new StringBuilder();
             var primaryModel = this.GetPrimaryModel(sourceLang, targetLang);
             if (primaryModel == null)
@@ -215,7 +226,14 @@ namespace FiskmoMTEngine
             
             MTModel mtModel;
 
-            if (modelTag == null || modelTag == "")
+            //It's possible to choose an override model, which is used to serve all requests.
+            //This is intended for testing and for those cases where CAT tools / 3rd party software
+            //uses non-standard language codes (e.g. memoq and cgy for Montenegrin).
+            if (this.OverrideModel != null)
+            {
+                mtModel = this.OverrideModel;
+            }
+            else if (modelTag == null || modelTag == "")
             {
                 mtModel = this.GetPrimaryModel(srcLang, trgLang);
             }
@@ -230,11 +248,10 @@ namespace FiskmoMTEngine
             return mtModel;
         }
 
-        internal void PreTranslateBatch(List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        internal void PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
             this.BatchTranslationOngoing = true;
-            var sourceLang = new IsoLanguage(srcLangCode);
-            var targetLang = new IsoLanguage(trgLangCode);
+
             var mtModel = this.SelectModel(sourceLang, targetLang, modelTag, true);
 
             Log.Information($"Pretranslating a batch of translations with model tag {modelTag}, model {mtModel.Name} will be used.");
@@ -412,10 +429,10 @@ namespace FiskmoMTEngine
         {
             //Write the tuning set as two files
             var fileGuid = Guid.NewGuid();
-            var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLang.Iso639_3Code}");
-            var trgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{trgLang.Iso639_3Code}");
-            var validSrcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{srcLang.Iso639_3Code}");
-            var validTrgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{trgLang.Iso639_3Code}");
+            var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLang.ShortestIsoCode}");
+            var trgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{trgLang.ShortestIsoCode}");
+            var validSrcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{srcLang.ShortestIsoCode}");
+            var validTrgFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.validation.{trgLang.ShortestIsoCode}");
 
             var inputPair = new ParallelFilePair(input, srcFile, trgFile);
             var validPair = new ParallelFilePair(validation, validSrcFile, validTrgFile);

@@ -245,6 +245,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FiskmoMTEngineSettings.Designer.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="iso-639-3_20200515.tab" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -69,7 +69,10 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return this.ModelManager.CheckModelStatus(sourceCode, targetCode, modelTag);
+            var sourceLang = new IsoLanguage(sourceCode);
+            var targetLang = new IsoLanguage(targetCode);
+            
+            return this.ModelManager.CheckModelStatus(sourceLang, targetLang, modelTag);
         }
 
         /// <summary>
@@ -175,6 +178,9 @@ namespace FiskmoMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return "";
 
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
             if (input.Count == 0)
             {
                 return "input was empty";
@@ -182,7 +188,7 @@ namespace FiskmoMTEngine
 
             if (!this.ModelManager.BatchTranslationOngoing && !this.ModelManager.CustomizationOngoing)
             {
-                this.ModelManager.PreTranslateBatch(input, srcLangCode, trgLangCode, modelTag);
+                this.ModelManager.PreTranslateBatch(input, sourceLang, targetLang, modelTag);
                 return "batch translation started";
             }
             else

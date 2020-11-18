@@ -65,6 +65,12 @@ namespace FiskmoMTEngine
             }
         }
 
+        private void btnSetOverride_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            ((ModelManager)this.DataContext).OverrideModel = selectedModel;
+        }
+
         private void btnDeleteModel_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", "Delete Confirmation", System.Windows.MessageBoxButton.YesNo);

@@ -32,6 +32,7 @@
                     -->
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
+                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="setAsOverride" Click="btnSetOverride_Click">Set as override model</Button>
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 

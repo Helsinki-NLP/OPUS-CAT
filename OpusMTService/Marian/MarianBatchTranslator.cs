@@ -68,8 +68,8 @@ namespace FiskmoMTEngine
             bool includePlaceholderTags, 
             bool includeTagPairs)
         {
-            this.SourceCode = sourceLang.Iso639_3Code;
-            this.TargetCode = targetLang.Iso639_3Code;
+            this.SourceCode = sourceLang.ShortestIsoCode;
+            this.TargetCode = targetLang.ShortestIsoCode;
             
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
