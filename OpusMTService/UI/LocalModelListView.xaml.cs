@@ -68,7 +68,36 @@ namespace FiskmoMTEngine
         private void btnSetOverride_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            selectedModel.IsOverrideModel = true;
+            selectedModel.IsOverridden = false;
+
+            if (((ModelManager)this.DataContext).OverrideModel != null)
+            {
+                ((ModelManager)this.DataContext).OverrideModel.IsOverrideModel = false;
+            }
+
+            foreach (MTModel model in this.LocalModelList.Items)
+            {
+                if (model != selectedModel)
+                {
+                    model.IsOverridden = true;
+                }
+            }
+            
             ((ModelManager)this.DataContext).OverrideModel = selectedModel;
+            ((ModelManager)this.DataContext).MoveOverrideToTop();
+        }
+
+        private void btnCancelOverride_Click(object sender, RoutedEventArgs e)
+        {
+
+            foreach (MTModel model in this.LocalModelList.Items)
+            {
+                model.IsOverridden = false;
+            }
+
+            ((ModelManager)this.DataContext).OverrideModel.IsOverrideModel = false;
+            ((ModelManager)this.DataContext).OverrideModel = null;
         }
 
         private void btnDeleteModel_Click(object sender, RoutedEventArgs e)

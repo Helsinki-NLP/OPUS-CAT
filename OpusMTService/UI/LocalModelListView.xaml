@@ -32,7 +32,8 @@
                     -->
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
-                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="setAsOverride" Click="btnSetOverride_Click">Set as override model</Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsNotOverrideModel, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="setAsOverride" Click="btnSetOverride_Click">Set as override model</Button>
+                    <Button Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="cancelOverride" Click="btnCancelOverride_Click">Cancel override</Button>
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 
@@ -44,6 +45,14 @@
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="BorderBrush" Value="LightGray" />
                             <Setter Property="BorderThickness" Value="1,1,1,1" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOverrideModel}" Value="true">
+                                    <Setter Property="BorderBrush" Value="Red" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsOverridden}" Value="true">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListView.ItemContainerStyle>
 

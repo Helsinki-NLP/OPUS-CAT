@@ -73,6 +73,8 @@ namespace FiskmoMTEngine
         private bool batchTranslationOngoing;
         private bool customizationOngoing;
 
+
+        public bool OverrideModelSet { get => this.overrideModel != null; }
         public MTModel OverrideModel
         {
             get => overrideModel;
@@ -80,6 +82,7 @@ namespace FiskmoMTEngine
             {
                 overrideModel = value;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged("OverrideModelSet");
             }
         }
         private MTModel overrideModel;
@@ -137,6 +140,12 @@ namespace FiskmoMTEngine
             NotifyPropertyChanged("FilteredOnlineModels");
         }
 
+        internal void MoveOverrideToTop()
+        {
+            var overrideModelIndex = this.localModels.IndexOf(this.OverrideModel);
+            this.localModels.Move(overrideModelIndex, 0);
+            NotifyPropertyChanged("LocalModels");
+        }
 
         internal void SortLocalModels(string header, ListSortDirection direction)
         {
@@ -145,6 +154,13 @@ namespace FiskmoMTEngine
             {
                 this.LocalModels = new ObservableCollection<MTModel>(this.LocalModels.Reverse());
             }
+
+            //If there's an override model, always show it on top
+            if (this.OverrideModel != null)
+            {
+                this.MoveOverrideToTop();
+            }
+
             NotifyPropertyChanged("LocalModels");
         }
 

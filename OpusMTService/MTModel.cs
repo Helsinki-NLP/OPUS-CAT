@@ -85,6 +85,32 @@ namespace FiskmoMTEngine
         private List<IsoLanguage> targetLanguages;
         private string name;
 
+        private Boolean isOverrideModel;
+        public bool IsOverrideModel
+        {
+            get => isOverrideModel;
+            set
+            {
+                isOverrideModel = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("IsNotOverrideModel");
+            }
+        }
+
+        public bool IsNotOverrideModel { get => !this.isOverrideModel; }
+
+        private Boolean isOverridden;
+
+        public bool IsOverridden
+        {
+            get => isOverridden;
+            set
+            {
+                isOverridden = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public FileInfo AlignmentPriorsFile {
             get { return new FileInfo(Path.Combine(this.InstallDir, "alignmentpriors.txt")); } }
 
@@ -457,6 +483,7 @@ namespace FiskmoMTEngine
 
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
         public Process FinetuneProcess { get; set; }
+        
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;
