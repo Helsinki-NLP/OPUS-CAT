@@ -97,7 +97,7 @@ namespace FiskmoTranslationProvider
                         this.TmFuzzies.AddRange(results.Select(x => x.MemoryTranslationUnit));
                         this.collectedSentencePairCount += results.Count;
                     }
-
+   
                 }
             }
         }

@@ -53,7 +53,10 @@ namespace FiskmoTranslationProvider
             {
                 this.fiskmoOptions.modelTag = this.Project.GetProjectInfo().Id.ToString();
             }
+
+            //Get instances of the translation memories included in the project.
             this.tms = this.InstantiateProjectTms();
+
             this.ProjectTranslations = new Dictionary<Language, List<Tuple<string, string>>>();
             this.ProjectNewSegments = new Dictionary<Language, List<string>>();
             this.ProjectFuzzies = new Dictionary<Language, List<TranslationUnit>>();
@@ -64,8 +67,6 @@ namespace FiskmoTranslationProvider
 
         protected override void ConfigureConverter(ProjectFile projectFile, IMultiFileConverter multiFileConverter)
         {            
-            //Get instances of the translation memories included in the project.
-
             var languageDirection = projectFile.GetLanguageDirection();
             var targetLanguage = languageDirection.TargetLanguage;
             var tmLanguageDirections = tms[targetLanguage].Select(x => x.GetLanguageDirection(new Sdl.LanguagePlatform.Core.LanguagePair(languageDirection.SourceLanguage.CultureInfo, languageDirection.TargetLanguage.CultureInfo)));
@@ -95,6 +96,9 @@ namespace FiskmoTranslationProvider
             }
             
         }
+
+        
+        
 
         /// <summary>
         /// Instantiate all file TMs for each language pair

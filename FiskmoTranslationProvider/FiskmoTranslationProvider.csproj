@@ -116,6 +116,7 @@
     <Reference Include="System.Reactive.Linq, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Linq.4.0.0\lib\net46\System.Reactive.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web" />
@@ -149,6 +150,9 @@
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
     </Compile>
+    <Compile Include="..\OpusMTInterface\Translation.cs">
+      <Link>Translation.cs</Link>
+    </Compile>
     <Compile Include="ConnectionControl.xaml.cs">
       <DependentUpon>ConnectionControl.xaml</DependentUpon>
     </Compile>
@@ -159,6 +163,7 @@
     <Compile Include="FinetuneBatchTaskControl.Designer.cs">
       <DependentUpon>FinetuneBatchTaskControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="FinetuneTransUnitExtractor.cs" />
     <Compile Include="FinetuneWpfControl.xaml.cs">
       <DependentUpon>FinetuneWpfControl.xaml</DependentUpon>
     </Compile>

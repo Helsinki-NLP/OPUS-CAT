@@ -92,7 +92,8 @@ namespace FiskmoTranslationProvider
                 List<string> modelTags = new List<string>();
                 foreach (var languagePair in modelTagLanguagePairs)
                 {
-                    modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(host, port, languagePair.ToString()));
+                    var pairSplit = languagePair.Split('-');
+                    modelTags.AddRange(FiskmöMTServiceHelper.GetLanguagePairModelTags(host, port, pairSplit[0],pairSplit[1]));
                 }
 
                 this.NoConnection = false;

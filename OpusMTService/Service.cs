@@ -32,7 +32,7 @@ namespace FiskmoMTEngine
             Log.Information($"Creating service host with following URIs: {String.Join(",",baseAddresses.Select(x => x.ToString()))}");
 
             var selfHost = new ServiceHost(mtService, baseAddresses);
-
+            
             // Check to see if the service host already has a ServiceMetadataBehavior
             ServiceMetadataBehavior smb = selfHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
             // If not, add one

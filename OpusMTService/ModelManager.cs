@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.ServiceModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -585,6 +586,11 @@ namespace FiskmoMTEngine
 
 
             var mtModel = this.SelectModel(srcLang, trgLang, modelTag);
+
+            if (mtModel == null)
+            {
+                throw new FaultException($"No MT model available for {srcLang}-{trgLang}");
+            }
 
             return mtModel.Translate(input);
         }

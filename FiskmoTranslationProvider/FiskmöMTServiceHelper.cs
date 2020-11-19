@@ -64,6 +64,7 @@ namespace FiskmoTranslationProvider
             return TokenCode;
         }
 
+      
         public static List<string> GetLanguagePairModelTags(FiskmoOptions options, string srcLangCode, string trgLangCode)
         {
             return FiskmöMTServiceHelper.GetLanguagePairModelTags(options.mtServiceAddress, options.mtServicePort, srcLangCode, trgLangCode);
@@ -74,7 +75,7 @@ namespace FiskmoTranslationProvider
             var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
             {
-                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(host, port), languagePair);
+                List<string> modelTags = proxy.GetLanguagePairModelTags(GetTokenCode(host, port), srcLangCode, trgLangCode);
                 return modelTags;
             }
         }
