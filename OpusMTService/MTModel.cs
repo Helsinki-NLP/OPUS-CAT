@@ -8,6 +8,7 @@ using System.Data.Entity.Migrations.History;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -15,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using YamlDotNet.Serialization;
 
@@ -154,7 +156,63 @@ namespace FiskmoMTEngine
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
 
-        
+        //This creates a zip package of the model that can be moved to another computer
+        internal void PackageModel()
+        {
+            var customModelZipDirPath = HelperFunctions.GetLocalAppDataPath(FiskmoMTEngineSettings.Default.CustomModelZipPath);
+            if (!Directory.Exists(customModelZipDirPath))
+            {
+                Directory.CreateDirectory(customModelZipDirPath);
+            }
+
+            var zipPath = Path.Combine(customModelZipDirPath, $"{this.Name}.zip");
+
+            if (File.Exists(zipPath))
+            {
+                MessageBox.Show($"Zipped model already exists: {zipPath}");
+                return;
+            }
+
+            using (var packageZip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+            {
+
+                //Include model files, README.md, spm files, tcmodel (not needed but expected), modelconfig.yml
+                var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
+                var deserializer = new Deserializer();
+                var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+
+                foreach (var modelNpzName in decoderSettings.models)
+                {
+                    //No point in compressing npz, it's already compressed
+                    packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, modelNpzName), modelNpzName, CompressionLevel.NoCompression);
+                }
+
+                foreach (var vocabName in decoderSettings.vocabs.Distinct())
+                {
+                    packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, vocabName), vocabName);
+                }
+
+                var otherModelFiles =
+                    new List<string>()
+                    {
+                        "source.spm",
+                        "target.spm",
+                        "source.tcmodel",
+                        "decoder.yml",
+                        "README.md",
+                        "preprocess.sh",
+                        "postprocess.sh",
+                        "modelconfig.yml",
+                        "LICENSE"
+                    };
+
+                foreach (var fileName in otherModelFiles)
+                {
+                    packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, fileName), fileName);
+                }
+            }
+            
+        }
 
         public string StatusAndEstimateString
         {
@@ -212,6 +270,8 @@ namespace FiskmoMTEngine
             else
             {
                 this.Status = MTModelStatus.OK;
+                this.ModelConfig.FinetuningComplete = true;
+                this.SaveModelConfig();
                 this.CustomizationStatus = null;
                 this.StatusProgress = 0;
                 this.NotifyPropertyChanged("StatusAndEstimateString");
@@ -272,7 +332,7 @@ namespace FiskmoMTEngine
 
                 //Check if the model finetuning has been suspended (because the MT engine has been closed,
                 //or there's been an error)
-                if (this.ModelConfig.Finetuned)
+                if (this.ModelConfig.FinetuningInitiated && !this.ModelConfig.FinetuningComplete)
                 {
                     if (this.IsCustomizationSuspended.Value)
                     {
@@ -381,7 +441,7 @@ namespace FiskmoMTEngine
             this.ModelConfig.IncludeTagPairs = includeTagPairs;
             if (status == MTModelStatus.Customizing)
             {
-                this.ModelConfig.Finetuned = true;
+                this.ModelConfig.FinetuningInitiated = true;
                 this.TrainingLog = new MarianLog();
             }
             this.InstallDir = customDir.FullName;
@@ -393,7 +453,7 @@ namespace FiskmoMTEngine
         {
             this.ParseModelPath(modelPath);
         }
-
+    
 
         public Boolean IsReady
         {
@@ -410,12 +470,20 @@ namespace FiskmoMTEngine
             }
         }
 
+        public Boolean IsCustomizationFinished
+        {
+            get
+            {
+                return (this.IsCustomizationSuspended.HasValue && !this.IsCustomizationSuspended.Value);
+            }
+        }
+
         //Indicates whether customization has been suspended, null value is for noncustomized models
         public Boolean? IsCustomizationSuspended
         {
             get
             {
-                if (!this.ModelConfig.Finetuned)
+                if (!this.ModelConfig.FinetuningInitiated)
                 {
                     return null;
                 }
@@ -439,6 +507,7 @@ namespace FiskmoMTEngine
                                 {
                                     if (line.EndsWith("Training finished"))
                                     {
+                                        this.ModelConfig.FinetuningComplete = true;
                                         return false;
                                     }
                                 }

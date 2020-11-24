@@ -124,6 +124,11 @@ namespace FiskmoMTEngine
             selectedModel.ResumeTraining();
         }
 
+        private void btnpackageCustomModel_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            selectedModel.PackageModel();
+        }
 
         private void btnCustomizationProgress_Click(object sender, RoutedEventArgs e)
         {

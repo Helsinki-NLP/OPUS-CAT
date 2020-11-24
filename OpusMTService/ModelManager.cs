@@ -538,7 +538,14 @@ namespace FiskmoMTEngine
 
             foreach (var modelPath in modelPaths)
             {
-                this.LocalModels.Add(new MTModel(Regex.Match(modelPath, @"[^\\]+\\[^\\]+$").Value, modelPath));
+                try
+                {
+                    this.LocalModels.Add(new MTModel(Regex.Match(modelPath, @"[^\\]+\\[^\\]+$").Value, modelPath));
+                }
+                catch
+                {
+                    Log.Error($"Model path invalid: {modelPath}.");
+                }
             }
         }
 
@@ -613,7 +620,7 @@ namespace FiskmoMTEngine
                 else
                 {
                     //Pick a model that is not fine-tuned
-                    primaryModel = languagePairModels.FirstOrDefault(x => !x.ModelConfig.Finetuned);
+                    primaryModel = languagePairModels.FirstOrDefault(x => !x.ModelConfig.FinetuningInitiated);
                     if (primaryModel == null)
                     {
                         //As a fallback pick any model

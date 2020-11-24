@@ -25,6 +25,7 @@
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
                     <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationSuspended, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="continueCustomization" Click="btnContinueCustomization_Click">Continue customization</Button>
                     <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.ModelConfig.Finetuned, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="customizationProgress" Click="btnCustomizationProgress_Click">Show customization progress</Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationFinished, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="packageCustomModel" Click="btnpackageCustomModel_Click">Package customized model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Translate with model</Button>
                     <!-- This is disabled until the testing functionalities can be polished a bit more

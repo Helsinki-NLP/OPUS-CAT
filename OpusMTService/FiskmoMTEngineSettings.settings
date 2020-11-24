@@ -47,5 +47,8 @@
     <Setting Name="PostFinetuneBatchName" Type="System.String" Scope="User">
       <Value Profile="(Default)">postfinetune.txt</Value>
     </Setting>
+    <Setting Name="CustomModelZipPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">custom_model_packages</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

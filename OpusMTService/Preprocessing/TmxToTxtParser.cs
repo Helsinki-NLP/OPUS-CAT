@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Xml.Linq;
 
 namespace FiskmoMTEngine
@@ -11,6 +13,7 @@ namespace FiskmoMTEngine
     public static class TmxToTxtParser
     {
 
+        //Tmx may contain tags. They can be converted to tag tokens for use in training or omitted.
         private static string FilterTextAndTags(
             XElement seg,
             bool includePlaceholderTags,
@@ -27,7 +30,11 @@ namespace FiskmoMTEngine
 
                 if (top is XText)
                 {
-                    segText.Append(top);
+                    //The text node may contain escaped characters, parse them
+                    //by using the Value property.
+                    var unescapedText = ((XText)top).Value;
+                    
+                    segText.Append(((XText)top).Value);
                     continue;
                 }
 
@@ -64,6 +71,7 @@ namespace FiskmoMTEngine
                             segText.Append(" ");
                         }
                     }
+                    //This handles elements with inner structure that should be included in the training corpus
                     else
                     {
                         foreach (var node in topElement.Nodes().Reverse())
@@ -74,7 +82,22 @@ namespace FiskmoMTEngine
                 }
             }
 
-            return segText.ToString();
+            var uncleanText = segText.ToString();
+
+            //The text may contain tags (as result of unescaping entities), remove them
+            var taglessText = Regex.Replace(uncleanText,"<[^> ]+>","");
+
+            //Segments may have multiple line breaks in them, especially segments from old TMs.
+            //Simply remove the line breaks to make sure the lines different language files sync.
+            //It might be best to skip these segments altogether, since they probably won't
+            //benefit training.
+            var delinedText = Regex.Replace(taglessText, "[\r\n]", " ");
+
+            //There may still be some residual entities (like if entities have been encoded twice, such as &auml
+            //becoming &amp;auml), convert those
+
+            var unescaped = HttpUtility.HtmlDecode(delinedText);
+            return unescaped;
         }
         
         public static ParallelFilePair ParseTmxToParallelFiles(

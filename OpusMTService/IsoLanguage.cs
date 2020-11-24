@@ -16,10 +16,11 @@ namespace FiskmoMTEngine
     /// </summary>
     public class IsoLanguage
     {
-        //this static constructor parses the iso table file that is embedded as a resource
-        static IsoLanguage()
+
+        private static void ParseIso639_3()
         {
             var assembly = Assembly.GetExecutingAssembly();
+
             using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("FiskmoMTEngine.iso-639-3_20200515.tab")))
             {
                 //Skip header
@@ -43,14 +44,43 @@ namespace FiskmoMTEngine
             }
         }
 
+        private static void ParseIso639_5()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("FiskmoMTEngine.iso639-5.tsv")))
+            {
+                //Skip header
+                isoTable.ReadLine();
+
+                string line;
+                while ((line = isoTable.ReadLine()) != null)
+                {
+                    var split = line.Split('\t');
+                    var iso639_5 = split[1];
+                    var refname = split[2];
+                    IsoLanguage.Iso639_5ToRefName[iso639_5] = refname;
+                }
+            }
+        }
+
+            //this static constructor parses the iso table files that are embedded as resources
+        static IsoLanguage()
+        {
+            IsoLanguage.ParseIso639_3();
+            IsoLanguage.ParseIso639_5();
+            
+        }
+
         private static Dictionary<string, string> Iso639_3To639_1 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_1To639_3 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_3ToRefName = new Dictionary<string, string>();
+        private static Dictionary<string, string> Iso639_5ToRefName = new Dictionary<string, string>();
 
         public string Iso639_5Code { get; set; }
         public string Iso3166Locale { get; set; }
         public string Iso639_3Code { get; set; }
         public string Iso639_1Code { get; set; }
+        public string NonIsoCode { get; set; }
 
         public override string ToString()
         {
@@ -65,9 +95,17 @@ namespace FiskmoMTEngine
                 {
                     return this.Iso639_1Code;
                 }
-                else
+                else if (this.Iso639_3Code != null)
                 {
                     return this.Iso639_3Code;
+                }
+                else if (this.Iso639_5Code != null)
+                {
+                    return this.Iso639_5Code;
+                }
+                else
+                {
+                    return this.NonIsoCode;
                 }
             }
         }
@@ -92,38 +130,68 @@ namespace FiskmoMTEngine
             if (opusMatch != null)
             {
                 this.Iso639_1Code = opusMatch.Groups["iso639_1"].Value;
-                this.Iso639_3Code = opusMatch.Groups["iso639_3"].Value;
+
+                var threeLetterIsoCode = opusMatch.Groups["iso639_3"].Value;
+                if (IsoLanguage.Iso639_3ToRefName.ContainsKey(threeLetterIsoCode))
+                {
+                    this.Iso639_3Code = threeLetterIsoCode;
+                }
+                else if (IsoLanguage.Iso639_5ToRefName.ContainsKey(threeLetterIsoCode))
+                {
+                    this.Iso639_5Code = threeLetterIsoCode;
+                }
+
                 this.Iso3166Locale = opusMatch.Groups["locale"].Value;
             }
-
-            Match cultureInfoMatch = IsoLanguage.CultureInfoCode.Match(languageCode);
-            if (cultureInfoMatch != null)
+            else
             {
-                this.Iso639_1Code = cultureInfoMatch.Groups["iso639_1"].Value;
-                this.Iso639_3Code = cultureInfoMatch.Groups["iso639_3"].Value;
-                this.Iso3166Locale = cultureInfoMatch.Groups["locale"].Value;
-                this.Iso15924Script = cultureInfoMatch.Groups["script"].Value;
+                Match cultureInfoMatch = IsoLanguage.CultureInfoCode.Match(languageCode);
+                if (cultureInfoMatch != null)
+                {
+                    this.Iso639_1Code = cultureInfoMatch.Groups["iso639_1"].Value;
+                    this.Iso639_3Code = cultureInfoMatch.Groups["iso639_3"].Value;
+                    this.Iso3166Locale = cultureInfoMatch.Groups["locale"].Value;
+                    this.Iso15924Script = cultureInfoMatch.Groups["script"].Value;
+                }
             }
 
-            //Get iso639_1 from is639_3 code if one exists
-            if ((this.Iso639_1Code == null || this.Iso639_1Code.Length != 2) && 
-                IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code))
+            //If parsing has failed, store the language code as non iso
+            if ((String.IsNullOrEmpty(this.Iso639_1Code) || !IsoLanguage.Iso639_1To639_3.ContainsKey(this.Iso639_1Code)) &&
+                (String.IsNullOrEmpty(this.Iso639_3Code) || !IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code)) &&
+                (String.IsNullOrEmpty(this.Iso639_5Code) || !IsoLanguage.Iso639_5ToRefName.ContainsKey(this.Iso639_5Code)))
             {
-                this.Iso639_1Code = IsoLanguage.Iso639_3To639_1[this.Iso639_3Code];
+                this.NonIsoCode = languageCode;
             }
-            //Get iso639_3 from is639_1 code, there should always be one
-            else if (this.Iso639_3Code == null || this.Iso639_3Code.Length != 3)
+            else
             {
-                this.Iso639_3Code = IsoLanguage.Iso639_1To639_3[this.Iso639_1Code];
-            }
+                //Get iso639_1 from is639_3 code if one exists
+                if (String.IsNullOrEmpty(Iso639_1Code) &&
+                    !String.IsNullOrEmpty(this.Iso639_3Code) &&
+                    IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code))
+                {
+                    this.Iso639_1Code = IsoLanguage.Iso639_3To639_1[this.Iso639_3Code];
+                }
+                else if (!String.IsNullOrEmpty(this.Iso639_1Code) && (String.IsNullOrEmpty(this.Iso639_3Code)))
+                {
+                    this.Iso639_3Code = IsoLanguage.Iso639_1To639_3[this.Iso639_1Code];
+                }
 
-            this.IsoRefName = IsoLanguage.Iso639_3ToRefName[this.Iso639_3Code];
+                if (this.Iso639_3Code != null)
+                {
+                    this.IsoRefName = IsoLanguage.Iso639_3ToRefName[this.Iso639_3Code];
+                }
+                else
+                {
+                    this.IsoRefName = IsoLanguage.Iso639_5ToRefName[this.Iso639_5Code];
+                }
+            }
         }
 
 
         internal bool IsCompatibleLanguage(IsoLanguage lang)
         {
-            return this.Iso639_3Code == lang.Iso639_3Code;
+            //TODO: add language group compatibility matching here
+            return this.ShortestIsoCode == lang.ShortestIsoCode;
         }
 
         //OPUS MT code is usually ISO-639-1, but might be ISO-639-3

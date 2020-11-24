@@ -92,20 +92,24 @@ namespace FiskmoMTEngine
         //This parses Marian log file to detect finetuning progress
         internal void MarianProgressHandler(object sender, DataReceivedEventArgs e)
         {
-            this.trainingLog.ParseTrainLogLine(e.Data);
+            //Data will be null in when the process exits
+            if (e.Data != null)
+            {
+                this.trainingLog.ParseTrainLogLine(e.Data);
 
-            //Here convert the amount of processed lines / total lines into estimated progress
-            //The progress start from five, so normalize it
-            int newProgress;
-            if (this.trainingLog.TotalLines > 0 && this.trainingLog.SentencesSoFar > 0)
-            {
-                newProgress = 5 + Convert.ToInt32(0.95 * ((100 *this.trainingLog.SentencesSoFar) / (this.trainingLog.TotalLines)));
+                //Here convert the amount of processed lines / total lines into estimated progress
+                //The progress start from five, so normalize it
+                int newProgress;
+                if (this.trainingLog.TotalLines > 0 && this.trainingLog.SentencesSoFar > 0)
+                {
+                    newProgress = 5 + Convert.ToInt32(0.95 * ((100 * this.trainingLog.SentencesSoFar) / (this.trainingLog.TotalLines)));
+                }
+                else
+                {
+                    newProgress = 5;
+                }
+                this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Customizing, this.trainingLog.EstimatedRemainingTotalTime)));
             }
-            else
-            {
-                newProgress = 5;
-            }
-            this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Customizing,this.trainingLog.EstimatedRemainingTotalTime)));
         }
 
         public enum CustomizationStep {
@@ -151,7 +155,6 @@ namespace FiskmoMTEngine
             //Preprocess input files
             this.PreprocessInput();
 
-            //Generate alignments for the training data
             var decoderYaml = this.customDir.GetFiles("decoder.yml").Single();
             var deserializer = new Deserializer();
 
@@ -182,9 +185,7 @@ namespace FiskmoMTEngine
             //Wait for the initial valid to finish before starting customization
             //(TODO: make sure this is not done on UI thread)
             initialValidProcess.WaitForExit();
-
             
-
             this.OnProgressChanged(new ProgressChangedEventArgs(6, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
 
             //Use the initial translation time as basis for estimating the duration of validation file
@@ -192,7 +193,6 @@ namespace FiskmoMTEngine
             this.trainingLog.EstimatedTranslationDuration = Convert.ToInt32((initialValidProcess.ExitTime - initialValidProcess.StartTime).TotalSeconds);
             
             MarianTrainerConfig trainingConfig;
-
             
             var baseCustomizeYmlPath =
                 HelperFunctions.GetLocalAppDataPath(
@@ -325,7 +325,7 @@ namespace FiskmoMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs,
             List<string> postCustomizationBatch,
-            bool guidedAlignment=true)
+            bool guidedAlignment=false)
         {
             this.model = model;
             this.customModel = customModel;

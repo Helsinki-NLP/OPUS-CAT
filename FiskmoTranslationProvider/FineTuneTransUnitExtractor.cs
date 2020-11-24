@@ -25,22 +25,52 @@ namespace FiskmoTranslationProvider
 
 
         IEnumerable<ITranslationProviderLanguageDirection> tms;
-        Dictionary<int, IEnumerable<TranslationUnit>> tmMatches;
+        Dictionary<int, List<TranslationUnit>> tmMatches;
+        public Dictionary<int, List<TranslationUnit>> TmMatches { get => tmMatches; set => tmMatches = value; }
+        HashSet<string> allTmMatches;
+
+        internal void Extract()
+        {
+            this.ExtractFullMatches();
+            this.ExtractFuzzies();
+        }
+
         private int transUnitCount;
         IEnumerable<string> sourceSegments;
+        IEnumerable<int> fuzzyBands;
+        
+        public FinetuneTransUnitExtractor(
+            IEnumerable<ITranslationProviderLanguageDirection> tms,
+            IEnumerable<string> sourceSegments,
+            IEnumerable<int> fuzzyBands)
+        {
+            this.tms = tms;
+            this.sourceSegments = sourceSegments;
+            this.fuzzyBands = fuzzyBands;
+            this.tmMatches = new Dictionary<int, List<TranslationUnit>>();
+            this.allTmMatches = new HashSet<string>();
+        }
 
         private void ExtractFullMatches()
         {
+            this.tmMatches[100] = new List<TranslationUnit>();
             foreach (var sourceSegment in this.sourceSegments)
             {
-                this.RunTmSearch(100, 10, sourceSegment);
+                this.RunTmSearch(sourceSegment, 100, 10, SearchMode.NormalSearch);
             }
-            
         }
 
         private void ExtractFuzzies()
         {
-
+            
+            foreach (var fuzzyBand in this.fuzzyBands)
+            {
+                this.tmMatches[fuzzyBand] = new List<TranslationUnit>();
+                foreach (var sourceSegment in this.sourceSegments)
+                {
+                    this.RunTmSearch(sourceSegment, fuzzyBand, 50, SearchMode.NormalSearch);
+                }
+            }
         }
 
         private void ExtractConcordanceMatches()
@@ -53,18 +83,30 @@ namespace FiskmoTranslationProvider
 
         }
 
-        private void RunTmSearch(int minScore, int maxResults, string sourceText)
+        private void RunTmSearch(string sourceText, int minScore, int maxResults, SearchMode searchMode)
         {
             SearchSettings searchSettings = new SearchSettings();
-            searchSettings.Mode = SearchMode.NormalSearch;
+            searchSettings.Mode = searchMode;
 
-            searchSettings.MinScore = 95;
-            searchSettings.MaxResults = 5;
+            searchSettings.MinScore = minScore;
+            searchSettings.MaxResults = maxResults;
+
+            this.TmMatches[minScore] = new List<TranslationUnit>();
 
             foreach (var tm in this.tms)
             {
                 var results = tm.SearchText(searchSettings, sourceText);
-                this.tmMatches[minScore] = results.Select(x => x.MemoryTranslationUnit);
+                
+                foreach (var res in results)
+                {
+                    //This match might have been saved as part of previous fuzzy band
+                    if (!this.allTmMatches.Contains(res.MemoryTranslationUnit.SourceSegment.ToPlain()))
+                    {
+                        this.TmMatches[minScore].Add(res.MemoryTranslationUnit);
+                        this.allTmMatches.Add(res.MemoryTranslationUnit.SourceSegment.ToPlain());
+                    }
+                }
+                
                 this.transUnitCount += results.Count;
             }
         }

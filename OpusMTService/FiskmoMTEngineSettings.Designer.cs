@@ -202,5 +202,17 @@ namespace FiskmoMTEngine {
                 this["PostFinetuneBatchName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("custom_model_packages")]
+        public string CustomModelZipPath {
+            get {
+                return ((string)(this["CustomModelZipPath"]));
+            }
+            set {
+                this["CustomModelZipPath"] = value;
+            }
+        }
     }
 }

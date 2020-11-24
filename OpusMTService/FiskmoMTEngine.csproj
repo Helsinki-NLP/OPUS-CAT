@@ -91,6 +91,7 @@
     <Reference Include="System.Data.SQLite.Linq, Version=1.0.112.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Linq.1.0.112.2\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Management" />
     <Reference Include="System.ServiceModel" />
@@ -246,6 +247,7 @@
       <LastGenOutput>FiskmoMTEngineSettings.Designer.cs</LastGenOutput>
     </None>
     <EmbeddedResource Include="iso-639-3_20200515.tab" />
+    <EmbeddedResource Include="iso639-5.tsv" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

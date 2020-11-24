@@ -34,9 +34,18 @@ namespace FiskmoMTEngine
         public bool IncludeTagPairs { get => includeTagPairs; set => includeTagPairs = value; }
         private bool includeTagPairs;
 
+        //For backwards compatibility
         [YamlMember(Alias = "finetuned", ApplyNamingConventions = false)]
-        public bool Finetuned { get => finetuned; set { finetuned = value; NotifyPropertyChanged(); } }
+        public bool Finetuned { get => finetuned; set { finetuningInitiated = value; finetuningComplete = value; NotifyPropertyChanged(); } }
         private bool finetuned;
+
+        [YamlMember(Alias = "finetuning-initiated", ApplyNamingConventions = false)]
+        public bool FinetuningInitiated { get => finetuningInitiated; set { finetuningInitiated = value; NotifyPropertyChanged(); } }
+        private bool finetuningInitiated;
+
+        [YamlMember(Alias = "finetuning-complete", ApplyNamingConventions = false)]
+        public bool FinetuningComplete { get => finetuningComplete; set { finetuningComplete = value; NotifyPropertyChanged(); } }
+        private bool finetuningComplete;
 
         public MTModelConfig()
         {
