@@ -62,6 +62,10 @@ If the fine-tuning is still in progress for the model with chosen tag, the conne
 
 If the project contains a lot tags, it's possible to include textual representations of tags into the fine-tuning material, in which case the fine-tuned model learns to transfer tags from the source text into the target text. The tag learning feature is experimental, so it might not work optimally in all cases (the fine-tuning material needs to contain enough tags to learn from, and the tag structure should be relatively simple). You can choose to learn  placeholder tag positions (**Include placeholder tags as text**) and tag pairs (**Include tag pairs as text**).
 
+## Installing a zipped model in the MT engine
+
+Models are normally installed in the MT engine with the **Install model from Web** functionality, but they can also be installed from files. This is useful for distributing customized models and for installing models in systems where no Internet connections are possible. To install a zipped model, click **Install model from zip**, browse to the location of the model zip in the file system, select the model zip, and click **Open**. 
+
 ## Using the Fiskmo plugin in memoQ
 
 ### Installing the memoQ plugin
