@@ -46,24 +46,41 @@ namespace FiskmoTranslationProvider
         public List<TranslationUnit> ConcordanceMatches { get => concordanceMatches; set => concordanceMatches = value; }
 
         HashSet<string> allTmMatches;
+        private int unitsNeeded;
 
-        internal void Extract()
+        internal void Extract(bool includeFillerUnits=true, bool includeConcordanceUnits=true)
         {
-            //this.ExtractFullMatches();
-            //this.ExtractFuzzies();
-            //this.ExtractConcordanceMatches();
-            this.ExtractFillerUnits();
+            //Note that all methods will first extract matches from TMs sequentially,
+            //i.e. the latter TMs might not be used at all, if the first TM has enough material.
+            
+            this.ExtractFullMatches();
+            if (this.unitsNeeded > 0)
+            {
+                this.ExtractFuzzies();
+            }
+
+            if (this.unitsNeeded > 0 && includeConcordanceUnits)
+            {
+                this.ExtractConcordanceMatches();
+            }
+
+            if (this.unitsNeeded > 0 && includeFillerUnits)
+            {
+                this.ExtractFillerUnits();
+            }
         }
 
         private int transUnitCount;
         IEnumerable<string> sourceSegments;
         IEnumerable<int> fuzzyBands;
         private List<TranslationUnit> concordanceMatches;
+        private List<TranslationUnit> fillerUnits;
 
         public FinetuneTransUnitExtractor(
             IEnumerable<ITranslationMemoryLanguageDirection> tms,
             IEnumerable<string> sourceSegments,
-            IEnumerable<int> fuzzyBands)
+            IEnumerable<int> fuzzyBands,
+            int unitsNeeded)
         {
             this.tms = tms;
             this.sourceLanguage = tms.First().SourceLanguage.TwoLetterISOLanguageName;
@@ -71,21 +88,38 @@ namespace FiskmoTranslationProvider
             this.fuzzyBands = fuzzyBands;
             this.tmMatches = new Dictionary<int, List<TranslationUnit>>();
             this.allTmMatches = new HashSet<string>();
+            this.unitsNeeded = unitsNeeded;
         }
 
         private void ExtractFillerUnits()
         {
+
             //Extract segments from the end of the TM, with the assumption that
             //the last segments are the newest. This might not be the case, though,
             //it seems the TMs are ordered by insertion date, which might be different
             //from creation date (e.g. if tm has been processed in some way).
+
+            this.fillerUnits = new List<TranslationUnit>();
+
             foreach (var tm in this.tms)
             {
                 RegularIterator iterator = new RegularIterator();
                 iterator.Forward = false;
                 iterator.PositionFrom = tm.GetTranslationUnitCount();
-                var test = tm.GetTranslationUnits(ref iterator);
+                TranslationUnit[] fillerBatch = tm.GetTranslationUnits(ref iterator);
+                while (fillerBatch != null && fillerBatch.Length > 0)
+                {
+                    fillerBatch = tm.GetTranslationUnits(ref iterator);
+                    fillerUnits.AddRange(fillerBatch);
+                    if (fillerUnits.Count > this.unitsNeeded)
+                    {
+                        this.fillerUnits.RemoveRange(this.unitsNeeded, this.fillerUnits.Count - this.unitsNeeded);
+                        return;
+                    }
+                }
             }
+
+            return;
         }
 
         private void ExtractFullMatches()
@@ -176,15 +210,21 @@ namespace FiskmoTranslationProvider
                 
                 foreach (var res in results)
                 {
-                    //This match might have been saved as part of previous fuzzy band
+                    if (this.unitsNeeded <= 0)
+                    {
+                        return newResults;
+                    }
+
+                    //This match might have been saved as part of previous fuzzy band.
+                    //If there are multiple transunits with same source, this should pick the newest
+                    //(assumed to be most correct).
                     if (!this.allTmMatches.Contains(res.MemoryTranslationUnit.SourceSegment.ToPlain()))
                     {
                         newResults.Add(res.MemoryTranslationUnit);
                         this.allTmMatches.Add(res.MemoryTranslationUnit.SourceSegment.ToPlain());
+                        this.unitsNeeded--;
                     }
                 }
-                
-                this.transUnitCount += results.Count;
             }
 
             return newResults;
