@@ -134,7 +134,7 @@ namespace FiskmoTranslationProvider
 
         public string Name
         {
-            get { return PluginResources.Plugin_NiceName; }
+            get { return "Fiskmo"; }
         }
 
         public void RefreshStatusInfo()
@@ -151,7 +151,7 @@ namespace FiskmoTranslationProvider
 
         public ProviderStatusInfo StatusInfo
         {
-            get { return new ProviderStatusInfo(true, PluginResources.Plugin_NiceName); }
+            get { return new ProviderStatusInfo(true, "Fiskmo"); }
         }
 
         #region "SupportsConcordanceSearch"

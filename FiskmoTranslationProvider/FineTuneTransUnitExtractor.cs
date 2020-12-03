@@ -12,6 +12,23 @@ using System.Threading.Tasks;
 
 namespace FiskmoTranslationProvider
 {
+
+    static class ShuffleExtension
+    {
+        public static void Swap<T>(this IList<T> list, int i, int j)
+        {
+            var temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+
+        public static void Shuffle<T>(this IList<T> list, Random rnd)
+        {
+            for (var i = list.Count; i > 0; i--)
+                list.Swap(0, rnd.Next(0, i));
+        }
+    }
+
     class FinetuneTransUnitExtractor
     {
         /// <summary>
@@ -30,7 +47,7 @@ namespace FiskmoTranslationProvider
         static FinetuneTransUnitExtractor()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("TransunitExtractionTester.stopwords-iso.json")))
+            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("FiskmoTranslationProvider.stopwords-iso.json")))
             {
                 FinetuneTransUnitExtractor.stopWords = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(isoTable.ReadToEnd());
             }
@@ -44,17 +61,53 @@ namespace FiskmoTranslationProvider
         Dictionary<int, List<TranslationUnit>> tmMatches;
         public Dictionary<int, List<TranslationUnit>> TmMatches { get => tmMatches; set => tmMatches = value; }
         public List<TranslationUnit> ConcordanceMatches { get => concordanceMatches; set => concordanceMatches = value; }
+        public List<TranslationUnit> FillerUnits { get => fillerUnits; set => fillerUnits = value; }
+        public List<Tuple<string, string>> AllExtractedTranslations
+        {
+            get
+            {
+                var allUnits =
+                    this.TmMatches.SelectMany(x => x.Value).Concat(
+                        this.ConcordanceMatches).Concat(
+                        this.FillerUnits);
+                var allTranslations = new List<Tuple<string, string>>();
 
-        HashSet<string> allTmMatches;
+                var sourceVisitor = new FiskmoProviderElementVisitor();
+                var targetVisitor = new FiskmoProviderElementVisitor();
+                foreach (var unit in allUnits)
+                {
+                    sourceVisitor.Reset();
+                    targetVisitor.Reset();
+                    foreach (var element in unit.SourceSegment.Elements)
+                    {
+                        element.AcceptSegmentElementVisitor(sourceVisitor);
+                    }
+                    foreach (var element in unit.TargetSegment.Elements)
+                    {
+                        element.AcceptSegmentElementVisitor(targetVisitor);
+                    }
+
+                    allTranslations.Add(new Tuple<string, string>(sourceVisitor.PlainText,targetVisitor.PlainText));
+                }
+
+                return allTranslations;
+            }
+        }
+
+        HashSet<string> allTmMatchSourceTexts;
         private int unitsNeeded;
 
-        internal void Extract(bool includeFillerUnits=true, bool includeConcordanceUnits=true)
+        internal void Extract(
+            bool includeFuzzies=true,
+            bool includeConcordanceUnits=true,
+            bool includeFillerUnits = true)
         {
             //Note that all methods will first extract matches from TMs sequentially,
             //i.e. the latter TMs might not be used at all, if the first TM has enough material.
             
             this.ExtractFullMatches();
-            if (this.unitsNeeded > 0)
+
+            if (this.unitsNeeded > 0 && includeFuzzies)
             {
                 this.ExtractFuzzies();
             }
@@ -70,8 +123,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        private int transUnitCount;
-        IEnumerable<string> sourceSegments;
+        List<string> sourceSegments;
         IEnumerable<int> fuzzyBands;
         private List<TranslationUnit> concordanceMatches;
         private List<TranslationUnit> fillerUnits;
@@ -84,10 +136,17 @@ namespace FiskmoTranslationProvider
         {
             this.tms = tms;
             this.sourceLanguage = tms.First().SourceLanguage.TwoLetterISOLanguageName;
-            this.sourceSegments = sourceSegments;
+            //Shuffle the source segment to prevent focusing on the initial part of the job (in case
+            //units needed value is reached before whole source has been processed).
+            this.sourceSegments = sourceSegments.ToList();
+            this.sourceSegments.Shuffle(new Random());
             this.fuzzyBands = fuzzyBands;
+
             this.tmMatches = new Dictionary<int, List<TranslationUnit>>();
-            this.allTmMatches = new HashSet<string>();
+            this.ConcordanceMatches = new List<TranslationUnit>();
+            this.FillerUnits = new List<TranslationUnit>();
+
+            this.allTmMatchSourceTexts = new HashSet<string>();
             this.unitsNeeded = unitsNeeded;
         }
 
@@ -99,21 +158,22 @@ namespace FiskmoTranslationProvider
             //it seems the TMs are ordered by insertion date, which might be different
             //from creation date (e.g. if tm has been processed in some way).
 
-            this.fillerUnits = new List<TranslationUnit>();
-
             foreach (var tm in this.tms)
             {
-                RegularIterator iterator = new RegularIterator();
-                iterator.Forward = false;
-                iterator.PositionFrom = tm.GetTranslationUnitCount();
+                RegularIterator iterator = new RegularIterator
+                {
+                    Forward = false,
+                    PositionFrom = tm.GetTranslationUnitCount()
+                };
+
                 TranslationUnit[] fillerBatch = tm.GetTranslationUnits(ref iterator);
                 while (fillerBatch != null && fillerBatch.Length > 0)
                 {
                     fillerBatch = tm.GetTranslationUnits(ref iterator);
-                    fillerUnits.AddRange(fillerBatch);
-                    if (fillerUnits.Count > this.unitsNeeded)
+                    FillerUnits.AddRange(fillerBatch);
+                    if (FillerUnits.Count > this.unitsNeeded)
                     {
-                        this.fillerUnits.RemoveRange(this.unitsNeeded, this.fillerUnits.Count - this.unitsNeeded);
+                        this.FillerUnits.RemoveRange(this.unitsNeeded, this.FillerUnits.Count - this.unitsNeeded);
                         return;
                     }
                 }
@@ -146,7 +206,6 @@ namespace FiskmoTranslationProvider
 
         private void ExtractConcordanceMatches(int maxWindow=2)
         {
-            this.ConcordanceMatches = new List<TranslationUnit>();
             foreach (var sourceSegment in this.sourceSegments)
             {
                 //partition the source segment for concordance search
@@ -175,13 +234,13 @@ namespace FiskmoTranslationProvider
 
                         var windowString = String.Join(" ", windowTokens);
 
-                        if (this.allTmMatches.Contains(windowString))
+                        if (this.allTmMatchSourceTexts.Contains(windowString))
                         {
                             continue;
                         }
                         else
                         {
-                            this.allTmMatches.Add(windowString);
+                            this.allTmMatchSourceTexts.Add(windowString);
                         }
 
                         var results = this.RunTmSearch(windowString, 100, 10, SearchMode.ConcordanceSearch);
@@ -218,10 +277,10 @@ namespace FiskmoTranslationProvider
                     //This match might have been saved as part of previous fuzzy band.
                     //If there are multiple transunits with same source, this should pick the newest
                     //(assumed to be most correct).
-                    if (!this.allTmMatches.Contains(res.MemoryTranslationUnit.SourceSegment.ToPlain()))
+                    if (!this.allTmMatchSourceTexts.Contains(res.MemoryTranslationUnit.SourceSegment.ToPlain()))
                     {
                         newResults.Add(res.MemoryTranslationUnit);
-                        this.allTmMatches.Add(res.MemoryTranslationUnit.SourceSegment.ToPlain());
+                        this.allTmMatchSourceTexts.Add(res.MemoryTranslationUnit.SourceSegment.ToPlain());
                         this.unitsNeeded--;
                     }
                 }

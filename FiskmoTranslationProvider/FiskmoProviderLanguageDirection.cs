@@ -6,7 +6,6 @@ using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using Sdl.TranslationStudioAutomation.IntegrationApi;
-using Sdl.TranslationStudioAutomation.IntegrationApi.Extensions;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Linq;

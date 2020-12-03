@@ -32,11 +32,11 @@ namespace FiskmoTranslationProvider
             switch (propertyName)
             {
                 case "MaxFinetuningSentences":
-                    if (this.MaxFinetuningSentences != null && this.MaxFinetuningSentences != "")
+                    if (this.MaxFinetuningSentences != 0)
                     {
-                        var maxSent = Int32.Parse(this.MaxFinetuningSentences);
-                        if (maxSent < Int32.Parse(FiskmoTpSettings.Default.FinetuningMinSentencePairs) ||
-                            maxSent > Int32.Parse(FiskmoTpSettings.Default.FinetuningSentencePairsHardLimit))
+                        var maxSent = this.MaxFinetuningSentences;
+                        if (maxSent < FiskmoTpSettings.Default.FinetuningMinSentencePairs ||
+                            maxSent > FiskmoTpSettings.Default.FinetuningSentencePairsHardLimit)
                         {
                             validationMessage = "Error";
                         }
@@ -163,6 +163,32 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        public bool ExtractConcordanceUnits
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(ExtractConcordanceUnits));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(ExtractConcordanceUnits)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool ExtractFillerUnits
+        {
+            get
+            {
+                return GetSetting<bool>(nameof(ExtractFillerUnits));
+            }
+            set
+            {
+                GetSetting<bool>(nameof(ExtractFillerUnits)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public int FuzzyMinPercentage
         {
             get
@@ -206,12 +232,12 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public string MaxFinetuningSentences
+        public int MaxFinetuningSentences
         {
             get
             {
-                var settingValue = GetSetting<string>(nameof(MaxFinetuningSentences));
-                if (settingValue == null || settingValue == "")
+                var settingValue = GetSetting<int>(nameof(MaxFinetuningSentences));
+                if (settingValue == 0)
                 {
                     return FiskmoTpSettings.Default.FinetuningMaxSentencePairs;
                 }
@@ -222,7 +248,7 @@ namespace FiskmoTranslationProvider
             }
             set
             {
-                GetSetting<string>(nameof(MaxFinetuningSentences)).Value = value;
+                GetSetting<int>(nameof(MaxFinetuningSentences)).Value = value;
                 NotifyPropertyChanged();
             }
         }
