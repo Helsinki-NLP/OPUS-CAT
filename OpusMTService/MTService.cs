@@ -244,8 +244,6 @@ namespace FiskmoMTEngine
             {
                 return "batch translation or customization already in process";
             }
-
-            
         }
 
     }

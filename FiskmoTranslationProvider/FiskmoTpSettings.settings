@@ -29,5 +29,11 @@
     <Setting Name="FinetuningMinSentencePairs" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
     </Setting>
+    <Setting Name="FinetuningMaxConcordanceResults" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="MaxConcordanceWindow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

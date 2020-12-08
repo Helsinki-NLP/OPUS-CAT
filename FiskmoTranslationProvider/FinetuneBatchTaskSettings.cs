@@ -163,15 +163,15 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public bool ExtractConcordanceUnits
+        public bool ExtractConcordanceMatches
         {
             get
             {
-                return GetSetting<bool>(nameof(ExtractConcordanceUnits));
+                return GetSetting<bool>(nameof(ExtractConcordanceMatches));
             }
             set
             {
-                GetSetting<bool>(nameof(ExtractConcordanceUnits)).Value = value;
+                GetSetting<bool>(nameof(ExtractConcordanceMatches)).Value = value;
                 NotifyPropertyChanged();
             }
         }
@@ -188,7 +188,7 @@ namespace FiskmoTranslationProvider
                 NotifyPropertyChanged();
             }
         }
-
+        
         public int FuzzyMinPercentage
         {
             get
@@ -228,6 +228,48 @@ namespace FiskmoTranslationProvider
             set
             {
                 GetSetting<int>(nameof(FuzzyMaxResults)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int MaxConcordanceWindow
+        {
+            get
+            {
+                var settingValue = GetSetting<int>(nameof(MaxConcordanceWindow));
+                if (settingValue == 0)
+                {
+                    return FiskmoTpSettings.Default.MaxConcordanceWindow;
+                }
+                else
+                {
+                    return settingValue;
+                }
+            }
+            set
+            {
+                GetSetting<int>(nameof(MaxConcordanceWindow)).Value = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public int ConcordanceMaxResults
+        {
+            get
+            {
+                var settingValue = GetSetting<int>(nameof(ConcordanceMaxResults));
+                if (settingValue == 0)
+                {
+                    return FiskmoTpSettings.Default.FinetuningMaxConcordanceResults;
+                }
+                else
+                {
+                    return settingValue;
+                }
+            }
+            set
+            {
+                GetSetting<int>(nameof(ConcordanceMaxResults)).Value = value;
                 NotifyPropertyChanged();
             }
         }

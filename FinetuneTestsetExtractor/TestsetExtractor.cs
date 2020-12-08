@@ -53,7 +53,7 @@ namespace FinetuneTestsetExtractor
                 finetuneTestset.AddRange(tuBatch);
                 foreach (var tu in tuBatch)
                 {
-                    tmLangdir.DeleteTranslationUnit(tu.ResourceId);
+                    var success = tmLangdir.DeleteTranslationUnit(tu.ResourceId);
                 }
             }
 
@@ -73,6 +73,14 @@ namespace FinetuneTestsetExtractor
                         targetWriter.WriteLine(tu.TargetSegment.ToPlain());
                     }
                 }
+            }
+
+            RegularIterator reindexIterator = new RegularIterator();
+
+            bool reindexInProgress = true;
+            while (reindexInProgress)
+            {
+                reindexInProgress = tmLangdir.ReindexTranslationUnits(ref reindexIterator);
             }
 
             tm.Save();

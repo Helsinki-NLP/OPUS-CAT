@@ -192,11 +192,14 @@ namespace FiskmoTranslationProvider
                         this.tms[targetLang],
                         uniqueNewSegments,
                         new List<int>() { 100, 90, 80, 70, 60, 50 },
-                        settings.MaxFinetuningSentences);
+                        settings.MaxFinetuningSentences,
+                        settings.ConcordanceMaxResults,
+                        settings.FuzzyMaxResults,
+                        settings.MaxConcordanceWindow);
                 
                 transUnitExtractor.Extract(
                     this.settings.ExtractFuzzies,
-                    this.settings.ExtractConcordanceUnits,
+                    this.settings.ExtractConcordanceMatches,
                     this.settings.ExtractFillerUnits);
 
                 var finetuneSet = uniqueProjectTranslations.Union(transUnitExtractor.AllExtractedTranslations).ToList();
@@ -204,9 +207,8 @@ namespace FiskmoTranslationProvider
                 if (finetuneSet.Count() < FiskmoTpSettings.Default.FinetuningMinSentencePairs)
                 {
                     throw new Exception(
-                        $"Not enough sentence pairs for fine-tuning. Found {uniqueProjectTranslations.Count}, minimum is {FiskmoTpSettings.Default.FinetuningMinSentencePairs}");
+                        $"Not enough sentence pairs for fine-tuning. Found {finetuneSet.Count}, minimum is {FiskmoTpSettings.Default.FinetuningMinSentencePairs}");
                 }
-
 
                 //Send the tuning set to MT service
                 var result = FiskmöMTServiceHelper.Customize(

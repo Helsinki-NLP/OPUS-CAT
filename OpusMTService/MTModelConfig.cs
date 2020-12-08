@@ -34,10 +34,10 @@ namespace FiskmoMTEngine
         public bool IncludeTagPairs { get => includeTagPairs; set => includeTagPairs = value; }
         private bool includeTagPairs;
 
-        //For backwards compatibility
+        //finituningInitiated and finetuningComplete used to be combined as finetuned, this is retained
+        //for backwards compatibility
         [YamlMember(Alias = "finetuned", ApplyNamingConventions = false)]
-        public bool Finetuned { get => finetuned; set { finetuningInitiated = value; finetuningComplete = value; NotifyPropertyChanged(); } }
-        private bool finetuned;
+        public bool Finetuned { get => (finetuningInitiated || finetuningComplete); set { finetuningInitiated = value; finetuningComplete = value; NotifyPropertyChanged(); } }
 
         [YamlMember(Alias = "finetuning-initiated", ApplyNamingConventions = false)]
         public bool FinetuningInitiated { get => finetuningInitiated; set { finetuningInitiated = value; NotifyPropertyChanged(); } }

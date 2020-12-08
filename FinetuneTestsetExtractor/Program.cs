@@ -4,6 +4,7 @@ using Sdl.Core.Globalization;
 using Sdl.Core.Settings;
 using Sdl.ProjectAutomation.Core;
 using Sdl.ProjectAutomation.FileBased;
+using Sdl.ProjectAutomation.Settings;
 using Studio.AssemblyResolver;
 using System;
 using System.Collections.Generic;
@@ -31,16 +32,72 @@ namespace FinetuneTestsetExtractor
             var masterTMPath = args[0];
             var batches = Int32.Parse(args[1]);
             var batchSize = Int32.Parse(args[2]);
+            var mode = args[3];
             var masterTMNameWithoutExtension = masterTMPath.Replace(".sdltm", "");
             var filteredTMPath = $"{masterTMNameWithoutExtension}.filtered.sdltm";
-            File.Copy(masterTMPath, filteredTMPath,true);
+            
+            FileBasedProject testProject;
+            if (mode != "--finetune_only")
+            {
+                File.Copy(masterTMPath, filteredTMPath, true);
+                var testsetExtractor = new TestsetExtractor(filteredTMPath, batches, masterTMNameWithoutExtension, batchSize);
+                var sourceFile = testsetExtractor.ExtractTestset();
+                testProject = Program.CreateProject(filteredTMPath, sourceFile, testsetExtractor.SourceLang, testsetExtractor.TargetLang);
+            }
+            else
+            {
+                var existingProjectFile = Directory.GetFiles(Path.GetDirectoryName(masterTMPath), "*.sdlproj", SearchOption.AllDirectories).Single();
+                testProject = new FileBasedProject(existingProjectFile);
+            }
+            
 
-            var testsetExtractor = new TestsetExtractor(filteredTMPath, batches, masterTMNameWithoutExtension, batchSize);
-            var sourceFile = testsetExtractor.ExtractTestset();
-            Program.CreateProject(filteredTMPath, sourceFile, testsetExtractor.SourceLang, testsetExtractor.TargetLang);
+            Program.RunFinetune(testProject);
         }
 
-        private static void CreateProject(string tmPath, FileInfo sourceFile,Language sourceLang, Language targetLang)
+        private static void RunFinetune(FileBasedProject testProject)
+        {
+            ISettingsBundle settings = testProject.GetSettings();
+            FinetuneBatchTaskSettings finetuneSettings = settings.GetSettingsGroup<FinetuneBatchTaskSettings>();
+            TranslateTaskSettings pretranslateSettings = settings.GetSettingsGroup<TranslateTaskSettings>();
+            
+            /*pretranslateSettings.Finetune = true;
+            pretranslateSettings.ExtractFuzzies = true;
+            pretranslateSettings.FuzzyMaxResults = 5;
+            pretranslateSettings.ExtractFillerUnits = true;
+            pretranslateSettings.FuzzyMinPercentage = 60;
+            pretranslateSettings.BatchTranslate = false;
+            pretranslateSettings.AddFiskmoProvider = false;
+            pretranslateSettings.ExtractConcordanceUnits = true;
+            pretranslateSettings.MaxFinetuningSentences = 100000;
+            pretranslateSettings.IncludePlaceholderTags = false;
+            pretranslateSettings.IncludeTagPairs = false;*/
+
+
+
+            var finetuneTaskSettingsWindow = new FiskmoTranslationProvider.FinetuneWpfControl(finetuneSettings);
+            Window window = new Window
+            {
+                Title = "Finetune task settings",
+                Content = finetuneTaskSettingsWindow
+            };
+            window.ShowDialog();
+
+            testProject.UpdateSettings(settings);
+
+
+
+            AutomaticTask pretranslateTask = testProject.RunAutomaticTask(
+                testProject.GetTargetLanguageFiles().GetIds(),
+                AutomaticTaskTemplateIds.PreTranslateFiles);
+
+            AutomaticTask finetuneTask = testProject.RunAutomaticTask(
+                testProject.GetTargetLanguageFiles().GetIds(),
+                "FiskmoBatchTask");
+
+            testProject.Save();
+        }
+
+        private static FileBasedProject CreateProject(string tmPath, FileInfo sourceFile,Language sourceLang, Language targetLang)
         {
             ProjectInfo info = new ProjectInfo();
             
@@ -63,39 +120,20 @@ namespace FinetuneTestsetExtractor
             AutomaticTask scanFiles = newProject.RunAutomaticTask(
                 newProject.GetSourceLanguageFiles().GetIds(),
                 AutomaticTaskTemplateIds.Scan);
-
-            ISettingsBundle settings = newProject.GetSettings();
-            FinetuneBatchTaskSettings pretranslateSettings = settings.GetSettingsGroup<FinetuneBatchTaskSettings>();
-
-            pretranslateSettings.Finetune = true;
-            pretranslateSettings.ExtractFuzzies = true;
-            pretranslateSettings.FuzzyMaxResults = 5;
-            pretranslateSettings.ExtractFillerUnits = true;
-            pretranslateSettings.FuzzyMinPercentage = 60;
-            pretranslateSettings.BatchTranslate = false;
-            pretranslateSettings.AddFiskmoProvider = false;
-            pretranslateSettings.ExtractConcordanceUnits = true;
-            pretranslateSettings.MaxFinetuningSentences = 100000;
-            pretranslateSettings.IncludePlaceholderTags = false;
-            pretranslateSettings.IncludeTagPairs = false;
             
-            newProject.UpdateSettings(settings);
-            newProject.Save();
-            var finetuneTaskSettingsWindow = new FiskmoTranslationProvider.FinetuneWpfControl(pretranslateSettings);
-            Window window = new Window
-            {
-                Title = "Finetune task settings",
-                Content = finetuneTaskSettingsWindow
-            };
-            window.ShowDialog();
-
-            
-
-            AutomaticTask finetuneTask = newProject.RunAutomaticTask(
+            AutomaticTask convertFiles = newProject.RunAutomaticTask(
                 newProject.GetSourceLanguageFiles().GetIds(),
-                "FiskmoBatchTask");
-            
+                AutomaticTaskTemplateIds.ConvertToTranslatableFormat);
+
+            AutomaticTask copyFiles = newProject.RunAutomaticTask(
+                newProject.GetSourceLanguageFiles().GetIds(),
+                AutomaticTaskTemplateIds.CopyToTargetLanguages);
+
             newProject.Save();
+
+            return newProject;
+            
+            
         }
         
     }

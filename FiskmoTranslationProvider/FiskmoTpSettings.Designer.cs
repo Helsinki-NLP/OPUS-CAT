@@ -130,5 +130,29 @@ namespace FiskmoTranslationProvider {
                 this["FinetuningMinSentencePairs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int FinetuningMaxConcordanceResults {
+            get {
+                return ((int)(this["FinetuningMaxConcordanceResults"]));
+            }
+            set {
+                this["FinetuningMaxConcordanceResults"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int MaxConcordanceWindow {
+            get {
+                return ((int)(this["MaxConcordanceWindow"]));
+            }
+            set {
+                this["MaxConcordanceWindow"] = value;
+            }
+        }
     }
 }

@@ -395,7 +395,8 @@ namespace FiskmoMTEngine
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        internal void StartCustomization(List<Tuple<string, string>> input,
+        internal void StartCustomization(
+            List<Tuple<string, string>> input,
             List<Tuple<string, string>> validation,
             List<string> uniqueNewSegments,
             IsoLanguage srcLang,
@@ -421,16 +422,6 @@ namespace FiskmoMTEngine
         {
             Log.Error($"Task failed due to the following exception: {obj.Exception}");
         }
-
-        /// <summary>
-        /// this monitors the progress of finetuning based on the 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /*private void finetuningProgressChanged(object sender, FileSystemEventArgs e)
-        {
-            ;
-        }*/
 
         internal void Customize(
             List<Tuple<string, string>> input,

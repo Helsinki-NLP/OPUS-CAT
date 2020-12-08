@@ -48,7 +48,7 @@
             </TabItem>
             <TabItem IsEnabled="{Binding Path=Settings.Finetune}" Header="Fine-tuning settings">
                 <StackPanel Margin="5">
-                    
+
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
                     <DockPanel>
@@ -63,13 +63,23 @@
                                 <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMinPercentage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                                 <Label>Minimum fuzzy percentage</Label>
                             </DockPanel>
-
                             <DockPanel>
                                 <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                                 <Label>Maximum fuzzies per segment</Label>
                             </DockPanel>
                         </StackPanel>
                     </Border>
+                    <CheckBox Name="ExtractConcordanceMatches" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractConcordanceMatches, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract concordance matches to use as fine-tuning material</CheckBox>
+                    <Border IsEnabled="{Binding IsChecked,ElementName=ExtractConcordanceMatches}" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel Margin="5">
+                            <Label Margin="0,-5,0,0">Concordance match settings</Label>
+                            <DockPanel>
+                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractConcordanceMatches}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Settings.ConcordanceMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <Label>Max concordance matches per search</Label>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                    <CheckBox Name="ExtractFillerUnits" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractFillerUnits, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract translation units from TM as filler</CheckBox>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Connection" IsSelected="{Binding ElementName=ConnectionControl, Path=NoConnection, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">

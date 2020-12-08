@@ -94,6 +94,9 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        public int MaxConcordanceMatchesPerSearch { get; private set; }
+        public int MaxFuzzyMatchesPerSearch { get; private set; }
+        
         HashSet<string> allTmMatchSourceTexts;
         private int unitsNeeded;
 
@@ -127,12 +130,16 @@ namespace FiskmoTranslationProvider
         IEnumerable<int> fuzzyBands;
         private List<TranslationUnit> concordanceMatches;
         private List<TranslationUnit> fillerUnits;
+        private int maxConcordanceWindow;
 
         public FinetuneTransUnitExtractor(
             IEnumerable<ITranslationMemoryLanguageDirection> tms,
             IEnumerable<string> sourceSegments,
             IEnumerable<int> fuzzyBands,
-            int unitsNeeded)
+            int unitsNeeded,
+            int maxConcordanceMatchesPerSearch,
+            int maxFuzzyMatchesPerSearch,
+            int maxConcordanceWindow)
         {
             this.tms = tms;
             this.sourceLanguage = tms.First().SourceLanguage.TwoLetterISOLanguageName;
@@ -148,6 +155,9 @@ namespace FiskmoTranslationProvider
 
             this.allTmMatchSourceTexts = new HashSet<string>();
             this.unitsNeeded = unitsNeeded;
+            this.MaxConcordanceMatchesPerSearch = maxConcordanceMatchesPerSearch;
+            this.MaxFuzzyMatchesPerSearch = maxFuzzyMatchesPerSearch;
+            this.maxConcordanceWindow = maxConcordanceWindow;
         }
 
         private void ExtractFillerUnits()
@@ -204,12 +214,12 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        private void ExtractConcordanceMatches(int maxWindow=2)
+        private void ExtractConcordanceMatches()
         {
             foreach (var sourceSegment in this.sourceSegments)
             {
                 //partition the source segment for concordance search
-                for (var window = 1; window <= maxWindow; window++)
+                for (var window = 1; window <= this.maxConcordanceWindow; window++)
                 {
                     var sourceSplit = Regex.Split(sourceSegment, @"[ \p{P}]").Where(x => !String.IsNullOrEmpty(x)).ToList();
 
@@ -243,7 +253,7 @@ namespace FiskmoTranslationProvider
                             this.allTmMatchSourceTexts.Add(windowString);
                         }
 
-                        var results = this.RunTmSearch(windowString, 100, 10, SearchMode.ConcordanceSearch);
+                        var results = this.RunTmSearch(windowString, 100, this.MaxConcordanceMatchesPerSearch, SearchMode.ConcordanceSearch);
                         var resultText = results.Select(x => x.TargetSegment.ToPlain());
                         this.ConcordanceMatches.AddRange(results);
                     }                    
