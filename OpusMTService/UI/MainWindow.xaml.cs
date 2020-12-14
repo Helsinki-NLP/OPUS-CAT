@@ -31,6 +31,21 @@ namespace FiskmoMTEngine
 
         private bool saveButtonEnabled;
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (this.ModelManager.CustomizationOngoing || this.ModelManager.BatchTranslationOngoing)
+            {
+                MessageBoxResult result = MessageBox.Show("A customization or a batch translation is in progress. Are you sure you want to close the OpusCAT Engine?",
+                                          "Confirmation",
+                                          MessageBoxButton.YesNo,
+                                          MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    this.Close();
+                }
+            }
+        }
+
         public string Error
         {
             get { return "...."; }
@@ -132,7 +147,11 @@ namespace FiskmoMTEngine
 
             this.UiTabs = new ObservableCollection<ActionTabItem>();
             var localModels = new LocalModelListView(this.ModelManager);
-            this.UiTabs.Add(new ActionTabItem { Content = localModels, Header = "Models", Closable = false });
+            var settings = new OpusCatSettingsView();
+            this.UiTabs.Add(
+                new ActionTabItem { Content = localModels, Header = "Models", Closable = false });
+            this.UiTabs.Add(
+                new ActionTabItem { Content = settings, Header = "Settings", Closable = false });
 
             this.DataContext = this;
             this.serviceHost = service.StartService(this.ModelManager);

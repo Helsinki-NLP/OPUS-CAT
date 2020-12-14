@@ -84,8 +84,6 @@ namespace FinetuneTestsetExtractor
 
             testProject.UpdateSettings(settings);
 
-
-
             AutomaticTask pretranslateTask = testProject.RunAutomaticTask(
                 testProject.GetTargetLanguageFiles().GetIds(),
                 AutomaticTaskTemplateIds.PreTranslateFiles);

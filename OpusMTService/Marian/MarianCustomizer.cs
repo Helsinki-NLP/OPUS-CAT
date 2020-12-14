@@ -56,6 +56,7 @@ namespace FiskmoMTEngine
         private FileInfo spValidTarget;
         private FileInfo alignmentFile;
         private FileInfo validAlignmentFile;
+        private bool performFinalEvaluation;
 
         private void CopyModelDir(DirectoryInfo modelDir,string customLabel)
         {
@@ -74,17 +75,22 @@ namespace FiskmoMTEngine
 
         internal void MarianExitHandler(object sender, EventArgs e)
         {
+            //Separate final evaluation is disabled, since Marian will in any case perform
+            //validation in the end (at least if epoch limit is reached, not sure about other
+            //end conditions).
+            this.performFinalEvaluation = false;
+            if (this.performFinalEvaluation)
+            {
+                var finalValidProcess = this.customModel.TranslateAndEvaluate(
+                    new FileInfo(this.trainingLog.TrainingConfig.ValidSets[0]),
+                    new FileInfo(Path.Combine(this.customDir.FullName, "valid.final.txt")),
+                    new FileInfo(this.trainingLog.TrainingConfig.ValidSets[1]),
+                    FiskmoMTEngineSettings.Default.OODValidSetSize,
+                    true
+                    );
+                finalValidProcess.WaitForExit();
+            }
             
-            var finalValidProcess = this.customModel.TranslateAndEvaluate(
-                this.spValidSource,
-                new FileInfo(Path.Combine(this.customDir.FullName, "valid.final.txt")),
-                this.spValidTarget,
-                FiskmoMTEngineSettings.Default.OODValidSetSize,
-                true
-                );
-
-            finalValidProcess.WaitForExit();
-
             this.OnProcessExited(e);
         }
 
@@ -290,8 +296,9 @@ namespace FiskmoMTEngine
             return trainProcess;
         }
 
-        internal Process ResumeCustomization()
+        internal Process ResumeCustomization(MTModel customModel)
         {
+            this.customModel = customModel;
             var process = this.StartTraining();
             return process;
         }

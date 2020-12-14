@@ -113,6 +113,7 @@
     <Reference Include="System.Reactive.Linq, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Linq.4.0.0\lib\net46\System.Reactive.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Web" />
     <Reference Include="System.Web" />
@@ -165,6 +166,9 @@
     <Compile Include="..\FiskmoTranslationProvider\FinetuneBatchTaskSettingsPage.cs">
       <Link>FinetuneBatchTaskSettingsPage.cs</Link>
     </Compile>
+    <Compile Include="..\FiskmoTranslationProvider\FinetuneTransUnitExtractor.cs">
+      <Link>FinetuneTransUnitExtractor.cs</Link>
+    </Compile>
     <Compile Include="..\FiskmoTranslationProvider\FinetuneWpfControl.xaml.cs">
       <Link>FinetuneWpfControl.xaml.cs</Link>
       <DependentUpon>FinetuneWpfControl.xaml</DependentUpon>
@@ -212,6 +216,9 @@
     </Compile>
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
+    </Compile>
+    <Compile Include="..\OpusMTInterface\Translation.cs">
+      <Link>Translation.cs</Link>
     </Compile>
     <Compile Include="PluginResources.Designer.cs">
       <AutoGen>True</AutoGen>

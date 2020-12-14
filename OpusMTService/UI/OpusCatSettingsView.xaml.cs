@@ -19,9 +19,9 @@ namespace FiskmoMTEngine
     /// <summary>
     /// Interaction logic for CustomizationView.xaml
     /// </summary>
-    public partial class MarianSettingsView : UserControl
+    public partial class OpusCatSettingsView : UserControl
     {
-        public MarianSettingsView()
+        public OpusCatSettingsView()
         {
             InitializeComponent();
         }

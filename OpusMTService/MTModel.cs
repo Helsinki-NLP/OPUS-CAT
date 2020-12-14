@@ -254,7 +254,7 @@ namespace FiskmoMTEngine
             var customizer = new MarianCustomizer(new DirectoryInfo(this.InstallDir));
             customizer.ProgressChanged += this.CustomizationProgressHandler;
             customizer.ProcessExited += this.ExitHandler;
-            this.FinetuneProcess = customizer.ResumeCustomization();
+            this.FinetuneProcess = customizer.ResumeCustomization(this);
 
             this.Status = MTModelStatus.Customizing;
 

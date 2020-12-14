@@ -3,6 +3,7 @@ using Sdl.LanguagePlatform.TranslationMemory.EditScripts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.ServiceModel;
 using System.Windows;
 
@@ -31,6 +32,7 @@ namespace FiskmoTranslationProvider
 
             var epAddr = new EndpointAddress($"net.tcp://{host}:{port}/MTService");
             var proxy = ChannelFactory<IMTService>.CreateChannel(myBinding, epAddr);
+            
             return proxy;
         }
 
@@ -55,8 +57,18 @@ namespace FiskmoTranslationProvider
                         TokenCodeExpires = DateTime.Now.AddMinutes(1);
                     }
                 }
+                catch (Exception ex) when (ex.InnerException is SocketException)
+                {
+                    throw new Exception("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.");
+                }
                 catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
                 {
+                    throw new Exception("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.");
+                }
+                catch (Exception ex)
+                {
+                    //If the server throws an previously unseen exception, this will probably catch it.
+                    //This is here mainly for future debugging, no exceptions of this type are currently thrown.
                     throw ex;
                 }
             }
@@ -138,14 +150,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        /// <summary>
-        /// Translates a single string with the help of the dummy MT service.
-        /// </summary>
-        /// <param name="tokenCode">The token code.</param>
-        /// <param name="input">The string to translate.</param>
-        /// <param name="srcLangCode">The source language code.</param>
-        /// <param name="trgLangCode">The target language code.</param>
-        /// <returns>The translated string.</returns>
+        
         public static string Translate(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
             // Always dispose allocated resources
@@ -154,6 +159,16 @@ namespace FiskmoTranslationProvider
             {
                 string result = proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag);
                 return result;
+            }
+        }
+
+        public async static void PreOrder(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            // Always dispose allocated resources
+            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
+            using (proxy as IDisposable)
+            {
+                await System.Threading.Tasks.Task.Run(() => proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag));
             }
         }
 

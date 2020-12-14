@@ -187,11 +187,15 @@ namespace FiskmoTranslationProvider
                 var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
                 List<string> uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
 
+                //assign fuzzy min and all above percentage divisible by ten as fuzzybands
+                var fuzzyBands = Enumerable.Range(settings.FuzzyMinPercentage, 100).Where(
+                    x => (x % 10 == 0 && x <= 100) || x == settings.FuzzyMinPercentage).ToList();
+
                 var transUnitExtractor =
                     new FinetuneTransUnitExtractor(
                         this.tms[targetLang],
                         uniqueNewSegments,
-                        new List<int>() { 100, 90, 80, 70, 60, 50 },
+                        fuzzyBands,
                         settings.MaxFinetuningSentences,
                         settings.ConcordanceMaxResults,
                         settings.FuzzyMaxResults,

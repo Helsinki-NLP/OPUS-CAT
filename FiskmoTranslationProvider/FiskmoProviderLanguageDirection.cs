@@ -41,7 +41,6 @@ namespace FiskmoTranslationProvider
         public FiskmoProviderLanguageDirection(FiskmoProvider provider, LanguagePair languages)
         {
             #region "Instantiate"
-            // UT.LogMessageToFile("Init ListTranslationProviderLanguageDirection");
             
             _provider = provider;
             _languageDirection = languages;

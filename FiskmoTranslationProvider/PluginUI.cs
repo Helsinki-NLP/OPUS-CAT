@@ -15,6 +15,8 @@ namespace FiskmoTranslationProvider
 {
     class PluginUI
     {
+
+
         [Action("InsertTranslation", Icon = "fiskmo_icon.ico", Description = "Insert the current Fiskmo translation")]
         [Shortcut(Keys.Alt | Keys.F8)]
         public class MyMainIconAction : AbstractAction

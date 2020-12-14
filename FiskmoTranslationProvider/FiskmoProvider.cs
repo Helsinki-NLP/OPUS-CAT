@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Sdl.LanguagePlatform.Core;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
+using Sdl.ProjectAutomation.Core;
 using Sdl.TranslationStudioAutomation.IntegrationApi;
 
 namespace FiskmoTranslationProvider
@@ -25,8 +26,33 @@ namespace FiskmoTranslationProvider
             get;
             set;
         }
+        
+        /*private static FiskmoOptions GetActiveOpusTpOptions(Document doc)
+        {
+            //Make sure that the project has an active Fiskmö translation provider included in it.
+            var projectTpConfig = project.GetTranslationProviderConfiguration();
 
-        private static Dictionary<LanguageDirection, ConcurrentBag<Document>> processedDocuments = new Dictionary<LanguageDirection, ConcurrentBag<Document>>();
+            //Check if language-specific tp config overrides the main config
+            var targetLanguageTpConfig = project.GetTranslationProviderConfiguration(langDir.TargetLanguage);
+
+            TranslationProviderCascadeEntry activeFiskmoTp;
+            if (targetLanguageTpConfig.OverrideParent)
+            {
+                activeFiskmoTp = targetLanguageTpConfig.Entries.SingleOrDefault(
+                x =>
+                    x.MainTranslationProvider.Enabled &&
+                    x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
+                );
+            }
+            else
+            {
+                activeFiskmoTp = projectTpConfig.Entries.SingleOrDefault(
+                x =>
+                    x.MainTranslationProvider.Enabled &&
+                    x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
+                );
+            }
+        }*/
 
         //Whenever doc changes, start translating the segments and caching translations
         private static void DocChanged(object sender, DocumentEventArgs e)
@@ -39,32 +65,70 @@ namespace FiskmoTranslationProvider
             var project = e.Document.Project;
             var projectInfo = project.GetProjectInfo();
 
+            LanguageDirection langDir;
+
+            //Check whether document contains files
+            if (e.Document.Files.Any())
+            {
+                langDir = e.Document.Files.First().GetLanguageDirection();
+            }
+            else
+            {
+                return;
+            }
+
             //Make sure that the project has an active Fiskmö translation provider included in it.
             var projectTpConfig = project.GetTranslationProviderConfiguration();
-            var tpEntries = projectTpConfig.Entries;
-            var activeFiskmoTp = tpEntries.SingleOrDefault(
+            
+            //Check if language-specific tp config overrides the main config
+            var targetLanguageTpConfig = project.GetTranslationProviderConfiguration(langDir.TargetLanguage);
+
+            TranslationProviderCascadeEntry activeFiskmoTp;
+            if (targetLanguageTpConfig.OverrideParent)
+            {
+                activeFiskmoTp = targetLanguageTpConfig.Entries.SingleOrDefault(
                 x =>
                     x.MainTranslationProvider.Enabled &&
                     x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
                 );
-
-
-            
-            
-            if (e.Document.Files.Count() > 0 && activeFiskmoTp != null)
+            }
+            else
             {
+                activeFiskmoTp = projectTpConfig.Entries.SingleOrDefault(
+                x =>
+                    x.MainTranslationProvider.Enabled &&
+                    x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
+                );
+            }
+            
+            if (activeFiskmoTp != null)
+            {
+                 
                 var activeFiskmoOptions = new FiskmoOptions(activeFiskmoTp.MainTranslationProvider.Uri);
-                var langPair = e.Document.Files.First().GetLanguageDirection();
-                if (!FiskmoProvider.processedDocuments.ContainsKey(langPair))
-                {
-                    FiskmoProvider.processedDocuments.Add(langPair, new ConcurrentBag<Document>());
-                }
 
-                if (activeFiskmoTp != null &&
-                    activeFiskmoOptions.pregenerateMt &&
-                    !FiskmoProvider.processedDocuments[langPair].Contains(e.Document))
+                if (activeFiskmoOptions.pregenerateMt)
                 {
-                    Task t = Task.Run(() => TranslateDocumentSegments(e.Document, langPair, activeFiskmoOptions));
+                    //The previous solution for pregeneration was to start translating the
+                    //whole document as soon as the doc changes. This has a problem:
+                    //if you have a massive document, just opening the document will cause a massive
+                    //load on the translation service.
+                    //So instead this was changed to add a segment changed handler which order only a certain
+                    //amount on new translations for the next n segments whenever segment changes.
+                    //Previous solution is provided below, commented out.
+
+                    e.Document.ActiveSegmentChanged += (x,y) => segmentChanged(activeFiskmoOptions, langDir, x, y);
+
+                    //Add a collection for tracking which documents have been preprocessed for each lang pair
+                    /*if (!FiskmoProvider.processedDocuments.ContainsKey(langDir))
+                    {
+                        FiskmoProvider.processedDocuments.Add(langDir, new ConcurrentBag<Document>());
+                    }
+
+                    //If a document has been processed already, don't process it again
+                    if (!FiskmoProvider.processedDocuments[langDir].Contains(e.Document))
+                    {
+                        System.Threading.Tasks.Task t = System.Threading.Tasks.Task.Run(() => TranslateDocumentSegments(e.Document, langDir, activeFiskmoOptions));
+                    }*/
                 }
             }
             else
@@ -74,10 +138,43 @@ namespace FiskmoTranslationProvider
             
         }
 
+        private static void segmentChanged(FiskmoOptions options, LanguageDirection langDir, object sender, EventArgs e)
+        {
+            var doc = (Document)sender;
+            var visitor = new FiskmoMarkupDataVisitor();
+            
+            //TODO: time this to see if it's a bottleneck during translation.
+            //If this is too slow, it might be best to go with a doc changed handler that would collect all the source texts
+            //once as soon as the doc is changed and then you could use that collection to run the 
+            //next segment checks.
+            //TESTED: doesn't seem slow at all, probably the translation part later that causes delay.
+            var nextSegmentPairs = doc.SegmentPairs.SkipWhile(x =>
+                !(x.Properties.Id == doc.ActiveSegmentPair.Properties.Id &&
+                x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId)).Take(10);
+
+            foreach (var segmentPair in nextSegmentPairs)
+            {
+                if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified)
+                {
+                    visitor.Reset();
+                    segmentPair.Source.AcceptVisitor(visitor);
+                    var sourceText = visitor.PlainText;
+                    
+                    var sourceCode = langDir.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
+                    var targetCode = langDir.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;
+                    var langpair = $"{sourceCode}-{targetCode}";
+
+                    //The preorder method is async, so it doesn't block execution
+                    FiskmöMTServiceHelper.PreOrder(options, sourceText, sourceCode, targetCode, options.modelTag);
+                }
+            }
+        }
+
+        //THIS IS DEPRECATED, REPLACED WITH SEGMENT CHANGE HANDLER EVENT
         //This function starts translating all segments in the document once the document is opened,
         //so that the translator won't have to wait for the translation to finish when opening a segment.
         //Note that Studio contains a feature called LookAhead which attempts to do a similar thing, but
-        //this feature appears to be buggy with TMs etc., so it's better to rely on a custom caching system.
+        //LookAhead appears to be buggy with TMs etc., so it's better to rely on a custom caching system.
         private static void TranslateDocumentSegments(Document doc, LanguageDirection langPair, FiskmoOptions options)
         {
             var visitor = new FiskmoMarkupDataVisitor();
@@ -99,16 +196,20 @@ namespace FiskmoTranslationProvider
                 }
             }
 
-            processedDocuments[langPair].Add(doc);
+            //processedDocuments[langPair].Add(doc);
         }
 
         public FiskmoProvider(FiskmoOptions options)
         {
             Options = options;
-
+            
+            //If we create a provider with the pregenerate on, add a doc change handler to start preordering
+            //MT when doc is changed
             if (options.pregenerateMt)
             {
                 EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
+                //This should ensure the handler is only attached once, by always removing a possible previously
+                //added handler before adding the new one
                 editorController.ActiveDocumentChanged -= FiskmoProvider.DocChanged;
                 editorController.ActiveDocumentChanged += FiskmoProvider.DocChanged;
             }

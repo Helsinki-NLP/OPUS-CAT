@@ -162,8 +162,8 @@
       <DependentUpon>TranslateView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TranslationDbHelper.cs" />
-    <Compile Include="UI\MarianSettingsView.xaml.cs">
-      <DependentUpon>MarianSettingsView.xaml</DependentUpon>
+    <Compile Include="UI\OpusCatSettingsView.xaml.cs">
+      <DependentUpon>OpusCatSettingsView.xaml</DependentUpon>
     </Compile>
     <Page Include="UI\CustomizationProgressView.xaml">
       <SubType>Designer</SubType>
@@ -205,7 +205,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\MarianSettingsView.xaml">
+    <Page Include="UI\OpusCatSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

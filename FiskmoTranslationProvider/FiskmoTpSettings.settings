@@ -15,16 +15,16 @@
       <Value Profile="(Default)">localhost</Value>
     </Setting>
     <Setting Name="FinetuningSentencePairsHardLimit" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">300000</Value>
+      <Value Profile="(Default)">50000</Value>
     </Setting>
     <Setting Name="FinetuningMaxSentencePairs" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100000</Value>
+      <Value Profile="(Default)">10000</Value>
     </Setting>
     <Setting Name="FinetuningMaxFuzzyResults" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="FinetuningMinFuzzyPercentage" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">70</Value>
+      <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="FinetuningMinSentencePairs" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
