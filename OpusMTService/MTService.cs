@@ -17,7 +17,8 @@ namespace FiskmoMTEngine
     [ServiceBehavior(
         InstanceContextMode=InstanceContextMode.Single,
         AddressFilterMode = AddressFilterMode.Any,
-        ConcurrencyMode = ConcurrencyMode.Single)]
+        ConcurrencyMode = ConcurrencyMode.Multiple,
+        UseSynchronizationContext = false)]
     public class MTService : IMTService
     {
         

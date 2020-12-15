@@ -208,11 +208,20 @@
     <Compile Include="..\FiskmoTranslationProvider\FiskmoTpSettings.Designer.cs">
       <Link>FiskmoTpSettings.Designer.cs</Link>
     </Compile>
+    <Compile Include="..\FiskmoTranslationProvider\FiskmoTpSettings1.Designer.cs">
+      <Link>FiskmoTpSettings1.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>FiskmoTpSettings.settings</DependentUpon>
+    </Compile>
     <Compile Include="..\FiskmoTranslationProvider\FiskmöMTServiceHelper.cs">
       <Link>FiskmöMTServiceHelper.cs</Link>
     </Compile>
     <Compile Include="..\FiskmoTranslationProvider\IHasFiskmoOptions.cs">
       <Link>IHasFiskmoOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\FiskmoTranslationProvider\OpusCatConnectionException.cs">
+      <Link>OpusCatConnectionException.cs</Link>
     </Compile>
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
@@ -246,6 +255,8 @@
     </Content>
     <None Include="..\FiskmoTranslationProvider\FiskmoTpSettings.settings">
       <Link>FiskmoTpSettings.settings</Link>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>FiskmoTpSettings1.Designer.cs</LastGenOutput>
     </None>
     <None Include="Resources\fiskmo_zIQ_icon.ico" />
     <None Include="Resources\fiskmo_icon.ico" />

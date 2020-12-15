@@ -148,6 +148,22 @@ namespace FiskmoTranslationProvider
             set { SetBooleanParameter("pregenerateMt", value); NotifyPropertyChanged(); }
         }
 
+        public int pregenerateSegmentCount
+        {
+            get
+            {
+                var value = GetIntParameter("pregenerateSegmentCount");
+                if (value == null)
+                {
+                    return FiskmoTpSettings.Default.PregenerateSegmentCount;
+                }
+                else
+                {
+                    return value.Value;
+                }
+            }
+            set { SetIntParameter("pregenerateSegmentCount", value); NotifyPropertyChanged(); }
+        }
 
         public Boolean showMtAsOrigin
         {
@@ -155,8 +171,6 @@ namespace FiskmoTranslationProvider
             set { SetBooleanParameter("showMtAsOrigin", value); NotifyPropertyChanged(); }
         }
 
-
-        
 
         
 
@@ -169,6 +183,13 @@ namespace FiskmoTranslationProvider
 
         #region "SetBooleanParameter"
         private void SetBooleanParameter(string p, Boolean value)
+        {
+            _uriBuilder[p] = value.ToString();
+        }
+        #endregion
+
+        #region "SetIntParameter"
+        private void SetIntParameter(string p, int value)
         {
             _uriBuilder[p] = value.ToString();
         }
@@ -198,6 +219,24 @@ namespace FiskmoTranslationProvider
             {
                 return result;
             }
+        }
+        #endregion
+
+        #region "GetIntParameter"
+        private int? GetIntParameter(string p)
+        {
+            string paramString = _uriBuilder[p];
+            int result;
+            var parseResult = Int32.TryParse(paramString, out result);
+            if (parseResult)
+            {
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+            
         }
         #endregion
 

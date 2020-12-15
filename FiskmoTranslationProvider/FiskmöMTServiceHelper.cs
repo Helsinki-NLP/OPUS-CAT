@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace FiskmoTranslationProvider
@@ -32,7 +33,7 @@ namespace FiskmoTranslationProvider
 
             var epAddr = new EndpointAddress($"net.tcp://{host}:{port}/MTService");
             var proxy = ChannelFactory<IMTService>.CreateChannel(myBinding, epAddr);
-            
+
             return proxy;
         }
 
@@ -59,11 +60,11 @@ namespace FiskmoTranslationProvider
                 }
                 catch (Exception ex) when (ex.InnerException is SocketException)
                 {
-                    throw new Exception("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.");
+                    throw new OpusCatEngineConnectionException("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.", ex);
                 }
                 catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
                 {
-                    throw new Exception("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.");
+                    throw new OpusCatEngineConnectionException("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.", ex);
                 }
                 catch (Exception ex)
                 {
@@ -76,7 +77,7 @@ namespace FiskmoTranslationProvider
             return TokenCode;
         }
 
-      
+
         public static List<string> GetLanguagePairModelTags(FiskmoOptions options, string srcLangCode, string trgLangCode)
         {
             return FiskmöMTServiceHelper.GetLanguagePairModelTags(options.mtServiceAddress, options.mtServicePort, srcLangCode, trgLangCode);
@@ -97,7 +98,7 @@ namespace FiskmoTranslationProvider
             var proxy = getNewProxy(host, port);
             using (proxy as IDisposable)
             {
-                string status = proxy.CheckModelStatus(GetTokenCode(host, port),srcLangCode,trgLangCode, modelTag);
+                string status = proxy.CheckModelStatus(GetTokenCode(host, port), srcLangCode, trgLangCode, modelTag);
                 return status;
             }
         }
@@ -122,16 +123,16 @@ namespace FiskmoTranslationProvider
                 return proxy.Login(userName, password);
             }
         }
-        
-        
+
+
         public static List<string> ListSupportedLanguages(FiskmoOptions options)
         {
-            return ListSupportedLanguages(GetTokenCode(options),options.mtServiceAddress, options.mtServicePort);
+            return ListSupportedLanguages(GetTokenCode(options), options.mtServiceAddress, options.mtServicePort);
         }
 
         public static List<string> ListSupportedLanguages(string host, string port)
         {
-            return ListSupportedLanguages(GetTokenCode(host,port), host, port);
+            return ListSupportedLanguages(GetTokenCode(host, port), host, port);
         }
 
         /// <summary>
@@ -150,7 +151,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        
+
         public static string Translate(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
             // Always dispose allocated resources
@@ -162,14 +163,17 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public async static void PreOrder(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
+        public static void PreOrder(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
-            // Always dispose allocated resources
-            var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
-            using (proxy as IDisposable)
+            Task.Run(() =>
             {
-                await System.Threading.Tasks.Task.Run(() => proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag));
-            }
+                // Always dispose allocated resources
+                var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
+                using (proxy as IDisposable)
+                {
+                    proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag);
+                }
+            });
         }
 
         internal static string PreTranslateBatch(string host, string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)

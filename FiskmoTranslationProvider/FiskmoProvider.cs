@@ -19,6 +19,7 @@ namespace FiskmoTranslationProvider
         /// This is the string that precedes the plug-in URI.
         ///</summary>    
         public static readonly string FiskmoTranslationProviderScheme = "fiskmoprovider";
+        private static EventHandler activeSegmentHandler;
 
         #region "ListTranslationOptions"
         public FiskmoOptions Options
@@ -26,7 +27,7 @@ namespace FiskmoTranslationProvider
             get;
             set;
         }
-        
+
         /*private static FiskmoOptions GetActiveOpusTpOptions(Document doc)
         {
             //Make sure that the project has an active Fiskmö translation provider included in it.
@@ -54,23 +55,39 @@ namespace FiskmoTranslationProvider
             }
         }*/
 
-        //Whenever doc changes, start translating the segments and caching translations
-        private static void DocChanged(object sender, DocumentEventArgs e)
+        private static Document activeDocument;
+
+        internal static void UpdateSegmentHandler()
         {
-            if (e.Document == null)
+            EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
+            var activeDoc = editorController.ActiveDocument;
+            if (activeDoc != null)
             {
-                return;
+                FiskmoProvider.UpdateSegmentHandler(activeDoc);
+            }
+        }
+
+        private static void UpdateSegmentHandler(Document doc)
+        {
+            //This method may be fired through docChanged event or through settings change.
+            //TODO: segment handler not being removed
+            if (FiskmoProvider.activeSegmentHandler != null)
+            {
+                FiskmoProvider.activeDocument.ActiveSegmentChanged -= FiskmoProvider.activeSegmentHandler;
             }
 
-            var project = e.Document.Project;
+            FiskmoProvider.activeDocument = doc;
+
+            var project = doc.Project;
             var projectInfo = project.GetProjectInfo();
 
             LanguageDirection langDir;
 
             //Check whether document contains files
-            if (e.Document.Files.Any())
+            if (doc.Files.Any())
             {
-                langDir = e.Document.Files.First().GetLanguageDirection();
+                //only files of same language can be merged, so taking the langdir of first file is enough
+                langDir = doc.Files.First().GetLanguageDirection();
             }
             else
             {
@@ -79,7 +96,7 @@ namespace FiskmoTranslationProvider
 
             //Make sure that the project has an active Fiskmö translation provider included in it.
             var projectTpConfig = project.GetTranslationProviderConfiguration();
-            
+
             //Check if language-specific tp config overrides the main config
             var targetLanguageTpConfig = project.GetTranslationProviderConfiguration(langDir.TargetLanguage);
 
@@ -100,10 +117,10 @@ namespace FiskmoTranslationProvider
                     x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
                 );
             }
-            
+
             if (activeFiskmoTp != null)
             {
-                 
+
                 var activeFiskmoOptions = new FiskmoOptions(activeFiskmoTp.MainTranslationProvider.Uri);
 
                 if (activeFiskmoOptions.pregenerateMt)
@@ -116,7 +133,10 @@ namespace FiskmoTranslationProvider
                     //amount on new translations for the next n segments whenever segment changes.
                     //Previous solution is provided below, commented out.
 
-                    e.Document.ActiveSegmentChanged += (x,y) => segmentChanged(activeFiskmoOptions, langDir, x, y);
+                    //Assign the handler to field to make it possible to remove it later
+                    FiskmoProvider.activeSegmentHandler = new EventHandler((x, y) => segmentChanged(activeFiskmoOptions, langDir, x, y));
+
+                    doc.ActiveSegmentChanged += FiskmoProvider.activeSegmentHandler;
 
                     //Add a collection for tracking which documents have been preprocessed for each lang pair
                     /*if (!FiskmoProvider.processedDocuments.ContainsKey(langDir))
@@ -135,7 +155,17 @@ namespace FiskmoTranslationProvider
             {
                 return;
             }
+        }
+
+        //Whenever doc changes, start translating the segments and caching translations
+        private static void DocChanged(object sender, DocumentEventArgs e)
+        {
+            if (e.Document == null)
+            {
+                return;
+            }
             
+            FiskmoProvider.UpdateSegmentHandler(e.Document);
         }
 
         private static void segmentChanged(FiskmoOptions options, LanguageDirection langDir, object sender, EventArgs e)
@@ -150,7 +180,7 @@ namespace FiskmoTranslationProvider
             //TESTED: doesn't seem slow at all, probably the translation part later that causes delay.
             var nextSegmentPairs = doc.SegmentPairs.SkipWhile(x =>
                 !(x.Properties.Id == doc.ActiveSegmentPair.Properties.Id &&
-                x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId)).Take(10);
+                x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId)).Take(options.pregenerateSegmentCount);
 
             foreach (var segmentPair in nextSegmentPairs)
             {
@@ -163,9 +193,10 @@ namespace FiskmoTranslationProvider
                     var sourceCode = langDir.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
                     var targetCode = langDir.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;
                     var langpair = $"{sourceCode}-{targetCode}";
-
-                    //The preorder method is async, so it doesn't block execution
+                    
+                    //The preorder method doesn't wait for the translation, so the requests return quicker
                     FiskmöMTServiceHelper.PreOrder(options, sourceText, sourceCode, targetCode, options.modelTag);
+                    
                 }
             }
         }
@@ -212,6 +243,9 @@ namespace FiskmoTranslationProvider
                 //added handler before adding the new one
                 editorController.ActiveDocumentChanged -= FiskmoProvider.DocChanged;
                 editorController.ActiveDocumentChanged += FiskmoProvider.DocChanged;
+
+                //If a document is open, check if the segment change handler should be added
+                FiskmoProvider.UpdateSegmentHandler();
             }
 
         }

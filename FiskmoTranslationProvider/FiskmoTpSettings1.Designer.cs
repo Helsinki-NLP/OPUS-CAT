@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FiskmoTranslationProvider {
+namespace FiskmoTranslationProvider2017 {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

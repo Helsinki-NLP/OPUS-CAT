@@ -74,7 +74,16 @@ namespace FiskmoTranslationProvider
             FiskmoOptionsFormWPF dialog = new FiskmoOptionsFormWPF(editProvider.Options, languagePairs);
             if (dialog.ShowDialog(owner) == DialogResult.OK)
             {
+
+                //If the preordering settings have been changed, update the segment handler
+                if (editProvider.Options.pregenerateMt != dialog.Options.pregenerateMt ||
+                    editProvider.Options.pregenerateSegmentCount != dialog.Options.pregenerateSegmentCount)
+                {
+                    FiskmoProvider.UpdateSegmentHandler();
+                }
+
                 editProvider.Options = dialog.Options;
+
                 return true;
             }
 

@@ -100,7 +100,7 @@ namespace FiskmoTranslationProvider
 
                 Dispatcher.Invoke(() => UpdateModelTags(modelTags,modeltag));
             }
-            catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
+            catch (Exception ex) when (ex is OpusCatEngineConnectionException)
             {
                 connectionResult.Append($"No connection to Fiskmö MT service at {host}:{port}.");
                 this.NoConnection = true;
@@ -204,7 +204,11 @@ namespace FiskmoTranslationProvider
             this.DataContextChanged += ConnectionControl_DataContextChanged;
 
             //Fetch data only after data context has been set and the bindings have been resolved.
-            Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            }
+            
         }
 
         private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -228,10 +232,8 @@ namespace FiskmoTranslationProvider
             this.UseCustomConnection.IsChecked =
                 host != FiskmoTpSettings.Default.MtServiceAddress ||
                 port != FiskmoTpSettings.Default.MtServicePort;
-            
 
-
-                var modeltag = this.options.modelTag;
+            var modeltag = this.options.modelTag;
             Task.Run(() => this.FetchServiceData(host, port, modeltag));
         }
 

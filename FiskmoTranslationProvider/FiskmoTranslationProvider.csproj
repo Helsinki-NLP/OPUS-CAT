@@ -203,6 +203,7 @@
     <Compile Include="FinetuneBatchTask.cs" />
     <Compile Include="FinetuneBatchTaskSettings.cs" />
     <Compile Include="FinetuneBatchTaskSettingsPage.cs" />
+    <Compile Include="OpusCatConnectionException.cs" />
     <Compile Include="PluginResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
