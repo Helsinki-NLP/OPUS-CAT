@@ -41,15 +41,16 @@ namespace FiskmoMTEngine
             //smb.HttpGetEnabled = true;
             smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
             selfHost.Description.Behaviors.Add(smb);
+            
             // Add MEX endpoint
             selfHost.AddServiceEndpoint(
                 ServiceMetadataBehavior.MexContractName,
                 MetadataExchangeBindings.CreateMexTcpBinding(),
                 "mex"
             );
-
+            
             var nettcpBinding = new NetTcpBinding();
-
+            
             //Use default net.tcp security, which is based on Windows authentication:
             //using the service is only possible from other computers in the same domain.
             //TODO: add a checkbox (with warning) in the UI for using security mode None,
@@ -62,6 +63,9 @@ namespace FiskmoMTEngine
 
             //Customization tuning sets tend to be big
             nettcpBinding.MaxReceivedMessageSize = 20000000;
+            
+            
+
             selfHost.AddServiceEndpoint(typeof(IMTService), nettcpBinding, "MTService");
 
             if (!onlyNetTcp)
@@ -72,9 +76,17 @@ namespace FiskmoMTEngine
                 selfHost.Description.Endpoints[2].Behaviors.Add(helpBehavior);
                 
             }
-            
+
+            /*This doesn't seem to have an effect
+             * var stb = new ServiceThrottlingBehavior();
+            stb.MaxConcurrentCalls = 100000;
+            stb.MaxConcurrentSessions = 100000;
+            selfHost.Description.Behaviors.Add(stb);
+            */
+
             Log.Information($"Opening the service host");
             selfHost.Open();
+            
             return selfHost;
         }
 

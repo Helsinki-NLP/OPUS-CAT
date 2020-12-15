@@ -174,10 +174,7 @@ namespace FiskmoMTEngine
                 translationTask.ContinueWith((x) => CheckTaskStack());
                 
                 //if there's no translation in progress, start translation
-                //FIX: I'm using WCF in Single concurrency mode, so it's single-threaded.
-                //Translation calls don't return until the translation is ready, the translationInProgress flag
-                //is never true. Need a preorder call which will not wait until translation is ready to handle
-                //preorders
+                
                 if (this.translationInProgress)
                 {
                     this.taskStack.Push(translationTask);

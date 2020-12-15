@@ -8,6 +8,7 @@ using Sdl.LanguagePlatform.Core;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using Sdl.ProjectAutomation.AutomaticTasks;
 using Sdl.ProjectAutomation.Core;
+using Sdl.ProjectAutomation.FileBased;
 using Sdl.TranslationStudioAutomation.IntegrationApi;
 
 namespace FiskmoTranslationProvider
@@ -19,7 +20,7 @@ namespace FiskmoTranslationProvider
         /// This is the string that precedes the plug-in URI.
         ///</summary>    
         public static readonly string FiskmoTranslationProviderScheme = "fiskmoprovider";
-        private static EventHandler activeSegmentHandler;
+        private static ConcurrentDictionary<Document,List<EventHandler>> activeSegmentHandlers = new ConcurrentDictionary<Document, List<EventHandler>>();
 
         #region "ListTranslationOptions"
         public FiskmoOptions Options
@@ -67,33 +68,8 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        private static void UpdateSegmentHandler(Document doc)
+        private static FiskmoOptions GetProjectFiskmoOptions(FileBasedProject project, LanguageDirection langDir)
         {
-            //This method may be fired through docChanged event or through settings change.
-            //TODO: segment handler not being removed
-            if (FiskmoProvider.activeSegmentHandler != null)
-            {
-                FiskmoProvider.activeDocument.ActiveSegmentChanged -= FiskmoProvider.activeSegmentHandler;
-            }
-
-            FiskmoProvider.activeDocument = doc;
-
-            var project = doc.Project;
-            var projectInfo = project.GetProjectInfo();
-
-            LanguageDirection langDir;
-
-            //Check whether document contains files
-            if (doc.Files.Any())
-            {
-                //only files of same language can be merged, so taking the langdir of first file is enough
-                langDir = doc.Files.First().GetLanguageDirection();
-            }
-            else
-            {
-                return;
-            }
-
             //Make sure that the project has an active Fiskmö translation provider included in it.
             var projectTpConfig = project.GetTranslationProviderConfiguration();
 
@@ -120,9 +96,55 @@ namespace FiskmoTranslationProvider
 
             if (activeFiskmoTp != null)
             {
-
                 var activeFiskmoOptions = new FiskmoOptions(activeFiskmoTp.MainTranslationProvider.Uri);
+                return activeFiskmoOptions;
+            }
+            else
+            {
+                return null;
+            }
+        }
 
+        private static void ClearSegmentHandlers()
+        {
+            foreach (var docHandlerListPair in FiskmoProvider.activeSegmentHandlers)
+            {
+                foreach (var handler in docHandlerListPair.Value)
+                {
+                    docHandlerListPair.Key.ActiveSegmentChanged -= handler;
+                }
+            }
+        }
+
+        private static void UpdateSegmentHandler(Document doc)
+        {
+            //This method may be fired through docChanged event or through settings change.
+
+            FiskmoProvider.ClearSegmentHandlers();
+
+            FiskmoProvider.activeDocument = doc;
+
+            var project = doc.Project;
+            var projectInfo = project.GetProjectInfo();
+
+            LanguageDirection langDir;
+
+            //Check whether document contains files
+            if (doc.Files.Any())
+            {
+                //only files of same language can be merged, so taking the langdir of first file is enough
+                langDir = doc.Files.First().GetLanguageDirection();
+            }
+            else
+            {
+                return;
+            }
+
+            var activeFiskmoOptions = FiskmoProvider.GetProjectFiskmoOptions(project,langDir);
+
+            if (activeFiskmoOptions != null)
+            {
+                
                 if (activeFiskmoOptions.pregenerateMt)
                 {
                     //The previous solution for pregeneration was to start translating the
@@ -134,9 +156,14 @@ namespace FiskmoTranslationProvider
                     //Previous solution is provided below, commented out.
 
                     //Assign the handler to field to make it possible to remove it later
-                    FiskmoProvider.activeSegmentHandler = new EventHandler((x, y) => segmentChanged(activeFiskmoOptions, langDir, x, y));
+                    if (!FiskmoProvider.activeSegmentHandlers.ContainsKey(doc))
+                    {
+                        FiskmoProvider.activeSegmentHandlers[doc] = new List<EventHandler>();
+                    }
+                    var handler = new EventHandler((x, y) => segmentChanged(activeFiskmoOptions, langDir, x, y));
+                    FiskmoProvider.activeSegmentHandlers[doc].Add(handler);
 
-                    doc.ActiveSegmentChanged += FiskmoProvider.activeSegmentHandler;
+                    doc.ActiveSegmentChanged += handler;
 
                     //Add a collection for tracking which documents have been preprocessed for each lang pair
                     /*if (!FiskmoProvider.processedDocuments.ContainsKey(langDir))
@@ -172,7 +199,18 @@ namespace FiskmoTranslationProvider
         {
             var doc = (Document)sender;
             var visitor = new FiskmoMarkupDataVisitor();
-            
+
+            var activeFiskmoOptions = FiskmoProvider.GetProjectFiskmoOptions(doc.Project, langDir);
+
+            //If there is no active OPUS CAT provider, unsubscribe this handler (there's probably no event in Trados
+            //API for removing a translation provider from a project, so this is the only way to unsubscribe
+            //after translation provider has been removed.
+            if (activeFiskmoOptions == null || activeFiskmoOptions.pregenerateMt == false)
+            {
+                FiskmoProvider.ClearSegmentHandlers();
+                return;
+            }
+
             //TODO: time this to see if it's a bottleneck during translation.
             //If this is too slow, it might be best to go with a doc changed handler that would collect all the source texts
             //once as soon as the doc is changed and then you could use that collection to run the 
@@ -232,6 +270,8 @@ namespace FiskmoTranslationProvider
 
         public FiskmoProvider(FiskmoOptions options)
         {
+            //TODO: add some kind of throttling here or to Helper to prevent the service being overwhelmed by requests.
+            //Just keep a count of open connections and prevent connections when there are more than 100 or so.
             Options = options;
             
             //If we create a provider with the pregenerate on, add a doc change handler to start preordering

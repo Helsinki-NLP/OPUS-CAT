@@ -145,7 +145,17 @@ namespace FiskmoTranslationProvider
         public Boolean pregenerateMt
         {
             get { return GetBooleanParameter("pregenerateMt"); }
-            set { SetBooleanParameter("pregenerateMt", value); NotifyPropertyChanged(); }
+            set
+            {
+                //The pre-order segment handler needs to update whenever this setting changes
+                var oldValue = this.pregenerateMt;
+                SetBooleanParameter("pregenerateMt", value);
+                if (value != oldValue)
+                {
+                    FiskmoProvider.UpdateSegmentHandler();
+                }
+                NotifyPropertyChanged();
+            }
         }
 
         public int pregenerateSegmentCount
@@ -162,7 +172,18 @@ namespace FiskmoTranslationProvider
                     return value.Value;
                 }
             }
-            set { SetIntParameter("pregenerateSegmentCount", value); NotifyPropertyChanged(); }
+            set
+            {
+                var oldValue = this.pregenerateSegmentCount;
+
+                //The pre-order segment handler needs to update whenever this setting changes
+                SetIntParameter("pregenerateSegmentCount", value);
+                if (value != oldValue)
+                {
+                    FiskmoProvider.UpdateSegmentHandler();
+                }
+                NotifyPropertyChanged();
+            }
         }
 
         public Boolean showMtAsOrigin
