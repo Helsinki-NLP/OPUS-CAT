@@ -365,7 +365,7 @@ namespace FiskmoMTEngine
 
         internal string TranslateWithModel(string input, string modelName)
         {
-            return this.LocalModels.Single(x => x.Name == modelName).Translate(input);
+            return this.LocalModels.Single(x => x.Name == modelName).Translate(input).Result;
         }
 
         internal void StartCustomization(
@@ -579,10 +579,8 @@ namespace FiskmoMTEngine
             return null;
         }
 
-        internal string Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
+        internal Task<string> Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
         {
-
-
             var mtModel = this.SelectModel(srcLang, trgLang, modelTag);
 
             if (mtModel == null)

@@ -39,7 +39,7 @@ namespace FiskmoMTEngine
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
             var source = this.SourceBox.Text;
-            Task<string> translate = new Task<string>(() => this.Model.Translate(source));
+            Task<string> translate = new Task<string>(() => this.Model.Translate(source).Result);
             translate.ContinueWith(x => Dispatcher.Invoke(() => this.TargetBox.Text = x.Result));
             translate.Start();
 

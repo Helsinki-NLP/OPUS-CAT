@@ -16,7 +16,8 @@ namespace FiskmoMTEngine
 
     [ServiceBehavior(
         InstanceContextMode=InstanceContextMode.Single,
-        AddressFilterMode = AddressFilterMode.Any)]
+        AddressFilterMode = AddressFilterMode.Any,
+        ConcurrencyMode = ConcurrencyMode.Single)]
     public class MTService : IMTService
     {
         
@@ -91,7 +92,7 @@ namespace FiskmoMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
+            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
         }
 
         public Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
@@ -100,7 +101,7 @@ namespace FiskmoMTEngine
             var targetLang = new IsoLanguage(trgLangCode);
 
             var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
-            return new Translation(translation);
+            return new Translation(translation.Result);
         }
 
         public Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
@@ -116,7 +117,7 @@ namespace FiskmoMTEngine
             //the default Server header.
             WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Server.ToString(), string.Empty);
             
-            var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
+            var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
             return new MemoryStream(Encoding.UTF8.GetBytes(translation));
         }
 
@@ -158,7 +159,7 @@ namespace FiskmoMTEngine
             List<string> translations = new List<string>();
             foreach (var sourceSegment in input)
             {
-                translations.Add(this.ModelManager.Translate(sourceSegment, sourceLang, targetLang, modelTag));
+                translations.Add(this.ModelManager.Translate(sourceSegment, sourceLang, targetLang, modelTag).Result);
             }
             
             return translations;

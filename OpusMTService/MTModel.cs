@@ -137,14 +137,14 @@ namespace FiskmoMTEngine
             }
         }
 
-        internal string Translate(string input)
+        internal Task<string> Translate(string input)
         {
             if (this.marianProcess == null)
             {
                 this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
             }
 
-            return this.marianProcess.Translate(input);
+            return this.marianProcess.AddToTranslationQueue(input);
         }
 
         internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)

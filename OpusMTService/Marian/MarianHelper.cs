@@ -34,7 +34,7 @@ namespace FiskmoMTEngine
             ExternalProcess.StartInfo.RedirectStandardOutput = true;
             ExternalProcess.StartInfo.RedirectStandardError = true;
             ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-
+            
             //Async error data handler is used for tracking progress
             if (errorDataHandler != null)
             {
@@ -68,6 +68,7 @@ namespace FiskmoMTEngine
             return ExternalProcess;
         }
 
+        
         private static void outputHandler(object sender, DataReceivedEventArgs e)
         {
             //throw new NotImplementedException();

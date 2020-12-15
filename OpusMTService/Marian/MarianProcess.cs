@@ -24,11 +24,15 @@ namespace FiskmoMTEngine
         private Process decoderProcess;*/
         private Process mtPipe;
         private string langpair;
+        
+        private volatile bool translationInProgress = false;
 
         public string SourceCode { get; }
         public string TargetCode { get; }
         public bool Faulted { get; private set; }
         public Process MtPipe { get => mtPipe; set => mtPipe = value; }
+
+        private ConcurrentStack<Task<string>> taskStack = new ConcurrentStack<Task<string>>();
 
         private StreamWriter utf8Writer;
         private string modelDir;
@@ -98,12 +102,14 @@ namespace FiskmoMTEngine
                 this.sentencePiecePostProcess = false;
             }
 
+            //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
             this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
 
             this.utf8Writer = new StreamWriter(this.MtPipe.StandardInput.BaseStream, new UTF8Encoding(false));
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
         }
+
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
@@ -154,11 +160,59 @@ namespace FiskmoMTEngine
             return translation;
         }
 
-        
+        public Task<string> AddToTranslationQueue(string sourceText)
+        {
+            string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
+            if (existingTranslation != null)
+            {
+                //If translation already exists, just return it
+                return Task.Run(() => existingTranslation);
+            }
+            else
+            {
+                Task<string> translationTask = new Task<string>(() => Translate(sourceText));
+                translationTask.ContinueWith((x) => CheckTaskStack());
+                
+                //if there's no translation in progress, start translation
+                //FIX: I'm using WCF in Single concurrency mode, so it's single-threaded.
+                //Translation calls don't return until the translation is ready, the translationInProgress flag
+                //is never true. Need a preorder call which will not wait until translation is ready to handle
+                //preorders
+                if (this.translationInProgress)
+                {
+                    this.taskStack.Push(translationTask);
+                }
+                else
+                {
+                    this.translationInProgress = true;
+                    translationTask.Start();
+                }
+                
+                return translationTask;
+            }
+        }
+
+        private void CheckTaskStack()
+        {
+            Task<string> translationTask;
+            var success = this.taskStack.TryPop(out translationTask);
+
+            if (success)
+            {
+                translationTask.Start();
+            }
+        }
 
         public string Translate(string sourceText)
         {
-            
+            //This is used to determine whether a incoming translation should be immediately started
+            //or queued.
+            //This isn't thread-safe, but the even if there's race conditions etc., this will only
+            //have a minor effect on the order of the translations, it won't break anything.
+            //Main point is that there will not be a case where a translation is not started or queued
+            //when the request arrives (this should be guaranteed by the code flow).
+            translationInProgress = true;
+
             if (this.MtPipe.HasExited)
             {
                 if (this.modelDir == null)
@@ -174,6 +228,7 @@ namespace FiskmoMTEngine
             string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName);
             if (existingTranslation != null)
             {
+                translationInProgress = false;
                 return existingTranslation;
             }
             else
@@ -187,6 +242,7 @@ namespace FiskmoMTEngine
                     existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
                     if (existingTranslation != null)
                     {
+                        translationInProgress = false;
                         return existingTranslation;
                     }
 
@@ -207,6 +263,7 @@ namespace FiskmoMTEngine
                     TranslationDbHelper.WriteTranslationToDb(sourceText, translation, this.SystemName);
                     //sw.Stop();
 
+                    translationInProgress = false;
                     return translation;
                 }
             }
