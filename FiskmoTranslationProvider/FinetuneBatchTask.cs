@@ -16,9 +16,9 @@ using Sdl.LanguagePlatform.TranslationMemory;
 namespace FiskmoTranslationProvider
 {
      
-    [AutomaticTask("FiskmoBatchTask",
-                   "Fiskmo fine-tune and translate",
-                   "Task for fine-tuning Fiskmo models with project data, also support batch translation. IMPORTANT: Segment the files before running this task by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
+    [AutomaticTask("OPUSCATBatchTask",
+                   "OPUS-CAT finetune and preorder machine translation",
+                   "Task for finetuning OPUS MT models with project data, with optional preordering of MT for new segments in project (makes fetching MT much quicker during translation). IMPORTANT: Segment the files before running this task by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
                    GeneratedFileType = AutomaticTaskFileType.None)]
     //[TODO] You can change the file type according to your needs
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
@@ -173,6 +173,33 @@ namespace FiskmoTranslationProvider
             }
         }
 
+        private List<Tuple<string, string>> ExtractFromTm(
+            List<ITranslationMemoryLanguageDirection> tms,
+            List<string> uniqueNewSegments)
+        {
+
+            //assign fuzzy min and all above percentage divisible by ten as fuzzybands
+            var fuzzyBands = Enumerable.Range(settings.FuzzyMinPercentage, 100).Where(
+                x => (x % 10 == 0 && x <= 100) || x == settings.FuzzyMinPercentage).ToList();
+
+            var transUnitExtractor =
+                new FinetuneTransUnitExtractor(
+                    tms,
+                    uniqueNewSegments,
+                    fuzzyBands,
+                    this.settings.MaxFinetuningSentences,
+                    this.settings.ConcordanceMaxResults,
+                    this.settings.FuzzyMaxResults,
+                    this.settings.MaxConcordanceWindow);
+
+            transUnitExtractor.Extract(
+                this.settings.ExtractFuzzies,
+                this.settings.ExtractConcordanceMatches,
+                this.settings.ExtractFillerUnits);
+
+            return transUnitExtractor.AllExtractedTranslations;
+        }
+
         private void Finetune()
         {
             var projectInfo = this.Project.GetProjectInfo();
@@ -187,26 +214,18 @@ namespace FiskmoTranslationProvider
                 var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
                 List<string> uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
 
-                //assign fuzzy min and all above percentage divisible by ten as fuzzybands
-                var fuzzyBands = Enumerable.Range(settings.FuzzyMinPercentage, 100).Where(
-                    x => (x % 10 == 0 && x <= 100) || x == settings.FuzzyMinPercentage).ToList();
+                List<Tuple<string, string>> finetuneSet;
+                if (this.tms[targetLang].Any())
+                {
+                    var tmExtracts = this.ExtractFromTm(this.tms[targetLang], uniqueNewSegments);
+                    finetuneSet = uniqueProjectTranslations.Union(tmExtracts).ToList();
+                }
+                else
+                {
+                    finetuneSet = uniqueProjectTranslations;
+                }
 
-                var transUnitExtractor =
-                    new FinetuneTransUnitExtractor(
-                        this.tms[targetLang],
-                        uniqueNewSegments,
-                        fuzzyBands,
-                        settings.MaxFinetuningSentences,
-                        settings.ConcordanceMaxResults,
-                        settings.FuzzyMaxResults,
-                        settings.MaxConcordanceWindow);
                 
-                transUnitExtractor.Extract(
-                    this.settings.ExtractFuzzies,
-                    this.settings.ExtractConcordanceMatches,
-                    this.settings.ExtractFillerUnits);
-
-                var finetuneSet = uniqueProjectTranslations.Union(transUnitExtractor.AllExtractedTranslations).ToList();
 
                 if (finetuneSet.Count() < FiskmoTpSettings.Default.FinetuningMinSentencePairs)
                 {
@@ -225,14 +244,7 @@ namespace FiskmoTranslationProvider
                     this.fiskmoOptions.modelTag,
                     this.settings.IncludePlaceholderTags,
                     this.settings.IncludeTagPairs);
-
-                switch (result)
-                {
-                    case "fine-tuning already in process":
-                        throw new Exception("MT engine is currently batch translating or fine-tuning, wait for previous job to finish (or cancel it by restarting MT engine).");
-                    default:
-                        break;
-                }
+                
             }
         }
 

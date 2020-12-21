@@ -244,7 +244,8 @@ namespace FiskmoMTEngine
             }
             else
             {
-                return "batch translation or customization already in process";
+                //TODO: need to queue up customization, i.e. save data for starting later
+                throw new FaultException($"Batch translation or customization already in process in the MT engine");
             }
         }
 

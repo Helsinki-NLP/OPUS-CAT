@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FiskmoTranslationProvider
@@ -12,39 +13,42 @@ namespace FiskmoTranslationProvider
     {
         private StringBuilder plainText;
         private Dictionary<string, ITagPair> sourceTagStarts;
+        private bool _segmentContainsText = false;
 
         public Dictionary<string, IPlaceholderTag> Placeholders { get; set; }
         public string PlainText { get => plainText.ToString(); }
         public Dictionary<string, ITagPair> TagStarts { get; set; }
         public Dictionary<string, ITagPair> TagEnds { get; set; }
+        public bool SegmentContainsText { get => _segmentContainsText; internal set => _segmentContainsText = value; }
 
         public void Reset()
         {
+            this.SegmentContainsText = false;
             this.plainText = new StringBuilder();
             this.Placeholders = new Dictionary<string, IPlaceholderTag>();
             this.TagStarts = new Dictionary<string, ITagPair>();
             this.TagEnds = new Dictionary<string, ITagPair>();
-    }
+        }
 
 
         public void VisitCommentMarker(ICommentMarker commentMarker)
         {
-            
+
         }
 
         public void VisitLocationMarker(ILocationMarker location)
         {
-            
+
         }
 
         public void VisitLockedContent(ILockedContent lockedContent)
         {
-            
+
         }
 
         public void VisitOtherMarker(IOtherMarker marker)
         {
-            
+
         }
 
         public void VisitPlaceholderTag(IPlaceholderTag tag)
@@ -58,7 +62,7 @@ namespace FiskmoTranslationProvider
 
         public void VisitRevisionMarker(IRevisionMarker revisionMarker)
         {
-            
+
         }
 
         private void VisitChildren(IAbstractMarkupDataContainer container)
@@ -116,7 +120,12 @@ namespace FiskmoTranslationProvider
 
         public void VisitText(IText text)
         {
-            this.plainText.Append(text.ToString());
+            string textString = text.ToString();
+            if (Regex.IsMatch(textString, @"[^\s]"))
+            {
+                this.SegmentContainsText = true;
+            }
+            this.plainText.Append(textString);
         }
 
         internal void Reset(Dictionary<string, ITagPair> tagStarts)

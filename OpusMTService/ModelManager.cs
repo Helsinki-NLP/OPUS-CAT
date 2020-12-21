@@ -72,9 +72,7 @@ namespace FiskmoMTEngine
         private DirectoryInfo opusModelDir;
         private FileSystemWatcher watcher;
         private bool batchTranslationOngoing;
-        private bool customizationOngoing;
-
-
+        
         public bool OverrideModelSet { get => this.overrideModel != null; }
         public MTModel OverrideModel
         {
@@ -89,7 +87,9 @@ namespace FiskmoMTEngine
         private MTModel overrideModel;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
-        public bool CustomizationOngoing { get => customizationOngoing; set { customizationOngoing = value; NotifyPropertyChanged(); } }
+        public bool CustomizationOngoing {
+            get => this.LocalModels.Any(x => x.Status == MTModelStatus.Customizing);
+        }
         public bool BatchTranslationOngoing { get => batchTranslationOngoing; set { batchTranslationOngoing = value; NotifyPropertyChanged(); } }
 
         
@@ -513,8 +513,7 @@ namespace FiskmoMTEngine
             //so config can be saved).
             incompleteModel.FinetuneProcess = trainProcess;
             incompleteModel.SaveModelConfig();
-
-            this.CustomizationOngoing = true;    
+    
         }
 
         internal void GetLocalModels()

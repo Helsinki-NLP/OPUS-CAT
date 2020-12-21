@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PluginPackage xmlns="http://www.sdl.com/Plugins/PluginPackage/1.0">
-  <PlugInName>FiskmoTranslationProvider</PlugInName>
+  <PlugInName>OPUSCATPlugin</PlugInName>
   <Version>1.2</Version>
-  <Description>Plugin description</Description>
+  <Description>Plugin for fetching MT from local OPUS-CAT MT Engine</Description>
   <Author></Author>
   <RequiredProduct name="SDLTradosStudio" minversion="14.0" maxversion="14.999999"/>
   <Include>
     <File>Xceed.Wpf.Toolkit.dll</File>
+    <File>Newtonsoft.Json.dll</File>
   </Include>
 </PluginPackage>

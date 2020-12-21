@@ -1,6 +1,4 @@
-﻿
-
-using Sdl.Core.Globalization;
+﻿using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.LanguagePlatform.TranslationMemory;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
@@ -42,16 +40,25 @@ namespace FiskmoTranslationProvider
             {
                 if (segmentPair.Properties.ConfirmationLevel == ConfirmationLevel.Translated ||
                     segmentPair.Properties.ConfirmationLevel == ConfirmationLevel.ApprovedTranslation ||
-                    segmentPair.Properties.ConfirmationLevel == ConfirmationLevel.ApprovedSignOff)
+                    segmentPair.Properties.ConfirmationLevel == ConfirmationLevel.ApprovedSignOff ||
+                    (segmentPair.Properties.ConfirmationLevel == ConfirmationLevel.Draft && segmentPair.Properties.TranslationOrigin.MatchPercent == 100))
                 {
                     this.sourceVisitor.Reset();
                     segmentPair.Source.AcceptVisitor(this.sourceVisitor);
                     this.targetVisitor.Reset(this.sourceVisitor.TagStarts);
                     segmentPair.Target.AcceptVisitor(this.targetVisitor);
 
-                    FileTranslations.Add(new Tuple<string, string>(
-                        this.sourceVisitor.PlainText,
-                        this.targetVisitor.PlainText));
+                    //Add translation only if there's actual text content on both sides (not just tags)
+                    if (this.sourceVisitor.SegmentContainsText && this.targetVisitor.SegmentContainsText)
+                    {
+                        FileTranslations.Add(new Tuple<string, string>(
+                            this.sourceVisitor.PlainText,
+                            this.targetVisitor.PlainText));
+                    }
+                    else
+                    {
+                        
+                    }
                 }
                 else
                 {

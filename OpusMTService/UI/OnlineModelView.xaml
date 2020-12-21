@@ -50,7 +50,6 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <ListView 
-                Height="370"
                 Name="ModelListView" 
                 ItemsSource="{Binding FilteredOnlineModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"

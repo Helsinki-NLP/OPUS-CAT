@@ -8,8 +8,8 @@
     <ProjectGuid>{FC5E3080-72AB-432E-9071-FBE72F30AAE6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FiskmoTranslationProvider2017</RootNamespace>
-    <AssemblyName>FiskmoTranslationProvider2017</AssemblyName>
+    <RootNamespace>FiskmoTranslationProvider</RootNamespace>
+    <AssemblyName>FiskmoTranslationProvider</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -34,17 +34,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Minio, Version=3.1.1.0, Culture=neutral, PublicKeyToken=348239ebd7debb4c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Minio.3.1.1\lib\net46\Minio.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RestSharp, Version=106.3.1.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.106.3.1\lib\net452\RestSharp.dll</HintPath>
-    </Reference>
     <Reference Include="Sdl.Core.Globalization">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\SDL\SDL Trados Studio\Studio5\Sdl.Core.Globalization.dll</HintPath>
       <Private>False</Private>
@@ -208,12 +202,6 @@
     <Compile Include="..\FiskmoTranslationProvider\FiskmoTpSettings.Designer.cs">
       <Link>FiskmoTpSettings.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\FiskmoTranslationProvider\FiskmoTpSettings1.Designer.cs">
-      <Link>FiskmoTpSettings1.Designer.cs</Link>
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>FiskmoTpSettings.settings</DependentUpon>
-    </Compile>
     <Compile Include="..\FiskmoTranslationProvider\FiskmöMTServiceHelper.cs">
       <Link>FiskmöMTServiceHelper.cs</Link>
     </Compile>
@@ -253,11 +241,9 @@
     <Content Include="pluginpackage.manifest.xml">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="..\FiskmoTranslationProvider\FiskmoTpSettings.settings">
-      <Link>FiskmoTpSettings.settings</Link>
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>FiskmoTpSettings1.Designer.cs</LastGenOutput>
-    </None>
+    <EmbeddedResource Include="..\FiskmoTranslationProvider\stopwords-iso.json">
+      <Link>stopwords-iso.json</Link>
+    </EmbeddedResource>
     <None Include="Resources\fiskmo_zIQ_icon.ico" />
     <None Include="Resources\fiskmo_icon.ico" />
     <None Include="Resources\fiskmo_7sA_icon.ico" />

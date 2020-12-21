@@ -39,7 +39,7 @@ namespace FiskmoTranslationProvider {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FiskmoTranslationProvider2017.PluginResources", typeof(PluginResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FiskmoTranslationProvider.PluginResources", typeof(PluginResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -81,7 +81,7 @@ namespace FiskmoTranslationProvider {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fiskmö Machine Translation Provider.
+        ///   Looks up a localized string similar to OPUS-CAT Machine Translation Provider.
         /// </summary>
         internal static string Plugin_Description {
             get {
@@ -90,7 +90,7 @@ namespace FiskmoTranslationProvider {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fiskmö.
+        ///   Looks up a localized string similar to OPUS-CAT.
         /// </summary>
         internal static string Plugin_Name {
             get {
@@ -99,7 +99,7 @@ namespace FiskmoTranslationProvider {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fiskmö.
+        ///   Looks up a localized string similar to OPUS-CAT.
         /// </summary>
         internal static string Plugin_NiceName {
             get {
@@ -108,7 +108,7 @@ namespace FiskmoTranslationProvider {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Gets translations from local Fiskmö container.
+        ///   Looks up a localized string similar to Gets translations from a local OPUS-CAT MT Engine.
         /// </summary>
         internal static string Plugin_Tooltip {
             get {

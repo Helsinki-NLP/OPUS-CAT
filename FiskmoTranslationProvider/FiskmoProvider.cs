@@ -198,6 +198,13 @@ namespace FiskmoTranslationProvider
         private static void segmentChanged(FiskmoOptions options, LanguageDirection langDir, object sender, EventArgs e)
         {
             var doc = (Document)sender;
+
+            //There are some "segments" the Trados editor view which are not proper segments, like
+            //the start of document tag
+            if (doc.ActiveSegmentPair == null)
+            {
+                return;
+            }
             var visitor = new FiskmoMarkupDataVisitor();
 
             var activeFiskmoOptions = FiskmoProvider.GetProjectFiskmoOptions(doc.Project, langDir);
@@ -218,11 +225,20 @@ namespace FiskmoTranslationProvider
             //TESTED: doesn't seem slow at all, probably the translation part later that causes delay.
             var nextSegmentPairs = doc.SegmentPairs.SkipWhile(x =>
                 !(x.Properties.Id == doc.ActiveSegmentPair.Properties.Id &&
-                x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId)).Take(options.pregenerateSegmentCount);
+                x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId));
 
+            var segmentsNeeded = options.pregenerateSegmentCount;
             foreach (var segmentPair in nextSegmentPairs)
             {
-                if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified)
+                if (segmentsNeeded == 0)
+                {
+                    break;
+                }
+                
+                //Also preorder translations for Draft segments, since quite often there will be draft content
+                //provided in segments where having MT is still desirable. This could also be an option.
+                if (segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Unspecified ||
+                    segmentPair.Properties.ConfirmationLevel == Sdl.Core.Globalization.ConfirmationLevel.Draft)
                 {
                     visitor.Reset();
                     segmentPair.Source.AcceptVisitor(visitor);
@@ -234,7 +250,7 @@ namespace FiskmoTranslationProvider
                     
                     //The preorder method doesn't wait for the translation, so the requests return quicker
                     FiskmöMTServiceHelper.PreOrder(options, sourceText, sourceCode, targetCode, options.modelTag);
-                    
+                    segmentsNeeded -= 1;
                 }
             }
         }

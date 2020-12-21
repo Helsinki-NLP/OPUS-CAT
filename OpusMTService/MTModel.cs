@@ -439,6 +439,7 @@ namespace FiskmoMTEngine
             this.ModelConfig.ModelTags.Add(modelTag);
             this.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
             this.ModelConfig.IncludeTagPairs = includeTagPairs;
+
             if (status == MTModelStatus.Customizing)
             {
                 this.ModelConfig.FinetuningInitiated = true;
