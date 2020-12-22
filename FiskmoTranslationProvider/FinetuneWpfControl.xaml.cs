@@ -72,7 +72,7 @@ namespace FiskmoTranslationProvider
             this.Settings = Settings;
             //Mode defaults, changeable with radio buttons
             this.Settings.Finetune = true;
-            this.Settings.BatchTranslate = true;
+            this.Settings.PreOrderMtForNewSegments = true;
             //Some settings are initially held in a FiskmoOptions object (the shared properties
             //with the translation provider settings).
             this.Options = new FiskmoOptions();
@@ -95,16 +95,16 @@ namespace FiskmoTranslationProvider
                 switch (radioButton.Name)
                 {
                     case "FinetuneAndTranslate":
-                        this.Settings.BatchTranslate = true;
+                        this.Settings.PreOrderMtForNewSegments = true;
                         this.Settings.Finetune = true;
                         break;
                     case "FinetuneOnly":
                         this.Settings.Finetune = true;
-                        this.Settings.BatchTranslate = false;
+                        this.Settings.PreOrderMtForNewSegments = false;
                         break;
                     case "TranslateOnly":
                         this.Settings.Finetune = false;
-                        this.Settings.BatchTranslate = true;
+                        this.Settings.PreOrderMtForNewSegments = true;
                         break;
                 }
 

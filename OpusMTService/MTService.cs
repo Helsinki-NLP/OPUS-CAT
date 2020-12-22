@@ -174,7 +174,7 @@ namespace FiskmoMTEngine
         /// <param name="input"></param>
         /// <param name="srcLangCode"></param>
         /// <param name="trgLangCode"></param>
-        public string PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        public string PreOrderBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
 
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
@@ -188,6 +188,18 @@ namespace FiskmoMTEngine
                 return "input was empty";
             }
 
+            foreach (var inputString in input)
+            {
+                this.ModelManager.Translate(inputString, sourceLang, targetLang, modelTag);
+            }
+
+            /* Batch preordering was done earlier with batch translation, but it doesn't seem
+             * to be much quicker than normal translation, and it has to problem of providing all
+             * the translations at once in the end. Using normal translation means the MT is ready
+             * as soon as a sentence gets translated (you could do this for batch translation as well
+             * by adding an outputline handler, but it's not implemented yet). Batch translation should be
+             * much quicker, need to test for correct parameters, so stick with this. Using normal translate
+             * is also more robust, one less thing to break.
             if (!this.ModelManager.BatchTranslationOngoing && !this.ModelManager.CustomizationOngoing)
             {
                 this.ModelManager.PreTranslateBatch(input, sourceLang, targetLang, modelTag);
@@ -196,7 +208,9 @@ namespace FiskmoMTEngine
             else
             {
                 return "batch translation or customization already in process";
-            }
+            }*/
+
+            return "preorder received";
         }
 
 

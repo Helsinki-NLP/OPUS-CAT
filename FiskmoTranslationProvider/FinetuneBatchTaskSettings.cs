@@ -102,15 +102,15 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public bool BatchTranslate
+        public bool PreOrderMtForNewSegments
         {
             get
             {
-                return GetSetting<bool>(nameof(BatchTranslate));
+                return GetSetting<bool>(nameof(PreOrderMtForNewSegments));
             }
             set
             {
-                GetSetting<bool>(nameof(BatchTranslate)).Value = value;
+                GetSetting<bool>(nameof(PreOrderMtForNewSegments)).Value = value;
                 NotifyPropertyChanged();
             }
         }

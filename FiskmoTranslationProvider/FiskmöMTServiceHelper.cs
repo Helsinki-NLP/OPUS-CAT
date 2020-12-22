@@ -163,7 +163,8 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        public static void PreOrder(FiskmoOptions options, string input, string srcLangCode, string trgLangCode, string modelTag)
+        
+        public static void PreOrderBatch(FiskmoOptions options, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
         {
             Task.Run(() =>
             {
@@ -171,18 +172,18 @@ namespace FiskmoTranslationProvider
                 var proxy = getNewProxy(options.mtServiceAddress, options.mtServicePort);
                 using (proxy as IDisposable)
                 {
-                    proxy.Translate(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag);
+                    proxy.PreOrderBatch(GetTokenCode(options), input, srcLangCode, trgLangCode, modelTag);
                 }
             });
         }
 
-        internal static string PreTranslateBatch(string host, string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
+        internal static string PreOrderBatch(string host, string mtServicePort, List<string> projectNewSegments, string sourceCode, string targetCode, string modelTag)
         {
             var proxy = getNewProxy(host, mtServicePort);
 
             using (proxy as IDisposable)
             {
-                return proxy.PreTranslateBatch(GetTokenCode(host, mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
+                return proxy.PreOrderBatch(GetTokenCode(host, mtServicePort), projectNewSegments, sourceCode, targetCode, modelTag);
             }
         }
 

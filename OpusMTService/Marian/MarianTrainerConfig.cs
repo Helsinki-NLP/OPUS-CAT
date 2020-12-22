@@ -32,6 +32,9 @@ namespace FiskmoMTEngine
         [YamlMember(Alias = "valid-translation-output", ApplyNamingConventions = false)]
         public string validTranslationOutput { get; set; }
 
+        [YamlMember(Alias = "valid-max-length", ApplyNamingConventions = false)]
+        public string validMaxLength { get; set; }
+
         [YamlMember(Alias = "guided-alignment", ApplyNamingConventions = false)]
         public string guidedAlignment { get; set; }
 

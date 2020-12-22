@@ -17,8 +17,8 @@ namespace FiskmoTranslationProvider
 {
      
     [AutomaticTask("OPUSCATBatchTask",
-                   "OPUS-CAT finetune and preorder machine translation",
-                   "Task for finetuning OPUS MT models with project data, with optional preordering of MT for new segments in project (makes fetching MT much quicker during translation). IMPORTANT: Segment the files before running this task by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
+                   "OPUS-CAT Finetune and Preorder",
+                   "Task for finetuning OPUS MT models, with optional preordering of MT for new segments. IMPORTANT: This task works only on segmented files. If files are not segmented, segment them by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
                    GeneratedFileType = AutomaticTaskFileType.None)]
     //[TODO] You can change the file type according to your needs
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
@@ -150,7 +150,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        private void BatchTranslate()
+        private void PreOrderMt()
         {
             var projectInfo = this.Project.GetProjectInfo();
             var projectGuid = projectInfo.Id;
@@ -161,7 +161,7 @@ namespace FiskmoTranslationProvider
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
                 var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                 //Send the new segments to MT service
-                var result = FiskmöMTServiceHelper.PreTranslateBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, fiskmoOptions.modelTag);
+                var result = FiskmöMTServiceHelper.PreOrderBatch(fiskmoOptions.mtServiceAddress, fiskmoOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, fiskmoOptions.modelTag);
 
                 switch (result)
                 {
@@ -267,9 +267,9 @@ namespace FiskmoTranslationProvider
             //Send the new segments to MT engine for pretranslation.
             //If finetuning is selected, the new segments are translated after
             //customization finished, so this is only for BatchTranslateOnly
-            if (settings.BatchTranslate == true && settings.Finetune == false)
+            if (settings.PreOrderMtForNewSegments == true && settings.Finetune == false)
             {
-                this.BatchTranslate();    
+                this.PreOrderMt();    
             }
         }
     

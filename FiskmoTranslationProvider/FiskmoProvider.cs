@@ -218,11 +218,8 @@ namespace FiskmoTranslationProvider
                 return;
             }
 
-            //TODO: time this to see if it's a bottleneck during translation.
-            //If this is too slow, it might be best to go with a doc changed handler that would collect all the source texts
-            //once as soon as the doc is changed and then you could use that collection to run the 
-            //next segment checks.
-            //TESTED: doesn't seem slow at all, probably the translation part later that causes delay.
+            var sourceSegmentTexts = new List<string>();
+
             var nextSegmentPairs = doc.SegmentPairs.SkipWhile(x =>
                 !(x.Properties.Id == doc.ActiveSegmentPair.Properties.Id &&
                 x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId));
@@ -230,7 +227,7 @@ namespace FiskmoTranslationProvider
             var segmentsNeeded = options.pregenerateSegmentCount;
             foreach (var segmentPair in nextSegmentPairs)
             {
-                if (segmentsNeeded == 0)
+                if (sourceSegmentTexts.Count == segmentsNeeded)
                 {
                     break;
                 }
@@ -243,16 +240,15 @@ namespace FiskmoTranslationProvider
                     visitor.Reset();
                     segmentPair.Source.AcceptVisitor(visitor);
                     var sourceText = visitor.PlainText;
-                    
-                    var sourceCode = langDir.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
-                    var targetCode = langDir.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;
-                    var langpair = $"{sourceCode}-{targetCode}";
-                    
-                    //The preorder method doesn't wait for the translation, so the requests return quicker
-                    FiskmöMTServiceHelper.PreOrder(options, sourceText, sourceCode, targetCode, options.modelTag);
-                    segmentsNeeded -= 1;
+                    sourceSegmentTexts.Add(sourceText);
                 }
             }
+
+            var sourceCode = langDir.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
+            var targetCode = langDir.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;
+
+            //The preorder method doesn't wait for the translation, so the requests return quicker
+            FiskmöMTServiceHelper.PreOrderBatch(options, sourceSegmentTexts, sourceCode, targetCode, options.modelTag);
         }
 
         //THIS IS DEPRECATED, REPLACED WITH SEGMENT CHANGE HANDLER EVENT

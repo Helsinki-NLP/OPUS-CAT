@@ -10,5 +10,6 @@ early-stopping: 20
 valid-freq: 100u
 valid-metrics:
 - translation
+valid-max-length: 200
 gradient-checkpointing: true
 shuffle-in-ram: true
