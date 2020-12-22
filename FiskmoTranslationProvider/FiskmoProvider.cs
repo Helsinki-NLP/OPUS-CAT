@@ -21,8 +21,7 @@ namespace FiskmoTranslationProvider
         ///</summary>    
         public static readonly string FiskmoTranslationProviderScheme = "fiskmoprovider";
         private static ConcurrentDictionary<Document,List<EventHandler>> activeSegmentHandlers = new ConcurrentDictionary<Document, List<EventHandler>>();
-
-        #region "ListTranslationOptions"
+        
         public FiskmoOptions Options
         {
             get;
@@ -68,7 +67,7 @@ namespace FiskmoTranslationProvider
             }
         }
 
-        private static FiskmoOptions GetProjectFiskmoOptions(FileBasedProject project, LanguageDirection langDir)
+        private static IEnumerable<FiskmoOptions> GetProjectFiskmoOptions(FileBasedProject project, LanguageDirection langDir)
         {
             //Make sure that the project has an active Fiskmö translation provider included in it.
             var projectTpConfig = project.GetTranslationProviderConfiguration();
@@ -76,10 +75,10 @@ namespace FiskmoTranslationProvider
             //Check if language-specific tp config overrides the main config
             var targetLanguageTpConfig = project.GetTranslationProviderConfiguration(langDir.TargetLanguage);
 
-            TranslationProviderCascadeEntry activeFiskmoTp;
+            IEnumerable<TranslationProviderCascadeEntry> activeFiskmoTps;
             if (targetLanguageTpConfig.OverrideParent)
             {
-                activeFiskmoTp = targetLanguageTpConfig.Entries.SingleOrDefault(
+                activeFiskmoTps = targetLanguageTpConfig.Entries.Where(
                 x =>
                     x.MainTranslationProvider.Enabled &&
                     x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
@@ -87,16 +86,16 @@ namespace FiskmoTranslationProvider
             }
             else
             {
-                activeFiskmoTp = projectTpConfig.Entries.SingleOrDefault(
+                activeFiskmoTps = projectTpConfig.Entries.Where(
                 x =>
                     x.MainTranslationProvider.Enabled &&
                     x.MainTranslationProvider.Uri.OriginalString.Contains(FiskmoTranslationProviderScheme)
                 );
             }
 
-            if (activeFiskmoTp != null)
+            if (activeFiskmoTps.Any())
             {
-                var activeFiskmoOptions = new FiskmoOptions(activeFiskmoTp.MainTranslationProvider.Uri);
+                var activeFiskmoOptions = activeFiskmoTps.Select(x => new FiskmoOptions(x.MainTranslationProvider.Uri));
                 return activeFiskmoOptions;
             }
             else
@@ -145,7 +144,7 @@ namespace FiskmoTranslationProvider
             if (activeFiskmoOptions != null)
             {
                 
-                if (activeFiskmoOptions.pregenerateMt)
+                if (activeFiskmoOptions.Any(x => x.pregenerateMt))
                 {
                     //The previous solution for pregeneration was to start translating the
                     //whole document as soon as the doc changes. This has a problem:
@@ -160,7 +159,8 @@ namespace FiskmoTranslationProvider
                     {
                         FiskmoProvider.activeSegmentHandlers[doc] = new List<EventHandler>();
                     }
-                    var handler = new EventHandler((x, y) => segmentChanged(activeFiskmoOptions, langDir, x, y));
+
+                    var handler = new EventHandler((x, y) => segmentChanged(langDir, x, y));
                     FiskmoProvider.activeSegmentHandlers[doc].Add(handler);
 
                     doc.ActiveSegmentChanged += handler;
@@ -195,7 +195,7 @@ namespace FiskmoTranslationProvider
             FiskmoProvider.UpdateSegmentHandler(e.Document);
         }
 
-        private static void segmentChanged(FiskmoOptions options, LanguageDirection langDir, object sender, EventArgs e)
+        private static void segmentChanged(LanguageDirection langDir, object sender, EventArgs e)
         {
             var doc = (Document)sender;
 
@@ -207,12 +207,12 @@ namespace FiskmoTranslationProvider
             }
             var visitor = new FiskmoMarkupDataVisitor();
 
-            var activeFiskmoOptions = FiskmoProvider.GetProjectFiskmoOptions(doc.Project, langDir);
+            var activeFiskmoOptionsWithPregenerate = FiskmoProvider.GetProjectFiskmoOptions(doc.Project, langDir).Where(x => x.pregenerateMt);
 
             //If there is no active OPUS CAT provider, unsubscribe this handler (there's probably no event in Trados
             //API for removing a translation provider from a project, so this is the only way to unsubscribe
             //after translation provider has been removed.
-            if (activeFiskmoOptions == null || activeFiskmoOptions.pregenerateMt == false)
+            if (activeFiskmoOptionsWithPregenerate == null || !activeFiskmoOptionsWithPregenerate.Any())
             {
                 FiskmoProvider.ClearSegmentHandlers();
                 return;
@@ -224,7 +224,7 @@ namespace FiskmoTranslationProvider
                 !(x.Properties.Id == doc.ActiveSegmentPair.Properties.Id &&
                 x.GetParagraphUnitProperties().ParagraphUnitId == doc.ActiveSegmentPair.GetParagraphUnitProperties().ParagraphUnitId));
 
-            var segmentsNeeded = options.pregenerateSegmentCount;
+            var segmentsNeeded = activeFiskmoOptionsWithPregenerate.Max(x => x.pregenerateSegmentCount);
             foreach (var segmentPair in nextSegmentPairs)
             {
                 if (sourceSegmentTexts.Count == segmentsNeeded)
@@ -247,8 +247,12 @@ namespace FiskmoTranslationProvider
             var sourceCode = langDir.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
             var targetCode = langDir.TargetLanguage.CultureInfo.TwoLetterISOLanguageName;
 
-            //The preorder method doesn't wait for the translation, so the requests return quicker
-            FiskmöMTServiceHelper.PreOrderBatch(options, sourceSegmentTexts, sourceCode, targetCode, options.modelTag);
+            foreach (var options in activeFiskmoOptionsWithPregenerate)
+            {
+                //The preorder method doesn't wait for the translation, so the requests return quicker
+                var sourceSegmentTextsNeeded = sourceSegmentTexts.Take(options.pregenerateSegmentCount).ToList();
+                FiskmöMTServiceHelper.PreOrderBatch(options, sourceSegmentTextsNeeded, sourceCode, targetCode, options.modelTag);
+            }
         }
 
         //THIS IS DEPRECATED, REPLACED WITH SEGMENT CHANGE HANDLER EVENT
@@ -301,7 +305,6 @@ namespace FiskmoTranslationProvider
             }
 
         }
-        #endregion
 
         #region "ITranslationProvider Members"
 

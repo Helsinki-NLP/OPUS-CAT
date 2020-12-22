@@ -7,6 +7,7 @@ after-epochs: 1
 normalize: 1
 workspace: 2048
 early-stopping: 20
+learn-rate: 0.00002
 valid-freq: 100u
 valid-metrics:
 - translation

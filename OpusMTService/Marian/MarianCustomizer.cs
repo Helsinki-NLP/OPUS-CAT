@@ -62,11 +62,13 @@ namespace FiskmoMTEngine
         {
             if (this.customDir.Exists)
             {
-                throw new Exception("custom model directory exists already");
+
+                //throw new Exception("custom model directory exists already");
             }
 
             this.customDir.Create();
 
+            //TODO: this should not copy everything
             foreach (FileInfo file in modelDir.GetFiles())
             {
                 file.CopyTo(Path.Combine(this.customDir.FullName, file.Name));

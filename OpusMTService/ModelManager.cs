@@ -412,8 +412,15 @@ namespace FiskmoMTEngine
                 baseModel = this.GetPrimaryModel(srcLang, trgLang);
             }
 
-            var customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
-            
+            //Select a custom dir that doesn't exist
+            DirectoryInfo customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
+            var nameIndex = 0;
+            while (customDir.Exists)
+            {
+                nameIndex++;
+                customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}_{nameIndex}");
+            }
+
             var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLang, trgLang, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
