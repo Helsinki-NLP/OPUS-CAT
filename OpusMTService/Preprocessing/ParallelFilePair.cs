@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     //A convenience class for handling bilingual file pairs, i.e. the same content in two languages, in two parallel files
     public class ParallelFilePair

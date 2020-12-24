@@ -1,5 +1,5 @@
-﻿Fiskmö MT Engine. Copyright © 2020 Tommi Nieminen, KITES. Licensed under the MIT license.
-The following open source software is distributed with Fiskmö MT Engine (licenses included in the installation folder):
+﻿Opus CAT MT Engine. Copyright © 2020 Tommi Nieminen. Licensed under the MIT license.
+The following open source software is distributed with OPUS-CAT MT Engine (licenses included in the installation folder):
 1. Marian NMT: Fast Neural Machine Translation in C++ (https://marian-nmt.github.io). Copyright (c) 2016 Marcin Junczys-Dowmunt, the University of Edinburgh, Adam Mickiewicz University. Licensed under the MIT License (included in the plugin folder). File: marian-decoder.exe.
 2. Subword Neural Machine Translation: Unsupervised Word Segmentation for Neural Machine Translation and Text Generation (https://github.com/rsennrich/subword-nmt). Copyright (c) 2015 University of Edinburgh. Licensed under the MIT License (included in the plugin folder). File: apply_bpe.exe.
 3. Sacremoses: Python port of Moses tokenizer, truecaser and normalizer (https://github.com/alvations/sacremoses). Licensed under the GNU Lesser General Public License version 3.0 (included in the plugin folder). File: process.exe (source code available on demand).

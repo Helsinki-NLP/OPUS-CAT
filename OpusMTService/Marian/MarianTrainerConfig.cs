@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using YamlDotNet.Serialization;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     public class MarianTrainerConfig
     {

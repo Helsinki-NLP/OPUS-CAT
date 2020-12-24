@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     class HelperFunctions
     {
@@ -30,7 +30,7 @@ namespace FiskmoMTEngine
         {
             return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    FiskmoMTEngineSettings.Default.LocalFiskmoDir,
+                    OpusCatMTEngineSettings.Default.LocalOpusCatDir,
                     restOfPath);
         }
 
@@ -53,7 +53,7 @@ namespace FiskmoMTEngine
         internal static ParallelFilePair GetTatoebaFileInfos(string sourceCode, string targetCode)
         {
             var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var testsets = Directory.GetDirectories(Path.Combine(processDir,FiskmoMTEngineSettings.Default.TatoebaDir));            
+            var testsets = Directory.GetDirectories(Path.Combine(processDir,OpusCatMTEngineSettings.Default.TatoebaDir));            
             var testsetDir = testsets.Single(
                 x => x.EndsWith($"{sourceCode}-{targetCode}") || x.EndsWith($"{targetCode}-{sourceCode}"));
             var source = Directory.GetFiles(testsetDir, $"tatoeba.{sourceCode}.txt").Select(x => new FileInfo(x)).Single();

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static FiskmoMTEngine.MarianCustomizer;
+using static OpusCatMTEngine.MarianCustomizer;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     //Used with progress handlers to communicate the state of long-running Marian tasks (customization, batch translation)
     public class MarianCustomizationStatus

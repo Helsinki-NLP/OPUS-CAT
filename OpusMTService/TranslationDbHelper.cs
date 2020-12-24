@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     class TranslationDbHelper
     {
@@ -14,8 +14,8 @@ namespace FiskmoMTEngine
         {
             var translationDb = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
-                FiskmoMTEngineSettings.Default.TranslationDBName);
+                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
+                OpusCatMTEngineSettings.Default.TranslationDBName);
 
             using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
             {
@@ -36,8 +36,8 @@ namespace FiskmoMTEngine
         {
             var translationDb = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
-                FiskmoMTEngineSettings.Default.TranslationDBName);
+                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
+                OpusCatMTEngineSettings.Default.TranslationDBName);
 
             List<string> items = new List<string>();
 

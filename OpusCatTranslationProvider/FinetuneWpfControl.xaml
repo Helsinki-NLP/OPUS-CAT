@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="OpusCatTranslationProvider.FinetuneWpfControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpusCatTranslationProvider"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300">
+    <Control.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Control.Resources>
+    <DockPanel Background="White">
+        <TabControl DockPanel.Dock="Top">
+            <TabItem Header="Task settings" IsSelected="{Binding ElementName=ConnectionControl, Path=ConnectionExists, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                <StackPanel>
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <StackPanel Margin="5,0,0,5">
+                            <Label>Preprocessing mode</Label>
+                            <RadioButton IsChecked="True" Name="FinetuneAndTranslate" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model and batch translate</RadioButton>
+                            <RadioButton Name="FinetuneOnly" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model only</RadioButton>
+                            <RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Mode">Batch translate only</RadioButton>
+                        </StackPanel>
+                    </Border>
+     
+                    <CheckBox Name="AddProvider" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.AddOpusCatProvider, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Add OPUS-CAT MT provider to project</CheckBox>
+                    <Border IsEnabled="{Binding IsChecked,ElementName=AddProvider}" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel Margin="5">
+                            <Label Margin="0,-5,0,0">MT provider settings</Label>
+                            <CheckBox ToolTip="If checked, document segments are sent for translation as soon as the document is opened."
+                                IsChecked="{Binding Path=Options.pregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                Pregenerate MT
+                            </CheckBox>
+                            <CheckBox ToolTip="If checked, the results of OPUS-CAT MT are identified as MT segments"
+                                IsChecked="{Binding Path=Options.showMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                Show MT as suggestion origin
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+
+                    <DockPanel>
+                        <Label>Model tag</Label>
+                        <ComboBox IsEnabled="{Binding IsChecked,ElementName=TranslateOnly}" Visibility="{Binding IsChecked,ElementName=TranslateOnly, Converter={StaticResource BoolToVis}}" Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                        <TextBox IsEnabled="{Binding Path=Settings.Finetune}" Visibility="{Binding Path=Settings.Finetune, Converter={StaticResource BoolToVis}}" Text="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    </DockPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem IsEnabled="{Binding Path=Settings.Finetune}" Header="Fine-tuning settings">
+                <StackPanel Margin="5">
+                    
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
+                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
+                    <DockPanel>
+                        <TextBox PreviewTextInput="NumberBox_PreviewTextInput" IsEnabled="{Binding Path=Settings.Finetune}" VerticalAlignment="Center" Text="{Binding Path=Settings.MaxFinetuningSentences, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" />
+                        <Label>Maximum amount of sentences for fine-tuning</Label>
+                    </DockPanel>
+                    <CheckBox Name="ExtractFuzzies" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractFuzzies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract fuzzies to use as fine-tuning material</CheckBox>
+                    <Border IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel Margin="5">
+                            <Label Margin="0,-5,0,0">Fuzzy settings</Label>
+                            <DockPanel>
+                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMinPercentage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <Label>Minimum fuzzy percentage</Label>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <Label>Maximum fuzzies per segment</Label>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Connection" IsSelected="{Binding ElementName=ConnectionControl, Path=NoConnection, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                <local:ConnectionControl x:Name="ConnectionControl" />
+            </TabItem>
+
+        </TabControl>
+        <Border BorderThickness="1" BorderBrush="Black">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="15" Height="15" StrokeThickness="2" Stroke="Black" Fill="{Binding ElementName=ConnectionControl, Path=ConnectionColor, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Ellipse>
+                    <Label FontWeight="Bold">Connection status</Label>
+                </StackPanel>
+                <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+                <TextBlock Margin="5"><Hyperlink NavigateUri="https://helsinki-nlp.github.io/OPUS-CAT/" RequestNavigate="Hyperlink_RequestNavigate">
+                    OPUS-CAT MT online documentation
+                </Hyperlink></TextBlock>
+            </StackPanel>
+        </Border>
+    </DockPanel>
+</UserControl>

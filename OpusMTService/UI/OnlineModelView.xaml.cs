@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// Interaction logic for OnlineModelView.xaml
@@ -52,6 +52,11 @@ namespace FiskmoMTEngine
             foreach (object selected in this.ModelListView.SelectedItems)
             {
                 MTModel selectedModel = (MTModel)selected;
+                if (selectedModel.InstallStatus != "")
+                {
+                    continue;
+                }
+
                 selectedModel.InstallStatus = "Downloading";
                 this.modelManager.DownloadModel(
                     selectedModel.ModelPath,

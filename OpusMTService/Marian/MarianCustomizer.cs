@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using YamlDotNet.Serialization;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
 
     public class MarianCustomizer
@@ -87,7 +87,7 @@ namespace FiskmoMTEngine
                     new FileInfo(this.trainingLog.TrainingConfig.ValidSets[0]),
                     new FileInfo(Path.Combine(this.customDir.FullName, "valid.final.txt")),
                     new FileInfo(this.trainingLog.TrainingConfig.ValidSets[1]),
-                    FiskmoMTEngineSettings.Default.OODValidSetSize,
+                    OpusCatMTEngineSettings.Default.OODValidSetSize,
                     true
                     );
                 finalValidProcess.WaitForExit();
@@ -144,7 +144,7 @@ namespace FiskmoMTEngine
             //Save the batch to translate after customization to a file (to be batch translated after successful exit)
             if (this.postCustomizationBatch != null && this.postCustomizationBatch.Count > 0)
             {
-                FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.PostFinetuneBatchName));
+                FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.customDir.FullName, OpusCatMTEngineSettings.Default.PostFinetuneBatchName));
                 using (var writer = postCustomizationBatchFile.CreateText())
                 {
                     foreach (var sourceString in this.postCustomizationBatch)
@@ -186,7 +186,7 @@ namespace FiskmoMTEngine
                 this.spValidSource,
                 new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
                 this.spValidTarget,
-                FiskmoMTEngineSettings.Default.OODValidSetSize,
+                OpusCatMTEngineSettings.Default.OODValidSetSize,
                 true
                 );
 
@@ -204,7 +204,7 @@ namespace FiskmoMTEngine
             
             var baseCustomizeYmlPath =
                 HelperFunctions.GetLocalAppDataPath(
-                    FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+                    OpusCatMTEngineSettings.Default.CustomizationBaseConfig);
 
             var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -213,7 +213,7 @@ namespace FiskmoMTEngine
             {
                 
                 File.Copy(
-                    Path.Combine(processDir,FiskmoMTEngineSettings.Default.CustomizationBaseConfig), 
+                    Path.Combine(processDir,OpusCatMTEngineSettings.Default.CustomizationBaseConfig), 
                     baseCustomizeYmlPath);
             }
 
@@ -247,7 +247,7 @@ namespace FiskmoMTEngine
                 Path.Combine(processDir,"Validate.bat"), trainingConfig.validScriptPath);
 
             trainingConfig.validScriptArgs = 
-                new List<string> { spValidTarget.FullName, FiskmoMTEngineSettings.Default.OODValidSetSize.ToString()};
+                new List<string> { spValidTarget.FullName, OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             if (this.guidedAlignment)
@@ -264,7 +264,7 @@ namespace FiskmoMTEngine
             builder.ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull);
             var serializer = builder.Build();
             
-            var configPath = Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+            var configPath = Path.Combine(this.customDir.FullName, OpusCatMTEngineSettings.Default.CustomizationBaseConfig);
             using (var writer = File.CreateText(configPath))
             {
                 serializer.Serialize(writer, trainingConfig, typeof(MarianTrainerConfig));
@@ -279,7 +279,7 @@ namespace FiskmoMTEngine
 
         private Process StartTraining()
         {
-            var configPath = Path.Combine(this.customDir.FullName, FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+            var configPath = Path.Combine(this.customDir.FullName, OpusCatMTEngineSettings.Default.CustomizationBaseConfig);
 
             var deserializer = new Deserializer();
             MarianTrainerConfig trainingConfig;
@@ -294,7 +294,7 @@ namespace FiskmoMTEngine
             var trainingArgs = $"--config {configPath} --log-level=info"; // --quiet";
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                Path.Combine(FiskmoMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
+                Path.Combine(OpusCatMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
             return trainProcess;
         }
 
@@ -319,7 +319,7 @@ namespace FiskmoMTEngine
                 tatoebaValidFileInfos,
                 new ParallelFilePair(this.inDomainValidationSource, this.inDomainValidationTarget),
                 this.customDir.FullName,
-                FiskmoMTEngineSettings.Default.OODValidSetSize);
+                OpusCatMTEngineSettings.Default.OODValidSetSize);
 
             this.spValidSource = MarianHelper.PreprocessLanguage(combinedValid.Source, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
             this.spValidTarget = MarianHelper.PreprocessLanguage(combinedValid.Target, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);

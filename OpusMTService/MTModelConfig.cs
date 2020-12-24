@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     public class MTModelConfig : INotifyPropertyChanged
     {

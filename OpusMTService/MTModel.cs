@@ -20,7 +20,7 @@ using System.Windows;
 using System.Windows.Data;
 using YamlDotNet.Serialization;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     
     public enum MTModelStatus
@@ -159,7 +159,7 @@ namespace FiskmoMTEngine
         //This creates a zip package of the model that can be moved to another computer
         internal void PackageModel()
         {
-            var customModelZipDirPath = HelperFunctions.GetLocalAppDataPath(FiskmoMTEngineSettings.Default.CustomModelZipPath);
+            var customModelZipDirPath = HelperFunctions.GetLocalAppDataPath(OpusCatMTEngineSettings.Default.CustomModelZipPath);
             if (!Directory.Exists(customModelZipDirPath))
             {
                 Directory.CreateDirectory(customModelZipDirPath);
@@ -275,7 +275,7 @@ namespace FiskmoMTEngine
                 this.CustomizationStatus = null;
                 this.StatusProgress = 0;
                 this.NotifyPropertyChanged("StatusAndEstimateString");
-                FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.InstallDir, FiskmoMTEngineSettings.Default.PostFinetuneBatchName));
+                FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.InstallDir, OpusCatMTEngineSettings.Default.PostFinetuneBatchName));
                 if (postCustomizationBatchFile.Exists)
                 {
                     List<string> newSegments = new List<string>();
@@ -495,7 +495,7 @@ namespace FiskmoMTEngine
                     FileInfo trainingLog = new FileInfo(
                         Path.Combine(
                             this.InstallDir,
-                            FiskmoMTEngineSettings.Default.TrainLogName));
+                            OpusCatMTEngineSettings.Default.TrainLogName));
 
                     if (trainingLog.Exists)
                     {

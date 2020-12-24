@@ -20,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -101,7 +101,7 @@ namespace FiskmoMTEngine
                         }
                         else
                         {
-                            if (this.ServicePortBox != FiskmoMTEngineSettings.Default.MtServicePort)
+                            if (this.ServicePortBox != OpusCatMTEngineSettings.Default.MtServicePort)
                             {
                                 this.SaveButtonEnabled = true;
                             }
@@ -133,11 +133,11 @@ namespace FiskmoMTEngine
 
         public MainWindow()
         {
-            Log.Information("Starting Fiskmö MT service");
+            Log.Information("Starting OPUS-CAT MT Engine");
             
             this.StartEngine();
             InitializeComponent();
-            this.ServicePortBox = FiskmoMTEngineSettings.Default.MtServicePort;
+            this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
         }
 
         private void StartEngine()
@@ -166,8 +166,8 @@ namespace FiskmoMTEngine
 
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
-            FiskmoMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
-            FiskmoMTEngineSettings.Default.Save();
+            OpusCatMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
+            OpusCatMTEngineSettings.Default.Save();
             this.SaveButtonEnabled = false;
         }
 

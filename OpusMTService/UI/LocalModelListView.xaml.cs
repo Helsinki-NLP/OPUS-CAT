@@ -17,7 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// Interaction logic for ListBoxWithControls.xaml

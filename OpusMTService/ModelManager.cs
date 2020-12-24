@@ -23,11 +23,11 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using static System.Environment;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// This class contains methods for checking and downloading latest models from
-    /// the fiskmo model repository. 
+    /// the opus cat model repository and managing the downloaded models. 
     /// </summary>
     public class ModelManager : INotifyPropertyChanged
     {
@@ -101,7 +101,7 @@ namespace FiskmoMTEngine
             var primaryModel = this.GetPrimaryModel(sourceLang, targetLang);
             if (primaryModel == null)
             {
-                statusMessage.Append($"No model available for {sourceCode}-{targetCode}. Install a model in the Fiskmö MT engine application.");
+                statusMessage.Append($"No model available for {sourceCode}-{targetCode}. Install a model in the OPUS-CAT MT Engine.");
             }
             else if (modelTag != null && modelTag != "")
             {
@@ -115,7 +115,7 @@ namespace FiskmoMTEngine
                 else if (taggedModel.Status == MTModelStatus.Customizing)
                 {
                     statusMessage.Append($"Model with tag {modelTag} for {sourceCode}-{targetCode} is still being fine-tuned. ");
-                    statusMessage.Append($"Wait for fine-tuning to complete. If Fiskmö MT is used before the fine-tuning is complete, primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
+                    statusMessage.Append($"Wait for fine-tuning to complete. If OPUS-CAT MT is used before the fine-tuning is complete, primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
                 }
                 else
                 {
@@ -216,7 +216,7 @@ namespace FiskmoMTEngine
             this.GetOnlineModels();
             this.opusModelDir = new DirectoryInfo(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
+                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
                 "models"));
             if (!this.OpusModelDir.Exists)
             {
@@ -230,11 +230,11 @@ namespace FiskmoMTEngine
         {
             this.onlineModels = new List<MTModel>();
 
-            Log.Information($"Fetching a list of online models from {FiskmoMTEngineSettings.Default.ModelStorageUrl}");
+            Log.Information($"Fetching a list of online models from {OpusCatMTEngineSettings.Default.ModelStorageUrl}");
             using (var client = new WebClient())
             {
                 client.DownloadStringCompleted += modelListDownloadComplete;
-                client.DownloadStringAsync(new Uri(FiskmoMTEngineSettings.Default.ModelStorageUrl));
+                client.DownloadStringAsync(new Uri(OpusCatMTEngineSettings.Default.ModelStorageUrl));
             }
         }
 
@@ -337,7 +337,7 @@ namespace FiskmoMTEngine
                 using (var client = new WebClient())
                 {
                     client.DownloadStringCompleted += modelListDownloadComplete;
-                    var uriBuilder = new UriBuilder(FiskmoMTEngineSettings.Default.ModelStorageUrl);
+                    var uriBuilder = new UriBuilder(OpusCatMTEngineSettings.Default.ModelStorageUrl);
                     var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                     query["marker"] = nextMarker.Value;
                     uriBuilder.Query = query.ToString();
@@ -670,7 +670,7 @@ namespace FiskmoMTEngine
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{FiskmoMTEngineSettings.Default.ModelStorageUrl}{newerModel}.zip";
+                var modelUrl = $"{OpusCatMTEngineSettings.Default.ModelStorageUrl}{newerModel}.zip";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }
@@ -747,7 +747,7 @@ namespace FiskmoMTEngine
             return this.LocalModels.Any(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
         }
 
-        //Check for existence of current Fiskmo models in ProgramData
+        //Check for existence of current OPUS-CAT models in the model dir
         public string CheckForNewerModel(string sourceLang, string targetLang)
         {
             string newerModel = null;

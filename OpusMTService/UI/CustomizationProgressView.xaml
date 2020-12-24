@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="FiskmoMTEngine.CustomizationProgressView"
+﻿<UserControl x:Class="OpusCatMTEngine.CustomizationProgressView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FiskmoMTEngine"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
         Height="450" Width="800">

@@ -1,12 +1,12 @@
-﻿<Window x:Class="FiskmoMTEngine.MainWindow"
+﻿<Window x:Class="OpusCatMTEngine.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:FiskmoMTEngine"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
         mc:Ignorable="d"
-        Title="Fiskmö MT service" Height="500" Width="1000" Icon="fiskmo_zIQ_icon.ico"
-        Name="FiskmoWindow"
+        Title="OPUS-CAT MT Engine" Height="500" Width="1000" Icon="opus.bmp"
+        Name="OpusCatWindow"
         Closing="Window_Closing">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -19,7 +19,7 @@
                     <Image 
                         Visibility="{Binding Path=Closable, Converter={StaticResource BoolToVis}}" 
                         IsEnabled="{Binding Closable}" 
-                        Source="/FiskmoMTEngine;component/UI/cross.png" 
+                        Source="/OpusCatMtEngine;component/UI/cross.png" 
                         Width="10" 
                         Height="10" 
                         MouseUp="Image_MouseUp"
@@ -32,31 +32,5 @@
                 <UserControl Content="{Binding Content}" Margin="0" />
             </DataTemplate>
         </TabControl.ContentTemplate>
-        <!--<TabItem Header="Models">
-            <StackPanel>
-                <local:LocalModelListView DataContext="{Binding .}" />
-                <TextBlock Visibility="{Binding Path=BatchTranslationOngoing, Converter={StaticResource BoolToVis}}">Batch translation in progress</TextBlock>
-                <TextBlock Visibility="{Binding Path=CustomizationOngoing, Converter={StaticResource BoolToVis}}">Fine-tuning in progress</TextBlock>
-            </StackPanel>
-        </TabItem>-->
-        <!--<TabItem Header="Advanced">
-            <StackPanel>
-            <local:MarianSettingsView />
-            <Border Margin="5" BorderThickness="1" BorderBrush="Black">
-                <DockPanel Margin="-3.333,0,2.667,0">
-                    <Label DockPanel.Dock="Left">MT service port (1024-65535):</Label>
-                    <Button DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>
-                    <Button IsEnabled="{Binding ElementName=FiskmoWindow, Path=SaveButtonEnabled}" DockPanel.Dock="Right" Width="100"  Click="saveButton_Click">Save</Button>
-
-                    <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=FiskmoWindow, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
-                </DockPanel>
-            </Border>
-            </StackPanel>
-        </TabItem>-->
-        <!--<TabItem Header="Online models">
-            <StackPanel>
-                <local:OnlineModelView />
-            </StackPanel>
-        </TabItem>-->
     </TabControl>
 </Window>

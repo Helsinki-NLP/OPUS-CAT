@@ -19,7 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml

@@ -15,7 +15,7 @@ using System.Data;
 using System.Windows.Controls.Primitives;
 using System.ServiceModel.Description;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     public class MarianProcess
     {
@@ -212,14 +212,7 @@ namespace FiskmoMTEngine
 
             if (this.MtPipe.HasExited)
             {
-                if (this.modelDir == null)
-                {
-                    throw new Exception($"No local OPUS model exists for language pair {this.langpair}. Open the Settings dialog of Fiskmö translation provider to download the latest model.");
-                }
-                else
-                {
-                    throw new Exception("Opus MT functionality has stopped working. Restarting the OPUS MT service may resolve the problem.");
-                }
+                throw new Exception("Opus MT functionality has stopped working. Restarting the OPUS-CAT MT Engine may resolve the problem.");
             }
 
             string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName);

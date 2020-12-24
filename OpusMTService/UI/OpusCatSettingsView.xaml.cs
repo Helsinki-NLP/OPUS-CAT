@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// Interaction logic for CustomizationView.xaml
@@ -28,7 +28,7 @@ namespace FiskmoMTEngine
 
         private void OpenCustomSettingsInEditor_Click(object sender, RoutedEventArgs e)
         {
-            var customizeYml = HelperFunctions.GetLocalAppDataPath(FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+            var customizeYml = HelperFunctions.GetLocalAppDataPath(OpusCatMTEngineSettings.Default.CustomizationBaseConfig);
             Process.Start("notepad.exe",customizeYml);
         }
     }

@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// This is a custom language class needed for dealing with the wide variety of languages
@@ -21,7 +21,7 @@ namespace FiskmoMTEngine
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("FiskmoMTEngine.iso-639-3_20200515.tab")))
+            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("OpusCatMTEngine.iso-639-3_20200515.tab")))
             {
                 //Skip header
                 isoTable.ReadLine();
@@ -47,7 +47,7 @@ namespace FiskmoMTEngine
         private static void ParseIso639_5()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("FiskmoMTEngine.iso639-5.tsv")))
+            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("OpusCatMTEngine.iso639-5.tsv")))
             {
                 //Skip header
                 isoTable.ReadLine();

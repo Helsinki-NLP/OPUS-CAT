@@ -6,7 +6,7 @@ using System.ServiceModel.Web;
 using OpusMTInterface;
 using Serilog;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
 
     class Service
@@ -17,13 +17,13 @@ namespace FiskmoMTEngine
             if (onlyNetTcp)
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{FiskmoMTEngineSettings.Default.MtServicePort}/")
+                    new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/")
                 };
             }
             else
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{FiskmoMTEngineSettings.Default.MtServicePort}/"),
+                    new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
                     new Uri($"http://localhost:8500/") };
             };
 
@@ -99,9 +99,9 @@ namespace FiskmoMTEngine
             //Launching the http service requires that the program is run with
             //administrator privileges or that the port has been enabled for http 
             //with netsh http add urlacl
-            if (FiskmoMTEngineSettings.Default.StartHttpService)
+            if (OpusCatMTEngineSettings.Default.StartHttpService)
             {
-                Log.Information("Starting Fiskmö MT service's net.tcp and HTTP APIs");
+                Log.Information("Starting OPUS-CAT MT Engine's net.tcp and HTTP APIs");
                 try
                 {
                     host = this.StartNetTcpAndHttpService(modelManager, false);

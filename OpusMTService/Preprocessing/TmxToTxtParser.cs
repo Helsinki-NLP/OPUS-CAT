@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     public static class TmxToTxtParser
     {

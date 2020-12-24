@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     public partial class ModelCustomizerView : UserControl, IDataErrorInfo, INotifyPropertyChanged
     {
@@ -105,7 +105,7 @@ namespace FiskmoMTEngine
                     {
                         validationMessage = "Model tag not specified.";
                     }
-                    else if (this.ModelTag.Length > FiskmoMTEngineSettings.Default.ModelTagMaxLength)
+                    else if (this.ModelTag.Length > OpusCatMTEngineSettings.Default.ModelTagMaxLength)
                     {
                         validationMessage = "Model tag is too long.";
                     }
@@ -195,7 +195,7 @@ namespace FiskmoMTEngine
             }
             else
             {
-                (filePair, validPair) = HelperFunctions.SplitFilePair(filePair, FiskmoMTEngineSettings.Default.IDValidSetSize);
+                (filePair, validPair) = HelperFunctions.SplitFilePair(filePair, OpusCatMTEngineSettings.Default.IDValidSetSize);
             }
 
             var modelManager = ((ModelManager)this.DataContext);

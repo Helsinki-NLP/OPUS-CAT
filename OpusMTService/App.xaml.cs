@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace FiskmoMTEngine
+namespace OpusCatMTEngine
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -31,12 +31,12 @@ namespace FiskmoMTEngine
         {
             var logDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
-                FiskmoMTEngineSettings.Default.LogDir);
+                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
+                OpusCatMTEngineSettings.Default.LogDir);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.File(Path.Combine(logDir, "fiskmö_log.txt"), rollingInterval: RollingInterval.Day)
+                .WriteTo.File(Path.Combine(logDir, "opuscat_log.txt"), rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
 
@@ -46,8 +46,8 @@ namespace FiskmoMTEngine
 
             var translationDb = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir,
-                FiskmoMTEngineSettings.Default.TranslationDBName);
+                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
+                OpusCatMTEngineSettings.Default.TranslationDBName);
             if (!File.Exists(translationDb))
             {
                 SQLiteConnection.CreateFile(translationDb);
@@ -70,12 +70,12 @@ namespace FiskmoMTEngine
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             //Create appdata dir
-            var fiskmoAppdataDir = Path.Combine(
+            var opusCatAppdataDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                FiskmoMTEngineSettings.Default.LocalFiskmoDir);
-            if (!Directory.Exists(fiskmoAppdataDir))
+                OpusCatMTEngineSettings.Default.LocalOpusCatDir);
+            if (!Directory.Exists(opusCatAppdataDir))
             {
-                Directory.CreateDirectory(fiskmoAppdataDir);
+                Directory.CreateDirectory(opusCatAppdataDir);
             }
 
             this.CopyConfigs();
@@ -86,7 +86,7 @@ namespace FiskmoMTEngine
             Log.Information("Setting Tls12 as security protocol (required for accessing online model storage");
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            Log.Information("Opening Fiskmö MT service window");
+            Log.Information("Opening OPUS-CAT MT Engine window");
 
             // Create the startup window
             MainWindow wnd = new MainWindow();
@@ -100,12 +100,12 @@ namespace FiskmoMTEngine
         private void CopyConfigs()
         {
             FileInfo baseCustomizeYml = new FileInfo(
-                HelperFunctions.GetLocalAppDataPath(FiskmoMTEngineSettings.Default.CustomizationBaseConfig));
-            FileInfo defaultCustomizeYml = new FileInfo(FiskmoMTEngineSettings.Default.CustomizationBaseConfig);
+                HelperFunctions.GetLocalAppDataPath(OpusCatMTEngineSettings.Default.CustomizationBaseConfig));
+            FileInfo defaultCustomizeYml = new FileInfo(OpusCatMTEngineSettings.Default.CustomizationBaseConfig);
             //There might be a previous customize.yml file present, don't overwrite it unless it's older
             if (!baseCustomizeYml.Exists || (defaultCustomizeYml.LastWriteTime > baseCustomizeYml.LastWriteTime))
             {
-                File.Copy(FiskmoMTEngineSettings.Default.CustomizationBaseConfig, baseCustomizeYml.FullName,true);
+                File.Copy(OpusCatMTEngineSettings.Default.CustomizationBaseConfig, baseCustomizeYml.FullName,true);
             }
         }
 
