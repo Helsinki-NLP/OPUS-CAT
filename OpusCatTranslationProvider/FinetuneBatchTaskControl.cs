@@ -8,10 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Sdl.Desktop.IntegrationApi;
+using Sdl.Desktop.IntegrationApi.Interfaces;
 
 namespace OpusCatTranslationProvider
 {
     public partial class FinetuneBatchTaskControl : UserControl, ISettingsAware<FinetuneBatchTaskSettings>
+    #if TRADOS21
+    , IUISettingsControl
+    #endif
     {
         private FinetuneWpfControl wpfControl;
 

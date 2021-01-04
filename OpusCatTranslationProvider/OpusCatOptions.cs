@@ -188,7 +188,10 @@ namespace OpusCatTranslationProvider
 
         public Boolean showMtAsOrigin
         {
-            get { return GetBooleanParameter("showMtAsOrigin"); }
+            get
+            {
+                return GetBooleanParameter("showMtAsOrigin", defaultValue: OpusCatTpSettings.Default.ShowMtAsOrigin);
+            }
             set { SetBooleanParameter("showMtAsOrigin", value); NotifyPropertyChanged(); }
         }
 
@@ -225,7 +228,7 @@ namespace OpusCatTranslationProvider
         #endregion
 
         #region "GetBooleanParameter"
-        private Boolean GetBooleanParameter(string p)
+        private Boolean GetBooleanParameter(string p, bool defaultValue=false)
         {
             string paramString = _uriBuilder[p];
             Boolean result;
@@ -233,7 +236,7 @@ namespace OpusCatTranslationProvider
             if (!parseResult)
             {
                 //Default the parameter to make it visible in the URI
-                SetBooleanParameter(p, false);
+                SetBooleanParameter(p, defaultValue);
                 return false;
             }
             else

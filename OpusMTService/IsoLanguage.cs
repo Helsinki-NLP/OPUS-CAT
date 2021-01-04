@@ -31,15 +31,29 @@ namespace OpusCatMTEngine
                 {
                     var split = line.Split('\t');
                     var iso639_3 = split[0];
+                    
                     var refname = split[6];
                     IsoLanguage.Iso639_3ToRefName[iso639_3] = refname;
 
+                    //Also record the bibliographical iso639-2 codes, they
+                    //are used in e.g. memoQ
+                    string iso639_2b = null;
+                    if (split[1].Length == 3 && split[1] != iso639_3)
+                    {
+                        iso639_2b = split[1];
+                        IsoLanguage.Iso639_2BTo639_3[iso639_2b] = iso639_3;
+                    }
+
+                    //Some languages have ISO 639 1 two-letter codes
                     if (split[3].Length == 2)
                     {
                         var iso639_1 = split[3];
                         IsoLanguage.Iso639_1To639_3[iso639_1] = iso639_3;
                         IsoLanguage.Iso639_3To639_1[iso639_3] = iso639_1;
                     }
+
+
+
                 }
             }
         }
@@ -59,6 +73,7 @@ namespace OpusCatMTEngine
                     var iso639_5 = split[1];
                     var refname = split[2];
                     IsoLanguage.Iso639_5ToRefName[iso639_5] = refname;
+                    
                 }
             }
         }
@@ -73,6 +88,7 @@ namespace OpusCatMTEngine
 
         private static Dictionary<string, string> Iso639_3To639_1 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_1To639_3 = new Dictionary<string, string>();
+        private static Dictionary<string, string> Iso639_2BTo639_3 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_3ToRefName = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_5ToRefName = new Dictionary<string, string>();
 
@@ -125,6 +141,7 @@ namespace OpusCatMTEngine
         //The purpose of this class is to convert all these dissimilar formats to objects of one type.
         public IsoLanguage(string languageCode)
         {
+
             //Format checking
             Match opusMatch = IsoLanguage.OpusMtCode.Match(languageCode);
             if (opusMatch != null)
@@ -132,6 +149,13 @@ namespace OpusCatMTEngine
                 this.Iso639_1Code = opusMatch.Groups["iso639_1"].Value;
 
                 var threeLetterIsoCode = opusMatch.Groups["iso639_3"].Value;
+
+                //the code may be iso 639 2B code, in which case convert it here to iso 639 3
+                if (IsoLanguage.Iso639_2BTo639_3.ContainsKey(threeLetterIsoCode))
+                {
+                    threeLetterIsoCode = IsoLanguage.Iso639_2BTo639_3[threeLetterIsoCode];
+                }
+
                 if (IsoLanguage.Iso639_3ToRefName.ContainsKey(threeLetterIsoCode))
                 {
                     this.Iso639_3Code = threeLetterIsoCode;

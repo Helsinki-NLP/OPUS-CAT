@@ -27,8 +27,13 @@ namespace OpusCatTranslationProvider
             get;
             set;
         }
-        
+
+#if TRADOS21
+        private static IStudioDocument activeDocument;
+#else
         private static Document activeDocument;
+
+#endif
 
         internal static void UpdateSegmentHandler()
         {
@@ -88,7 +93,11 @@ namespace OpusCatTranslationProvider
             }
         }
 
+#if TRADOS21
+        private static void UpdateSegmentHandler(IStudioDocument doc)
+#else
         private static void UpdateSegmentHandler(Document doc)
+#endif
         {
             //This method may be fired through docChanged event or through settings change.
 
@@ -128,13 +137,13 @@ namespace OpusCatTranslationProvider
                     //Previous solution is provided below, commented out.
 
                     //Assign the handler to field to make it possible to remove it later
-                    if (!OpusCatProvider.activeSegmentHandlers.ContainsKey(doc))
+                    if (!OpusCatProvider.activeSegmentHandlers.ContainsKey(doc as Document))
                     {
-                        OpusCatProvider.activeSegmentHandlers[doc] = new List<EventHandler>();
+                        OpusCatProvider.activeSegmentHandlers[doc as Document] = new List<EventHandler>();
                     }
 
                     var handler = new EventHandler((x, y) => segmentChanged(langDir, x, y));
-                    OpusCatProvider.activeSegmentHandlers[doc].Add(handler);
+                    OpusCatProvider.activeSegmentHandlers[doc as Document].Add(handler);
 
                     doc.ActiveSegmentChanged += handler;
                     
@@ -169,8 +178,17 @@ namespace OpusCatTranslationProvider
             }
             var visitor = new OpusCatMarkupDataVisitor();
 
-            var activeOpusCatOptionsWithPregenerate = OpusCatProvider.GetProjectOpusCatOptions(doc.Project, langDir).Where(x => x.pregenerateMt);
+            var activeOpusCatOptions = OpusCatProvider.GetProjectOpusCatOptions(doc.Project, langDir);
 
+            IEnumerable<OpusCatOptions> activeOpusCatOptionsWithPregenerate;
+            if (activeOpusCatOptions == null)
+            {
+                activeOpusCatOptionsWithPregenerate = null;
+            }
+            else
+            {
+                activeOpusCatOptionsWithPregenerate = activeOpusCatOptions.Where(x => x.pregenerateMt);
+            }
             //If there is no active OPUS CAT provider, unsubscribe this handler (there's probably no event in Trados
             //API for removing a translation provider from a project, so this is the only way to unsubscribe
             //after translation provider has been removed.

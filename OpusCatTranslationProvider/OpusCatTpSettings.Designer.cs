@@ -154,5 +154,17 @@ namespace OpusCatTranslationProvider {
                 this["PregenerateSegmentCount"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowMtAsOrigin {
+            get {
+                return ((bool)(this["ShowMtAsOrigin"]));
+            }
+            set {
+                this["ShowMtAsOrigin"] = value;
+            }
+        }
     }
 }
