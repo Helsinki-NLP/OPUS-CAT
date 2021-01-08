@@ -13,14 +13,14 @@
     </Control.Resources>
     <DockPanel Background="White">
         <TabControl DockPanel.Dock="Top">
-            <TabItem Header="Task settings" IsSelected="{Binding ElementName=ConnectionControl, Path=ConnectionExists, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+            <TabItem Visibility="Collapsed" IsEnabled="False" Header="Task settings" IsSelected="False">
                 <StackPanel>
                     <Border BorderBrush="Black" BorderThickness="1">
                         <StackPanel Margin="5,0,0,5">
-                            <Label>Preprocessing mode</Label>
-                            <RadioButton IsChecked="True" Name="FinetuneAndTranslate" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model and batch translate</RadioButton>
+                            <Label>Mode</Label>
+                            <RadioButton IsChecked="True" Name="FinetuneAndTranslate" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model and preorder translations</RadioButton>
                             <RadioButton Name="FinetuneOnly" Checked="ModeButton_Checked" GroupName="Mode">Fine-tune model only</RadioButton>
-                            <RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Mode">Batch translate only</RadioButton>
+                            <RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Mode">Preorder translations only</RadioButton>
                         </StackPanel>
                     </Border>
      
@@ -39,16 +39,22 @@
                         </StackPanel>
                     </Border>
 
-                    <DockPanel>
+                    <!--<DockPanel>
                         <Label>Model tag</Label>
                         <ComboBox IsEnabled="{Binding IsChecked,ElementName=TranslateOnly}" Visibility="{Binding IsChecked,ElementName=TranslateOnly, Converter={StaticResource BoolToVis}}" Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
                         <TextBox IsEnabled="{Binding Path=Settings.Finetune}" Visibility="{Binding Path=Settings.Finetune, Converter={StaticResource BoolToVis}}" Text="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                    </DockPanel>
+                    </DockPanel>-->
                 </StackPanel>
             </TabItem>
-            <TabItem IsEnabled="{Binding Path=Settings.Finetune}" Header="Fine-tuning settings">
+            <TabItem IsEnabled="{Binding Path=Settings.Finetune}" IsSelected="{Binding ElementName=ConnectionControl, Path=ConnectionExists, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" Header="Fine-tuning settings">
                 <StackPanel Margin="5">
-                    
+                    <Border BorderThickness="1" BorderBrush="Black" Margin="0,0,0,5">
+                    <StackPanel>
+                        <DockPanel Margin="0,5,5,0">
+                        <Label>Fine-tuned model tag</Label>
+                        <ComboBox IsEnabled="{Binding IsChecked,ElementName=TranslateOnly}" Visibility="{Binding IsChecked,ElementName=TranslateOnly, Converter={StaticResource BoolToVis}}" Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                        <TextBox IsEnabled="{Binding Path=Settings.Finetune}" Visibility="{Binding Path=Settings.Finetune, Converter={StaticResource BoolToVis}}" Text="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                    </DockPanel>
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludePlaceholderTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include placeholder tags as text</CheckBox>
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding Path=Settings.IncludeTagPairs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Include tag pairs as text</CheckBox>
                     <DockPanel>
@@ -56,6 +62,8 @@
                         <Label>Maximum amount of sentences for fine-tuning</Label>
                     </DockPanel>
                     <CheckBox Name="ExtractFuzzies" Margin="0,0,0,5" IsChecked="{Binding Path=Settings.ExtractFuzzies, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">Extract fuzzies to use as fine-tuning material</CheckBox>
+                    </StackPanel>
+                    </Border>
                     <Border IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" BorderThickness="1" BorderBrush="Black">
                         <StackPanel Margin="5">
                             <Label Margin="0,-5,0,0">Fuzzy settings</Label>
@@ -68,6 +76,19 @@
                                 <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
                                 <Label>Maximum fuzzies per segment</Label>
                             </DockPanel>
+                            <CheckBox 
+                                Margin="0,5,0,0" 
+                                IsChecked="{Binding Path=Settings.ExtractConcordanceMatches, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center">
+                            Extract concordance matches
+                            </CheckBox>
+                            <CheckBox 
+                                Margin="0,5,0,0" 
+                                IsChecked="{Binding Path=Settings.ExtractFillerUnits, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center">
+                                Extract filler units
+                            </CheckBox>
+
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -84,6 +105,7 @@
                     <Label FontWeight="Bold">Connection status</Label>
                 </StackPanel>
                 <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" DockPanel.Dock="Bottom"></TextBlock>
+                <TextBlock Margin="5"  TextWrapping="Wrap"  Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}">Make sure OPUS-CAT MT Engine application has been installed and is running and that it uses the same connection settings as the plugin (default settings should work).</TextBlock>
                 <TextBlock Margin="5"><Hyperlink NavigateUri="https://helsinki-nlp.github.io/OPUS-CAT/" RequestNavigate="Hyperlink_RequestNavigate">
                     OPUS-CAT MT online documentation
                 </Hyperlink></TextBlock>

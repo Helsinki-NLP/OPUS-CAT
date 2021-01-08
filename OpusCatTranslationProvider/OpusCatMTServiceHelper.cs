@@ -60,11 +60,11 @@ namespace OpusCatTranslationProvider
                 }
                 catch (Exception ex) when (ex.InnerException is SocketException)
                 {
-                    throw new OpusCatEngineConnectionException("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.", ex);
+                    throw new OpusCatEngineConnectionException("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine has been installed and is running. See OPUS-CAT online help for details.", ex);
                 }
                 catch (Exception ex) when (ex is EndpointNotFoundException || ex is CommunicationObjectFaultedException)
                 {
-                    throw new OpusCatEngineConnectionException("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine is running.", ex);
+                    throw new OpusCatEngineConnectionException("OPUS-CAT MT Engine cannot be connected to. Check that the OPUS-CAT MT Engine has been installed and is running. See OPUS-CAT online help for details.", ex);
                 }
                 catch (Exception ex)
                 {

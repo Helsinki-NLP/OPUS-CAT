@@ -29,6 +29,7 @@ namespace OpusCatTranslationProvider
         private ObservableCollection<string> allModelTags;
         private bool noConnection;
         private OpusCatOptions options;
+        internal static List<string> MtServiceLanguagePairs;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -53,11 +54,11 @@ namespace OpusCatTranslationProvider
             StringBuilder connectionResult = new StringBuilder();
             try
             {
-                var serviceLanguagePairs = OpusCatMTServiceHelper.ListSupportedLanguages(host,port);
+                ConnectionControl.MtServiceLanguagePairs = OpusCatMTServiceHelper.ListSupportedLanguages(host,port);
                 IEnumerable<string> modelTagLanguagePairs;
                 if (this.LanguagePairs != null)
                 {
-                    var projectLanguagePairsWithMt = serviceLanguagePairs.Intersect(this.LanguagePairs);
+                    var projectLanguagePairsWithMt = ConnectionControl.MtServiceLanguagePairs.Intersect(this.LanguagePairs);
                     modelTagLanguagePairs = projectLanguagePairsWithMt;
                     if (projectLanguagePairsWithMt.Count() == 0)
                     {
@@ -84,8 +85,8 @@ namespace OpusCatTranslationProvider
                 {
                     //This options is used with the batch task, where there's no easy way of getting
                     //the project language pairs, so all pairs are assumed.
-                    modelTagLanguagePairs = serviceLanguagePairs;
-                    connectionResult.Append($"MT models available for following language pairs: {String.Join(", ", serviceLanguagePairs)}");
+                    modelTagLanguagePairs = ConnectionControl.MtServiceLanguagePairs;
+                    connectionResult.Append($"MT models available for following language pairs: {String.Join(", ", ConnectionControl.MtServiceLanguagePairs)}");
                 }
                 
                 //Get a list of model tags that are supported for these language pairs

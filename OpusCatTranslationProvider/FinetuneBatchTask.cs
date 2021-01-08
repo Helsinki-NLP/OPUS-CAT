@@ -17,8 +17,8 @@ namespace OpusCatTranslationProvider
 {
      
     [AutomaticTask("OPUSCATBatchTask",
-                   "OPUS-CAT Finetune and Preorder",
-                   "Task for finetuning OPUS MT models, with optional preordering of MT for new segments. IMPORTANT: This task works only on segmented files. If files are not segmented, segment them by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
+                   "OPUS-CAT Finetune",
+                   "Task for finetuning OPUS MT models. IMPORTANT: This task works only on segmented files. If files are not segmented, segment them by opening them in the editor and saving, or by running Pretranslate or Pseudotranslate tasks.",
                    GeneratedFileType = AutomaticTaskFileType.None)]
     //[TODO] You can change the file type according to your needs
     [AutomaticTaskSupportedFileType(AutomaticTaskFileType.BilingualTarget)]
@@ -44,6 +44,17 @@ namespace OpusCatTranslationProvider
 
         protected override void OnInitializeTask()
         {
+            var fileLanguageDirections = TaskFiles.Select(x => x.GetLanguageDirection().TargetLanguage.IsoAbbreviation).Distinct();
+            if (fileLanguageDirections.Count() > 1)
+            {
+                throw new Exception(
+                    $"This batch task can only be applied to one language direction at a time. Select only files with same language direction and try again.");
+            }
+            else if (fileLanguageDirections.Count() == 0)
+            {
+                throw new Exception(
+                    $"No target files selected.");
+            }
             this.collectedSentencePairCount = 0;
             this.settings = GetSetting<FinetuneBatchTaskSettings>();
             this.opusCatOptions = new OpusCatOptions(new Uri(this.settings.ProviderOptions));
@@ -205,47 +216,67 @@ namespace OpusCatTranslationProvider
             var projectInfo = this.Project.GetProjectInfo();
             var projectGuid = projectInfo.Id;
             var sourceCode = projectInfo.SourceLanguage.CultureInfo.TwoLetterISOLanguageName;
-
-            foreach (var targetLang in projectInfo.TargetLanguages)
+            var collectedLanguages = this.ProjectNewSegments.Keys.Union(this.ProjectTranslations.Keys);
+            
+            if (ConnectionControl.MtServiceLanguagePairs == null)
             {
-                var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
-
-                //Remove duplicates
-                var uniqueProjectTranslations = this.ProjectTranslations[targetLang].Distinct().ToList();
-                List<string> uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
-
-                List<Tuple<string, string>> finetuneSet;
-                if (this.tms[targetLang].Any())
-                {
-                    var tmExtracts = this.ExtractFromTm(this.tms[targetLang], uniqueNewSegments);
-                    finetuneSet = uniqueProjectTranslations.Union(tmExtracts).ToList();
-                }
-                else
-                {
-                    finetuneSet = uniqueProjectTranslations;
-                }
-
-                
-
-                if (finetuneSet.Count() < OpusCatTpSettings.Default.FinetuningMinSentencePairs)
-                {
-                    throw new Exception(
-                        $"Not enough sentence pairs for fine-tuning. Found {finetuneSet.Count}, minimum is {OpusCatTpSettings.Default.FinetuningMinSentencePairs}");
-                }
-
-                //Send the tuning set to MT service
-                var result = OpusCatMTServiceHelper.Customize(
-                    this.opusCatOptions.mtServiceAddress,
-                    this.opusCatOptions.mtServicePort,
-                    finetuneSet,
-                    uniqueNewSegments,
-                    sourceCode,
-                    targetCode,
-                    this.opusCatOptions.modelTag,
-                    this.settings.IncludePlaceholderTags,
-                    this.settings.IncludeTagPairs);
-                
+                throw new Exception($"Language pair data not available, check if connection with OPUS-CAT MT Engine is working.");
             }
+            
+            var languagePairsWithMt = collectedLanguages.Where(x => ConnectionControl.MtServiceLanguagePairs.Contains($"{sourceCode}-{x.IsoAbbreviation}"));
+
+            //Select the target language with most segments as the one to finetune.
+            //If there are many, the selection will be random I suppose.
+            Language primaryTargetLanguage;
+            if (languagePairsWithMt.Any())
+            {
+                primaryTargetLanguage = languagePairsWithMt.OrderByDescending(x => this.ProjectTranslations[x].Count + this.ProjectNewSegments.Count).First();
+            }
+            else
+            {
+                //This is a backoff in case the iso code of the language does not match
+                //the language pair codes from the mt service (e.g. with rare languages where
+                //codes may be strange).
+                primaryTargetLanguage = collectedLanguages.OrderByDescending(x => this.ProjectTranslations[x].Count + this.ProjectNewSegments.Count).First();
+            }
+
+            var targetCode = primaryTargetLanguage.CultureInfo.TwoLetterISOLanguageName;
+            
+            //Remove duplicates
+            var uniqueProjectTranslations = this.ProjectTranslations[primaryTargetLanguage].Distinct().ToList();
+            List<string> uniqueNewSegments = this.ProjectNewSegments[primaryTargetLanguage].Distinct().ToList();
+
+            List<Tuple<string, string>> finetuneSet;
+            if (this.tms[primaryTargetLanguage].Any())
+            {
+                var tmExtracts = this.ExtractFromTm(this.tms[primaryTargetLanguage], uniqueNewSegments);
+                finetuneSet = uniqueProjectTranslations.Union(tmExtracts).ToList();
+            }
+            else
+            {
+                finetuneSet = uniqueProjectTranslations;
+            }
+
+                
+
+            if (finetuneSet.Count() < OpusCatTpSettings.Default.FinetuningMinSentencePairs)
+            {
+                throw new Exception(
+                    $"Not enough sentence pairs for fine-tuning. Found {finetuneSet.Count}, minimum is {OpusCatTpSettings.Default.FinetuningMinSentencePairs}");
+            }
+
+            //Send the tuning set to MT service
+            var result = OpusCatMTServiceHelper.Customize(
+                this.opusCatOptions.mtServiceAddress,
+                this.opusCatOptions.mtServicePort,
+                finetuneSet,
+                uniqueNewSegments,
+                sourceCode,
+                targetCode,
+                this.opusCatOptions.modelTag,
+                this.settings.IncludePlaceholderTags,
+                this.settings.IncludeTagPairs);
+            
         }
 
         public override void TaskComplete()
