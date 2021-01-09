@@ -1,2 +1,0 @@
-C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTService\bin\Debug\FiskmoMTService.exe
-C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTService\bin\Debug\/marian.exe

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PluginPackage xmlns="http://www.sdl.com/Plugins/PluginPackage/1.0">
+  <PlugInName>OpusCatTranslationProvider</PlugInName>
+  <Version>1.0.0.0</Version>
+  <Description>Plugin description</Description>
+  <Author></Author>
+  <RequiredProduct name="SDLTradosStudio" minversion="15.0" maxversion="15.999999"/>
+  <Include>
+    <File>Xceed.Wpf.Toolkit.dll</File>
+    <File>Newtonsoft.Json.dll</File>
+    <File>License.txt</File>
+  </Include>
+</PluginPackage>
