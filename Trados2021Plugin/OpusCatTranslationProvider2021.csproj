@@ -217,6 +217,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\Trados2019Plugin\License.txt">
+      <Link>License.txt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Trados2019Plugin\ThirdPartyNotices.txt">
+      <Link>ThirdPartyNotices.txt</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="pluginpackage.manifest.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -248,12 +256,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Extended.Wpf.Toolkit">
-      <Version>3.8.1</Version>
-    </PackageReference>
-    <PackageReference Include="Minio">
-      <Version>3.1.1</Version>
-    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
     </PackageReference>

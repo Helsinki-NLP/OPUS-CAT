@@ -63,6 +63,7 @@ namespace OpusCatTranslationProvider
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        
 
         public FinetuneWpfControl(FinetuneBatchTaskSettings Settings)
         {
@@ -143,8 +144,10 @@ namespace OpusCatTranslationProvider
 
         private void NumberBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("[^0-9]");
-            e.Handled = regex.IsMatch(e.Text);
+            int textAsInt;
+            var isInt = Int32.TryParse(e.Text, out textAsInt);
+            
+            e.Handled = !(isInt && textAsInt <= 100);
         }
     }
 }

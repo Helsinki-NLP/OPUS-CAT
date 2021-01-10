@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Text;
@@ -61,7 +60,9 @@ namespace OpusCatTranslationProvider
         private OpusCatOptions options;
         private List<string> projectLanguagePairs;
         private OpusCatOptionsFormWPF hostForm;
-        
+
+        public string MaxPreorderString { get { return $"segments (max {OpusCatTpSettings.Default.PregenerateSegmentCountMax})"; } }
+
         public OpusCatOptions Options { get => options; set => options = value; }
 
         private void cancel_Click(object sender, RoutedEventArgs e)
@@ -84,6 +85,15 @@ namespace OpusCatTranslationProvider
         private void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.ConnectionControl.TagBox_SelectionChanged(sender, e);
+        }
+
+        private void NumberBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            int textAsInt;
+            var isInt = Int32.TryParse(e.Text, out textAsInt);
+            //Fix this, why doesn't it implement max?
+            
+            e.Handled = !(isInt && textAsInt <= 10);
         }
     }
 }

@@ -71,6 +71,7 @@ namespace OpusCatTranslationProvider
                     }
 
                     break;
+
             }
 
             return validationMessage;
@@ -175,7 +176,7 @@ namespace OpusCatTranslationProvider
             set
             {
                 var oldValue = this.pregenerateSegmentCount;
-
+                value = Math.Min(value, OpusCatTpSettings.Default.PregenerateSegmentCountMax);
                 //The pre-order segment handler needs to update whenever this setting changes
                 SetIntParameter("pregenerateSegmentCount", value);
                 if (value != oldValue)

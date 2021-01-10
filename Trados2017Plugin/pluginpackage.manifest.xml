@@ -6,7 +6,8 @@
   <Author></Author>
   <RequiredProduct name="SDLTradosStudio" minversion="14.0" maxversion="14.999999"/>
   <Include>
-    <File>Xceed.Wpf.Toolkit.dll</File>
     <File>Newtonsoft.Json.dll</File>
+    <File>License.txt</File>
+    <File>ThirdPartyNotices.txt</File>
   </Include>
 </PluginPackage>

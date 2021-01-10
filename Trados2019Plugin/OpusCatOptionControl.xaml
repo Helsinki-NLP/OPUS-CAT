@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:bot="http://schemas.thinkpixellab.com/2011/xaml/presentation"
              xmlns:local="clr-namespace:OpusCatTranslationProvider"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="290">
@@ -20,8 +20,8 @@
                                     IsChecked="{Binding Path=Options.pregenerateMt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             </CheckBox>
                             <Label VerticalAlignment="Top">Pre-order MT for next</Label>
-                            <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=PreOrderCheckbox}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Options.pregenerateSegmentCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-                            <Label>segments</Label>
+                            <TextBox IsEnabled="{Binding IsChecked,ElementName=PreOrderCheckbox}" VerticalAlignment="Center" Text="{Binding Path=Options.pregenerateSegmentCount, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="NumberBox_PreviewTextInput"/>
+                            <Label Content="{Binding MaxPreorderString}" />
                         </StackPanel>
                     
                         <CheckBox ToolTip="If checked, the results of OPUS-CAT MT are identified as MT segments"

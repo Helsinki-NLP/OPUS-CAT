@@ -4,10 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpusCatTranslationProvider"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:s="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignHeight="450" d:DesignWidth="400">
     <Control.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Control.Resources>
@@ -68,19 +67,19 @@
                         <StackPanel Margin="5">
                             <Label Margin="0,-5,0,0">Fuzzy settings</Label>
                             <DockPanel>
-                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" Maximum="100" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMinPercentage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <TextBox Width="20" IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMinPercentage, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PreviewTextInput="NumberBox_PreviewTextInput"/>
                                 <Label>Minimum fuzzy percentage</Label>
                             </DockPanel>
 
                             <DockPanel>
-                                <xctk:IntegerUpDown IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                                <TextBox Width="20" IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center" Text="{Binding Path=Settings.FuzzyMaxResults, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" PreviewTextInput="NumberBox_PreviewTextInput"/>
                                 <Label>Maximum fuzzies per segment</Label>
                             </DockPanel>
                             <CheckBox 
                                 Margin="0,5,0,0" 
                                 IsChecked="{Binding Path=Settings.ExtractConcordanceMatches, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                 IsEnabled="{Binding IsChecked,ElementName=ExtractFuzzies}" VerticalAlignment="Center">
-                            Extract concordance matches
+                            Extract concordance matches (note: may take a long time!)
                             </CheckBox>
                             <CheckBox 
                                 Margin="0,5,0,0" 

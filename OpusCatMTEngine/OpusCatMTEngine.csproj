@@ -305,12 +305,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="ThirdPartyNotices.txt" />
-    <Resource Include="lgpl-3.0.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="LICENSE_1_0.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="TatoebaTestsets\**">

@@ -198,6 +198,10 @@ namespace OpusCatTranslationProvider
                 {
                     return OpusCatTpSettings.Default.FinetuningMinFuzzyPercentage;
                 }
+                else if (settingValue > 100)
+                {
+                    return 100;
+                }
                 else
                 {
                     return settingValue;
@@ -227,6 +231,8 @@ namespace OpusCatTranslationProvider
             }
             set
             {
+                //Use a reasonable max value to prevent weirdness with huge numbers.
+                value = Math.Min(value, 100);
                 GetSetting<int>(nameof(FuzzyMaxResults)).Value = value;
                 NotifyPropertyChanged();
             }
@@ -282,6 +288,10 @@ namespace OpusCatTranslationProvider
                 if (settingValue == 0)
                 {
                     return OpusCatTpSettings.Default.FinetuningMaxSentencePairs;
+                }
+                else if (settingValue > OpusCatTpSettings.Default.FinetuningSentencePairsHardLimit)
+                {
+                    return OpusCatTpSettings.Default.FinetuningSentencePairsHardLimit;
                 }
                 else
                 {

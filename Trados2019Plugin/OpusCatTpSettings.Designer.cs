@@ -166,5 +166,17 @@ namespace OpusCatTranslationProvider {
                 this["ShowMtAsOrigin"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int PregenerateSegmentCountMax {
+            get {
+                return ((int)(this["PregenerateSegmentCountMax"]));
+            }
+            set {
+                this["PregenerateSegmentCountMax"] = value;
+            }
+        }
     }
 }
