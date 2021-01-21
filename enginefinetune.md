@@ -10,17 +10,17 @@ Most CAT tools support exporting translation memories in the TMX format, see the
 
 1. Select a model to fine-tune from the **Models** tab of the OPUS-CAT MT Engine and click **Fine-tune model**:
 
-  <img src="./images/enginefinetune1.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune1.png?raw=true" alt="drawing" width="75%"/>
 
 
 2. The **Fine-tune model** tab opens. Click **Browse** next to the **Tmx file** box:
 
-  <img src="./images/enginefinetune2.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune2.png?raw=true" alt="drawing" width="75%"/>
 
 
 3. In the file dialog that opens, select a .tmx file and click **Open**:
 
-  <img src="./images/enginefinetune3.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune3.png?raw=true" alt="drawing" width="75%"/>
 
 
 4. Path of the selected .tmx file should now appear in the **Tmx file** box. Enter a label for the fine-tuned model in the **Fine-tuned model label** box and click **Fine-tune**:
