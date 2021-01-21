@@ -2,7 +2,7 @@
 
 As fine-tuning can take a long time, it is useful to monitor its progress to make sure everything is working correctly.
 
-**Fine-tuning status and estimated duration**
+### Fine-tuning status and estimated duration
 
 The model list on the **Models** tab shows an indicator of progress in the **Status** column for each model that is currently being fine-tuned.
 
@@ -15,7 +15,7 @@ The **Status** column displays a textual description of the ongoing phase of fin
 
 Once the preprocessing steps of the training are complete, the **Status** displays the text *Fine-tuning* and the estimated remaining duration of the fine-tuning process. The estimate is based on the speed of fine-tuning seen so far, so it may be inaccurate.
 
-**Displaying the development of the validation scores of the fine-tuned model**
+### Displaying the development of the validation scores of the fine-tuned model
 
 <img src="./images/finetuneprogress2.png?raw=true" alt="drawing" width="75%"/>
 

@@ -6,7 +6,7 @@ OPUS-CAT MT models can be fine-tuned directly in the OPUS-CAT MT Engine (fine-tu
 
 Most CAT tools support exporting translation memories in the TMX format, see the documentation of your CAT tool for instructions.
 
-**Initiating fine-tuning from the OPUS-CAT MT Engine with a TMX translation memory:**
+### Initiating fine-tuning from the OPUS-CAT MT Engine with a TMX translation memory
 
 1. Select a model to fine-tune from the **Models** tab of the OPUS-CAT MT Engine and click **Fine-tune model**:
 
@@ -34,11 +34,11 @@ Most CAT tools support exporting translation memories in the TMX format, see the
 
 See [here](finetuneprogress.md) for information about monitoring the progress of fine-tuning.
 
-**Initiating fine-tuning from the OPUS-CAT MT Engine with an aligned pair of source and target language files:**
+### Initiating fine-tuning from the OPUS-CAT MT Engine with an aligned pair of source and target language files
 
 The process is otherwise the same as with TMX fine-tuning, except that instead of selecting a TMX file (steps 2 and 3), you click the radio button labeled **Text (separate files for source target)** and browse for the source and target files.
 
-**Validation files**
+### Validation files
 
 Validation files are used to track the progress of fine-tuning. During fine-tuning the OPUS-CAT MT Engine will periodically translate the source validation files and compare the results to the target validation file. The progress of fine-tuning can be tracked by checking whether the machine translations that the fine-tuned model produces become closer to the translations in the target validation file.
 
