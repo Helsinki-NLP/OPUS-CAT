@@ -109,7 +109,17 @@ namespace OpusCatMTEngine
         {
             var sourceFile = new FileInfo($"{tmxFile}.{sourceLang.ShortestIsoCode}.txt");
             var targetFile = new FileInfo($"{tmxFile}.{targetLang.ShortestIsoCode}.txt");
-            var tmx = XDocument.Load(tmxFile);
+
+            XDocument tmx;
+            try
+            {
+                tmx = XDocument.Load(tmxFile);
+            }
+            catch (System.Xml.XmlException ex)
+            {
+                return null;
+            }
+            
             var tus = tmx.Descendants("tu");
 
             using (var sourceWriter = sourceFile.CreateText())

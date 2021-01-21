@@ -104,6 +104,12 @@ namespace OpusCatMTEngine
             if (e.Data != null)
             {
                 this.trainingLog.ParseTrainLogLine(e.Data);
+                //Check here for Marian error, if it happens trigger ui to show customization as suspended.
+                if (this.trainingLog.EncounteredError)
+                {
+                    this.OnProgressChanged(new ProgressChangedEventArgs(0, new MarianCustomizationStatus(CustomizationStep.Error, this.trainingLog.EstimatedRemainingTotalTime)));
+                    return;
+                }
 
                 //Here convert the amount of processed lines / total lines into estimated progress
                 //The progress start from five, so normalize it
@@ -116,7 +122,7 @@ namespace OpusCatMTEngine
                 {
                     newProgress = 5;
                 }
-                this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Customizing, this.trainingLog.EstimatedRemainingTotalTime)));
+                this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Finetuning, this.trainingLog.EstimatedRemainingTotalTime)));
             }
         }
 
@@ -125,7 +131,9 @@ namespace OpusCatMTEngine
             Copying_training_files,
             Preprocessing_training_files,
             Initial_evaluation,
-            Customizing };
+            Finetuning,
+            Error
+        };
         
         public Process Customize()
         {
@@ -134,6 +142,8 @@ namespace OpusCatMTEngine
             try
             {
                 this.CopyModelDir(this.modelDir, this.customLabel);
+                //Save model config as soon as the model dir exists
+                this.customModel.SaveModelConfig();
             }
             catch (Exception ex)
             {
@@ -194,7 +204,7 @@ namespace OpusCatMTEngine
             //(TODO: make sure this is not done on UI thread)
             initialValidProcess.WaitForExit();
             
-            this.OnProgressChanged(new ProgressChangedEventArgs(6, new MarianCustomizationStatus(CustomizationStep.Customizing, null)));
+            this.OnProgressChanged(new ProgressChangedEventArgs(6, new MarianCustomizationStatus(CustomizationStep.Finetuning, null)));
 
             //Use the initial translation time as basis for estimating the duration of validation file
             //translation

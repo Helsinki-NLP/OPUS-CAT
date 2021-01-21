@@ -75,7 +75,7 @@ namespace OpusCatMTEngine
 
 
             this.Model = selectedModel;
-            this.Title = $"Customization progress for model {Model.Name}";
+            this.Title = $"Fine-tuning progress for model {Model.Name}";
 
             this.SeriesCollection = new SeriesCollection();
 

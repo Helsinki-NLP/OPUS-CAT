@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Text;
@@ -27,6 +28,15 @@ namespace OpusCatMTEngine
     /// </summary>
     public partial class MainWindow : Window, IDataErrorInfo, INotifyPropertyChanged
     {
+        public string WindowTitle
+        {
+            get
+            {
+                Version version = Assembly.GetExecutingAssembly().GetName().Version;
+                return "OPUS-CAT MT Engine v" + version;
+            }
+        }
+
         public ModelManager ModelManager { get; private set; }
 
         private bool saveButtonEnabled;

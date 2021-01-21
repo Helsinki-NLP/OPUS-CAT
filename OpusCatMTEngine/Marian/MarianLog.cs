@@ -26,6 +26,7 @@ namespace OpusCatMTEngine
         Regex totalLineCountRegex = new Regex(@".*Done reading (?<totalLineCount>[\d,]+) sentences$");
         Regex updateRegex = new Regex(@".*Ep\. (?<epoch>\d+) .*\: Sen\. (?<linesSoFar>[\d,]+) \: Cost.*: Time (?<duration>[\d,]+).*");
         Regex translationDurationRegex = new Regex(@".*Total translation time: (?<translationDuration>\d+).*");
+        Regex errorRegex = new Regex(@".*Error: Aborted.*");
 
         private int linesSoFar;
         public int SentencesSoFar { get => linesSoFar; set => linesSoFar = value; }
@@ -48,12 +49,18 @@ namespace OpusCatMTEngine
                 this.trainingConfig = value;
             }
         }
+
+        public bool EncounteredError { get; internal set; }
+
         internal void ParseTrainLogLine(string data)
         {
-
             //This parsing with regexes is prone to failing, so don't let it crash everything
             try
             {
+                if (this.errorRegex.IsMatch(data))
+                {
+                    this.EncounteredError = true;
+                }
                 if (this.totalLines == 0)
                 {
                     var totalLinesMatch = this.totalLineCountRegex.Match(data);

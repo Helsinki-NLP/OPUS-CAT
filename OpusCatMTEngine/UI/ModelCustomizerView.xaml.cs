@@ -162,14 +162,16 @@ namespace OpusCatMTEngine
             this.CustomizationNotStarted = true;
             this.selectedModel = selectedModel;
             
-            this.Title = $"Customize model {this.selectedModel.Name}";
+            this.Title = $"Fine-tune model {this.selectedModel.Name}";
             InitializeComponent();
         }
 
         private void customize_Click(object sender, RoutedEventArgs e)
         {
+
             ParallelFilePair filePair = null;
             ParallelFilePair validPair = null;
+
             switch (this.inputType)
             {
                 case InputFileType.TxtFile:
@@ -177,13 +179,21 @@ namespace OpusCatMTEngine
                     break;
                 case InputFileType.TmxFile:
                     filePair = TmxToTxtParser.ParseTmxToParallelFiles(
-                        this.TmxFile,
-                        this.selectedModel.SourceLanguages.Single(),
-                        this.selectedModel.TargetLanguages.Single(),
-                        this.IncludePlaceholderTagsBox.IsChecked.Value,
-                        this.IncludeTagPairBox.IsChecked.Value
-                        );
+                            this.TmxFile,
+                            this.selectedModel.SourceLanguages.Single(),
+                            this.selectedModel.TargetLanguages.Single(),
+                            this.IncludePlaceholderTagsBox.IsChecked.Value,
+                            this.IncludeTagPairBox.IsChecked.Value
+                            );
+                    if (filePair == null)
+                    {
+                        MessageBox.Show($"{this.TmxFile} is not a valid .tmx file");
+                        return;
+                    }
                     break;
+                    
+                    
+                    
                 default:
                     break;
             }
@@ -213,14 +223,15 @@ namespace OpusCatMTEngine
                 this.selectedModel);
 
             this.CustomizationNotStarted = false;
-
         }
+
         private void browse_Click(object sender, RoutedEventArgs e)
         {
-            var pathBox = (TextBox)((Button)sender).DataContext;
-
+            var button = sender as Button;
+            var pathBox = (TextBox)button.DataContext;
+            
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-
+            dlg.Filter = (string)button.Tag;
             // Show open file dialog box
             bool? result = dlg.ShowDialog();
 

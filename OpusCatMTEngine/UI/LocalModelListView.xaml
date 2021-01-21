@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <local:EnumToStringConverter x:Key="DefaultEnumToStringConverter"/>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+        <local:BooleanAndConverter x:Key="booleanAndConverter" />
     </UserControl.Resources>
     <Border BorderBrush="Black" BorderThickness="1" Margin="5">
         <StackPanel>
@@ -22,12 +23,28 @@
                     </StackPanel.Resources>
                     <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Install OPUS model from Web</Button>
                     <Button Name="addZipModel" Click="btnAddZipModel_Click">Install model from zip</Button>
-                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="customizeModel" Click="btnCustomizeModel_Click">Customize selected model</Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationSuspended, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="continueCustomization" Click="btnContinueCustomization_Click">Continue customization</Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.ModelConfig.Finetuned, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="customizationProgress" Click="btnCustomizationProgress_Click">Show customization progress</Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationFinished, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="packageCustomModel" Click="btnpackageCustomModel_Click">Package customized model</Button>
+                    <Button  Name="customizeModel" Click="btnCustomizeModel_Click">
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                                <Binding ElementName="LocalModelList" Path="SelectedItem.IsReady"/>
+                                <Binding ElementName="LocalModelList" Path="SelectedItems.Count" />
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                        Fine-tune selected model
+                    </Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationSuspended, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="continueCustomization" Click="btnContinueCustomization_Click">Continue fine-tuning</Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.ModelConfig.Finetuned, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="customizationProgress" Click="btnCustomizationProgress_Click">Show fine-tuning progress</Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationFinished, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="packageCustomModel" Click="btnpackageCustomModel_Click">Package fine-tuned model</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
-                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="translateWithModel" Click="btnTranslateWithModel_Click">Translate with model</Button>
+                    <Button Name="translateWithModel" Click="btnTranslateWithModel_Click">
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource booleanAndConverter}">
+                                <Binding ElementName="LocalModelList" Path="SelectedItem.IsReady"/>
+                                <Binding ElementName="LocalModelList" Path="SelectedItems.Count" />
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                        Translate with model
+                    </Button>
                     <!-- This is disabled until the testing functionalities can be polished a bit more
                         <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
                     -->

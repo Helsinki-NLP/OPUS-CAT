@@ -65,7 +65,7 @@
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TmxFiles}" Visibility="{Binding IsChecked,ElementName=TmxFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
                         <Label>Tmx file</Label>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TmxFileBox" Width="400" Text="{Binding ElementName=_this,Path=TmxFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
-                        <Button DataContext="{Binding ElementName=TmxFileBox}" Click="browse_Click">Browse</Button>
+                        <Button DataContext="{Binding ElementName=TmxFileBox}" Tag="TMX Files|*.tmx" Click="browse_Click">Browse</Button>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
                         <Label>Target file</Label>
@@ -107,12 +107,12 @@
                 </StackPanel>
             </Border>
             <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                <Label>Custom model label</Label>
+                <Label>Fine-tuned model label</Label>
                 <TextBox IsEnabled="{Binding ElementName=_this,Path=CustomizationNotStarted, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ValidatedTextBoxStyle}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
             </StackPanel>
         </StackPanel>
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
-            <Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>
+            <!--<Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>-->
             <Button Name="CustomizeButton" DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Click="customize_Click">
                 <Button.Visibility>
                     <Binding ElementName="_this" Path="CustomizationNotStarted"  UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource BoolToVis}"/>
@@ -127,7 +127,7 @@
                         <Binding ElementName="TmxFileBox" Path="(Validation.Errors)[0]"/>
                     </MultiBinding>
                 </Button.IsEnabled>
-                Customize
+                Fine-tune
             </Button>
         </DockPanel>
     </DockPanel>

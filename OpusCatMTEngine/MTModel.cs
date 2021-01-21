@@ -26,8 +26,9 @@ namespace OpusCatMTEngine
     public enum MTModelStatus
     {
         OK,
-        Customizing,
-        Customization_suspended
+        Finetuning,
+        Finetuning_suspended,
+        Preprocessing_failed
     }
 
     public class EnumToStringConverter : IValueConverter
@@ -221,7 +222,11 @@ namespace OpusCatMTEngine
                 string statusAndEstimate;
                 if (this.CustomizationStatus != null)
                 {
-                    
+                    if (this.CustomizationStatus.CustomizationStep == MarianCustomizer.CustomizationStep.Error)
+                    {
+                        return "Error during fine-tuning\nCheck fine-tuning log for details";
+                    }
+
                     statusAndEstimate = HelperFunctions.EnumToString(this.CustomizationStatus.CustomizationStep);
                     if (!(this.CustomizationStatus.EstimatedSecondsRemaining == null))
                     {
@@ -256,7 +261,7 @@ namespace OpusCatMTEngine
             customizer.ProcessExited += this.ExitHandler;
             this.FinetuneProcess = customizer.ResumeCustomization(this);
 
-            this.Status = MTModelStatus.Customizing;
+            this.Status = MTModelStatus.Finetuning;
 
             NotifyPropertyChanged("IsCustomizationSuspended");
         }
@@ -265,7 +270,7 @@ namespace OpusCatMTEngine
         {
             if (this.IsCustomizationSuspended.Value)
             {
-                this.Status = MTModelStatus.Customization_suspended;
+                this.Status = MTModelStatus.Finetuning_suspended;
             }
             else
             {
@@ -336,7 +341,19 @@ namespace OpusCatMTEngine
                 {
                     if (this.IsCustomizationSuspended.Value)
                     {
-                        this.Status = MTModelStatus.Customization_suspended;
+                        FileInfo trainingLog = new FileInfo(
+                        Path.Combine(
+                            this.InstallDir,
+                            OpusCatMTEngineSettings.Default.TrainLogName));
+
+                        if (trainingLog.Exists)
+                        {
+                            this.Status = MTModelStatus.Finetuning_suspended;
+                        }
+                        else
+                        {
+                            this.Status = MTModelStatus.Preprocessing_failed;
+                        }
                     }
                 }
             }
@@ -440,7 +457,7 @@ namespace OpusCatMTEngine
             this.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
             this.ModelConfig.IncludeTagPairs = includeTagPairs;
 
-            if (status == MTModelStatus.Customizing)
+            if (status == MTModelStatus.Finetuning)
             {
                 this.ModelConfig.FinetuningInitiated = true;
                 this.TrainingLog = new MarianLog();
@@ -509,6 +526,7 @@ namespace OpusCatMTEngine
                                     if (line.EndsWith("Training finished"))
                                     {
                                         this.ModelConfig.FinetuningComplete = true;
+                                        this.SaveModelConfig();
                                         return false;
                                     }
                                 }
@@ -517,14 +535,16 @@ namespace OpusCatMTEngine
                         }
                         catch (IOException ex)
                         {
-                            Log.Information($"Train.log for customized system {this.Name} has been locked by another process. The previous training process is probably stil running in the background (wait for it to finish or end it). Exception: {ex.Message}");
+                            Log.Information($"Train.log for customized system {this.Name} has been locked by another process. The previous training process is probably still running in the background (wait for it to finish or end it). Exception: {ex.Message}");
                             return true;
                         }
                     }
                     else
                     {
                         //If there's no process and no train.log, this indicates that customization
-                        //has failed before the training has started
+                        //has failed before the training has started. This means the finetuning process
+                        //is not salvageable
+
                         return true;
                     }
                 }

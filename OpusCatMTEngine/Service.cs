@@ -33,22 +33,6 @@ namespace OpusCatMTEngine
 
             var selfHost = new ServiceHost(mtService, baseAddresses);
             
-            // Check to see if the service host already has a ServiceMetadataBehavior
-            ServiceMetadataBehavior smb = selfHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
-            // If not, add one
-            if (smb == null)
-                smb = new ServiceMetadataBehavior();
-            //smb.HttpGetEnabled = true;
-            smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
-            selfHost.Description.Behaviors.Add(smb);
-            
-            // Add MEX endpoint
-            selfHost.AddServiceEndpoint(
-                ServiceMetadataBehavior.MexContractName,
-                MetadataExchangeBindings.CreateMexTcpBinding(),
-                "mex"
-            );
-            
             var nettcpBinding = new NetTcpBinding();
             
             //Use default net.tcp security, which is based on Windows authentication:
@@ -64,8 +48,6 @@ namespace OpusCatMTEngine
             //Customization tuning sets tend to be big
             nettcpBinding.MaxReceivedMessageSize = 20000000;
             
-            
-
             selfHost.AddServiceEndpoint(typeof(IMTService), nettcpBinding, "MTService");
 
             if (!onlyNetTcp)
@@ -73,15 +55,26 @@ namespace OpusCatMTEngine
                 selfHost.AddServiceEndpoint(typeof(IMTService), new WebHttpBinding(), "MTRestService");
                 WebHttpBehavior helpBehavior = new WebHttpBehavior();
                 helpBehavior.HelpEnabled = true;
-                selfHost.Description.Endpoints[2].Behaviors.Add(helpBehavior);
+                selfHost.Description.Endpoints[1].Behaviors.Add(helpBehavior);
                 
             }
 
-            /*This doesn't seem to have an effect
-             * var stb = new ServiceThrottlingBehavior();
-            stb.MaxConcurrentCalls = 100000;
-            stb.MaxConcurrentSessions = 100000;
-            selfHost.Description.Behaviors.Add(stb);
+            /*
+            // Check to see if the service host already has a ServiceMetadataBehavior
+            ServiceMetadataBehavior smb = selfHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
+            // If not, add one
+            if (smb == null)
+                smb = new ServiceMetadataBehavior();
+            //smb.HttpGetEnabled = true;
+            smb.MetadataExporter.PolicyVersion = PolicyVersion.Policy15;
+            selfHost.Description.Behaviors.Add(smb);
+
+            // Add MEX endpoint
+            selfHost.AddServiceEndpoint(
+                ServiceMetadataBehavior.MexContractName,
+                MetadataExchangeBindings.CreateMexTcpBinding(),
+                "mex"
+            );
             */
 
             Log.Information($"Opening the service host");

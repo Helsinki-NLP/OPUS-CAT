@@ -17,6 +17,7 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -234,12 +235,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Alignment\eflomal">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Alignment\python\eflomal\eflomal.pyx">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Alignment\eflomal" />
+    <None Include="Alignment\python\eflomal\eflomal.pyx" />
     <None Include="App.config" />
     <None Include="Evaluate.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -269,15 +266,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Alignment\align.py">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Alignment\atools.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Alignment\python\eflomal\eflomal.c">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Alignment\align.py" />
+    <Content Include="Alignment\atools.exe" />
+    <Content Include="Alignment\python\eflomal\eflomal.c" />
     <Content Include="Evaluation\sacrebleu_wrapper.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

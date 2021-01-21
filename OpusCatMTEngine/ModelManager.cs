@@ -88,7 +88,7 @@ namespace OpusCatMTEngine
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
         public bool CustomizationOngoing {
-            get => this.LocalModels.Any(x => x.Status == MTModelStatus.Customizing);
+            get => this.LocalModels.Any(x => x.Status == MTModelStatus.Finetuning);
         }
         public bool BatchTranslationOngoing { get => batchTranslationOngoing; set { batchTranslationOngoing = value; NotifyPropertyChanged(); } }
 
@@ -112,7 +112,7 @@ namespace OpusCatMTEngine
                     statusMessage.Append($"Fine-tuning may have been aborted, or the model has been deleted. ");
                     statusMessage.Append($"Primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
                 }
-                else if (taggedModel.Status == MTModelStatus.Customizing)
+                else if (taggedModel.Status == MTModelStatus.Finetuning)
                 {
                     statusMessage.Append($"Model with tag {modelTag} for {sourceCode}-{targetCode} is still being fine-tuned. ");
                     statusMessage.Append($"Wait for fine-tuning to complete. If OPUS-CAT MT is used before the fine-tuning is complete, primary model {primaryModel.Name} for {sourceCode}-{targetCode} will be used.");
@@ -478,7 +478,7 @@ namespace OpusCatMTEngine
             MTModel baseModel)
         {
 
-            Log.Information($"Customizing a new model with model tag {modelTag} from base model {baseModel.Name}.");
+            Log.Information($"Fine-tuning a new model with model tag {modelTag} from base model {baseModel.Name}.");
             //Add an entry for an incomplete model to the model list
             var modelPath = Regex.Match(customDir.FullName, @"[^\\]+\\[^\\]+$").Value;
             var incompleteModel = new MTModel(
@@ -486,7 +486,7 @@ namespace OpusCatMTEngine
                     modelPath,
                     new List<IsoLanguage>() { srcLang },
                     new List<IsoLanguage>() { trgLang },
-                    MTModelStatus.Customizing,
+                    MTModelStatus.Finetuning,
                     modelTag,
                     customDir,
                     null,
@@ -520,7 +520,6 @@ namespace OpusCatMTEngine
             //so config can be saved).
             incompleteModel.FinetuneProcess = trainProcess;
             incompleteModel.SaveModelConfig();
-    
         }
 
         internal void GetLocalModels()
