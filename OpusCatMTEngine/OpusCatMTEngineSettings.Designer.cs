@@ -214,5 +214,17 @@ namespace OpusCatMTEngine {
                 this["CustomModelZipPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8500")]
+        public string HttpMtServicePort {
+            get {
+                return ((string)(this["HttpMtServicePort"]));
+            }
+            set {
+                this["HttpMtServicePort"] = value;
+            }
+        }
     }
 }

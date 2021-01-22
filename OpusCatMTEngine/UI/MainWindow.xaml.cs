@@ -26,7 +26,7 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IDataErrorInfo, INotifyPropertyChanged
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public string WindowTitle
         {
@@ -38,8 +38,6 @@ namespace OpusCatMTEngine
         }
 
         public ModelManager ModelManager { get; private set; }
-
-        private bool saveButtonEnabled;
 
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -56,37 +54,6 @@ namespace OpusCatMTEngine
             }
         }
 
-        public string Error
-        {
-            get { return "...."; }
-        }
-
-        public string ServicePortBox
-        {
-            get => servicePortBox;
-            set {
-                servicePortBox = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public bool SaveButtonEnabled
-        {
-            get => saveButtonEnabled;
-            set
-            {
-                saveButtonEnabled = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        public string this[string columnName]
-        {
-            get
-            {
-                return Validate(columnName);
-            }
-        }
 
         internal void AddTab(ActionTabItem actionTabItem)
         {
@@ -94,39 +61,7 @@ namespace OpusCatMTEngine
             this.Tabs.SelectedItem = actionTabItem;
         }
 
-        private string Validate(string propertyName)
-        {
-            // Return error message if there is error on else return empty or null string
-            string validationMessage = string.Empty;
-            this.SaveButtonEnabled = false;
-            switch (propertyName)
-            {
-                case "ServicePortBox":
-                    if (this.ServicePortBox != null && this.ServicePortBox != "" )
-                    {
-                        var portNumber = Int32.Parse(this.ServicePortBox);
-                        if (portNumber < 1024 || portNumber > 65535)
-                        {
-                            validationMessage = "Error";
-                        }
-                        else
-                        {
-                            if (this.ServicePortBox != OpusCatMTEngineSettings.Default.MtServicePort)
-                            {
-                                this.SaveButtonEnabled = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        validationMessage = "Error";
-                    }
-
-                    break;
-            }
-
-            return validationMessage;
-        }
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -139,7 +74,7 @@ namespace OpusCatMTEngine
         }
 
         private ServiceHost serviceHost;
-        private string servicePortBox;
+        
 
         public MainWindow()
         {
@@ -147,7 +82,6 @@ namespace OpusCatMTEngine
             
             this.StartEngine();
             InitializeComponent();
-            this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
         }
 
         private void StartEngine()
@@ -166,27 +100,7 @@ namespace OpusCatMTEngine
             this.DataContext = this;
             this.serviceHost = service.StartService(this.ModelManager);
         }
-
-        private void restartButton_Click(object sender, RoutedEventArgs e)
-        {
-            //Abort the service and start it again
-            this.serviceHost.Abort();
-            this.StartEngine();
-        }
-
-        private void saveButton_Click(object sender, RoutedEventArgs e)
-        {
-            OpusCatMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
-            OpusCatMTEngineSettings.Default.Save();
-            this.SaveButtonEnabled = false;
-        }
-
-        private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex("[^0-9]");
-            e.Handled = regex.IsMatch(e.Text);
-        }
-
+        
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.serviceHost.Close();

@@ -50,5 +50,8 @@
     <Setting Name="CustomModelZipPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">custom_model_packages</Value>
     </Setting>
+    <Setting Name="HttpMtServicePort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
