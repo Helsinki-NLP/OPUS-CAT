@@ -33,12 +33,12 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "include-tag-pairs", ApplyNamingConventions = false)]
         public bool IncludeTagPairs { get => includeTagPairs; set => includeTagPairs = value; }
         private bool includeTagPairs;
-
-        //finituningInitiated and finetuningComplete used to be combined as finetuned, this is retained
-        //for backwards compatibility
+        
         [YamlMember(Alias = "finetuned", ApplyNamingConventions = false)]
-        public bool Finetuned { get => (finetuningInitiated || finetuningComplete); set { finetuningInitiated = value; finetuningComplete = value; NotifyPropertyChanged(); } }
+        public bool Finetuned { get => finetuned; set { finetuned = value; } }
+        private bool finetuned;
 
+        //These are not used, they are for backwards-compatibility
         [YamlMember(Alias = "finetuning-initiated", ApplyNamingConventions = false)]
         public bool FinetuningInitiated { get => finetuningInitiated; set { finetuningInitiated = value; NotifyPropertyChanged(); } }
         private bool finetuningInitiated;

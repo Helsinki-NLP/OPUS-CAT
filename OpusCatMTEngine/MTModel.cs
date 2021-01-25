@@ -100,6 +100,14 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool CanSetAsOverrideModel
+        {
+            get 
+            {
+                return this.Status == MTModelStatus.OK && this.IsNotOverrideModel;
+            }
+        }
+
         public bool IsNotOverrideModel { get => !this.isOverrideModel; }
 
         private Boolean isOverridden;
@@ -156,7 +164,7 @@ namespace OpusCatMTEngine
         public List<IsoLanguage> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
-
+        
         //This creates a zip package of the model that can be moved to another computer
         internal void PackageModel()
         {
@@ -247,7 +255,19 @@ namespace OpusCatMTEngine
                 }
                 else
                 {
-                    statusAndEstimate = this.Status.ToString();
+                    switch (this.Status)
+                    {
+                        case MTModelStatus.Preprocessing_failed:
+                            statusAndEstimate = "Fine-tuning failed.\nDelete the model.";
+                            break;
+                        case MTModelStatus.Finetuning_suspended:
+                            statusAndEstimate = "Fine-tuning suspended.";
+                            break;
+                        default:
+                            statusAndEstimate = this.Status.ToString();
+                            break;
+                    }
+                    
                 }
 
                 return statusAndEstimate;
@@ -268,14 +288,9 @@ namespace OpusCatMTEngine
 
         internal void ExitHandler(object sender, EventArgs e)
         {
-            if (this.IsCustomizationSuspended.Value)
+            this.CheckFinetuningState();
+            if (this.Status == MTModelStatus.OK)
             {
-                this.Status = MTModelStatus.Finetuning_suspended;
-            }
-            else
-            {
-                this.Status = MTModelStatus.OK;
-                this.ModelConfig.FinetuningComplete = true;
                 this.SaveModelConfig();
                 this.CustomizationStatus = null;
                 this.StatusProgress = 0;
@@ -321,6 +336,55 @@ namespace OpusCatMTEngine
             this.InstallProgress = e.ProgressPercentage;
         }
 
+        private void CheckFinetuningState()
+        {
+            //Check for train.log to determine whether training has been started/is finished
+            this.trainingLogFileInfo = new FileInfo(
+                Path.Combine(
+                    this.InstallDir,
+                    OpusCatMTEngineSettings.Default.TrainLogName));
+
+            //If training log does not exist, Marian training has not been started.
+            //This is currently an unrecoverable error.
+            if (!trainingLogFileInfo.Exists)
+            {
+                this.Status = MTModelStatus.Preprocessing_failed;
+            }
+            else
+            {
+                //Training log exists, so training has started, check if it has finished
+                try
+                {
+                    using (var reader = this.trainingLogFileInfo.OpenText())
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            if (line.EndsWith("Training finished"))
+                            {
+                                this.Status = MTModelStatus.OK;
+                                break;
+                            }
+                            else
+                            {
+                                this.Status = MTModelStatus.Finetuning_suspended;
+                            }
+                        }
+                    }
+                }
+                catch (IOException ex)
+                {
+                    Log.Information($"Train.log for customized system {this.Name} has been locked by another process. The previous training process is probably still running in the background (wait for it to finish or end it). Exception: {ex.Message}");
+                    this.Status = MTModelStatus.Finetuning;
+                }
+            }
+        }
+
+        public bool CanContinueCustomization
+        {
+            get { return this.Status == MTModelStatus.Finetuning_suspended; }
+        }
+
         public MTModel(string modelPath, string installDir)
         {
             this.InstallDir = installDir;
@@ -335,26 +399,10 @@ namespace OpusCatMTEngine
                     this.ModelConfig = deserializer.Deserialize<MTModelConfig>(reader);
                 }
 
-                //Check if the model finetuning has been suspended (because the MT engine has been closed,
-                //or there's been an error)
-                if (this.ModelConfig.FinetuningInitiated && !this.ModelConfig.FinetuningComplete)
+                //Check the state of a fine-tuned model
+                if (this.ModelConfig.Finetuned)
                 {
-                    if (this.IsCustomizationSuspended.Value)
-                    {
-                        FileInfo trainingLog = new FileInfo(
-                        Path.Combine(
-                            this.InstallDir,
-                            OpusCatMTEngineSettings.Default.TrainLogName));
-
-                        if (trainingLog.Exists)
-                        {
-                            this.Status = MTModelStatus.Finetuning_suspended;
-                        }
-                        else
-                        {
-                            this.Status = MTModelStatus.Preprocessing_failed;
-                        }
-                    }
+                    this.CheckFinetuningState();
                 }
             }
             else
@@ -456,13 +504,18 @@ namespace OpusCatMTEngine
             this.ModelConfig.ModelTags.Add(modelTag);
             this.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
             this.ModelConfig.IncludeTagPairs = includeTagPairs;
+            this.InstallDir = customDir.FullName;
 
             if (status == MTModelStatus.Finetuning)
             {
-                this.ModelConfig.FinetuningInitiated = true;
+                this.ModelConfig.Finetuned = true;
                 this.TrainingLog = new MarianLog();
+                this.trainingLogFileInfo = new FileInfo(
+                Path.Combine(
+                    this.InstallDir,
+                    OpusCatMTEngineSettings.Default.TrainLogName));
             }
-            this.InstallDir = customDir.FullName;
+            
             this.ModelPath = modelPath;
             this.SaveModelConfig();
         }
@@ -472,89 +525,55 @@ namespace OpusCatMTEngine
             this.ParseModelPath(modelPath);
         }
     
-
+        //This indicates whether the model is ready for translation
+        //(essentially means whether fine-tuning has finished if the model is a fine-tuned model).
         public Boolean IsReady
         {
             get
             {
-                if (this.IsCustomizationSuspended == null)
-                {
-                    return true;
-                }
-                else
-                {
-                    return !this.IsCustomizationSuspended.Value;
-                }
+                return this.Status == MTModelStatus.OK;
             }
         }
 
-        public Boolean IsCustomizationFinished
+        public Boolean CanContinueFinetuning
         {
             get
             {
-                return (this.IsCustomizationSuspended.HasValue && !this.IsCustomizationSuspended.Value);
+                return this.Status == MTModelStatus.Finetuning_suspended;
             }
         }
 
-        //Indicates whether customization has been suspended, null value is for noncustomized models
-        public Boolean? IsCustomizationSuspended
+        public Boolean HasProgress
         {
             get
             {
-                if (!this.ModelConfig.FinetuningInitiated)
-                {
-                    return null;
-                }
-
-                if (this.FinetuneProcess == null || this.FinetuneProcess.HasExited)
-                {
-                    //Parse train.log to determine whether training is done
-                    FileInfo trainingLog = new FileInfo(
-                        Path.Combine(
-                            this.InstallDir,
-                            OpusCatMTEngineSettings.Default.TrainLogName));
-
-                    if (trainingLog.Exists)
-                    {
-                        try
-                        {
-                            using (var reader = trainingLog.OpenText())
-                            {
-                                string line;
-                                while ((line = reader.ReadLine()) != null)
-                                {
-                                    if (line.EndsWith("Training finished"))
-                                    {
-                                        this.ModelConfig.FinetuningComplete = true;
-                                        this.SaveModelConfig();
-                                        return false;
-                                    }
-                                }
-                            }
-                            return true;
-                        }
-                        catch (IOException ex)
-                        {
-                            Log.Information($"Train.log for customized system {this.Name} has been locked by another process. The previous training process is probably still running in the background (wait for it to finish or end it). Exception: {ex.Message}");
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        //If there's no process and no train.log, this indicates that customization
-                        //has failed before the training has started. This means the finetuning process
-                        //is not salvageable
-
-                        return true;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
+                return this.trainingLogFileInfo != null && this.trainingLogFileInfo.Exists;
             }
         }
 
+        public Boolean CanPackage
+        {
+            get
+            {
+                return this.trainingLogFileInfo != null && this.trainingLogFileInfo.Exists && this.Status == MTModelStatus.OK;
+            }
+        }
+
+        public Boolean CanDelete
+        {
+            get
+            {
+                return this.Status != MTModelStatus.Finetuning;
+            }
+        }
+
+        public Boolean CanTranslate
+        {
+            get
+            {
+                return this.Status == MTModelStatus.OK;
+            }
+        }
         public string SourceLanguageString
         {
             get { return String.Join("+", this.SourceLanguages); }
@@ -568,22 +587,15 @@ namespace OpusCatMTEngine
         public string ModelPath { get; internal set; }
         public string InstallDir { get; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
-
+        
         private MarianLog TrainingLog;
 
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
         public Process FinetuneProcess { get; set; }
         
-
         private MTModelStatus status;
         private MTModelConfig modelConfig;
-        private IsoLanguage srcLang;
-        private IsoLanguage trgLang;
-        private MTModelStatus customizing;
-        private string modelTag;
-        
-        private object includePlaceholderTags;
-        private object includeTagPairs;
+        private FileInfo trainingLogFileInfo;
 
         internal Process PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
@@ -601,6 +613,8 @@ namespace OpusCatMTEngine
         {
             this.StatusProgress = e.ProgressPercentage;
             this.CustomizationStatus = (MarianCustomizationStatus)e.UserState;
+            //TODO: Why does this not update the UI?
+            this.NotifyPropertyChanged("HasProgress");
             this.NotifyPropertyChanged("StatusAndEstimateString");
         }
     }

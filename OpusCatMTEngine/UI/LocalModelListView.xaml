@@ -10,6 +10,8 @@
         <local:EnumToStringConverter x:Key="DefaultEnumToStringConverter"/>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
         <local:BooleanAndConverter x:Key="booleanAndConverter" />
+        <local:InverseBooleanConverter x:Key="booleanNotConverter" />
+        <local:BooleanAndToVisibilityConverter x:Key="booleanAndToVisibilityConverter" />
     </UserControl.Resources>
     <Border BorderBrush="Black" BorderThickness="1" Margin="5">
         <StackPanel>
@@ -24,25 +26,63 @@
                     <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Install OPUS model from Web</Button>
                     <Button Name="addZipModel" Click="btnAddZipModel_Click">Install model from zip</Button>
                     <Button  Name="customizeModel" Click="btnCustomizeModel_Click">
-                        <Button.IsEnabled>
-                            <MultiBinding Converter="{StaticResource booleanAndConverter}">
-                                <Binding ElementName="LocalModelList" Path="SelectedItem.IsReady"/>
-                                <Binding ElementName="LocalModelList" Path="SelectedItems.Count" />
-                            </MultiBinding>
-                        </Button.IsEnabled>
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.IsReady"/>
+                        </Button.Visibility>
                         Fine-tune selected model
                     </Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationSuspended, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="continueCustomization" Click="btnContinueCustomization_Click">Continue fine-tuning</Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.ModelConfig.Finetuned, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="customizationProgress" Click="btnCustomizationProgress_Click">Show fine-tuning progress</Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsCustomizationFinished, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="packageCustomModel" Click="btnpackageCustomModel_Click">Package fine-tuned model</Button>
-                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="deleteModel" Click="btnDeleteModel_Click">Delete selected model</Button>
+                    <Button Name="continueCustomization" Click="btnContinueCustomization_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanContinueFinetuning"/>
+                        </Button.Visibility>
+                        Continue fine-tuning
+                    </Button>
+                    <Button Name="customizationProgress" Click="btnCustomizationProgress_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.HasProgress"/>
+                        </Button.Visibility>
+                        Show fine-tuning progress
+                    </Button>
+                    <Button Name="packageCustomModel" Click="btnpackageCustomModel_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanPackage"/>
+                        </Button.Visibility>
+                        Package fine-tuned model
+                    </Button>
+                    <Button Name="deleteModel" Click="btnDeleteModel_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanDelete"/>
+                        </Button.Visibility>
+                        Delete selected model
+                    </Button>
                     <Button Name="translateWithModel" Click="btnTranslateWithModel_Click">
-                        <Button.IsEnabled>
-                            <MultiBinding Converter="{StaticResource booleanAndConverter}">
-                                <Binding ElementName="LocalModelList" Path="SelectedItem.IsReady"/>
-                                <Binding ElementName="LocalModelList" Path="SelectedItems.Count" />
-                            </MultiBinding>
-                        </Button.IsEnabled>
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanTranslate"/>
+                        </Button.Visibility>
                         Translate with model
                     </Button>
                     <!-- This is disabled until the testing functionalities can be polished a bit more
@@ -50,7 +90,7 @@
                     -->
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
                     <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
-                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.IsNotOverrideModel, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="setAsOverride" Click="btnSetOverride_Click">Set as override model</Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.CanSetAsOverrideModel, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="setAsOverride" Click="btnSetOverride_Click">Set as override model</Button>
                     <Button Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="cancelOverride" Click="btnCancelOverride_Click">Cancel override</Button>
                 </StackPanel>
                 <ListView 

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace OpusCatMTEngine
 {
     //This is an object for the information contained in a Marian training log.
-    //The log is parsed 
     public class MarianLog
     {
         public MarianLog()

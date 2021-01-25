@@ -614,7 +614,7 @@ namespace OpusCatMTEngine
                 else
                 {
                     //Pick a model that is not fine-tuned
-                    primaryModel = languagePairModels.FirstOrDefault(x => !x.ModelConfig.FinetuningInitiated);
+                    primaryModel = languagePairModels.FirstOrDefault(x => !x.ModelConfig.Finetuned);
                     if (primaryModel == null)
                     {
                         //As a fallback pick any model
