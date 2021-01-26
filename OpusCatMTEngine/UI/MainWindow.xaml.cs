@@ -41,7 +41,7 @@ namespace OpusCatMTEngine
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (this.ModelManager.CustomizationOngoing || this.ModelManager.BatchTranslationOngoing)
+            if (this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
             {
                 MessageBoxResult result = MessageBox.Show("A customization or a batch translation is in progress. Customization can be resumed from the last save later. Are you sure you want to close the OpusCAT Engine?",
                                           "Confirmation",

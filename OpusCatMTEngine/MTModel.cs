@@ -294,7 +294,9 @@ namespace OpusCatMTEngine
                 this.SaveModelConfig();
                 this.CustomizationStatus = null;
                 this.StatusProgress = 0;
-                this.NotifyPropertyChanged("StatusAndEstimateString");
+                //Update all properties by passing empty string
+                this.NotifyPropertyChanged(String.Empty);
+                //this.NotifyPropertyChanged("StatusAndEstimateString");
                 FileInfo postCustomizationBatchFile = new FileInfo(Path.Combine(this.InstallDir, OpusCatMTEngineSettings.Default.PostFinetuneBatchName));
                 if (postCustomizationBatchFile.Exists)
                 {
@@ -346,6 +348,7 @@ namespace OpusCatMTEngine
 
             //If training log does not exist, Marian training has not been started.
             //This is currently an unrecoverable error.
+            this.trainingLogFileInfo.Refresh();
             if (!trainingLogFileInfo.Exists)
             {
                 this.Status = MTModelStatus.Preprocessing_failed;
@@ -547,7 +550,15 @@ namespace OpusCatMTEngine
         {
             get
             {
-                return this.trainingLogFileInfo != null && this.trainingLogFileInfo.Exists;
+                if (this.trainingLogFileInfo != null)
+                {
+                    this.trainingLogFileInfo.Refresh();
+                    return this.trainingLogFileInfo.Exists;
+                }
+                else
+                {
+                    return false;
+                } 
             }
         }
 
@@ -555,7 +566,16 @@ namespace OpusCatMTEngine
         {
             get
             {
-                return this.trainingLogFileInfo != null && this.trainingLogFileInfo.Exists && this.Status == MTModelStatus.OK;
+                if (this.trainingLogFileInfo != null)
+                {
+                    this.trainingLogFileInfo.Refresh();
+                    return this.Status == MTModelStatus.OK;
+                }
+                else
+                {
+                    return false;
+                }
+                
             }
         }
 

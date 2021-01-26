@@ -250,7 +250,7 @@ namespace OpusCatMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            if (!this.ModelManager.CustomizationOngoing && !this.ModelManager.BatchTranslationOngoing)
+            if (!this.ModelManager.FinetuningOngoing && !this.ModelManager.BatchTranslationOngoing)
             {
                 this.ModelManager.StartCustomization(
                     input, validation, uniqueNewSegments, sourceLang, targetLang, modelTag, includePlaceholderTags, includeTagPairs);

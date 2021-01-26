@@ -87,7 +87,7 @@ namespace OpusCatMTEngine
         private MTModel overrideModel;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
-        public bool CustomizationOngoing {
+        public bool FinetuningOngoing {
             get => this.LocalModels.Any(x => x.Status == MTModelStatus.Finetuning);
         }
         public bool BatchTranslationOngoing { get => batchTranslationOngoing; set { batchTranslationOngoing = value; NotifyPropertyChanged(); } }
@@ -367,6 +367,7 @@ namespace OpusCatMTEngine
         {
             return this.LocalModels.Single(x => x.Name == modelName).Translate(input).Result;
         }
+        
 
         internal void StartCustomization(
             ParallelFilePair inputPair,
@@ -377,7 +378,6 @@ namespace OpusCatMTEngine
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
-            DirectoryInfo customDir,
             MTModel baseModel)
         {
             var customTask = Task.Run(() => 
@@ -389,8 +389,7 @@ namespace OpusCatMTEngine
                 trgLang,
                 modelTag, 
                 includePlaceholderTags, 
-                includeTagPairs, 
-                customDir, 
+                includeTagPairs,
                 baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
@@ -406,22 +405,7 @@ namespace OpusCatMTEngine
             bool includeTagPairs,
             MTModel baseModel=null)
         {
-            
-            if (baseModel == null)
-            {
-                baseModel = this.GetPrimaryModel(srcLang, trgLang);
-            }
-
-            //Select a custom dir that doesn't exist
-            DirectoryInfo customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
-            var nameIndex = 0;
-            while (customDir.Exists)
-            {
-                nameIndex++;
-                customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}_{nameIndex}");
-            }
-
-            var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLang, trgLang, modelTag, includePlaceholderTags, includeTagPairs, customDir, baseModel));
+            var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLang, trgLang, modelTag, includePlaceholderTags, includeTagPairs, baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
@@ -439,7 +423,6 @@ namespace OpusCatMTEngine
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
-            DirectoryInfo customDir,
             MTModel baseModel)
         {
             //Write the tuning set as two files
@@ -461,7 +444,6 @@ namespace OpusCatMTEngine
                 modelTag,
                 includePlaceholderTags,
                 includeTagPairs,
-                customDir,
                 baseModel);
         }
 
@@ -474,9 +456,23 @@ namespace OpusCatMTEngine
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
-            DirectoryInfo customDir,
             MTModel baseModel)
         {
+            modelTag = Regex.Replace(modelTag, @"[^\w-]", "_");
+
+            if (baseModel == null)
+            {
+                baseModel = this.GetPrimaryModel(srcLang, trgLang);
+            }
+
+            //Select a custom dir that doesn't exist
+            DirectoryInfo customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}");
+            var nameIndex = 0;
+            while (customDir.Exists)
+            {
+                nameIndex++;
+                customDir = new DirectoryInfo($"{baseModel.InstallDir}_{modelTag}_{nameIndex}");
+            }
 
             Log.Information($"Fine-tuning a new model with model tag {modelTag} from base model {baseModel.Name}.");
             //Add an entry for an incomplete model to the model list

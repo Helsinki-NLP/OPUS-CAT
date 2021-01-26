@@ -54,7 +54,8 @@ namespace OpusCatMTEngine
             get => modelTag;
             set
             {
-                modelTag = value;
+                //No spaces in model tags, keeps things simple
+                modelTag = value.Replace(' ','_');
                 NotifyPropertyChanged();
             }
         }
@@ -197,8 +198,8 @@ namespace OpusCatMTEngine
                 default:
                     break;
             }
-            var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
 
+            
             if (this.SeparateValidationFiles.IsChecked.Value)
             {
                 validPair = new ParallelFilePair(this.ValidSourceFileBox.Text, this.ValidTargetFileBox.Text);
@@ -219,7 +220,6 @@ namespace OpusCatMTEngine
                 this.ModelTag,
                 this.IncludePlaceholderTagsBox.IsChecked.Value,
                 this.IncludeTagPairBox.IsChecked.Value,
-                customDir,
                 this.selectedModel);
 
             this.CustomizationNotStarted = false;
