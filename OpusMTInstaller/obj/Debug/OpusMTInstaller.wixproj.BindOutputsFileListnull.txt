@@ -1,3 +1,0 @@
-C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTInstaller\bin\Debug\cab1.cab
-C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTInstaller\bin\Debug\OpusMTInstaller.msi
-C:\Users\niemi\Documents\Code\fiskmo-trados\OpusMTInstaller\bin\Debug\OpusMTInstaller.wixpdb

@@ -1,0 +1,36 @@
+﻿<Window x:Class="OpusCatMTEngine.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle, RelativeSource={RelativeSource Mode=Self}}" Height="500" Width="1000" Icon="opus.bmp"
+        Name="OpusCatWindow"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+    <TabControl Name="Tabs" ItemsSource="{Binding UiTabs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,2,0.333,-2.333">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Header}" />
+                    <Image 
+                        Visibility="{Binding Path=Closable, Converter={StaticResource BoolToVis}}" 
+                        IsEnabled="{Binding Closable}" 
+                        Source="/OpusCatMtEngine;component/UI/cross.png" 
+                        Width="10" 
+                        Height="10" 
+                        MouseUp="Image_MouseUp"
+                        Margin="10,0,0,0"/>
+                </StackPanel>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <UserControl Content="{Binding Content}" Margin="0" />
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+    </TabControl>
+</Window>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 
@@ -14,7 +15,7 @@ namespace OpusMTInterface
         
         [OperationContract]
         [WebGet]
-        List<string> GetLanguagePairModelTags(string tokenCode, string languagePair);
+        List<string> GetLanguagePairModelTags(string tokenCode, string srcLangCode, string trgLangCode);
 
         [OperationContract]
         [WebGet]
@@ -23,6 +24,14 @@ namespace OpusMTInterface
         [OperationContract]
         [WebGet]
         string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
+
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
+
+        [OperationContract]
+        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
         [WebGet]
@@ -51,9 +60,8 @@ namespace OpusMTInterface
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]
-        string PreTranslateBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, String modelId);
+        string PreOrderBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, String modelId);
         
-
         [OperationContract]
         [WebGet]
         void StoreTranslation(string tokenCode, string source, string target, string srcLangCode, string trgLangCode);

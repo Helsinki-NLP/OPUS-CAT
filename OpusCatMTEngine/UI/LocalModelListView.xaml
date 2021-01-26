@@ -1,0 +1,147 @@
+﻿<UserControl x:Class="OpusCatMTEngine.LocalModelListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:OpusCatMTEngine"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <local:EnumToStringConverter x:Key="DefaultEnumToStringConverter"/>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+        <local:BooleanAndConverter x:Key="booleanAndConverter" />
+        <local:InverseBooleanConverter x:Key="booleanNotConverter" />
+        <local:BooleanAndToVisibilityConverter x:Key="booleanAndToVisibilityConverter" />
+    </UserControl.Resources>
+    <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+        <StackPanel>
+            <Label Margin="10,0,0,0" FontSize="20">Installed models</Label>
+            <DockPanel Margin="10,10,10.333,10">
+                <StackPanel DockPanel.Dock="Right" Margin="10,0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="0,0,0,5" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click">Install OPUS model from Web</Button>
+                    <Button Name="addZipModel" Click="btnAddZipModel_Click">Install model from zip</Button>
+                    <Button  Name="customizeModel" Click="btnCustomizeModel_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.IsReady"/>
+                        </Button.Visibility>
+                        Fine-tune selected model
+                    </Button>
+                    <Button Name="continueCustomization" Click="btnContinueCustomization_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanContinueFinetuning"/>
+                        </Button.Visibility>
+                        Continue fine-tuning
+                    </Button>
+                    <Button Name="customizationProgress" Click="btnCustomizationProgress_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.HasProgress"/>
+                        </Button.Visibility>
+                        Show fine-tuning progress
+                    </Button>
+                    <Button Name="packageCustomModel" Click="btnpackageCustomModel_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanPackage"/>
+                        </Button.Visibility>
+                        Package fine-tuned model
+                    </Button>
+                    <Button Name="deleteModel" Click="btnDeleteModel_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanDelete"/>
+                        </Button.Visibility>
+                        Delete selected model
+                    </Button>
+                    <Button Name="translateWithModel" Click="btnTranslateWithModel_Click">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanTranslate"/>
+                        </Button.Visibility>
+                        Translate with model
+                    </Button>
+                    <!-- This is disabled until the testing functionalities can be polished a bit more
+                        <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
+                    -->
+                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="addModelTag" Click="btnEditModelTags_Click">Edit model tags</Button>
+                    <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" Name="openModelDir" Click="btnOpenModelDir_Click">Open model directory</Button>
+                    <Button Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.CanSetAsOverrideModel, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="setAsOverride" Click="btnSetOverride_Click">Set as override model</Button>
+                    <Button Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Name="cancelOverride" Click="btnCancelOverride_Click">Cancel override</Button>
+                </StackPanel>
+                <ListView 
+                    Name="LocalModelList" 
+                    Height="300" 
+                    ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}" 
+                    SelectionMode="Single"
+                    GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="1,1,1,1" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOverrideModel}" Value="true">
+                                    <Setter Property="BorderBrush" Value="Red" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsOverridden}" Value="true">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
+                            
+                            <GridViewColumn Width="220" Header="Status">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <ProgressBar Width="220" Maximum="100" Value="{Binding Path=StatusProgress, Mode=OneWay}"/>
+                                            <TextBlock HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=StatusAndEstimateString, Mode=OneWay}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="60" Header="Prioritized">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=Prioritized, Mode=TwoWay}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

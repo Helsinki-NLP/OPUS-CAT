@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="OpusCatMTEngine.TranslateView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
+        mc:Ignorable="d"
+        Height="400" Width="800">
+    <Grid>
+        <StackPanel Margin="10">
+            <Label>Source text:</Label>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="150"></TextBox>
+            </Border>
+            <StackPanel Orientation="Horizontal">
+                <Button Click="translateButton_Click">Translate</Button>
+            </StackPanel>
+            <Label>Translation:</Label>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <TextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" TextWrapping="Wrap" Name="TargetBox" Height="150"></TextBox>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

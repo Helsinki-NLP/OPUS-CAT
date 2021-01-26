@@ -1,9 +1,0 @@
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.csprojAssemblyReference.cache
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.OpusMTOptionsForm.resources
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.csproj.GenerateResource.cache
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.csproj.CoreCompileInputs.cache
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\bin\OpusMTPlugin.dll
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\bin\OpusMTPlugin.pdb
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.csproj.CopyComplete
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.dll
-C:\Users\niemi\Documents\ohjelmointi\fiskmo-trados\OpusMTPlugin\obj\Debug\OpusMTPlugin.pdb

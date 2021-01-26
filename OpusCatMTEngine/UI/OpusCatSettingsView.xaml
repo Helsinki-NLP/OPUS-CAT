@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="OpusCatMTEngine.OpusCatSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpusCatMTEngine"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="_this">
+    <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+        <StackPanel>
+            <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                <Button HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Padding="5" Click="OpenCustomSettingsInEditor_Click">Open finetune settings in text editor</Button>
+            </Border>
+            <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                <StackPanel>
+                    <TextBlock Margin="5" DockPanel.Dock="Top">
+                    <Run FontWeight="Bold">Note:</Run> Restart OPUS-CAT MT Engine after changing these values.</TextBlock>
+                    <DockPanel Margin="0,0,0,0">
+
+                        <Label DockPanel.Dock="Left">MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):</Label>
+                        <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
+                        <Button Margin="5" IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}" DockPanel.Dock="Right" Width="100"  Click="saveButton_Click">Save</Button>
+
+
+                        <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                    </DockPanel>
+                    <DockPanel Margin="0,0,0,0">
+
+                        <Label DockPanel.Dock="Left">MT service HTTP port (used with other integrations, 1024-65535):</Label>
+                        <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
+                        <Button Margin="5" IsEnabled="{Binding ElementName=_this, Path=HttpSaveButtonEnabled}" DockPanel.Dock="Right" Width="100"  Click="httpSaveButton_Click">Save</Button>
+
+
+                        <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Border>
+</UserControl>
