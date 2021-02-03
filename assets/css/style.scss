@@ -1,9 +1,8 @@
 ---
 ---
 
-@import "minima/skins/{{ site.minima.skin | default: 'classic' }}";
-@import "minima/initialize";
 img {
    padding:1px;
    border:1px solid #021a40;
 }
+@import "{{ site.theme }}";
