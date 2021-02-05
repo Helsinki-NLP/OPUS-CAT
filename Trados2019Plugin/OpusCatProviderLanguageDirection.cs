@@ -228,7 +228,11 @@ namespace OpusCatTranslationProvider
             
             if (this._options.showMtAsOrigin)
             {
+#if TRADOS21
+                tu.Origin = TranslationUnitOrigin.Nmt;
+#else
                 tu.Origin = TranslationUnitOrigin.MachineTranslation;
+#endif
             }
             else
             {
