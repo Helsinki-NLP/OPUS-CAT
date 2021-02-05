@@ -53,8 +53,12 @@
                     <Label FontWeight="Bold">Connection status</Label>
                 </StackPanel>
                 <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionControl, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></TextBlock>
-                <TextBlock Margin="5"  TextWrapping="Wrap"  Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}">Make sure OPUS-CAT MT Engine application has been installed and is running and that it uses the same connection settings as the plugin (default settings should work).</TextBlock>
-                <TextBlock Margin="5"><Hyperlink NavigateUri="https://helsinki-nlp.github.io/OPUS-CAT/" RequestNavigate="Hyperlink_RequestNavigate">
+                <TextBlock 
+                    Margin="5" 
+                    TextWrapping="Wrap"  
+                    Visibility="{Binding ElementName=ConnectionControl, Path=NoConnection, Converter={StaticResource BoolToVis}}">
+                    Make sure OPUS-CAT MT Engine application has been installed on your computer (check help link below) and is running and that it uses the same connection settings as the plugin (default settings should work).</TextBlock>
+                <TextBlock Margin="5"><Hyperlink NavigateUri="https://helsinki-nlp.github.io/OPUS-CAT/tradosplugin" RequestNavigate="Hyperlink_RequestNavigate">
                     OPUS-CAT MT online documentation
                 </Hyperlink></TextBlock>
             </StackPanel>

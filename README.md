@@ -1,6 +1,8 @@
-# Fiskmo MT Engine and CAT plugins
+# OPUS-CAT MT Engine and CAT plugins
 
-Fiskmo MT Engine is a Windows-based machine translation system built on the [Marian NMT framework](https://marian-nmt.github.io/). Fiskmo MT Engine makes it possible to use a large selection of advanced neural machine translation models natively on Windows computers. The primary purpose of Fiskmo MT Engine is to provide professional translators local, secure, and confidential neural machine translation in computer-assisted translation tools (CAT tools), which are usually Windows-based. To that end, there are plugins available for two of the most popular CAT tools, SDL Trados Studio and memoQ (Fiskmo MT can also be used in the Wordfast CAT tool as a custom provider). Fiskmo MT Engine provides pretrained MT models for a very wide selection of language pairs, courtesy of the OPUS MT project ([listing of OPUS MT models](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models)).
+OPUS-CAT MT Engine is a Windows-based machine translation system built on the [Marian NMT framework](https://marian-nmt.github.io/). OPUS-CAT MT Engine makes it possible to use a large selection of advanced neural machine translation models natively on Windows computers. The primary purpose of OPUS-CAT Engine is to provide professional translators local, secure, and confidential neural machine translation in computer-assisted translation tools (CAT tools), which are usually Windows-based. To that end, there are plugins available for two of the most popular CAT tools, SDL Trados Studio and memoQ (OPUS-CAT can also be used in the Wordfast CAT tool as a custom provider). OPUS-CAT MT Engine provides pretrained MT models for a very wide selection of language pairs, courtesy of the OPUS MT project ([listing of OPUS MT models](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models)).
+
+## Note: The documentation below is for the earlier iteration of OPUS-CAT, which was branded Fiskmo MT. OPUS-CAT documentation is currently being added to a new site. To install the latest MT Engine and plugins, go to https://helsinki-nlp.github.io/OPUS-CAT/install. 
 
 ## Quickstart for translators
 
@@ -8,8 +10,9 @@ Fiskmo MT Engine is a Windows-based machine translation system built on the [Mar
 2. Download the plugin for your translation software and install it:
   - [Trados 2017](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoTranslationProvider2017.sdlplugin): double-click plugin file to install.
   - [Trados 2019](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoTranslationProvider.sdlplugin): double-click plugin file to install.
-  - [memoQ](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder. **IMPORTANT**: Make sure to unblock the dll file before copying it (right-click file, choose **Properties**, check the **Unblock** box in the bottom right of the **Properties** window). [Detailed memoQ instructions](#using-the-fiskmo-plugin-in-memoq).
-  - Wordfast: there is currently no plugin for Wordfast, but Fiskmo MT can be used in Wordfast as a custom MT provider (this requires some configuration work, so contact Fiskmo project for assistance if you wish to use Fiskmo with Wordfast).
+  - [memoQ 9.2 or older](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll) or [memoQ 9.3 or newer](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-10-07/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder. **IMPORTANT**: Make sure to unblock the dll file before copying it (right-click file, choose **Properties**, check the **Unblock** box in the bottom right of the **Properties** window). [Detailed memoQ instructions](#using-the-fiskmo-plugin-in-memoq).
+  - Wordfast: There is currently no plugin for Wordfast, but Fiskmo MT can be used in Wordfast as a custom MT provider (this requires some configuration work, so contact Fiskmo project for assistance if you wish to use Fiskmo with Wordfast).
+  - OmegaT: There is an OmegaT plugin available for the development version of the MT engine. The plugin will be released shortly, but if you want to use the OmegaT plugin before that, contact us.  
 3. Start the Fiskmo MT Engine application by clicking FiskmoMTEngine.exe in the extraction folder.
 4. Install models from the Fiskmo model repository for the language pairs that you require.
    - Click **Install OPUS model from Web**.
@@ -61,11 +64,15 @@ If the fine-tuning is still in progress for the model with chosen tag, the conne
 
 If the project contains a lot tags, it's possible to include textual representations of tags into the fine-tuning material, in which case the fine-tuned model learns to transfer tags from the source text into the target text. The tag learning feature is experimental, so it might not work optimally in all cases (the fine-tuning material needs to contain enough tags to learn from, and the tag structure should be relatively simple). You can choose to learn  placeholder tag positions (**Include placeholder tags as text**) and tag pairs (**Include tag pairs as text**).
 
+## Installing a zipped model in the MT engine
+
+Models are normally installed in the MT engine with the **Install model from Web** functionality, but they can also be installed from files. This is useful for distributing customized models and for installing models in systems where no Internet connections are possible. To install a zipped model, click **Install model from zip**, browse to the location of the model zip in the file system, select the model zip, and click **Open**. 
+
 ## Using the Fiskmo plugin in memoQ
 
 ### Installing the memoQ plugin
 
-1. First download the [memoQ plugin file](https://github.com/Helsinki-NLP/fiskmo-trados/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll).
+1. First download the memoQ plugin file: [memoQ 9.2 or older](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll) or [memoQ 9.3 or newer](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-10-07/FiskmoMTPlugin.dll).
 2. **IMPORTANT**: Unblock the *FiskmoMTPlugin.dll* file:
   - Right-click the file and choose **Properties**.
 
@@ -132,6 +139,22 @@ You can pretranslate documents with the Fiskmo MT plugin in memoQ by performing 
 - <img src="/images/Pretranslate2.PNG?raw=true" alt="drawing" width="75%"/>
 3. Click **OK** to start pretranslation. When you open the document again, each segment with no TM matches should contain a machine translation with a match percentage of 0.
 - <img src="/images/Pretranslate3.PNG?raw=true" alt="drawing" width="75%"/>
+
+## Using the HTTP API for integrations 
+
+It's possible to obtain translations from the Fiskmo MT engine via an HTTP API. Note that the HTTP API is not enabled by default, as doing so requires system administrator permissions. To enable the HTTP API, open the command prompt as an administrator and use the **netsh** utility: 
+
+*netsh http add urlacl url=http://+:8500/ user=DOMAIN\user*
+
+(Substitute your domain and username for *DOMAIN\user*. 8500 is the port number used by the HTTP API.)
+
+Translations can be fetched from a local Fiskmo MT engine instance with requests using the following format:
+
+http://localhost:8500/MTRestService/Translate?&input=Source%20sentence%20goes%20here&srcLangCode=en&trgLangCode=fi&modelTag=
+
+A list of available language pairs can be fetched with requests using the following format:
+
+http://localhost:8500/MTRestService/ListSupportedLanguagePairs
 
 ## About
 

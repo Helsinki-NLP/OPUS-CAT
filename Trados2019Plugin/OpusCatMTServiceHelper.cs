@@ -393,7 +393,9 @@ namespace OpusCatTranslationProvider
             var proxy = getNewProxy(host, mtServicePort);
 
             //Pick out 200 sentence pairs randomly to use as tuning set
-            var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
+            //There was a bug here, there was no ToList so trainingset and validset were picked
+            //from different random lists, resulting in overlap
+            var randomTranslations = projectTranslations.OrderBy(x => rng.Next()).ToList();
             var trainingSet = randomTranslations.Skip(200).ToList();
             var validSet = randomTranslations.Take(200).ToList();
             string result;

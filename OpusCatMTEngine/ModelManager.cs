@@ -425,6 +425,9 @@ namespace OpusCatMTEngine
             bool includeTagPairs,
             MTModel baseModel)
         {
+            //Make sure here that there's no overlap between train and validation sets
+            input.RemoveAll(x => validation.Contains(x));
+
             //Write the tuning set as two files
             var fileGuid = Guid.NewGuid();
             var srcFile = Path.Combine(Path.GetTempPath(), $"{fileGuid}.{srcLang.ShortestIsoCode}");

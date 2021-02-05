@@ -186,7 +186,8 @@ namespace OpusCatTranslationProvider
 
         private List<Tuple<string, string>> ExtractFromTm(
             List<ITranslationMemoryLanguageDirection> tms,
-            List<string> uniqueNewSegments)
+            List<string> uniqueNewSegments,
+            List<Tuple<string, string>> uniqueProjectTranslations)
         {
 
             //assign fuzzy min and all above percentage divisible by ten as fuzzybands
@@ -198,7 +199,7 @@ namespace OpusCatTranslationProvider
                     tms,
                     uniqueNewSegments,
                     fuzzyBands,
-                    this.settings.MaxFinetuningSentences,
+                    this.settings.MaxFinetuningSentences-uniqueProjectTranslations.Count,
                     this.settings.ConcordanceMaxResults,
                     this.settings.FuzzyMaxResults,
                     this.settings.MaxConcordanceWindow);
@@ -249,7 +250,7 @@ namespace OpusCatTranslationProvider
             List<Tuple<string, string>> finetuneSet;
             if (this.tms[primaryTargetLanguage].Any())
             {
-                var tmExtracts = this.ExtractFromTm(this.tms[primaryTargetLanguage], uniqueNewSegments);
+                var tmExtracts = this.ExtractFromTm(this.tms[primaryTargetLanguage], uniqueNewSegments, uniqueProjectTranslations);
                 finetuneSet = uniqueProjectTranslations.Union(tmExtracts).ToList();
             }
             else
@@ -257,7 +258,7 @@ namespace OpusCatTranslationProvider
                 finetuneSet = uniqueProjectTranslations;
             }
 
-                
+            finetuneSet = finetuneSet.Take(this.settings.MaxFinetuningSentences).ToList(); 
 
             if (finetuneSet.Count() < OpusCatTpSettings.Default.FinetuningMinSentencePairs)
             {
