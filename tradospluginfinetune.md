@@ -4,14 +4,18 @@ Fine-tuning is a method of adapting an MT model to a given domain or style. Fine
 
 OPUS-CAT MT models can be fine-tuned by using a custom batch task contained in the OPUS-CAT Trados plugin. (Models can also be [fine-tuned directly in the OPUS-CAT MT Engine](https://helsinki-nlp.github.io/OPUS-CAT/enginefinetune), but the Trados plugin fine-tuning allows for more targeted selection of fine-tuning sentences).
 
-The name of the fine-tuning custom batch is **OPUS-CAT Finetune**. This task extracts sentence pairs to use as fine-tuning material and sends them to the OPUS-CAT MT Engine, which performs the fine-tuning. Because the actual fine-tuning work happens in the OPUS-CAT MT Engine, Trados can be used normally during the duration of the fine-tuning. The progress of the fine-tuning can be [monitored in the OPUS-CAT MT Engine](https://helsinki-nlp.github.io/OPUS-CAT/finetuneprogress).
+The name of the fine-tuning custom batch is **OPUS-CAT Finetune**. When this task is performed for a translation project, it extracts relevant sentence pairs from the project files and file translation memories to use as fine-tuning material. Then the task sends the fine-tuning material to the OPUS-CAT MT Engine, which performs the fine-tuning. Because the actual fine-tuning work happens in the OPUS-CAT MT Engine, Trados can be used normally during the duration of the fine-tuning. The progress of the fine-tuning can be [monitored in the OPUS-CAT MT Engine](https://helsinki-nlp.github.io/OPUS-CAT/finetuneprogress).
 
 **OPUS-CAT Finetune** task extracts sentence pairs for fine-tuning from two different sources:
 
 - Existing translations present in the translation project
 - File-based translation memories included in the project
 
-The existing translations are the primary source, since they are directly relevant to the translation project. If the project does not contain enough existing translations to meet the specified amount of fine-tuning sentence pairs, sentence pairs from the translation memories are extracted, starting with full and fuzzy matches for the source sentences in the project. Fine-tuning requires a minimum of 500 sentence pairs (although results will probably not be good with such a low amount). The maximum amount of sentence pairs for fine-tuning is 50,000.
+The existing translations are the primary source, since they are directly relevant to the translation project. The new translations must remain consistent with these existing translations, so they are especially valuable for fine-tuning MT models. Many translation projects contain so many existing translations that they can be used alone as fine-tuning material.
+
+If the project does not contain enough existing translations, sentence pairs can also be extracted from the translation memories, starting with full and fuzzy matches for the source sentences in the project. Fine-tuning requires a minimum of 500 sentence pairs (although results will probably not be good with such a low amount).
+
+The maximum amount of fine-tuning sentence pairs is 50,000 in the Trados plugin (larger fine-tuning sets can be used when [fine-tuning directly in the OPUS-CAT MT Engine](https://helsinki-nlp.github.io/OPUS-CAT/enginefinetune). This restriction is in place as the fine-tuning batch task is intended to be used for extracting fine-tuning material that is directly relevant to the current translation job, which generally means an amount of sentence pairs in the tens of thousands at most.
 
 When the fine-tuning is complete, the fine-tuned model can be used in the Trados plugin by selecting the tag of the fine-tuned model in the settings of the OPUS-CAT translation provider.
 
@@ -19,7 +23,7 @@ When the fine-tuning is complete, the fine-tuned model can be used in the Trados
 
 The **OPUS-CAT Finetune** batch task can be accessed in Trados Studio by right-clicking a project in the **Projects** view of Trados Studio and selecting **Batch tasks** and **OPUS-CAT Finetune**:
 
-  <img src="./images/SelectFinetuneTask.png?raw=true" alt="drawing" width="75%"/>
+  <img src="./images/SelectFinetuneTask.png?raw=true" alt="drawing" width="75%" />
 
 An alternative way is to select a project in the **Projects** view, click the **Batch Tasks** icon on the **Home** ribbon, and then select **OPUS-CAT Finetune**:
 
@@ -27,7 +31,7 @@ An alternative way is to select a project in the **Projects** view, click the **
 
 ### Selecting files for the OPUS-CAT Finetune batch task
 
-After you select **OPUS-CAT Finetune**, the **Batch Processing** window opens up:
+After you select **OPUS-CAT Finetune**, the **Batch Processing** window opens:
 
   <img src="./images/TradosBatchProcessing.png?raw=true" alt="drawing" width="75%"/>
 
@@ -37,7 +41,7 @@ On the **Files** page of **Batch Processing** window, you can select the files w
 
  <img src="./images/BatchProcessingFiles.png?raw=true" alt="drawing" width="75%"/>
 
-**OPUS-CAT Finetune** batch task can be performed for only one target language at a time. If the project contains multiple target languages, refer to [Projects with multiple target languages](#projects-with-multiple-target-languages).
+**NOTE**: **OPUS-CAT Finetune** batch task can be performed for only one target language at a time. If the project contains multiple target languages, refer to [Projects with multiple target languages](#projects-with-multiple-target-languages).
 
 ### The settings of the OPUS-CAT Finetune batch task
 When you click **Next** on the **Files** page of **Batch Processing** window, the **Settings** page opens and **OPUS-CAT Finetune** settings are displayed.
@@ -64,7 +68,7 @@ The following settings are available:
 
 - **Maximum fuzzies per segment**: This setting determines the maximum amount of translation memory matches extracted per each segment. This value should be kept reasonably low (5-10), since setting it too high may make the fine-tuning material too homogeneous (for instance with translation memories where there are many similar matches).
 
-- **Extract concordance matches**: This option can be used to extract concordance matches, which are sentence pairs where the source segment contains one of the words from the new segments in the project. For the most common source languages, the most common words are filtered out before extracting concordance matches by using a list of stop words (https://github.com/stopwords-iso). For instance, for the English sentence "the cat sat on the mat" concordance matches would only be extracted for the words "cat" and "mat", as the other words are very common and therefore included in the stop word list. Extracting concordance matches is more time-consuming than other methods of extracting fine-tuning material from translation memories. Concordance matches are not as relevant to the current job as normal translation memory matches, but they are more relevant than randomly extracted sentence pairs.
+- **Extract concordance matches**: This option can be used to extract concordance matches, which are sentence pairs where the source segment contains one of the words from the new segments in the project. For the most common source languages, the most frequently used words are filtered out before extracting concordance matches by using a list of stop words (https://github.com/stopwords-iso). For instance, for the English sentence "the cat sat on the mat" concordance matches would only be extracted for the words "cat" and "mat", as the other words are very common and therefore included in the stop word list. Extracting concordance matches is more time-consuming than other methods of extracting fine-tuning material from translation memories. Concordance matches are not as relevant to the current job as normal translation memory matches, but they are more relevant than randomly extracted sentence pairs.
 
 - **Extract filler units**: If this option is checked, sentence pairs are extracted from the translation memory until the amount of sentence pairs specified in **Maximum amount of sentences for fine-tuning** is reached. The sentence pairs are extracted based on their creation date and time, and newest sentence pairs are extracted first. This option is useful if a sufficient amount of fine-tuning material cannot be extracted with the other extraction methods.
 
