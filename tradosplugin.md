@@ -1,3 +1,8 @@
+---
+layout: page
+title: Trados plugin
+permalink: /tradosplugin
+---
 ## Quickstart for translators
 
 1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.0.0.4/OpusCatMTEngine_v1.0.0.4.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 

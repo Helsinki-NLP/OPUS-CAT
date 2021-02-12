@@ -1,4 +1,8 @@
-## Monitoring the progress of fine-tuning
+---
+layout: page
+title: Monitoring the progress of fine-tuning
+permalink: /finetuneprogress
+---
 
 As fine-tuning can take a long time, it is useful to monitor its progress to make sure everything is working correctly.
 
