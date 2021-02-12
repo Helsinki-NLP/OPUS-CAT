@@ -11,6 +11,6 @@ OPUS-CAT MT Engine is a Windows-based machine translation system built on the [M
 **NOTE**: This documentation is a work in progress, and parts will be added as soon as possible. Old documentation for the previous iteration of OPUS-CAT (branded as Fiskmo MT) is still available on the [README.md page](https://github.com/Helsinki-NLP/OPUS-CAT/blob/master/README.md) of the OPUS-CAT repository. The screenshots and UI terms may be different in the old documentation, and some functionalities have changed.
 
 Current documentation pages:
-- [Installation](/install)
-- [Fine-tuning in the engine](/enginefinetune)
-- [Monitoring fine-tuning progress](/finetuneprogress)
+- [Installation](./install)
+- [Fine-tuning in the engine](./enginefinetune)
+- [Monitoring fine-tuning progress](./finetuneprogress)
