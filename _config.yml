@@ -16,8 +16,8 @@
 title: OPUS-CAT
 description: >- # this means to ignore newlines until "baseurl:"
   OPUS-CAT is a collection of software which makes it possible to OPUS-MT neural machine translation models in professional translation. OPUS-CAT includes a local offline MT engine and a collection of CAT tool plugins.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/OPUS-CAT" # the subpath of your site, e.g. /blog
+url: "https://helsinki-nlp.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 #github_username:  jekyll
 
