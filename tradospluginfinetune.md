@@ -6,9 +6,9 @@ permalink: /tradospluginfinetune
  
 Fine-tuning is a method of adapting an MT model to a given domain or style. Fine-tuning requires a collection of bilingual sentences (with same source and target languages as the model to be fine-tuned), which represent the domain or style that the MT model should adapt to. For instance, a model can be adapted for medical translation by fine-tuning it with bilingual medical texts. Fine-tuning may take several hours, but it can improve MT quality significantly.
 
-OPUS-CAT MT models can be fine-tuned by using a custom batch task contained in the OPUS-CAT Trados plugin. (Models can also be [fine-tuned directly in the OPUS-CAT MT Engine](/enginefinetune), but the Trados plugin fine-tuning allows for more targeted selection of fine-tuning sentences).
+OPUS-CAT MT models can be fine-tuned by using a custom batch task contained in the OPUS-CAT Trados plugin. (Models can also be [fine-tuned directly in the OPUS-CAT MT Engine](./enginefinetune), but the Trados plugin fine-tuning allows for more targeted selection of fine-tuning sentences).
 
-The name of the fine-tuning custom batch is **OPUS-CAT Finetune**. When this task is performed for a translation project, it extracts relevant sentence pairs from the project files and file translation memories to use as fine-tuning material. Then the task sends the fine-tuning material to the OPUS-CAT MT Engine, which performs the fine-tuning. Because the actual fine-tuning work happens in the OPUS-CAT MT Engine, Trados can be used normally during the duration of the fine-tuning. The progress of the fine-tuning can be [monitored in the OPUS-CAT MT Engine](/finetuneprogress).
+The name of the fine-tuning custom batch is **OPUS-CAT Finetune**. When this task is performed for a translation project, it extracts relevant sentence pairs from the project files and file translation memories to use as fine-tuning material. Then the task sends the fine-tuning material to the OPUS-CAT MT Engine, which performs the fine-tuning. Because the actual fine-tuning work happens in the OPUS-CAT MT Engine, Trados can be used normally during the duration of the fine-tuning. The progress of the fine-tuning can be [monitored in the OPUS-CAT MT Engine](./finetuneprogress).
 
 **OPUS-CAT Finetune** task extracts sentence pairs for fine-tuning from two different sources:
 
@@ -19,7 +19,7 @@ The existing translations are the primary source, since they are directly releva
 
 If the project does not contain enough existing translations, sentence pairs can also be extracted from the translation memories, starting with full and fuzzy matches for the source sentences in the project. Fine-tuning requires a minimum of 500 sentence pairs (although results will probably not be good with such a low amount).
 
-The maximum amount of fine-tuning sentence pairs is 50,000 in the Trados plugin (larger fine-tuning sets can be used when [fine-tuning directly in the OPUS-CAT MT Engine](/enginefinetune). This restriction is in place as the fine-tuning batch task is intended to be used for extracting fine-tuning material that is directly relevant to the current translation job, which generally means an amount of sentence pairs in the tens of thousands at most.
+The maximum amount of fine-tuning sentence pairs is 50,000 in the Trados plugin (larger fine-tuning sets can be used when [fine-tuning directly in the OPUS-CAT MT Engine](./enginefinetune). This restriction is in place as the fine-tuning batch task is intended to be used for extracting fine-tuning material that is directly relevant to the current translation job, which generally means an amount of sentence pairs in the tens of thousands at most.
 
 When the fine-tuning is complete, the fine-tuned model can be used in the Trados plugin by selecting the tag of the fine-tuned model in the settings of the OPUS-CAT translation provider.
 
@@ -95,7 +95,7 @@ Once the processing is complete, the **Close** button is enabled and you can clo
 
   <img src="./images/BatchTaskTrainingStarted.png?raw=true" alt="drawing" width="75%"/>
 
-More information about monitoring the progress of fine-tuning can be found [here](/finetuneprogress).
+More information about monitoring the progress of fine-tuning can be found [here](./finetuneprogress).
 
 
 ### Projects with multiple target languages
