@@ -38,6 +38,11 @@ Most CAT tools support exporting translation memories in the TMX format, see the
 
 See [here](finetuneprogress.md) for information about monitoring the progress of fine-tuning.
 
+### Fine-tuning and tag processing
+
+Bilingual files may contain tags. The base OPUS models that OPUS-CAT uses do not support translation of tagged text, instead the tags are stripped away before the text is translated, and the resulting machine translation contains no tags. However, when fine-tuning a model, it is possible to specify that tags are to be included in the fine-tuning material as text markers by using the **Include placeholder tags as texts** and **Include tag pairs as texts** check boxes. This allows the fine-tuned model to learn how to place the text markers in the translation. If a model has been fine-tuned with these options, the Trados plugin will attempt to place tags to the translation based on these text markers. This feature is not yet supported for other CAT tools. This is an experimental feature, so it is disabled by default.
+
+
 ### Initiating fine-tuning from the OPUS-CAT MT Engine with an aligned pair of source and target language files
 
 The process is otherwise the same as with TMX fine-tuning, except that instead of selecting a TMX file (steps 2 and 3), you click the radio button labeled **Text (separate files for source target)** and browse for the source and target files.
