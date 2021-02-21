@@ -1,4 +1,8 @@
-## Fine-tuning a model in the OPUS-CAT MT Engine
+---
+layout: page
+title: Fine-tuning a model in the OPUS-CAT MT Engine
+permalink: /enginefinetune
+---
 
 Fine-tuning is a method of adapting an MT model to a given domain or style. Fine-tuning requires a collection of bilingual sentences (with same source and target languages as the model to be fine-tuned), which represent the domain or style that the MT model should adapt to. For instance, a model can be adapted for medical translation by fine-tuning it with bilingual medical texts. Fine-tuning may take several hours, but it can improve MT quality significantly.
 
@@ -10,27 +14,27 @@ Most CAT tools support exporting translation memories in the TMX format, see the
 
 1. Select a model to fine-tune from the **Models** tab of the OPUS-CAT MT Engine and click **Fine-tune model**:
 
-    <img style="border:2px solid black" src="./images/enginefinetune1.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune1.png?raw=true" alt="drawing" width="75%"/>
 
 
 2. The **Fine-tune model** tab opens. Click **Browse** next to the **Tmx file** box:
 
-    <img style="border:2px solid black" src="./images/enginefinetune2.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune2.png?raw=true" alt="drawing" width="75%"/>
 
 
 3. In the file dialog that opens, select a .tmx file and click **Open**:
 
-    <img style="border:2px solid black" src="./images/enginefinetune3.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune3.png?raw=true" alt="drawing" width="75%"/>
 
 
 4. Path of the selected .tmx file should now appear in the **Tmx file** box. Enter a label for the fine-tuned model in the **Fine-tuned model label** box and click **Fine-tune**:
 
-    <img style="border:2px solid black" src="./images/enginefinetune4.png?raw=true" alt="drawing" width="75%"/>
+    <img src="./images/enginefinetune4.png?raw=true" alt="drawing" width="75%"/>
 
 
 5. After you have clicked **Fine-tune**, the **Fine-tune** button should disappear. When you switch to the **Models** tab, the fine-tuned model should be visible in the model list (its name is a combination of the base model name and the fine-tuned model label):
 
-      <img style="border:2px solid black" src="./images/enginefinetune5.png?raw=true" alt="drawing" width="75%"/>
+      <img src="./images/enginefinetune5.png?raw=true" alt="drawing" width="75%"/>
 
 See [here](finetuneprogress.md) for information about monitoring the progress of fine-tuning.
 
