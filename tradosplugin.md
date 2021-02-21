@@ -20,8 +20,8 @@ permalink: /tradosplugin
        <img src="./images/TestTranslation.PNG?raw=true" alt="drawing" width="75%"/>
 6. Start your version of Trados Studio, and add the OPUS-CAT plugin to a translation project.
     - Select the project and click the **Project Settings** button in  the **Home** tab of the Studio ribbon.
-      - <img style="border:2px solid black" src="./images/ProjectSettings.PNG?raw=true" alt="drawing" width="75%"/>
+      <img src="./images/ProjectSettings.png?raw=true" alt="drawing" width="75%"/>
     - The **Project Settings** window opens. Select **Language Pairs** and then select **All Language Pairs** (or a specific language pair, if the project has been set up to use different translation providers for different language pairs), and then select **Translation Memory and Automated Translation**. Click **Use** and select **OPUS-CAT** from the list.
-      - <img style="border:2px solid black" src="./images/TpSettings.PNG?raw=true" alt="drawing" width="75%"/>
+      <img src="./images/TpSettings.png?raw=true" alt="drawing" width="75%"/>
 
       
