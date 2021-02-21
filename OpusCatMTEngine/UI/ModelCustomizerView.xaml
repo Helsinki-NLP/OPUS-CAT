@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         x:Name="_this"
         Height="500" Width="700">
@@ -50,70 +51,120 @@
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <StackPanel Margin="5,0,0,5">
-                        <Label>
-                            <Bold>Training files</Bold>
-                        </Label>
-                        <RadioButton IsChecked="True" Name="TmxFiles" Checked="ModeButton_Checked" GroupName="Format">TMX translation memory</RadioButton>
-                        <RadioButton Name="TxtFiles" Checked="ModeButton_Checked" GroupName="Format">Text (separate files for source and target)</RadioButton>
+                        <Label FontWeight="Bold" Content="{x:Static resx:Resources.TrainingFilesLabel}"/>
+                        <RadioButton 
+                            IsChecked="True" 
+                            Name="TmxFiles" 
+                            Checked="ModeButton_Checked" 
+                            GroupName="Format"
+                            Content="{x:Static resx:Resources.TmxRadioButton}"/>
+                        <RadioButton
+                            Name="TxtFiles"
+                            Checked="ModeButton_Checked"
+                            GroupName="Format"
+                            Content="{x:Static resx:Resources.TxtFilesRadioButton}"/>
                         <!--<RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Format">Batch translate only</RadioButton>-->
                     </StackPanel>
-                    <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
-                        <Label>Source file</Label>
+                    <StackPanel 
+                        IsEnabledChanged="ReValidate" 
+                        IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" 
+                        Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}"
+                        Style="{StaticResource StackStyle}"
+                        Orientation="Horizontal">
+                        <Label Content="{x:Static resx:Resources.SourceFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="SourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=SourceFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
-                        <Button DataContext="{Binding ElementName=SourceFileBox}" Click="browse_Click">Browse</Button>
+                        <Button 
+                            DataContext="{Binding ElementName=SourceFileBox}" 
+                            Click="browse_Click"
+                            Content="{x:Static resx:Resources.BrowseButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TmxFiles}" Visibility="{Binding IsChecked,ElementName=TmxFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
-                        <Label>Tmx file</Label>
-                        <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TmxFileBox" Width="400" Text="{Binding ElementName=_this,Path=TmxFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
-                        <Button DataContext="{Binding ElementName=TmxFileBox}" Tag="TMX Files|*.tmx" Click="browse_Click">Browse</Button>
+                        <Label Content="{x:Static resx:Resources.TmxFileLabel}"/>
+                        <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TmxFileBox" Width="400" Text="{Binding ElementName=_this,Path=TmxFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"/>
+                        <Button
+                            DataContext="{Binding ElementName=TmxFileBox}" 
+                            Tag="TMX Files|*.tmx" 
+                            Click="browse_Click"
+                            Content="{x:Static resx:Resources.BrowseButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                        <Label>Target file</Label>
+                        <Label Content="{x:Static resx:Resources.TargetFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=TargetFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
-                        <Button DataContext="{Binding ElementName=TargetFileBox}" Click="browse_Click">Browse</Button>
+                        <Button
+                            DataContext="{Binding ElementName=TargetFileBox}"
+                            Click="browse_Click"
+                            Content="{x:Static resx:Resources.BrowseButton}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel Margin="5,0,0,5">
-                    <Label>
-                        <Bold>Tag processing</Bold>
-                    </Label>
-                    <CheckBox Margin="0,5,0,0" Name="IncludePlaceholderTagsBox">Include placeholder tags as text</CheckBox>
-                    <CheckBox Margin="0,5,0,0" Name="IncludeTagPairBox">Include tag pairs as text</CheckBox>
+                    <Label FontWeight="Bold" Content="{x:Static resx:Resources.TagProcessingLabel}"/>
+
+                    <CheckBox
+                        Margin="0,5,0,0"
+                        Name="IncludePlaceholderTagsBox"
+                        Content="{x:Static resx:Resources.IncludePlaceholderTagsCheckbox}"/>
+                    <CheckBox 
+                        Margin="0,5,0,0" 
+                        Name="IncludeTagPairBox"
+                        Content="{x:Static resx:Resources.IncludeTagPairsCheckbox}"/>
                 </StackPanel>
 
             </Border>
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <StackPanel Margin="5,0,0,5">
-                        <Label ToolTip="">
-                            <Bold>Validation files (for monitoring the progress of training)</Bold>
-
+                        <Label 
+                            FontWeight="Bold" 
+                            ToolTip=""
+                            Content="{x:Static resx:Resources.ValidationFilesLabel}">
                         </Label>
-                        <RadioButton IsChecked="True" Name="SplitValidationFiles" Checked="ValidationFileTypeButton_Checked" GroupName="ValidationType">Split validation files from the training files</RadioButton>
-                        <RadioButton Name="SeparateValidationFiles" Checked="ValidationFileTypeButton_Checked" GroupName="ValidationType">Select separate files</RadioButton>
+                        <RadioButton 
+                            IsChecked="True" 
+                            Name="SplitValidationFiles" 
+                            Checked="ValidationFileTypeButton_Checked" 
+                            GroupName="ValidationType"
+                            Content="{x:Static resx:Resources.SplitFromTrainingRadioButton}"/>
+                        <RadioButton 
+                            Name="SeparateValidationFiles" 
+                            Checked="ValidationFileTypeButton_Checked" 
+                            GroupName="ValidationType"
+                            Content="{x:Static resx:Resources.SeparateFilesRadioButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                        <Label>Validation source file</Label>
+                        <Label Content="{x:Static resx:Resources.ValidationSourceFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="ValidSourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidSourceFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
-                        <Button DataContext="{Binding ElementName=ValidSourceFileBox}" Click="browse_Click">Browse</Button>
+                        <Button 
+                            DataContext="{Binding ElementName=ValidSourceFileBox}" 
+                            Click="browse_Click" 
+                            Content="{x:Static resx:Resources.BrowseButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                        <Label>Validation target file</Label>
+                        <Label Content="{x:Static resx:Resources.ValidationTargetFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="ValidTargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidTargetFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
-                        <Button DataContext="{Binding ElementName=ValidTargetFileBox}" Click="browse_Click">Browse</Button>
+                        <Button 
+                            DataContext="{Binding ElementName=ValidTargetFileBox}" 
+                            Click="browse_Click"
+                            Content="{x:Static resx:Resources.BrowseButton}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
             <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                <Label>Fine-tuned model label</Label>
+                <Label Content="{x:Static resx:Resources.FinetunedModelTagLabel}"/>
                 <TextBox IsEnabled="{Binding ElementName=_this,Path=CustomizationNotStarted, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ValidatedTextBoxStyle}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
             </StackPanel>
         </StackPanel>
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
             <!--<Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>-->
-            <Button Name="CustomizeButton" DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Click="customize_Click">
+            <Button 
+                Name="CustomizeButton" 
+                DockPanel.Dock="Right" 
+                Margin="5" 
+                Height="30" 
+                Width="100" 
+                Click="customize_Click"
+                Content="{x:Static resx:Resources.StartFinetuneButton}">
                 <Button.Visibility>
                     <Binding ElementName="_this" Path="CustomizationNotStarted"  UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource BoolToVis}"/>
                 </Button.Visibility>
@@ -127,7 +178,6 @@
                         <Binding ElementName="TmxFileBox" Path="(Validation.Errors)[0]"/>
                     </MultiBinding>
                 </Button.IsEnabled>
-                Fine-tune
             </Button>
         </DockPanel>
     </DockPanel>

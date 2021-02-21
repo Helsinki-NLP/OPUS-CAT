@@ -33,7 +33,7 @@ namespace OpusCatMTEngine
             get
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
-                return "OPUS-CAT MT Engine v" + version;
+                return String.Format(OpusCatMTEngine.Properties.Resources.OpusCatWindowTitle, version);
             }
         }
 
@@ -43,8 +43,8 @@ namespace OpusCatMTEngine
         {
             if (this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
             {
-                MessageBoxResult result = MessageBox.Show("A customization or a batch translation is in progress. Customization can be resumed from the last save later. Are you sure you want to close the OpusCAT Engine?",
-                                          "Confirmation",
+                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.ConfirmExitMessage,
+                                          OpusCatMTEngine.Properties.Resources.ConfirmExitCaption,
                                           MessageBoxButton.YesNo,
                                           MessageBoxImage.Question);
                 if (result != MessageBoxResult.Yes)
@@ -93,9 +93,9 @@ namespace OpusCatMTEngine
             var localModels = new LocalModelListView(this.ModelManager);
             var settings = new OpusCatSettingsView();
             this.UiTabs.Add(
-                new ActionTabItem { Content = localModels, Header = "Models", Closable = false });
+                new ActionTabItem { Content = localModels, Header = OpusCatMTEngine.Properties.Resources.ModelsTabTitle, Closable = false });
             this.UiTabs.Add(
-                new ActionTabItem { Content = settings, Header = "Settings", Closable = false });
+                new ActionTabItem { Content = settings, Header = OpusCatMTEngine.Properties.Resources.SettingsTabTitle, Closable = false });
 
             this.DataContext = this;
             this.serviceHost = service.StartService(this.ModelManager);

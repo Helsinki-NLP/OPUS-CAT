@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         Height="450" Width="800">
     <Grid>
         <StackPanel>
-            <Label Margin="10,0,0,0" FontSize="20">Model tags</Label>
+            <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.ModelTagsLabel}"/>
             <DockPanel Margin="10">
                 <StackPanel DockPanel.Dock="Right" Margin="10,0">
                     <StackPanel.Resources>
@@ -37,7 +38,11 @@
                             <GridViewColumn>
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Name="DeleteTag" Tag="{Binding .}" Click="DeleteTag_Click">Delete</Button>
+                                        <Button 
+                                            Name="DeleteTag" 
+                                            Tag="{Binding .}" 
+                                            Click="DeleteTag_Click"
+                                            Content="{x:Static resx:Resources.DeleteTagButton}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -48,7 +53,11 @@
 
             </DockPanel>
             <StackPanel Orientation="Horizontal">
-                <Button IsEnabled="{Binding ElementName=TagTextBox,Path=Text.Length}" Name="add" Click="add_Click">Add tag</Button>
+                <Button 
+                    IsEnabled="{Binding ElementName=TagTextBox,Path=Text.Length}" 
+                    Name="add" 
+                    Click="add_Click"
+                    Content="{x:Static resx:Resources.AddTagButton}"/>
                 <TextBox x:Name="TagTextBox" />
             </StackPanel>
         </StackPanel>

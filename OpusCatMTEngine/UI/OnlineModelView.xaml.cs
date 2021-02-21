@@ -41,9 +41,9 @@ namespace OpusCatMTEngine
 
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
-            model.InstallStatus = "Extracting";
+            model.InstallStatus = OpusCatMTEngine.Properties.Resources.ExtractingStatus;
             this.modelManager.ExtractModel(model.ModelPath);
-            model.InstallStatus = "Installed";
+            model.InstallStatus = OpusCatMTEngine.Properties.Resources.InstalledStatus;
             this.modelManager.GetLocalModels();
         }
 
@@ -57,7 +57,7 @@ namespace OpusCatMTEngine
                     continue;
                 }
 
-                selectedModel.InstallStatus = "Downloading";
+                selectedModel.InstallStatus = OpusCatMTEngine.Properties.Resources.DownloadingStatus;
                 this.modelManager.DownloadModel(
                     selectedModel.ModelPath,
                     selectedModel.DownloadProgressChanged,

@@ -117,8 +117,225 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddTagButton" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="BleuAxis" xml:space="preserve">
+    <value>BLEU score</value>
+  </data>
+  <data name="BrowseButton" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="ConfirmExitCaption" xml:space="preserve">
+    <value>Confirm exit</value>
+  </data>
+  <data name="ConfirmExitMessage" xml:space="preserve">
+    <value>Fine-tuning or batch translation is in progress. Fine-tuning can be resumed later from the last save point, but batch translation will be aborted permanently. Are you sure you want to close the OpusCAT MT Engine?</value>
+  </data>
+  <data name="ContinueFinetuneButton" xml:space="preserve">
+    <value>Continue fine-tuning</value>
+  </data>
+  <data name="CustomizationProgressButton" xml:space="preserve">
+    <value>Show fine-tuning progress</value>
+  </data>
+  <data name="DeleteModelButton" xml:space="preserve">
+    <value>Delete selected model</value>
+  </data>
+  <data name="DeleteModelConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete model {0}? Deletion is permanent.</value>
+  </data>
+  <data name="DeleteModelConfirmationTitle" xml:space="preserve">
+    <value>Delete Confirmation</value>
+  </data>
+  <data name="DeleteTagButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DownloadingStatus" xml:space="preserve">
+    <value>Downloading</value>
+  </data>
+  <data name="EditModelTagsButton" xml:space="preserve">
+    <value>Edit model tags</value>
+  </data>
+  <data name="EditTagsTitle" xml:space="preserve">
+    <value>Edit tags for {0}</value>
+  </data>
+  <data name="ExtractingStatus" xml:space="preserve">
+    <value>Extracting</value>
+  </data>
+  <data name="FileDoesNotExistMessage" xml:space="preserve">
+    <value>File does not exist.</value>
+  </data>
+  <data name="FinetuneButton" xml:space="preserve">
+    <value>Fine-tune selected model</value>
+  </data>
+  <data name="FinetunedModelTagLabel" xml:space="preserve">
+    <value>Fine-tuned model label</value>
+  </data>
+  <data name="FineTuneWindowTitle" xml:space="preserve">
+    <value>Fine-tune model {0}</value>
+  </data>
+  <data name="GenericValidationErrorMessage" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="HttpPortLabel" xml:space="preserve">
+    <value>MT service HTTP port (used with other integrations, 1024-65535):</value>
+  </data>
+  <data name="IncludePlaceholderTagsCheckbox" xml:space="preserve">
+    <value>Include placeholder tags as text</value>
+  </data>
+  <data name="IncludeTagPairsCheckbox" xml:space="preserve">
+    <value>Include tag pairs as text</value>
+  </data>
+  <data name="InDomainSeriesName" xml:space="preserve">
+    <value>In-domain validation set</value>
+  </data>
+  <data name="InstallationProgressHeader" xml:space="preserve">
+    <value>Installation progress</value>
+  </data>
+  <data name="InstalledStatus" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="InstallFromWebButton" xml:space="preserve">
+    <value>Install OPUS model from Web</value>
+  </data>
+  <data name="InstallFromZipButton" xml:space="preserve">
+    <value>Install model from zip</value>
+  </data>
+  <data name="InstallModelLocallyButton" xml:space="preserve">
+    <value>Install model locally</value>
+  </data>
+  <data name="ModelNameFilterLabel" xml:space="preserve">
+    <value>Model name filter</value>
+  </data>
+  <data name="ModelNameHeader" xml:space="preserve">
+    <value>Model name</value>
+  </data>
+  <data name="ModelsTabTitle" xml:space="preserve">
+    <value>Models</value>
+  </data>
+  <data name="ModelTagInUseMessage" xml:space="preserve">
+    <value>Model tag is already in use for this base model</value>
+  </data>
+  <data name="ModelTagNotSpecifiedMessage" xml:space="preserve">
+    <value>Model tag not specified.</value>
+  </data>
+  <data name="ModelTagsLabel" xml:space="preserve">
+    <value>Model tags</value>
+  </data>
+  <data name="ModelTagTooLongMessage" xml:space="preserve">
+    <value>Model tag is too long.</value>
+  </data>
+  <data name="NetTcpPortLabel" xml:space="preserve">
+    <value>MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):</value>
+  </data>
+  <data name="NoteHeading" xml:space="preserve">
+    <value>Note:</value>
+  </data>
+  <data name="OnlineModelsTab" xml:space="preserve">
+    <value>Online models</value>
+  </data>
+  <data name="OpenModelDirButton" xml:space="preserve">
+    <value>Open model directory</value>
+  </data>
+  <data name="OpenSettingsFileButton" xml:space="preserve">
+    <value>Open finetune settings in text editor</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="opus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\UI\opus.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OpusCatWindowTitle" xml:space="preserve">
+    <value>OPUS-CAT MT Engine v{0}</value>
+    <comment>{0} will be replaced with version number</comment>
+  </data>
+  <data name="OutOfDomainSeriesName" xml:space="preserve">
+    <value>Out-of-domain validation set</value>
+  </data>
+  <data name="PackageModelButton" xml:space="preserve">
+    <value>Package fine-tuned model</value>
+  </data>
+  <data name="RestartReminder" xml:space="preserve">
+    <value>Restart OPUS-CAT MT Engine after changing these values.</value>
+  </data>
+  <data name="SaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SeparateFilesRadioButton" xml:space="preserve">
+    <value>Select separate files</value>
+  </data>
+  <data name="SetAsOverrideModelButton" xml:space="preserve">
+    <value>Set as override model</value>
+  </data>
+  <data name="SettingsTabTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SourceFileLabel" xml:space="preserve">
+    <value>Source file</value>
+  </data>
+  <data name="SourceLangFilterLabel" xml:space="preserve">
+    <value>Source filter</value>
+  </data>
+  <data name="SourceLanguagesHeader" xml:space="preserve">
+    <value>Source languages</value>
+  </data>
+  <data name="SourceTextLabel" xml:space="preserve">
+    <value>Source text:</value>
+  </data>
+  <data name="SplitFromTrainingRadioButton" xml:space="preserve">
+    <value>Split validation files from the training files</value>
+  </data>
+  <data name="StartFinetuneButton" xml:space="preserve">
+    <value>Fine-tune</value>
+  </data>
+  <data name="TagProcessingLabel" xml:space="preserve">
+    <value>Tag processing</value>
+  </data>
+  <data name="TargetFileLabel" xml:space="preserve">
+    <value>Target file</value>
+  </data>
+  <data name="TargetLangFilterLabel" xml:space="preserve">
+    <value>Target filter</value>
+  </data>
+  <data name="TargetLanguagesHeader" xml:space="preserve">
+    <value>Target languages</value>
+  </data>
+  <data name="TmxFileLabel" xml:space="preserve">
+    <value>Tmx file</value>
+  </data>
+  <data name="TmxFileNotValidMessage" xml:space="preserve">
+    <value>{0} is not a valid .tmx file</value>
+  </data>
+  <data name="TmxRadioButton" xml:space="preserve">
+    <value>TMX translation memory</value>
+  </data>
+  <data name="TrainingFilesLabel" xml:space="preserve">
+    <value>Training files</value>
+  </data>
+  <data name="TranslateButton" xml:space="preserve">
+    <value>Translate</value>
+  </data>
+  <data name="TranslateTitle" xml:space="preserve">
+    <value>Translating with model 0}</value>
+  </data>
+  <data name="TranslateWithModelButton" xml:space="preserve">
+    <value>Translate with model</value>
+  </data>
+  <data name="TranslationLabel" xml:space="preserve">
+    <value>Translation:</value>
+  </data>
+  <data name="TxtFilesRadioButton" xml:space="preserve">
+    <value>Text (separate files for source and target)</value>
+  </data>
+  <data name="ValidationFilesLabel" xml:space="preserve">
+    <value>Validation files (for monitoring the progress of training)</value>
+  </data>
+  <data name="ValidationSourceFileLabel" xml:space="preserve">
+    <value>Validation source file</value>
+  </data>
+  <data name="ValidationStepAxis" xml:space="preserve">
+    <value>Validation step</value>
+  </data>
+  <data name="ValidationTargetFileLabel" xml:space="preserve">
+    <value>Validation target file</value>
   </data>
 </root>

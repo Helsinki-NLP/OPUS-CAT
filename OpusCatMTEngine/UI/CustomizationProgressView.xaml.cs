@@ -80,11 +80,12 @@ namespace OpusCatMTEngine
             this.SeriesCollection = new SeriesCollection();
 
             var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
-            var inDomainSeries = this.ScoresToSeries(inDomainFiles, "In-domain");
+            var inDomainSeries = this.ScoresToSeries(inDomainFiles,OpusCatMTEngine.Properties.Resources.InDomainSeriesName);
+            
             this.SeriesCollection.Add(inDomainSeries);
 
             var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
-            var outOfDomainSeries = this.ScoresToSeries(outOfDomainFiles, "Out-of-domain");
+            var outOfDomainSeries = this.ScoresToSeries(outOfDomainFiles, OpusCatMTEngine.Properties.Resources.OutOfDomainSeriesName);
             this.SeriesCollection.Add(outOfDomainSeries);
 
             InitializeComponent();

@@ -4,16 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
-        Height="450" Width="800">
+        Height="350" Width="800">
     <Grid>
         <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Right" >
             <lvc:CartesianChart.AxisY>
-                <lvc:Axis MaxValue="100" MinValue="0" Title="BLEU"></lvc:Axis>
+                <lvc:Axis MaxValue="100" MinValue="0" Title="{x:Static resx:Resources.BleuAxis}"></lvc:Axis>
             </lvc:CartesianChart.AxisY>
             <lvc:CartesianChart.AxisX>
-                <lvc:Axis Title="Validation"></lvc:Axis>
+                <lvc:Axis Title="{x:Static resx:Resources.ValidationStepAxis}">
+                    <lvc:Axis.Separator>
+                        <lvc:Separator Step="1" />
+                    </lvc:Axis.Separator>
+                </lvc:Axis>
             </lvc:CartesianChart.AxisX>
         </lvc:CartesianChart>
     </Grid>

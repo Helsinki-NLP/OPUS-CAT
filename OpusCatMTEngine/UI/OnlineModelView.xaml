@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpusCatMTEngine"
+             xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="750">
     <Grid>
@@ -27,9 +28,9 @@
                     <RowDefinition Height="25"></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Grid.Column="0">Source filter</Label>
-                <Label Grid.Row="0" Grid.Column="1">Target filter</Label>
-                <Label Grid.Row="0" Grid.Column="2">Model name filter</Label>
+                <Label Grid.Row="0" Grid.Column="0" Content="{x:Static resx:Resources.SourceLangFilterLabel}"/>
+                <Label Grid.Row="0" Grid.Column="1" Content="{x:Static resx:Resources.TargetLangFilterLabel}"/>
+                <Label Grid.Row="0" Grid.Column="2" Content="{x:Static resx:Resources.ModelNameFilterLabel}"/>
 
                 <TextBox Grid.Row="1" Grid.Column="0" Margin="0,0,0,10" Name="txtFilter" TextChanged="sourceLangFilter_TextChanged"></TextBox>
                 <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="txtFilter1" TextChanged="targetLangFilter_TextChanged"></TextBox>
@@ -43,11 +44,13 @@
                         <Setter Property="Padding" Value="10,10,10,10" />
                     </Style>
                 </StackPanel.Resources>
-                <Button Name="installModel" Click="btnInstall_Click">
+                <Button 
+                    Name="installModel" 
+                    Click="btnInstall_Click" 
+                    Content="{x:Static resx:Resources.InstallModelLocallyButton}">
                     <Button.IsEnabled>
                         <Binding ElementName="ModelListView" Path="SelectedItems.Count"></Binding>
                     </Button.IsEnabled>
-                    Install model locally
                 </Button>
             </StackPanel>
             <Grid>
@@ -69,10 +72,10 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
-                        <GridViewColumn Header="Installation progress" x:Name="InstallProgress">
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.SourceLanguagesHeader}" Width="100"/>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.TargetLanguagesHeader}" Width="100" />
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.ModelNameHeader}" Width="200"/>
+                            <GridViewColumn Header="{x:Static resx:Resources.InstallationProgressHeader}" x:Name="InstallProgress">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>

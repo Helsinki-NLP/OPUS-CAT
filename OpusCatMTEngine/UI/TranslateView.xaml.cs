@@ -30,7 +30,7 @@ namespace OpusCatMTEngine
         public TranslateView(MTModel selectedModel)
         {
             this.Model = selectedModel;
-            this.Title = $"Translating with model {Model.Name}";
+            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.TranslateTitle, Model.Name);
             InitializeComponent();
         }
 

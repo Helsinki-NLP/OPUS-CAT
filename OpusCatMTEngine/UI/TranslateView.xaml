@@ -4,18 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         Height="400" Width="800">
     <Grid>
         <StackPanel Margin="10">
-            <Label>Source text:</Label>
+            <Label Content="{x:Static resx:Resources.SourceTextLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
                 <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="150"></TextBox>
             </Border>
             <StackPanel Orientation="Horizontal">
-                <Button Click="translateButton_Click">Translate</Button>
+                <Button 
+                    Click="translateButton_Click" 
+                    Content="{x:Static resx:Resources.TranslateButton}"/>
             </StackPanel>
-            <Label>Translation:</Label>
+            <Label Content="{x:Static resx:Resources.TranslationLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
                 <TextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" TextWrapping="Wrap" Name="TargetBox" Height="150"></TextBox>
             </Border>
