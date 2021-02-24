@@ -25,8 +25,8 @@ namespace OpusCatMTEngine
             else
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
-                    new Uri($"http://localhost:{OpusCatMTEngineSettings.Default.HttpMtServicePort}/") };
+                    new Uri($"net.tcp://127.0.0.1:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
+                    new Uri($"http://127.0.0.1:{OpusCatMTEngineSettings.Default.HttpMtServicePort}/") };
             };
 
             var mtService = new MTService(modelManager);
