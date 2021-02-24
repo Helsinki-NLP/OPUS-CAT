@@ -9,7 +9,7 @@
         Height="450" Width="800">
     <Grid>
         <StackPanel>
-            <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.ModelTagsLabel}"/>
+            <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.Tags_ModelTagsLabel}"/>
             <DockPanel Margin="10">
                 <StackPanel DockPanel.Dock="Right" Margin="10,0">
                     <StackPanel.Resources>
@@ -42,7 +42,7 @@
                                             Name="DeleteTag" 
                                             Tag="{Binding .}" 
                                             Click="DeleteTag_Click"
-                                            Content="{x:Static resx:Resources.DeleteTagButton}"/>
+                                            Content="{x:Static resx:Resources.Tags_DeleteTagButton}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -57,7 +57,7 @@
                     IsEnabled="{Binding ElementName=TagTextBox,Path=Text.Length}" 
                     Name="add" 
                     Click="add_Click"
-                    Content="{x:Static resx:Resources.AddTagButton}"/>
+                    Content="{x:Static resx:Resources.Tags_AddTagButton}"/>
                 <TextBox x:Name="TagTextBox" />
             </StackPanel>
         </StackPanel>

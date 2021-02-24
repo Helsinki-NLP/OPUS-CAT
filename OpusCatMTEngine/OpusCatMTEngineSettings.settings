@@ -53,5 +53,11 @@
     <Setting Name="HttpMtServicePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">8500</Value>
     </Setting>
+    <Setting Name="StoreOpusCatDataInLocalAppdata" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ModelDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">models</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

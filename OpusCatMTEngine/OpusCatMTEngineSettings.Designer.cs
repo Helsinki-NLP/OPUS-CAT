@@ -226,5 +226,29 @@ namespace OpusCatMTEngine {
                 this["HttpMtServicePort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool StoreOpusCatDataInLocalAppdata {
+            get {
+                return ((bool)(this["StoreOpusCatDataInLocalAppdata"]));
+            }
+            set {
+                this["StoreOpusCatDataInLocalAppdata"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("models")]
+        public string ModelDir {
+            get {
+                return ((string)(this["ModelDir"]));
+            }
+            set {
+                this["ModelDir"] = value;
+            }
+        }
     }
 }

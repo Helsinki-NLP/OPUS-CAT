@@ -12,10 +12,7 @@ namespace OpusCatMTEngine
     {
         internal static void WriteTranslationToDb(string sourceText, string translation, string model)
         {
-            var translationDb = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                OpusCatMTEngineSettings.Default.TranslationDBName);
+            var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
 
             using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
             {
@@ -34,10 +31,7 @@ namespace OpusCatMTEngine
 
         internal static string FetchTranslationFromDb(string sourceText, string model)
         {
-            var translationDb = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                OpusCatMTEngineSettings.Default.TranslationDBName);
+            var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
 
             List<string> items = new List<string>();
 

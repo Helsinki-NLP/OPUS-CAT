@@ -24,9 +24,9 @@
                             <Setter Property="Margin" Value="0,0,0,5" />
                         </Style>
                     </StackPanel.Resources>
-                    <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click" Content="{x:Static resx:Resources.InstallFromWebButton}" />
-                    <Button Name="addZipModel" Click="btnAddZipModel_Click" Content="{x:Static resx:Resources.InstallFromZipButton}" />
-                    <Button Name="customizeModel" Click="btnCustomizeModel_Click" Content="{x:Static resx:Resources.FinetuneButton}">
+                    <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click" Content="{x:Static resx:Resources.Main_InstallFromWebButton}" />
+                    <Button Name="addZipModel" Click="btnAddZipModel_Click" Content="{x:Static resx:Resources.Main_InstallFromZipButton}" />
+                    <Button Name="customizeModel" Click="btnCustomizeModel_Click" Content="{x:Static resx:Resources.Main_FinetuneButton}">
                         <Button.Visibility>
                             <Binding 
                                 Converter="{StaticResource VisibleIfTrueConverter}" 
@@ -35,7 +35,7 @@
                                 Path="SelectedItem.IsReady"/>
                         </Button.Visibility>
                     </Button>
-                    <Button Name="continueCustomization" Click="btnContinueCustomization_Click" Content="{x:Static resx:Resources.ContinueFinetuneButton}">
+                    <Button Name="continueCustomization" Click="btnContinueCustomization_Click" Content="{x:Static resx:Resources.Main_ContinueFinetuneButton}">
                         <Button.Visibility>
                             <Binding 
                                 Converter="{StaticResource VisibleIfTrueConverter}" 
@@ -45,7 +45,7 @@
                         </Button.Visibility>
                     </Button>
                     <Button Name="customizationProgress" Click="btnCustomizationProgress_Click"
-                            Content="{x:Static resx:Resources.CustomizationProgressButton}">
+                            Content="{x:Static resx:Resources.Main_CustomizationProgressButton}">
                         <Button.Visibility>
                             <Binding 
                                 Converter="{StaticResource VisibleIfTrueConverter}" 
@@ -55,7 +55,7 @@
                         </Button.Visibility>
                     </Button>
                     <Button Name="packageCustomModel" Click="btnpackageCustomModel_Click"
-                            Content="{x:Static resx:Resources.PackageModelButton}">
+                            Content="{x:Static resx:Resources.Main_PackageModelButton}">
                         <Button.Visibility>
                             <Binding 
                                 Converter="{StaticResource VisibleIfTrueConverter}" 
@@ -65,7 +65,7 @@
                         </Button.Visibility>
                     </Button>
                     <Button Name="deleteModel" Click="btnDeleteModel_Click"
-                            Content="{x:Static resx:Resources.DeleteModelButton}">
+                            Content="{x:Static resx:Resources.Main_DeleteModelButton}">
                         <Button.Visibility>
                             <Binding 
                                 Converter="{StaticResource VisibleIfTrueConverter}" 
@@ -75,7 +75,7 @@
                         </Button.Visibility>
                     </Button>
                     <Button Name="translateWithModel" Click="btnTranslateWithModel_Click"
-                            Content="{x:Static resx:Resources.TranslateWithModelButton}">
+                            Content="{x:Static resx:Resources.Main_TranslateWithModelButton}">
                         <Button.Visibility>
                             <Binding 
                                 Converter="{StaticResource VisibleIfTrueConverter}" 
@@ -91,22 +91,22 @@
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
                         Name="addModelTag" 
                         Click="btnEditModelTags_Click"
-                        Content="{x:Static resx:Resources.EditModelTagsButton}" />
+                        Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
                     <Button 
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
                         Name="openModelDir"
                         Click="btnOpenModelDir_Click"
-                        Content="{x:Static resx:Resources.OpenModelDirButton}"/>
+                        Content="{x:Static resx:Resources.Main_OpenModelDirButton}"/>
                     <Button 
                         Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.CanSetAsOverrideModel, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" 
                         Name="setAsOverride"
                         Click="btnSetOverride_Click"
-                        Content="{x:Static resx:Resources.SetAsOverrideModelButton}"/>
+                        Content="{x:Static resx:Resources.Main_SetAsOverrideModelButton}"/>
                     <Button 
                         Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}"
                         Name="cancelOverride"
                         Click="btnCancelOverride_Click"
-                        Content="{x:Static resx:Resources.DeleteModelButton}"/>
+                        Content="{x:Static resx:Resources.Main_DeleteModelButton}"/>
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 

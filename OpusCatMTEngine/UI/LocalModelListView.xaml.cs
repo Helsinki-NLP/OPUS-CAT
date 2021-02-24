@@ -45,7 +45,7 @@ namespace OpusCatMTEngine
             OnlineModelView onlineSelection = new OnlineModelView();
             onlineSelection.DataContext = this.DataContext;
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.AddTab(new ActionTabItem() { Content = onlineSelection, Header = OpusCatMTEngine.Properties.Resources.OnlineModelsTab, Closable = true });
+            mainWindow.AddTab(new ActionTabItem() { Content = onlineSelection, Header = OpusCatMTEngine.Properties.Resources.Main_OnlineModelsTab, Closable = true });
             
         }
 
@@ -105,8 +105,8 @@ namespace OpusCatMTEngine
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
             MessageBoxResult messageBoxResult = 
                 System.Windows.MessageBox.Show(
-                    String.Format(OpusCatMTEngine.Properties.Resources.DeleteModelConfirmation,selectedModel.Name),
-                    OpusCatMTEngine.Properties.Resources.DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
+                    String.Format(OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmation,selectedModel.Name),
+                    OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
                 

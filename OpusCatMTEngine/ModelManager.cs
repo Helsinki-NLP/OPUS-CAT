@@ -214,10 +214,8 @@ namespace OpusCatMTEngine
         {
 
             this.GetOnlineModels();
-            this.opusModelDir = new DirectoryInfo(Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                "models"));
+            var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
+            this.opusModelDir = new DirectoryInfo(modelDirPath);
             if (!this.OpusModelDir.Exists)
             {
                 this.OpusModelDir.Create();

@@ -51,18 +51,18 @@
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <StackPanel Margin="5,0,0,5">
-                        <Label FontWeight="Bold" Content="{x:Static resx:Resources.TrainingFilesLabel}"/>
+                        <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TrainingFilesLabel}"/>
                         <RadioButton 
                             IsChecked="True" 
                             Name="TmxFiles" 
                             Checked="ModeButton_Checked" 
                             GroupName="Format"
-                            Content="{x:Static resx:Resources.TmxRadioButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_TmxRadioButton}"/>
                         <RadioButton
                             Name="TxtFiles"
                             Checked="ModeButton_Checked"
                             GroupName="Format"
-                            Content="{x:Static resx:Resources.TxtFilesRadioButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_TxtFilesRadioButton}"/>
                         <!--<RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Format">Batch translate only</RadioButton>-->
                     </StackPanel>
                     <StackPanel 
@@ -71,44 +71,44 @@
                         Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}"
                         Style="{StaticResource StackStyle}"
                         Orientation="Horizontal">
-                        <Label Content="{x:Static resx:Resources.SourceFileLabel}"/>
+                        <Label Content="{x:Static resx:Resources.Finetune_SourceFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="SourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=SourceFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button 
                             DataContext="{Binding ElementName=SourceFileBox}" 
                             Click="browse_Click"
-                            Content="{x:Static resx:Resources.BrowseButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TmxFiles}" Visibility="{Binding IsChecked,ElementName=TmxFiles,Converter={StaticResource BoolToVis}}" Style="{StaticResource StackStyle}" Orientation="Horizontal">
-                        <Label Content="{x:Static resx:Resources.TmxFileLabel}"/>
+                        <Label Content="{x:Static resx:Resources.Finetune_TmxFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TmxFileBox" Width="400" Text="{Binding ElementName=_this,Path=TmxFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"/>
                         <Button
                             DataContext="{Binding ElementName=TmxFileBox}" 
                             Tag="TMX Files|*.tmx" 
                             Click="browse_Click"
-                            Content="{x:Static resx:Resources.BrowseButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" Visibility="{Binding IsChecked,ElementName=TxtFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                        <Label Content="{x:Static resx:Resources.TargetFileLabel}"/>
+                        <Label Content="{x:Static resx:Resources.Finetune_TargetFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="TargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=TargetFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button
                             DataContext="{Binding ElementName=TargetFileBox}"
                             Click="browse_Click"
-                            Content="{x:Static resx:Resources.BrowseButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel Margin="5,0,0,5">
-                    <Label FontWeight="Bold" Content="{x:Static resx:Resources.TagProcessingLabel}"/>
+                    <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TagProcessingLabel}"/>
 
                     <CheckBox
                         Margin="0,5,0,0"
                         Name="IncludePlaceholderTagsBox"
-                        Content="{x:Static resx:Resources.IncludePlaceholderTagsCheckbox}"/>
+                        Content="{x:Static resx:Resources.Finetune_IncludePlaceholderTagsCheckbox}"/>
                     <CheckBox 
                         Margin="0,5,0,0" 
                         Name="IncludeTagPairBox"
-                        Content="{x:Static resx:Resources.IncludeTagPairsCheckbox}"/>
+                        Content="{x:Static resx:Resources.Finetune_IncludeTagPairsCheckbox}"/>
                 </StackPanel>
 
             </Border>
@@ -118,40 +118,40 @@
                         <Label 
                             FontWeight="Bold" 
                             ToolTip=""
-                            Content="{x:Static resx:Resources.ValidationFilesLabel}">
+                            Content="{x:Static resx:Resources.Finetune_ValidationFilesLabel}">
                         </Label>
                         <RadioButton 
                             IsChecked="True" 
                             Name="SplitValidationFiles" 
                             Checked="ValidationFileTypeButton_Checked" 
                             GroupName="ValidationType"
-                            Content="{x:Static resx:Resources.SplitFromTrainingRadioButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_SplitFromTrainingRadioButton}"/>
                         <RadioButton 
                             Name="SeparateValidationFiles" 
                             Checked="ValidationFileTypeButton_Checked" 
                             GroupName="ValidationType"
-                            Content="{x:Static resx:Resources.SeparateFilesRadioButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_SeparateFilesRadioButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                        <Label Content="{x:Static resx:Resources.ValidationSourceFileLabel}"/>
+                        <Label Content="{x:Static resx:Resources.Finetune_ValidationSourceFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="ValidSourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidSourceFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button 
                             DataContext="{Binding ElementName=ValidSourceFileBox}" 
                             Click="browse_Click" 
-                            Content="{x:Static resx:Resources.BrowseButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
                     </StackPanel>
                     <StackPanel IsEnabledChanged="ReValidate" IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" Visibility="{Binding IsChecked,ElementName=SeparateValidationFiles,Converter={StaticResource BoolToVis}}" Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                        <Label Content="{x:Static resx:Resources.ValidationTargetFileLabel}"/>
+                        <Label Content="{x:Static resx:Resources.Finetune_ValidationTargetFileLabel}"/>
                         <TextBox Style="{StaticResource ValidatedTextBoxStyle}" Name="ValidTargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidTargetFile, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}"></TextBox>
                         <Button 
                             DataContext="{Binding ElementName=ValidTargetFileBox}" 
                             Click="browse_Click"
-                            Content="{x:Static resx:Resources.BrowseButton}"/>
+                            Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
             <StackPanel Orientation="Horizontal" Style="{StaticResource StackStyle}">
-                <Label Content="{x:Static resx:Resources.FinetunedModelTagLabel}"/>
+                <Label Content="{x:Static resx:Resources.Finetune_FinetunedModelTagLabel}"/>
                 <TextBox IsEnabled="{Binding ElementName=_this,Path=CustomizationNotStarted, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ValidatedTextBoxStyle}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
             </StackPanel>
         </StackPanel>
@@ -164,7 +164,7 @@
                 Height="30" 
                 Width="100" 
                 Click="customize_Click"
-                Content="{x:Static resx:Resources.StartFinetuneButton}">
+                Content="{x:Static resx:Resources.Finetune_StartFinetuneButton}">
                 <Button.Visibility>
                     <Binding ElementName="_this" Path="CustomizationNotStarted"  UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource BoolToVis}"/>
                 </Button.Visibility>

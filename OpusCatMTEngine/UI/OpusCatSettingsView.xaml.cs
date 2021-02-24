@@ -41,27 +41,24 @@ namespace OpusCatMTEngine
             InitializeComponent();
             this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
             this.HttpServicePortBox = OpusCatMTEngineSettings.Default.HttpMtServicePort;
+            this.StoreDataInAppdata = OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
+            NotifyPropertyChanged("SaveButtonEnabled");
         }
 
         private void OpenCustomSettingsInEditor_Click(object sender, RoutedEventArgs e)
         {
             var customizeYml = HelperFunctions.GetLocalAppDataPath(OpusCatMTEngineSettings.Default.CustomizationBaseConfig);
-            Process.Start("notepad.exe",customizeYml);
+            Process.Start("notepad.exe", customizeYml);
         }
 
-        
+
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
             OpusCatMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
-            OpusCatMTEngineSettings.Default.Save();
-            this.SaveButtonEnabled = false;
-        }
-
-        private void httpSaveButton_Click(object sender, RoutedEventArgs e)
-        {
             OpusCatMTEngineSettings.Default.HttpMtServicePort = this.HttpServicePortBox;
+            OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata = this.StoreDataInAppdata;
             OpusCatMTEngineSettings.Default.Save();
-            this.HttpSaveButtonEnabled = false;
+            NotifyPropertyChanged("SaveButtonEnabled");
         }
 
         private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -90,6 +87,17 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool StoreDataInAppdata
+        {
+            get => _storeDataInAppdata;
+            set
+            {
+                _storeDataInAppdata = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
+            }
+        }
+
         private string servicePortBox;
         public string ServicePortBox
         {
@@ -103,28 +111,21 @@ namespace OpusCatMTEngine
 
         public bool SaveButtonEnabled
         {
-            get => saveButtonEnabled;
-            set
+            get
             {
-                saveButtonEnabled = value;
-                NotifyPropertyChanged();
+                
+                bool allSettingsDefault =
+                    this.ServicePortBox == OpusCatMTEngineSettings.Default.MtServicePort &&
+                    this.HttpServicePortBox == OpusCatMTEngineSettings.Default.HttpMtServicePort &&
+                    this.StoreDataInAppdata == OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
+                bool validationErrors = !(this.servicePortBoxIsValid && this.httpServicePortBoxIsValid);
+                return !allSettingsDefault && !validationErrors;
             }
         }
-
-        public bool HttpSaveButtonEnabled
-        {
-            get => httpSaveButtonEnabled;
-            set
-            {
-                httpSaveButtonEnabled = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-
-        private bool saveButtonEnabled;
-        private bool httpSaveButtonEnabled;
-
+        
+        private bool _storeDataInAppdata;
+        private bool httpServicePortBoxIsValid;
+        private bool servicePortBoxIsValid;
 
         public string Error
         {
@@ -136,7 +137,6 @@ namespace OpusCatMTEngine
         {
             // Return error message if there is error on else return empty or null string
             string validationMessage = string.Empty;
-            this.SaveButtonEnabled = false;
             switch (propertyName)
             {
                 case "ServicePortBox":
@@ -146,18 +146,17 @@ namespace OpusCatMTEngine
                         if (portNumber < 1024 || portNumber > 65535)
                         {
                             validationMessage = "Error";
+                            this.servicePortBoxIsValid = false;
                         }
                         else
                         {
-                            if (this.ServicePortBox != OpusCatMTEngineSettings.Default.MtServicePort)
-                            {
-                                this.SaveButtonEnabled = true;
-                            }
+                            this.servicePortBoxIsValid = true;
                         }
                     }
                     else
                     {
                         validationMessage = "Error";
+                        this.servicePortBoxIsValid = false;
                     }
 
                     break;
@@ -168,24 +167,25 @@ namespace OpusCatMTEngine
                         if (portNumber < 1024 || portNumber > 65535)
                         {
                             validationMessage = "Error";
+                            this.httpServicePortBoxIsValid = false;
                         }
                         else
                         {
-                            if (this.HttpServicePortBox != OpusCatMTEngineSettings.Default.HttpMtServicePort)
-                            {
-                                this.HttpSaveButtonEnabled = true;
-                            }
+                            this.httpServicePortBoxIsValid = true;
                         }
                     }
                     else
                     {
                         validationMessage = "Error";
+                        this.httpServicePortBoxIsValid = false;
                     }
 
                     break;
             }
-
+            NotifyPropertyChanged("SaveButtonEnabled");
             return validationMessage;
         }
+        
+        
     }
 }

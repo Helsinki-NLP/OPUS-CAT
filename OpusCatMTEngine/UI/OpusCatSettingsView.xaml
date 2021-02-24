@@ -17,46 +17,41 @@
                     Margin="5" 
                     Padding="5" 
                     Click="OpenCustomSettingsInEditor_Click"
-                    Content="{x:Static resx:Resources.OpenSettingsFileButton}"/>
+                    Content="{x:Static resx:Resources.Settings_OpenSettingsFileButton}"/>
             </Border>
             <Border Margin="5" BorderThickness="1" BorderBrush="Black">
                 <StackPanel>
                     <TextBlock Margin="5" DockPanel.Dock="Top">
-                    <Run FontWeight="Bold" Text="{x:Static resx:Resources.NoteHeading}"/> <Run Text="{x:Static resx:Resources.RestartReminder}"/></TextBlock>
+                    <Run FontWeight="Bold" Text="{x:Static resx:Resources.Settings_NoteHeading}"/> <Run Text="{x:Static resx:Resources.Settings_RestartReminder}"/></TextBlock>
                     <DockPanel Margin="0,0,0,0">
 
                         <Label 
                             DockPanel.Dock="Left"
-                            Content="{x:Static resx:Resources.NetTcpPortLabel}"/>
+                            Content="{x:Static resx:Resources.Settings_NetTcpPortLabel}"/>
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-                        <Button 
-                            Margin="5" 
-                            IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}" 
-                            DockPanel.Dock="Right" 
-                            Width="100"  
-                            Click="saveButton_Click"
-                            Content="{x:Static resx:Resources.SaveButton}"/>
 
 
                         <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+
                     </DockPanel>
                     <DockPanel Margin="0,0,0,0">
-
                         <Label 
                             DockPanel.Dock="Left"
-                            Content="{x:Static resx:Resources.HttpPortLabel}"/>
+                            Content="{x:Static resx:Resources.Settings_HttpPortLabel}"/>
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-                        <Button 
-                            Margin="5" 
-                            IsEnabled="{Binding ElementName=_this, Path=HttpSaveButtonEnabled}" 
-                            DockPanel.Dock="Right" 
-                            Width="100"  
-                            Click="httpSaveButton_Click"
-                            Content="{x:Static resx:Resources.SaveButton}"/>
-
-
                         <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
                     </DockPanel>
+                    <DockPanel Margin="0,0,0,0">
+                        <CheckBox IsChecked="{Binding ElementName=_this, Path=StoreDataInAppdata, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{x:Static resx:Resources.Settings_StoreInAppdataCheckbox}" />
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button 
+                                Margin="5" 
+                                IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}" 
+                                Width="100"  
+                                Click="saveButton_Click"
+                                Content="{x:Static resx:Resources.Settings_SaveButton}"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </StackPanel>

@@ -28,9 +28,9 @@
                     <RowDefinition Height="25"></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" Content="{x:Static resx:Resources.SourceLangFilterLabel}"/>
-                <Label Grid.Row="0" Grid.Column="1" Content="{x:Static resx:Resources.TargetLangFilterLabel}"/>
-                <Label Grid.Row="0" Grid.Column="2" Content="{x:Static resx:Resources.ModelNameFilterLabel}"/>
+                <Label Grid.Row="0" Grid.Column="0" Content="{x:Static resx:Resources.Online_SourceLangFilterLabel}"/>
+                <Label Grid.Row="0" Grid.Column="1" Content="{x:Static resx:Resources.Online_TargetLangFilterLabel}"/>
+                <Label Grid.Row="0" Grid.Column="2" Content="{x:Static resx:Resources.Online_ModelNameFilterLabel}"/>
 
                 <TextBox Grid.Row="1" Grid.Column="0" Margin="0,0,0,10" Name="txtFilter" TextChanged="sourceLangFilter_TextChanged"></TextBox>
                 <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="txtFilter1" TextChanged="targetLangFilter_TextChanged"></TextBox>
@@ -47,7 +47,7 @@
                 <Button 
                     Name="installModel" 
                     Click="btnInstall_Click" 
-                    Content="{x:Static resx:Resources.InstallModelLocallyButton}">
+                    Content="{x:Static resx:Resources.Online_InstallModelLocallyButton}">
                     <Button.IsEnabled>
                         <Binding ElementName="ModelListView" Path="SelectedItems.Count"></Binding>
                     </Button.IsEnabled>
@@ -72,10 +72,10 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
-                            <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.SourceLanguagesHeader}" Width="100"/>
-                            <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.TargetLanguagesHeader}" Width="100" />
-                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.ModelNameHeader}" Width="200"/>
-                            <GridViewColumn Header="{x:Static resx:Resources.InstallationProgressHeader}" x:Name="InstallProgress">
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100"/>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100" />
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelNameHeader}" Width="200"/>
+                            <GridViewColumn Header="{x:Static resx:Resources.Online_InstallationProgressHeader}" x:Name="InstallProgress">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Grid>

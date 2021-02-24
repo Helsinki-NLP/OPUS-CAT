@@ -16,8 +16,10 @@ namespace OpusCatMTEngine
             Uri[] baseAddresses;
             if (onlyNetTcp)
             {
+                //Use 127.0.0.1 instead of localhost, since local host triggers the Windows Firewall popup (and create a firewall rule).
+                //The popup is probably distracting to standard users.
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/")
+                    new Uri($"net.tcp://127.0.0.1:{OpusCatMTEngineSettings.Default.MtServicePort}/")
                 };
             }
             else

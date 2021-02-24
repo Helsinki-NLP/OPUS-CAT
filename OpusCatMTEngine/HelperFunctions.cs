@@ -25,13 +25,49 @@ namespace OpusCatMTEngine
                 return string.Empty;
             }
         }
+        
+
+        public static string GetOpusCatDataPath(string restOfPath=null)
+        {
+            if (OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata)
+            {
+                return GetLocalAppDataPath(restOfPath);
+            }
+            else
+            {
+                string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (restOfPath == null)
+                {
+                    return Path.Combine(
+                        assemblyFolder,
+                        OpusCatMTEngineSettings.Default.LocalOpusCatDir);
+                }
+                else
+                {
+                    return Path.Combine(
+                        assemblyFolder,
+                        OpusCatMTEngineSettings.Default.LocalOpusCatDir,
+                        restOfPath);
+                }
+            }
+
+        }
 
         public static string GetLocalAppDataPath(string restOfPath)
         {
-            return Path.Combine(
+            if (restOfPath == null)
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    OpusCatMTEngineSettings.Default.LocalOpusCatDir);
+            }
+            else
+            {
+                return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     OpusCatMTEngineSettings.Default.LocalOpusCatDir,
                     restOfPath);
+            }
         }
 
         public static void SplitToFiles(List<Tuple<string, string>> biText, string srcPath, string trgPath)

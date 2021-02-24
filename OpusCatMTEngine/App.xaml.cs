@@ -29,10 +29,7 @@ namespace OpusCatMTEngine
 
         private void SetupLogging()
         {
-            var logDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                OpusCatMTEngineSettings.Default.LogDir);
+            var logDir = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.LogDir);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
@@ -44,10 +41,7 @@ namespace OpusCatMTEngine
         {
 
 
-            var translationDb = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                OpusCatMTEngineSettings.Default.TranslationDBName);
+            var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
             if (!File.Exists(translationDb))
             {
                 SQLiteConnection.CreateFile(translationDb);
@@ -69,13 +63,12 @@ namespace OpusCatMTEngine
         {
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
-            //Create appdata dir
-            var opusCatAppdataDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir);
-            if (!Directory.Exists(opusCatAppdataDir))
+            //Create data dir
+
+            var opusCatDataDir = HelperFunctions.GetOpusCatDataPath();
+            if (!Directory.Exists(opusCatDataDir))
             {
-                Directory.CreateDirectory(opusCatAppdataDir);
+                Directory.CreateDirectory(opusCatDataDir);
             }
 
             this.CopyConfigs();

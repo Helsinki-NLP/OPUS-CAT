@@ -96,6 +96,13 @@ namespace OpusCatMTEngine
             return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
         }
 
+        //For integration with Wordfast
+        public Translation TranslatePost(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            var translation = this.Translate(tokenCode, input, srcLangCode, trgLangCode, modelTag);
+            return new Translation(translation);
+        }
+
         public Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
             var sourceLang = new IsoLanguage(srcLangCode);
@@ -104,6 +111,7 @@ namespace OpusCatMTEngine
             var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
             return new Translation(translation.Result);
         }
+
 
         public Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
@@ -262,6 +270,6 @@ namespace OpusCatMTEngine
                 throw new FaultException($"Batch translation or customization already in process in the MT engine");
             }
         }
-
+        
     }
 }

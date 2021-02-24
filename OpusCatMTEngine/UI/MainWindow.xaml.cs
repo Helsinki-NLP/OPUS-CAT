@@ -33,7 +33,7 @@ namespace OpusCatMTEngine
             get
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
-                return String.Format(OpusCatMTEngine.Properties.Resources.OpusCatWindowTitle, version);
+                return String.Format(OpusCatMTEngine.Properties.Resources.Main_OpusCatWindowTitle, version);
             }
         }
 
@@ -43,8 +43,8 @@ namespace OpusCatMTEngine
         {
             if (this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
             {
-                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.ConfirmExitMessage,
-                                          OpusCatMTEngine.Properties.Resources.ConfirmExitCaption,
+                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.Main_ConfirmExitMessage,
+                                          OpusCatMTEngine.Properties.Resources.Main_ConfirmExitCaption,
                                           MessageBoxButton.YesNo,
                                           MessageBoxImage.Question);
                 if (result != MessageBoxResult.Yes)
@@ -93,9 +93,9 @@ namespace OpusCatMTEngine
             var localModels = new LocalModelListView(this.ModelManager);
             var settings = new OpusCatSettingsView();
             this.UiTabs.Add(
-                new ActionTabItem { Content = localModels, Header = OpusCatMTEngine.Properties.Resources.ModelsTabTitle, Closable = false });
+                new ActionTabItem { Content = localModels, Header = OpusCatMTEngine.Properties.Resources.Main_ModelsTabTitle, Closable = false });
             this.UiTabs.Add(
-                new ActionTabItem { Content = settings, Header = OpusCatMTEngine.Properties.Resources.SettingsTabTitle, Closable = false });
+                new ActionTabItem { Content = settings, Header = OpusCatMTEngine.Properties.Resources.Main_SettingsTabTitle, Closable = false });
 
             this.DataContext = this;
             this.serviceHost = service.StartService(this.ModelManager);

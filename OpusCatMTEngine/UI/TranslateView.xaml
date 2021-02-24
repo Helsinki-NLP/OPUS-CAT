@@ -9,16 +9,16 @@
         Height="400" Width="800">
     <Grid>
         <StackPanel Margin="10">
-            <Label Content="{x:Static resx:Resources.SourceTextLabel}"/>
+            <Label Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
                 <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="150"></TextBox>
             </Border>
             <StackPanel Orientation="Horizontal">
                 <Button 
                     Click="translateButton_Click" 
-                    Content="{x:Static resx:Resources.TranslateButton}"/>
+                    Content="{x:Static resx:Resources.Translate_TranslateButton}"/>
             </StackPanel>
-            <Label Content="{x:Static resx:Resources.TranslationLabel}"/>
+            <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
                 <TextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" TextWrapping="Wrap" Name="TargetBox" Height="150"></TextBox>
             </Border>

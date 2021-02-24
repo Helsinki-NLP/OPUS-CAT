@@ -61,371 +61,488 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add.
-        /// </summary>
-        public static string AddTagButton {
-            get {
-                return ResourceManager.GetString("AddTagButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to BLEU score.
-        /// </summary>
-        public static string BleuAxis {
-            get {
-                return ResourceManager.GetString("BleuAxis", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Browse.
         /// </summary>
-        public static string BrowseButton {
+        public static string Finetune_BrowseButton {
             get {
-                return ResourceManager.GetString("BrowseButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Confirm exit.
-        /// </summary>
-        public static string ConfirmExitCaption {
-            get {
-                return ResourceManager.GetString("ConfirmExitCaption", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fine-tuning or batch translation is in progress. Fine-tuning can be resumed later from the last save point, but batch translation will be aborted permanently. Are you sure you want to close the OpusCAT MT Engine?.
-        /// </summary>
-        public static string ConfirmExitMessage {
-            get {
-                return ResourceManager.GetString("ConfirmExitMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Continue fine-tuning.
-        /// </summary>
-        public static string ContinueFinetuneButton {
-            get {
-                return ResourceManager.GetString("ContinueFinetuneButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Show fine-tuning progress.
-        /// </summary>
-        public static string CustomizationProgressButton {
-            get {
-                return ResourceManager.GetString("CustomizationProgressButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Delete selected model.
-        /// </summary>
-        public static string DeleteModelButton {
-            get {
-                return ResourceManager.GetString("DeleteModelButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Are you sure you want to delete model {0}? Deletion is permanent..
-        /// </summary>
-        public static string DeleteModelConfirmation {
-            get {
-                return ResourceManager.GetString("DeleteModelConfirmation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Delete Confirmation.
-        /// </summary>
-        public static string DeleteModelConfirmationTitle {
-            get {
-                return ResourceManager.GetString("DeleteModelConfirmationTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Delete.
-        /// </summary>
-        public static string DeleteTagButton {
-            get {
-                return ResourceManager.GetString("DeleteTagButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Downloading.
-        /// </summary>
-        public static string DownloadingStatus {
-            get {
-                return ResourceManager.GetString("DownloadingStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Edit model tags.
-        /// </summary>
-        public static string EditModelTagsButton {
-            get {
-                return ResourceManager.GetString("EditModelTagsButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Edit tags for {0}.
-        /// </summary>
-        public static string EditTagsTitle {
-            get {
-                return ResourceManager.GetString("EditTagsTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Extracting.
-        /// </summary>
-        public static string ExtractingStatus {
-            get {
-                return ResourceManager.GetString("ExtractingStatus", resourceCulture);
+                return ResourceManager.GetString("Finetune_BrowseButton", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to File does not exist..
         /// </summary>
-        public static string FileDoesNotExistMessage {
+        public static string Finetune_FileDoesNotExistMessage {
             get {
-                return ResourceManager.GetString("FileDoesNotExistMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fine-tune selected model.
-        /// </summary>
-        public static string FinetuneButton {
-            get {
-                return ResourceManager.GetString("FinetuneButton", resourceCulture);
+                return ResourceManager.GetString("Finetune_FileDoesNotExistMessage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Fine-tuned model label.
         /// </summary>
-        public static string FinetunedModelTagLabel {
+        public static string Finetune_FinetunedModelTagLabel {
             get {
-                return ResourceManager.GetString("FinetunedModelTagLabel", resourceCulture);
+                return ResourceManager.GetString("Finetune_FinetunedModelTagLabel", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Fine-tune model {0}.
         /// </summary>
-        public static string FineTuneWindowTitle {
+        public static string Finetune_FineTuneWindowTitle {
             get {
-                return ResourceManager.GetString("FineTuneWindowTitle", resourceCulture);
+                return ResourceManager.GetString("Finetune_FineTuneWindowTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
-        public static string GenericValidationErrorMessage {
+        public static string Finetune_GenericValidationErrorMessage {
             get {
-                return ResourceManager.GetString("GenericValidationErrorMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to MT service HTTP port (used with other integrations, 1024-65535):.
-        /// </summary>
-        public static string HttpPortLabel {
-            get {
-                return ResourceManager.GetString("HttpPortLabel", resourceCulture);
+                return ResourceManager.GetString("Finetune_GenericValidationErrorMessage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Include placeholder tags as text.
         /// </summary>
-        public static string IncludePlaceholderTagsCheckbox {
+        public static string Finetune_IncludePlaceholderTagsCheckbox {
             get {
-                return ResourceManager.GetString("IncludePlaceholderTagsCheckbox", resourceCulture);
+                return ResourceManager.GetString("Finetune_IncludePlaceholderTagsCheckbox", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Include tag pairs as text.
         /// </summary>
-        public static string IncludeTagPairsCheckbox {
+        public static string Finetune_IncludeTagPairsCheckbox {
             get {
-                return ResourceManager.GetString("IncludeTagPairsCheckbox", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to In-domain validation set.
-        /// </summary>
-        public static string InDomainSeriesName {
-            get {
-                return ResourceManager.GetString("InDomainSeriesName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installation progress.
-        /// </summary>
-        public static string InstallationProgressHeader {
-            get {
-                return ResourceManager.GetString("InstallationProgressHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installed.
-        /// </summary>
-        public static string InstalledStatus {
-            get {
-                return ResourceManager.GetString("InstalledStatus", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Install OPUS model from Web.
-        /// </summary>
-        public static string InstallFromWebButton {
-            get {
-                return ResourceManager.GetString("InstallFromWebButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Install model from zip.
-        /// </summary>
-        public static string InstallFromZipButton {
-            get {
-                return ResourceManager.GetString("InstallFromZipButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Install model locally.
-        /// </summary>
-        public static string InstallModelLocallyButton {
-            get {
-                return ResourceManager.GetString("InstallModelLocallyButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Model name filter.
-        /// </summary>
-        public static string ModelNameFilterLabel {
-            get {
-                return ResourceManager.GetString("ModelNameFilterLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Model name.
-        /// </summary>
-        public static string ModelNameHeader {
-            get {
-                return ResourceManager.GetString("ModelNameHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Models.
-        /// </summary>
-        public static string ModelsTabTitle {
-            get {
-                return ResourceManager.GetString("ModelsTabTitle", resourceCulture);
+                return ResourceManager.GetString("Finetune_IncludeTagPairsCheckbox", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Model tag is already in use for this base model.
         /// </summary>
-        public static string ModelTagInUseMessage {
+        public static string Finetune_ModelTagInUseMessage {
             get {
-                return ResourceManager.GetString("ModelTagInUseMessage", resourceCulture);
+                return ResourceManager.GetString("Finetune_ModelTagInUseMessage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Model tag not specified..
         /// </summary>
-        public static string ModelTagNotSpecifiedMessage {
+        public static string Finetune_ModelTagNotSpecifiedMessage {
             get {
-                return ResourceManager.GetString("ModelTagNotSpecifiedMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Model tags.
-        /// </summary>
-        public static string ModelTagsLabel {
-            get {
-                return ResourceManager.GetString("ModelTagsLabel", resourceCulture);
+                return ResourceManager.GetString("Finetune_ModelTagNotSpecifiedMessage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Model tag is too long..
         /// </summary>
-        public static string ModelTagTooLongMessage {
+        public static string Finetune_ModelTagTooLongMessage {
             get {
-                return ResourceManager.GetString("ModelTagTooLongMessage", resourceCulture);
+                return ResourceManager.GetString("Finetune_ModelTagTooLongMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):.
+        ///   Looks up a localized string similar to Select separate files.
         /// </summary>
-        public static string NetTcpPortLabel {
+        public static string Finetune_SeparateFilesRadioButton {
             get {
-                return ResourceManager.GetString("NetTcpPortLabel", resourceCulture);
+                return ResourceManager.GetString("Finetune_SeparateFilesRadioButton", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Note:.
+        ///   Looks up a localized string similar to Source file.
         /// </summary>
-        public static string NoteHeading {
+        public static string Finetune_SourceFileLabel {
             get {
-                return ResourceManager.GetString("NoteHeading", resourceCulture);
+                return ResourceManager.GetString("Finetune_SourceFileLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Split validation files from the training files.
+        /// </summary>
+        public static string Finetune_SplitFromTrainingRadioButton {
+            get {
+                return ResourceManager.GetString("Finetune_SplitFromTrainingRadioButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fine-tune.
+        /// </summary>
+        public static string Finetune_StartFinetuneButton {
+            get {
+                return ResourceManager.GetString("Finetune_StartFinetuneButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tag processing.
+        /// </summary>
+        public static string Finetune_TagProcessingLabel {
+            get {
+                return ResourceManager.GetString("Finetune_TagProcessingLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target file.
+        /// </summary>
+        public static string Finetune_TargetFileLabel {
+            get {
+                return ResourceManager.GetString("Finetune_TargetFileLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tmx file.
+        /// </summary>
+        public static string Finetune_TmxFileLabel {
+            get {
+                return ResourceManager.GetString("Finetune_TmxFileLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not a valid .tmx file.
+        /// </summary>
+        public static string Finetune_TmxFileNotValidMessage {
+            get {
+                return ResourceManager.GetString("Finetune_TmxFileNotValidMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TMX translation memory.
+        /// </summary>
+        public static string Finetune_TmxRadioButton {
+            get {
+                return ResourceManager.GetString("Finetune_TmxRadioButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Training files.
+        /// </summary>
+        public static string Finetune_TrainingFilesLabel {
+            get {
+                return ResourceManager.GetString("Finetune_TrainingFilesLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text (separate files for source and target).
+        /// </summary>
+        public static string Finetune_TxtFilesRadioButton {
+            get {
+                return ResourceManager.GetString("Finetune_TxtFilesRadioButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation files (for monitoring the progress of training).
+        /// </summary>
+        public static string Finetune_ValidationFilesLabel {
+            get {
+                return ResourceManager.GetString("Finetune_ValidationFilesLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation source file.
+        /// </summary>
+        public static string Finetune_ValidationSourceFileLabel {
+            get {
+                return ResourceManager.GetString("Finetune_ValidationSourceFileLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation target file.
+        /// </summary>
+        public static string Finetune_ValidationTargetFileLabel {
+            get {
+                return ResourceManager.GetString("Finetune_ValidationTargetFileLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm exit.
+        /// </summary>
+        public static string Main_ConfirmExitCaption {
+            get {
+                return ResourceManager.GetString("Main_ConfirmExitCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fine-tuning or batch translation is in progress. Fine-tuning can be resumed later from the last save point, but batch translation will be aborted permanently. Are you sure you want to close the OpusCAT MT Engine?.
+        /// </summary>
+        public static string Main_ConfirmExitMessage {
+            get {
+                return ResourceManager.GetString("Main_ConfirmExitMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Continue fine-tuning.
+        /// </summary>
+        public static string Main_ContinueFinetuneButton {
+            get {
+                return ResourceManager.GetString("Main_ContinueFinetuneButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show fine-tuning progress.
+        /// </summary>
+        public static string Main_CustomizationProgressButton {
+            get {
+                return ResourceManager.GetString("Main_CustomizationProgressButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete selected model.
+        /// </summary>
+        public static string Main_DeleteModelButton {
+            get {
+                return ResourceManager.GetString("Main_DeleteModelButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete model {0}? Deletion is permanent..
+        /// </summary>
+        public static string Main_DeleteModelConfirmation {
+            get {
+                return ResourceManager.GetString("Main_DeleteModelConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Confirmation.
+        /// </summary>
+        public static string Main_DeleteModelConfirmationTitle {
+            get {
+                return ResourceManager.GetString("Main_DeleteModelConfirmationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit model tags.
+        /// </summary>
+        public static string Main_EditModelTagsButton {
+            get {
+                return ResourceManager.GetString("Main_EditModelTagsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fine-tune selected model.
+        /// </summary>
+        public static string Main_FinetuneButton {
+            get {
+                return ResourceManager.GetString("Main_FinetuneButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install OPUS model from Web.
+        /// </summary>
+        public static string Main_InstallFromWebButton {
+            get {
+                return ResourceManager.GetString("Main_InstallFromWebButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install model from zip.
+        /// </summary>
+        public static string Main_InstallFromZipButton {
+            get {
+                return ResourceManager.GetString("Main_InstallFromZipButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Models.
+        /// </summary>
+        public static string Main_ModelsTabTitle {
+            get {
+                return ResourceManager.GetString("Main_ModelsTabTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Online models.
         /// </summary>
-        public static string OnlineModelsTab {
+        public static string Main_OnlineModelsTab {
             get {
-                return ResourceManager.GetString("OnlineModelsTab", resourceCulture);
+                return ResourceManager.GetString("Main_OnlineModelsTab", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Open model directory.
         /// </summary>
-        public static string OpenModelDirButton {
+        public static string Main_OpenModelDirButton {
             get {
-                return ResourceManager.GetString("OpenModelDirButton", resourceCulture);
+                return ResourceManager.GetString("Main_OpenModelDirButton", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open finetune settings in text editor.
+        ///   Looks up a localized string similar to OPUS-CAT MT Engine v{0}.
         /// </summary>
-        public static string OpenSettingsFileButton {
+        public static string Main_OpusCatWindowTitle {
             get {
-                return ResourceManager.GetString("OpenSettingsFileButton", resourceCulture);
+                return ResourceManager.GetString("Main_OpusCatWindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package fine-tuned model.
+        /// </summary>
+        public static string Main_PackageModelButton {
+            get {
+                return ResourceManager.GetString("Main_PackageModelButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set as override model.
+        /// </summary>
+        public static string Main_SetAsOverrideModelButton {
+            get {
+                return ResourceManager.GetString("Main_SetAsOverrideModelButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string Main_SettingsTabTitle {
+            get {
+                return ResourceManager.GetString("Main_SettingsTabTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translate with model.
+        /// </summary>
+        public static string Main_TranslateWithModelButton {
+            get {
+                return ResourceManager.GetString("Main_TranslateWithModelButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downloading.
+        /// </summary>
+        public static string Online_DownloadingStatus {
+            get {
+                return ResourceManager.GetString("Online_DownloadingStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extracting.
+        /// </summary>
+        public static string Online_ExtractingStatus {
+            get {
+                return ResourceManager.GetString("Online_ExtractingStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installation progress.
+        /// </summary>
+        public static string Online_InstallationProgressHeader {
+            get {
+                return ResourceManager.GetString("Online_InstallationProgressHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installed.
+        /// </summary>
+        public static string Online_InstalledStatus {
+            get {
+                return ResourceManager.GetString("Online_InstalledStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install model locally.
+        /// </summary>
+        public static string Online_InstallModelLocallyButton {
+            get {
+                return ResourceManager.GetString("Online_InstallModelLocallyButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model name filter.
+        /// </summary>
+        public static string Online_ModelNameFilterLabel {
+            get {
+                return ResourceManager.GetString("Online_ModelNameFilterLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model name.
+        /// </summary>
+        public static string Online_ModelNameHeader {
+            get {
+                return ResourceManager.GetString("Online_ModelNameHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source filter.
+        /// </summary>
+        public static string Online_SourceLangFilterLabel {
+            get {
+                return ResourceManager.GetString("Online_SourceLangFilterLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source languages.
+        /// </summary>
+        public static string Online_SourceLanguagesHeader {
+            get {
+                return ResourceManager.GetString("Online_SourceLanguagesHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target filter.
+        /// </summary>
+        public static string Online_TargetLangFilterLabel {
+            get {
+                return ResourceManager.GetString("Online_TargetLangFilterLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target languages.
+        /// </summary>
+        public static string Online_TargetLanguagesHeader {
+            get {
+                return ResourceManager.GetString("Online_TargetLanguagesHeader", resourceCulture);
             }
         }
         
@@ -440,281 +557,173 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OPUS-CAT MT Engine v{0}.
+        ///   Looks up a localized string similar to BLEU score.
         /// </summary>
-        public static string OpusCatWindowTitle {
+        public static string Progress_BleuAxis {
             get {
-                return ResourceManager.GetString("OpusCatWindowTitle", resourceCulture);
+                return ResourceManager.GetString("Progress_BleuAxis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In-domain validation set.
+        /// </summary>
+        public static string Progress_InDomainSeriesName {
+            get {
+                return ResourceManager.GetString("Progress_InDomainSeriesName", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Out-of-domain validation set.
         /// </summary>
-        public static string OutOfDomainSeriesName {
+        public static string Progress_OutOfDomainSeriesName {
             get {
-                return ResourceManager.GetString("OutOfDomainSeriesName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Package fine-tuned model.
-        /// </summary>
-        public static string PackageModelButton {
-            get {
-                return ResourceManager.GetString("PackageModelButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Restart OPUS-CAT MT Engine after changing these values..
-        /// </summary>
-        public static string RestartReminder {
-            get {
-                return ResourceManager.GetString("RestartReminder", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save.
-        /// </summary>
-        public static string SaveButton {
-            get {
-                return ResourceManager.GetString("SaveButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select separate files.
-        /// </summary>
-        public static string SeparateFilesRadioButton {
-            get {
-                return ResourceManager.GetString("SeparateFilesRadioButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Set as override model.
-        /// </summary>
-        public static string SetAsOverrideModelButton {
-            get {
-                return ResourceManager.GetString("SetAsOverrideModelButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings.
-        /// </summary>
-        public static string SettingsTabTitle {
-            get {
-                return ResourceManager.GetString("SettingsTabTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Source file.
-        /// </summary>
-        public static string SourceFileLabel {
-            get {
-                return ResourceManager.GetString("SourceFileLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Source filter.
-        /// </summary>
-        public static string SourceLangFilterLabel {
-            get {
-                return ResourceManager.GetString("SourceLangFilterLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Source languages.
-        /// </summary>
-        public static string SourceLanguagesHeader {
-            get {
-                return ResourceManager.GetString("SourceLanguagesHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Source text:.
-        /// </summary>
-        public static string SourceTextLabel {
-            get {
-                return ResourceManager.GetString("SourceTextLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Split validation files from the training files.
-        /// </summary>
-        public static string SplitFromTrainingRadioButton {
-            get {
-                return ResourceManager.GetString("SplitFromTrainingRadioButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Fine-tune.
-        /// </summary>
-        public static string StartFinetuneButton {
-            get {
-                return ResourceManager.GetString("StartFinetuneButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tag processing.
-        /// </summary>
-        public static string TagProcessingLabel {
-            get {
-                return ResourceManager.GetString("TagProcessingLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Target file.
-        /// </summary>
-        public static string TargetFileLabel {
-            get {
-                return ResourceManager.GetString("TargetFileLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Target filter.
-        /// </summary>
-        public static string TargetLangFilterLabel {
-            get {
-                return ResourceManager.GetString("TargetLangFilterLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Target languages.
-        /// </summary>
-        public static string TargetLanguagesHeader {
-            get {
-                return ResourceManager.GetString("TargetLanguagesHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tmx file.
-        /// </summary>
-        public static string TmxFileLabel {
-            get {
-                return ResourceManager.GetString("TmxFileLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} is not a valid .tmx file.
-        /// </summary>
-        public static string TmxFileNotValidMessage {
-            get {
-                return ResourceManager.GetString("TmxFileNotValidMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to TMX translation memory.
-        /// </summary>
-        public static string TmxRadioButton {
-            get {
-                return ResourceManager.GetString("TmxRadioButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Training files.
-        /// </summary>
-        public static string TrainingFilesLabel {
-            get {
-                return ResourceManager.GetString("TrainingFilesLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Translate.
-        /// </summary>
-        public static string TranslateButton {
-            get {
-                return ResourceManager.GetString("TranslateButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Translating with model 0}.
-        /// </summary>
-        public static string TranslateTitle {
-            get {
-                return ResourceManager.GetString("TranslateTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Translate with model.
-        /// </summary>
-        public static string TranslateWithModelButton {
-            get {
-                return ResourceManager.GetString("TranslateWithModelButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Translation:.
-        /// </summary>
-        public static string TranslationLabel {
-            get {
-                return ResourceManager.GetString("TranslationLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Text (separate files for source and target).
-        /// </summary>
-        public static string TxtFilesRadioButton {
-            get {
-                return ResourceManager.GetString("TxtFilesRadioButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Validation files (for monitoring the progress of training).
-        /// </summary>
-        public static string ValidationFilesLabel {
-            get {
-                return ResourceManager.GetString("ValidationFilesLabel", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Validation source file.
-        /// </summary>
-        public static string ValidationSourceFileLabel {
-            get {
-                return ResourceManager.GetString("ValidationSourceFileLabel", resourceCulture);
+                return ResourceManager.GetString("Progress_OutOfDomainSeriesName", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Validation step.
         /// </summary>
-        public static string ValidationStepAxis {
+        public static string Progress_ValidationStepAxis {
             get {
-                return ResourceManager.GetString("ValidationStepAxis", resourceCulture);
+                return ResourceManager.GetString("Progress_ValidationStepAxis", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Validation target file.
+        ///   Looks up a localized string similar to MT service HTTP port (used with other integrations, 1024-65535):.
         /// </summary>
-        public static string ValidationTargetFileLabel {
+        public static string Settings_HttpPortLabel {
             get {
-                return ResourceManager.GetString("ValidationTargetFileLabel", resourceCulture);
+                return ResourceManager.GetString("Settings_HttpPortLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):.
+        /// </summary>
+        public static string Settings_NetTcpPortLabel {
+            get {
+                return ResourceManager.GetString("Settings_NetTcpPortLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Note:.
+        /// </summary>
+        public static string Settings_NoteHeading {
+            get {
+                return ResourceManager.GetString("Settings_NoteHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open finetune settings in text editor.
+        /// </summary>
+        public static string Settings_OpenSettingsFileButton {
+            get {
+                return ResourceManager.GetString("Settings_OpenSettingsFileButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restart OPUS-CAT MT Engine after changing these values..
+        /// </summary>
+        public static string Settings_RestartReminder {
+            get {
+                return ResourceManager.GetString("Settings_RestartReminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string Settings_SaveButton {
+            get {
+                return ResourceManager.GetString("Settings_SaveButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Store OPUS-CAT MT Engine data in local application data folder.
+        /// </summary>
+        public static string Settings_StoreInAppdataCheckbox {
+            get {
+                return ResourceManager.GetString("Settings_StoreInAppdataCheckbox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add.
+        /// </summary>
+        public static string Tags_AddTagButton {
+            get {
+                return ResourceManager.GetString("Tags_AddTagButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string Tags_DeleteTagButton {
+            get {
+                return ResourceManager.GetString("Tags_DeleteTagButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit tags for {0}.
+        /// </summary>
+        public static string Tags_EditTagsTitle {
+            get {
+                return ResourceManager.GetString("Tags_EditTagsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model tags.
+        /// </summary>
+        public static string Tags_ModelTagsLabel {
+            get {
+                return ResourceManager.GetString("Tags_ModelTagsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source text:.
+        /// </summary>
+        public static string Translate_SourceTextLabel {
+            get {
+                return ResourceManager.GetString("Translate_SourceTextLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translate.
+        /// </summary>
+        public static string Translate_TranslateButton {
+            get {
+                return ResourceManager.GetString("Translate_TranslateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translating with model {0}.
+        /// </summary>
+        public static string Translate_TranslateTitle {
+            get {
+                return ResourceManager.GetString("Translate_TranslateTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Translation:.
+        /// </summary>
+        public static string Translate_TranslationLabel {
+            get {
+                return ResourceManager.GetString("Translate_TranslationLabel", resourceCulture);
             }
         }
     }

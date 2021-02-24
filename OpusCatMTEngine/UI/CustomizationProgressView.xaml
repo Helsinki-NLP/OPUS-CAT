@@ -11,10 +11,10 @@
     <Grid>
         <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Right" >
             <lvc:CartesianChart.AxisY>
-                <lvc:Axis MaxValue="100" MinValue="0" Title="{x:Static resx:Resources.BleuAxis}"></lvc:Axis>
+                <lvc:Axis MaxValue="100" MinValue="0" Title="{x:Static resx:Resources.Progress_BleuAxis}"></lvc:Axis>
             </lvc:CartesianChart.AxisY>
             <lvc:CartesianChart.AxisX>
-                <lvc:Axis Title="{x:Static resx:Resources.ValidationStepAxis}">
+                <lvc:Axis Title="{x:Static resx:Resources.Progress_ValidationStepAxis}">
                     <lvc:Axis.Separator>
                         <lvc:Separator Step="1" />
                     </lvc:Axis.Separator>
