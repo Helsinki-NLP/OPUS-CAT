@@ -39,7 +39,20 @@ namespace OpusCatMTEngine
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
             var source = this.SourceBox.Text;
-            Task<string> translate = new Task<string>(() => this.Model.Translate(source).Result);
+            Task<string> translate = new Task<string>(() =>
+                {
+                    var translation = new StringBuilder();
+                    using (System.IO.StringReader reader = new System.IO.StringReader(source))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            translation.Append(this.Model.Translate(line).Result+Environment.NewLine);
+                        }
+                    }
+                    return translation.ToString();
+                }
+                );
             translate.ContinueWith(x => Dispatcher.Invoke(() => this.TargetBox.Text = x.Result));
             translate.Start();
 

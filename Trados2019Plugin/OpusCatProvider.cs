@@ -264,10 +264,8 @@ namespace OpusCatTranslationProvider
             //processedDocuments[langPair].Add(doc);
         }
 
-        public OpusCatProvider(OpusCatOptions options)
+        public OpusCatProvider(OpusCatOptions options, ITranslationProviderCredentialStore credentialStore)
         {
-            //TODO: add some kind of throttling here or to Helper to prevent the service being overwhelmed by requests.
-            //Just keep a count of open connections and prevent connections when there are more than 100 or so.
             Options = options;
             
             //If we create a provider with the pregenerate on, add a doc change handler to start preordering

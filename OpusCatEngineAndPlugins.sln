@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinetuneTestsetExtractor", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpusCatTranslationProvider2021", "Trados2021Plugin\OpusCatTranslationProvider2021.csproj", "{72114486-2563-4AF6-B40C-515A21B04754}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SettingsUiTester", "SettingsUiTester\SettingsUiTester.csproj", "{23EB17A2-9A46-4D3E-A471-1952430CDA26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,18 @@ Global
 		{72114486-2563-4AF6-B40C-515A21B04754}.Release|x64.Build.0 = Release|x64
 		{72114486-2563-4AF6-B40C-515A21B04754}.Release|x86.ActiveCfg = Release|Any CPU
 		{72114486-2563-4AF6-B40C-515A21B04754}.Release|x86.Build.0 = Release|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Debug|x64.Build.0 = Debug|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Debug|x86.Build.0 = Debug|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Release|x64.ActiveCfg = Release|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Release|x64.Build.0 = Release|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Release|x86.ActiveCfg = Release|Any CPU
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -159,6 +173,7 @@ Global
 		{900A1FC4-841A-417D-A28B-4A52DB7B8CD5} = {7A01F5CB-2378-473E-AF22-69ED318A6235}
 		{B92960AA-D96E-464D-BF62-76BA6D440995} = {7A01F5CB-2378-473E-AF22-69ED318A6235}
 		{72114486-2563-4AF6-B40C-515A21B04754} = {7A01F5CB-2378-473E-AF22-69ED318A6235}
+		{23EB17A2-9A46-4D3E-A471-1952430CDA26} = {7A01F5CB-2378-473E-AF22-69ED318A6235}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8F143A32-2D24-488F-AD4C-CD6D074641C6}

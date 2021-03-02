@@ -1,4 +1,5 @@
 ﻿using Sdl.LanguagePlatform.Core;
+using Sdl.LanguagePlatform.TranslationMemoryApi;
 using Sdl.ProjectAutomation.Core;
 using System;
 using System.Collections.Generic;
@@ -29,21 +30,23 @@ namespace OpusCatTranslationProvider
     public partial class OpusCatOptionControl : UserControl, INotifyPropertyChanged, IHasOpusCatOptions
     {
 
-
-        public OpusCatOptionControl(OpusCatOptionsFormWPF hostForm, OpusCatOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs)
+        public OpusCatOptionControl(OpusCatOptionsFormWPF hostForm, 
+            OpusCatOptions options, 
+            Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs, 
+            Sdl.LanguagePlatform.TranslationMemoryApi.ITranslationProviderCredentialStore credentialStore)
         {
             this.DataContext = this;
-            
+            this.CredentialStore = credentialStore;
             this.Options = options;
             this.projectLanguagePairs = languagePairs.Select(
                 x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
 
             InitializeComponent();
-            this.ConnectionControl.LanguagePairs = this.projectLanguagePairs;
+            this.ConnectionSelection.ConnectionControl.LanguagePairs = this.projectLanguagePairs;
 
             //Null indicates that all properties have changed. Populates the WPF form
             PropertyChanged(this, new PropertyChangedEventArgs(null));
-
+            
             this.hostForm = hostForm;
         }
 
@@ -63,6 +66,7 @@ namespace OpusCatTranslationProvider
 
         public string MaxPreorderString { get { return $"segments (max {OpusCatTpSettings.Default.PregenerateSegmentCountMax})"; } }
 
+        public ITranslationProviderCredentialStore CredentialStore { get; private set; }
         public OpusCatOptions Options { get => options; set => options = value; }
 
         private void cancel_Click(object sender, RoutedEventArgs e)
@@ -84,7 +88,7 @@ namespace OpusCatTranslationProvider
 
         private void TagBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ConnectionControl.TagBox_SelectionChanged(sender, e);
+            this.ConnectionSelection.ConnectionControl.TagBox_SelectionChanged(sender, e);
         }
 
         private void NumberBox_PreviewTextInput(object sender, TextCompositionEventArgs e)

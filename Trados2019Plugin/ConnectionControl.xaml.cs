@@ -223,7 +223,6 @@ namespace OpusCatTranslationProvider
 
         private void StartFetch()
         {
-            
             var host = this.options.mtServiceAddress;
             var port = this.options.mtServicePort;
             this.ConnectionColor = new RadialGradientBrush(Colors.Yellow, Colors.DarkGoldenrod);

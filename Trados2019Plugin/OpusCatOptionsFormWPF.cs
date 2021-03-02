@@ -12,11 +12,11 @@ namespace OpusCatTranslationProvider
 {
     public partial class OpusCatOptionsFormWPF : Form
     {
-        public OpusCatOptionsFormWPF(OpusCatOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs)
+        public OpusCatOptionsFormWPF(OpusCatOptions options, Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs, Sdl.LanguagePlatform.TranslationMemoryApi.ITranslationProviderCredentialStore credentialStore)
         {
             this.Options = options;
             InitializeComponent();
-            this.wpfHost.Child = new OpusCatOptionControl(this, options, languagePairs);
+            this.wpfHost.Child = new OpusCatOptionControl(this, options, languagePairs, credentialStore);
         }
 
         public OpusCatOptions Options { get; internal set; }

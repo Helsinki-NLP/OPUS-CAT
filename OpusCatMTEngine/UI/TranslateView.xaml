@@ -9,6 +9,7 @@
         Height="400" Width="800">
     <Grid>
         <StackPanel Margin="10">
+            <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
             <Label Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
                 <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="150"></TextBox>
