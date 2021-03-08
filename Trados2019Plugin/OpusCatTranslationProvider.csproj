@@ -172,7 +172,7 @@
     <Compile Include="ConnectionControl.xaml.cs">
       <DependentUpon>ConnectionControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ElgServiceHelper.cs" />
+    <Compile Include="ElgServiceConnection.cs" />
     <Compile Include="ElgTokenResponse.cs" />
     <Compile Include="FileReader.cs" />
     <Compile Include="FinetuneBatchTaskControl.cs">
@@ -185,6 +185,7 @@
     <Compile Include="FinetuneWpfControl.xaml.cs">
       <DependentUpon>FinetuneWpfControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IElgCredentials.cs" />
     <Compile Include="OpusCatMarkupDataVisitor.cs" />
     <Compile Include="OpusCatOptionControl.xaml.cs">
       <DependentUpon>OpusCatOptionControl.xaml</DependentUpon>
@@ -225,7 +226,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RestSharp\Deserializers\JsonDeserializer.cs" />
     <Compile Include="TestsetExtractor.cs" />
+    <Compile Include="TradosElgCredentialWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ThirdPartyNotices.txt">

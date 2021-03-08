@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sdl.LanguagePlatform.TranslationMemoryApi;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,6 +28,9 @@ namespace OpusCatTranslationProvider
     /// </summary>
     public partial class ElgConnectionControl : UserControl, INotifyPropertyChanged
     {
+        private ElgServiceConnection elgConnection;
+        private string connectionStatus;
+        private OpusCatOptions options;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,16 +42,47 @@ namespace OpusCatTranslationProvider
             }
         }
 
+        public string ConnectionStatus
+        {
+            get => connectionStatus;
+            set
+            {
+                connectionStatus = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public List<string> LanguagePairs { get; internal set; }
+
         public ElgConnectionControl()
         {
             InitializeComponent();
+            this.DataContextChanged += ConnectionControl_DataContextChanged;
+
+            if (!DesignerProperties.GetIsInDesignMode(this))
+            {
+                Dispatcher.BeginInvoke(new Action(CheckLanguagePairs), System.Windows.Threading.DispatcherPriority.ContextIdle);
+            }
         }
 
-        private void UseElgModels_Checked(object sender, RoutedEventArgs e)
+        private void CheckLanguagePairs()
         {
             
         }
 
+        private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is IHasOpusCatOptions)
+            {
+
+                this.options = ((IHasOpusCatOptions)e.NewValue).Options;
+                PropertyChanged(this, new PropertyChangedEventArgs(null));
+                var credStore = ((OpusCatOptionControl)this.DataContext).CredentialStore;
+                var elgCreds = new TradosElgCredentialWrapper(credStore);
+                this.elgConnection = new ElgServiceConnection(elgCreds);
+            }
+        }
+        
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
@@ -56,8 +91,13 @@ namespace OpusCatTranslationProvider
         
         private void ConfirmCode_Click(object sender, RoutedEventArgs e)
         {
-            ElgServiceHelper.   
+            var enteredCode = this.ElgSuccessCodeBox.Text;
+            if (!String.IsNullOrWhiteSpace(enteredCode))
+            {
+                this.elgConnection.GetAccessAndRefreshToken(enteredCode);
+            }
         }
+
     }
 
 

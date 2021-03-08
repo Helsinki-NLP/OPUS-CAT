@@ -88,6 +88,27 @@ namespace OpusCatTranslationProvider
         }
         #endregion
 
+        public enum OpusCatSource { OpusCatMtEngine, Elg }
+
+        public OpusCatSource opusCatSource
+        {
+            get
+            {
+                var parameter = GetStringParameter("OpusCatSource");
+                if (parameter == "" || parameter == null)
+                {
+                    //Add default to URI
+                    SetStringParameter("OpusCatSource", OpusCatSource.Elg.ToString());
+                    return OpusCatSource.Elg;
+                }
+                else
+                {
+                    return (OpusCatSource)Enum.Parse(typeof(OpusCatSource), parameter);
+                }
+            }
+            set { SetStringParameter("OpusCatSource", value.ToString()); NotifyPropertyChanged(); }
+        }
+
         public string mtServicePort
         {
             get 

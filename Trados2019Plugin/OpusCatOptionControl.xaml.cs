@@ -42,7 +42,7 @@ namespace OpusCatTranslationProvider
                 x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
 
             InitializeComponent();
-            this.ConnectionSelection.ConnectionControl.LanguagePairs = this.projectLanguagePairs;
+            this.ConnectionSelection.LanguagePairs = this.projectLanguagePairs;
 
             //Null indicates that all properties have changed. Populates the WPF form
             PropertyChanged(this, new PropertyChangedEventArgs(null));
