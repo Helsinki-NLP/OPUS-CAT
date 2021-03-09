@@ -27,7 +27,15 @@ namespace OpusCatTranslationProvider
         {
             get
             {
-                return this.credentialStore.GetCredential(TradosElgCredentialWrapper.AccessTokenUri).Credential;
+                var credential = this.credentialStore.GetCredential(TradosElgCredentialWrapper.AccessTokenUri);
+                if (credential != null)
+                {
+                    return credential.Credential;
+                }
+                else
+                {
+                    return null;
+                }
             }
             set
             {
@@ -40,7 +48,15 @@ namespace OpusCatTranslationProvider
         {
             get
             {
-                return this.credentialStore.GetCredential(TradosElgCredentialWrapper.RefreshTokenUri).Credential;
+                var credential = this.credentialStore.GetCredential(TradosElgCredentialWrapper.RefreshTokenUri);
+                if (credential != null)
+                {
+                    return credential.Credential;
+                }
+                else
+                {
+                    return null;
+                }
             }
             set
             {

@@ -22,7 +22,6 @@ namespace OpusCatTranslationProvider
     /// </summary>
     public partial class ConnectionSelection : UserControl, INotifyPropertyChanged
     {
-        private string connectionStatus;
         private OpusCatOptions options;
 
         public ConnectionSelection()
@@ -30,6 +29,13 @@ namespace OpusCatTranslationProvider
             InitializeComponent();
             PropertyChanged(this, new PropertyChangedEventArgs(null));
             this.DataContextChanged += ConnectionControl_DataContextChanged;
+            this.ElgConnectionControl.PropertyChanged += ConnectionControl_PropertyChanged;
+            this.ConnectionControl.PropertyChanged += ConnectionControl_PropertyChanged;
+        }
+
+        private void ConnectionControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            NotifyPropertyChanged("ConnectionStatus");
         }
 
         private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

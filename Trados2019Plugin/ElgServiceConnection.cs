@@ -19,7 +19,7 @@ namespace OpusCatTranslationProvider
         {
             Ok,
             IncorrectSuccessCode,
-            InvalidRefreshCode,
+            InvalidRefreshToken,
             NoRefreshCode
         }
 
@@ -28,10 +28,21 @@ namespace OpusCatTranslationProvider
             this.elgCreds = elgCreds;
         }
 
-        internal bool CheckLanguagePairAvailability(string sourceLangCode, string targetLangCode)
+        internal bool? CheckLanguagePairAvailability(string sourceLangCode, string targetLangCode)
         {
             var response = this.ProcessTranslationRequest("test", sourceLangCode, targetLangCode);
-            return response.IsSuccessful;
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return null;
+            }
+            else if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
+            else
+            {
+                return response.IsSuccessful;
+            }
         }
 
         internal IRestResponse ProcessTranslationRequest(string source, string sourceLangCode, string targetLangCode)
@@ -64,13 +75,24 @@ namespace OpusCatTranslationProvider
 
         private IRestResponse SendTranslationRequest(string source, string sourceLangCode, string targetLangCode)
         {
-            var client = new RestClient("https://live.european-language-grid.eu/execution/processText/opusmtfien");
+            var client = new RestClient("" +
+                $"https://live.european-language-grid.eu/execution/processText/opusmt{sourceLangCode}{targetLangCode}");
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
             request.AddHeader("Authorization", $"Bearer {this.elgCreds.AccessToken}");
             request.AddHeader("Content-Type", "text/plain");
             request.AddParameter("text/plain", source + "\n", ParameterType.RequestBody);
+            
             IRestResponse response = client.Execute(request);
+
+            //There seem to be bad gateway errors occasionally
+            int retryCount = 5;
+            while (response.StatusCode == HttpStatusCode.BadGateway && retryCount > 0)
+            {
+                response = client.Execute(request);
+                retryCount--;
+            }
+
             return response;
         }
 
@@ -89,11 +111,14 @@ namespace OpusCatTranslationProvider
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                this.Status = ElgConnectionStatus.InvalidRefreshCode;
+                this.Status = ElgConnectionStatus.InvalidRefreshToken;
             }
             else
             {
                 this.Status = ElgConnectionStatus.Ok;
+                RestSharp.Serialization.Json.JsonDeserializer jsonDeserializer = new RestSharp.Serialization.Json.JsonDeserializer();
+                var tokenResponse = jsonDeserializer.Deserialize<ElgTokenResponse>(response);
+                this.elgCreds.AccessToken = tokenResponse.access_token;
             }
         }
 

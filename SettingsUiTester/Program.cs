@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using OpusCatTranslationProvider;
+using Sdl.LanguagePlatform.TranslationMemoryApi;
 using Studio.AssemblyResolver;
 
 namespace SettingsUiTester
 {
     class Program
     {
+        
         [STAThread]
         static void Main(string[] args)
         {
@@ -21,7 +23,7 @@ namespace SettingsUiTester
         static void ShowSettings(string[] args)
         {
             Sdl.LanguagePlatform.Core.LanguagePair[] languagePairs = new Sdl.LanguagePlatform.Core.LanguagePair[] { new Sdl.LanguagePlatform.Core.LanguagePair("en", "fi") };
-            var settingsWindow = new OpusCatTranslationProvider.OpusCatOptionControl(null,new OpusCatOptions(), languagePairs, null);
+            var settingsWindow = new OpusCatTranslationProvider.OpusCatOptionControl(null,new OpusCatOptions(), languagePairs, new TestCredentials());
             Window window = new Window
             {
                 Title = "UI settings",

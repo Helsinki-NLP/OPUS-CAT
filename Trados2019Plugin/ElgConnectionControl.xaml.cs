@@ -67,7 +67,24 @@ namespace OpusCatTranslationProvider
 
         private void CheckLanguagePairs()
         {
-            
+            this.connectionStatus = "";
+            foreach (var languagePair in this.LanguagePairs)
+            {
+                var pairsplit = languagePair.Split('-');
+                var result = this.elgConnection.CheckLanguagePairAvailability(pairsplit[0], pairsplit[1]);
+                if (result == null)
+                {
+                    Dispatcher.Invoke(() => this.ConnectionStatus = "No valid ELG credentials. Fetch new ELG credentials by following the instructions on the Connection tab");
+                }
+                else if (result.Value)
+                {
+                    Dispatcher.Invoke(() => this.ConnectionStatus += $"ELG model available for {languagePair}");
+                }
+                else if (!result.Value)
+                {
+                    Dispatcher.Invoke(() => this.ConnectionStatus += $"ELG model not available for {languagePair}");
+                }
+            }
         }
 
         private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -76,7 +93,6 @@ namespace OpusCatTranslationProvider
             {
 
                 this.options = ((IHasOpusCatOptions)e.NewValue).Options;
-                PropertyChanged(this, new PropertyChangedEventArgs(null));
                 var credStore = ((OpusCatOptionControl)this.DataContext).CredentialStore;
                 var elgCreds = new TradosElgCredentialWrapper(credStore);
                 this.elgConnection = new ElgServiceConnection(elgCreds);
@@ -94,7 +110,11 @@ namespace OpusCatTranslationProvider
             var enteredCode = this.ElgSuccessCodeBox.Text;
             if (!String.IsNullOrWhiteSpace(enteredCode))
             {
-                this.elgConnection.GetAccessAndRefreshToken(enteredCode);
+                Task.Run(() =>
+                    {
+                        this.elgConnection.GetAccessAndRefreshToken(enteredCode);
+                        this.CheckLanguagePairs();
+                    });
             }
         }
 
