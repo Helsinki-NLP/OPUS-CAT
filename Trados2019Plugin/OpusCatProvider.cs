@@ -270,7 +270,7 @@ namespace OpusCatTranslationProvider
             
             //If we create a provider with the pregenerate on, add a doc change handler to start preordering
             //MT when doc is changed
-            if (options.pregenerateMt)
+            if (options.pregenerateMt && options.opusCatSource == OpusCatOptions.OpusCatSource.OpusCatMtEngine)
             {
                 EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
                 //This should ensure the handler is only attached once, by always removing a possible previously
@@ -280,6 +280,11 @@ namespace OpusCatTranslationProvider
 
                 //If a document is open, check if the segment change handler should be added
                 OpusCatProvider.UpdateSegmentHandler();
+            }
+
+            if (this.Options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
+            {
+                OpusCatProvider.ElgConnection = new ElgServiceConnection(new TradosElgCredentialWrapper(credentialStore)); 
             }
 
         }
@@ -444,6 +449,8 @@ namespace OpusCatTranslationProvider
         {
             get { return Options.Uri; }
         }
+
+        internal static ElgServiceConnection ElgConnection { get; private set; }
         #endregion
 
         #endregion

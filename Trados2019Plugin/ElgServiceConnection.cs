@@ -13,9 +13,9 @@ namespace OpusCatTranslationProvider
     {
         private IElgCredentials elgCreds;
 
-        private ElgConnectionStatus Status { get; set; }
+        internal ElgConnectionStatus Status { get; set; }
 
-        private enum ElgConnectionStatus
+        internal enum ElgConnectionStatus
         {
             Ok,
             IncorrectSuccessCode,
@@ -43,6 +43,13 @@ namespace OpusCatTranslationProvider
             {
                 return response.IsSuccessful;
             }
+        }
+
+        internal string Translate(string source, string sourceLangCode, string targetLangCode)
+        {
+            var translationResponse = this.ProcessTranslationRequest(source, sourceLangCode, targetLangCode);
+            TranslationResponseRoot translationObject = JsonConvert.DeserializeObject<TranslationResponseRoot>(translationResponse.Content);
+            return translationObject.response.texts[0].content;
         }
 
         internal IRestResponse ProcessTranslationRequest(string source, string sourceLangCode, string targetLangCode)

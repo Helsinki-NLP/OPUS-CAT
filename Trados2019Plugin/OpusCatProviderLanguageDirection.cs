@@ -114,7 +114,22 @@ namespace OpusCatTranslationProvider
         private List<SearchResult> GenerateSystemResult(string sourceText, SearchMode mode, Segment segment, string sourceCode, string targetCode)
         {
             List<SearchResult> systemResults = new List<SearchResult>();
-            string translatedSentence = OpusCatMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode,this._options.modelTag);
+
+            string translatedSentence;
+            if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.OpusCatMtEngine)
+            {
+                translatedSentence = OpusCatMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode, this._options.modelTag);
+            }
+            else if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
+            {
+                translatedSentence = OpusCatProvider.ElgConnection.Translate(sourceText,
+                    sourceCode, 
+                    targetCode);
+            }
+            else
+            {
+                translatedSentence = null;
+            }
 
             if (String.IsNullOrEmpty(translatedSentence))
                 return systemResults;

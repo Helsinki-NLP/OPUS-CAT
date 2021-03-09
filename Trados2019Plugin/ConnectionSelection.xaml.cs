@@ -36,6 +36,7 @@ namespace OpusCatTranslationProvider
         private void ConnectionControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             NotifyPropertyChanged("ConnectionStatus");
+            NotifyPropertyChanged("ConnectionColor");
         }
 
         private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -47,12 +48,7 @@ namespace OpusCatTranslationProvider
                 PropertyChanged(this, new PropertyChangedEventArgs(null));
             }
         }
-
-        private void UpdateUi(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            
-        }
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -81,6 +77,21 @@ namespace OpusCatTranslationProvider
             }
         }
 
+        public Brush ConnectionColor
+        {
+            get
+            {
+                switch (this.options.opusCatSource)
+                {
+                    case OpusCatOptions.OpusCatSource.OpusCatMtEngine:
+                        return this.ConnectionControl.ConnectionColor;
+                    case OpusCatOptions.OpusCatSource.Elg:
+                        return this.ElgConnectionControl.ConnectionColor;
+                    default:
+                        return null;
+                }
+            }
+        }
 
         public string ConnectionStatus
         {
@@ -113,6 +124,7 @@ namespace OpusCatTranslationProvider
             set
             {
                 this.options.opusCatSource = OpusCatOptions.OpusCatSource.OpusCatMtEngine;
+                this.ConnectionControl.Refresh();
                 PropertyChanged(this, new PropertyChangedEventArgs(null));
             }
         }

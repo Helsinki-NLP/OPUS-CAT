@@ -31,6 +31,7 @@ namespace OpusCatTranslationProvider
         private ElgServiceConnection elgConnection;
         private string connectionStatus;
         private OpusCatOptions options;
+        private Brush connectionColor;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -40,6 +41,12 @@ namespace OpusCatTranslationProvider
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+
+        public Brush ConnectionColor
+        {
+            get => connectionColor;
+            set { connectionColor = value; NotifyPropertyChanged(); }
         }
 
         public string ConnectionStatus
@@ -67,6 +74,14 @@ namespace OpusCatTranslationProvider
 
         private void CheckLanguagePairs()
         {
+            if (this.options.opusCatSource != OpusCatOptions.OpusCatSource.Elg)
+            {
+                return;
+            }
+
+            Dispatcher.Invoke(() => this.ConnectionStatus = $"Checking if models exist for project language pairs.");
+            Dispatcher.Invoke(() => this.ConnectionColor = new RadialGradientBrush(Colors.Yellow, Colors.DarkGoldenrod));
+
             this.connectionStatus = "";
             foreach (var languagePair in this.LanguagePairs)
             {
@@ -74,7 +89,12 @@ namespace OpusCatTranslationProvider
                 var result = this.elgConnection.CheckLanguagePairAvailability(pairsplit[0], pairsplit[1]);
                 if (result == null)
                 {
-                    Dispatcher.Invoke(() => this.ConnectionStatus = "No valid ELG credentials. Fetch new ELG credentials by following the instructions on the Connection tab");
+                    Dispatcher.Invoke(() =>
+                        {
+                            this.ConnectionStatus = "No valid ELG credentials. Fetch new ELG credentials by following the instructions on the Connection tab";
+                            this.ConnectionColor = new RadialGradientBrush(Colors.Red, Colors.DarkRed);
+                        });
+                    return;
                 }
                 else if (result.Value)
                 {
@@ -85,6 +105,7 @@ namespace OpusCatTranslationProvider
                     Dispatcher.Invoke(() => this.ConnectionStatus += $"ELG model not available for {languagePair}");
                 }
             }
+            Dispatcher.Invoke(() => this.ConnectionColor = new RadialGradientBrush(Colors.LightGreen, Colors.Green));
         }
 
         private void ConnectionControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -108,12 +129,20 @@ namespace OpusCatTranslationProvider
         private void ConfirmCode_Click(object sender, RoutedEventArgs e)
         {
             var enteredCode = this.ElgSuccessCodeBox.Text;
+            this.ConnectionStatus = "Fetching token with success code";
             if (!String.IsNullOrWhiteSpace(enteredCode))
             {
                 Task.Run(() =>
                     {
                         this.elgConnection.GetAccessAndRefreshToken(enteredCode);
-                        this.CheckLanguagePairs();
+                        if (this.elgConnection.Status == ElgServiceConnection.ElgConnectionStatus.Ok)
+                        {
+                            this.CheckLanguagePairs();
+                        }
+                        else
+                        {
+                            Dispatcher.Invoke(() => this.ConnectionStatus = $"Success code was not accepted, try again.");
+                        }
                     });
             }
         }

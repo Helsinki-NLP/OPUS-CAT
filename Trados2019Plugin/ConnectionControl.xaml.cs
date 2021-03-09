@@ -110,7 +110,10 @@ namespace OpusCatTranslationProvider
             Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult.ToString());
         }
 
-
+        internal void Refresh()
+        {
+            Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+        }
 
         private void UpdateModelTags(List<string> tags, string currentModelTag)
         {
@@ -217,7 +220,8 @@ namespace OpusCatTranslationProvider
             //Fetch data only after data context has been set and the bindings have been resolved.
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                this.Refresh();
+                
             }
             
         }

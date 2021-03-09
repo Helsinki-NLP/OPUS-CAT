@@ -49,7 +49,7 @@
         <Border Margin="5" BorderThickness="1" BorderBrush="Black">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="15" Height="15" StrokeThickness="2" Stroke="Black" Fill="{Binding ElementName=ConnectionControl, Path=ConnectionColor, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Ellipse>
+                    <Ellipse Width="15" Height="15" StrokeThickness="2" Stroke="Black" Fill="{Binding ElementName=ConnectionSelection, Path=ConnectionColor, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></Ellipse>
                     <Label FontWeight="Bold">Connection status</Label>
                 </StackPanel>
                 <TextBlock Margin="5" TextWrapping="Wrap" Text="{Binding ElementName=ConnectionSelection, Path=ConnectionStatus, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></TextBlock>

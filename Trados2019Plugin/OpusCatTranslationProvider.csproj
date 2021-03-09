@@ -229,6 +229,7 @@
     <Compile Include="RestSharp\Deserializers\JsonDeserializer.cs" />
     <Compile Include="TestsetExtractor.cs" />
     <Compile Include="TradosElgCredentialWrapper.cs" />
+    <Compile Include="TranslationResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ThirdPartyNotices.txt">
