@@ -23,5 +23,9 @@ permalink: /tradosplugin
       <img src="./images/ProjectSettings.png?raw=true" alt="drawing" width="75%"/>
     - The **Project Settings** window opens. Select **Language Pairs** and then select **All Language Pairs** (or a specific language pair, if the project has been set up to use different translation providers for different language pairs), and then select **Translation Memory and Automated Translation**. Click **Use** and select **OPUS-CAT** from the list.
       <img src="./images/TpSettings.png?raw=true" alt="drawing" width="75%"/>
-
-      
+7. Add OPUS-CAT to the project by clicking the **Save** button (you can also modify the default settings here if needed):
+      <img src="./images/SaveSettings.png?raw=true" alt="drawing" width="75%"/>
+8. **OPUS-CAT** should now appear in the list of translation providers:
+      <img src="./images/OpusCatAsTranslationProvider.png?raw=true" alt="drawing" width="75%"/>
+9. When you now open the project in Trados editor, OPUS-CAT MT suggestions should be displayed for new segments:
+      <img src="./images/TradosSuggestion.png?raw=true" alt="drawing" width="75%"/>
