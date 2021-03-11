@@ -14,7 +14,7 @@ Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/relea
 
 ### Installing machine translation models
 
-1. Start the OPUS-CAT MT Engine application by clicking *OpusCatMTEngine.exe* in the extraction folder.
+1. Start the OPUS-CAT MT Engine application by clicking *OpusCatMTEngine.exe* in the extraction folder (note that the file extension .exe may be hidden in Windows Explorer, in that case the file is shown as OpusCatMTEngine).
 2. Install models from the OPUS model repository for the language pairs that you require.
    - Click **Install OPUS model from Web**.
 	<img src="./images/InstallOnlineModel.PNG?raw=true" alt="drawing" width="75%"/>

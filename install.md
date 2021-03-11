@@ -11,7 +11,7 @@ permalink: /install
   - [memoQ 9.2 or older](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll) or [memoQ 9.3 or newer](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-10-07/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder. **IMPORTANT**: Make sure to unblock the dll file before copying it (right-click file, choose **Properties**, check the **Unblock** box in the bottom right of the **Properties** window).
   - Wordfast: There is currently no plugin for Wordfast, but Fiskmo MT can be used in Wordfast as a [custom MT provider](./wordfast).
   - OmegaT: There is an OmegaT plugin available for the development version of the MT engine. The plugin will be released shortly, but if you want to use the OmegaT plugin before that, contact us.
-3. Start the OPUS-CAT MT Engine application by clicking OpusCatMTEngine.exe in the extraction folder.
+3. Start the OPUS-CAT MT Engine application by clicking OpusCatMTEngine.exe in the extraction folder (note that the file extension .exe may be hidden in Windows Explorer, in that case the file is shown as OpusCatMTEngine).
 4. Install models from the OPUS model repository for the language pairs that you require.
    - Click **Install OPUS model from Web**.
        <img src="./images/InstallOnlineModel.PNG?raw=true" alt="drawing" width="75%"/>
