@@ -23,12 +23,11 @@ namespace OpusCatMTEngine
         private Process bpeProcess;
         private Process decoderProcess;*/
         private Process mtPipe;
-        private string langpair;
         
         private volatile bool translationInProgress = false;
 
-        public string SourceCode { get; }
-        public string TargetCode { get; }
+        public string SourceCode { get; set; }
+        public string TargetCode { get; set; }
         public bool Faulted { get; private set; }
         public Process MtPipe { get => mtPipe; set => mtPipe = value; }
 
@@ -40,8 +39,8 @@ namespace OpusCatMTEngine
         private readonly bool includeTagPairs;
 
         public string SystemName { get; }
+        public bool MultilingualModel { get; private set; }
 
-        private string mtPipeCmds;
         private bool sentencePiecePostProcess;
         private static readonly Object lockObj = new Object();
 
@@ -75,35 +74,60 @@ namespace OpusCatMTEngine
 
         public MarianProcess(
             string modelDir, 
-            string sourceCode, 
-            string targetCode, 
+            string sourceCode,
+            string targetCode,
+            string modelName, 
+            bool multilingualModel,
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
             this.Faulted = false;
-            this.langpair = $"{sourceCode}-{targetCode}";
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
             this.modelDir = modelDir;
-            this.SystemName = $"{sourceCode}-{targetCode}_" + (new DirectoryInfo(this.modelDir)).Name;
-         
+            this.SystemName = $"{this.SourceCode}-{this.TargetCode}_{modelName}";
+            this.MultilingualModel = multilingualModel;
+
             Log.Information($"Starting MT pipe for model {this.SystemName}.");
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
+            //There are scripts for monolingual and multilingual models
+
+            string pipeBat, pipeArgs;
+
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
-                this.mtPipeCmds = "StartSentencePieceMtPipe.bat";
+                if (this.MultilingualModel)
+                {
+                    pipeBat = "StartSentencePieceMultilingualMtPipe.bat";
+                    pipeArgs = $"{this.modelDir} {this.TargetCode}";
+                }
+                else
+                {
+                    pipeBat = "StartSentencePieceMtPipe.bat";
+                    pipeArgs = this.modelDir;
+                }
+                
                 this.sentencePiecePostProcess = true;
             }
             else
             {
-                this.mtPipeCmds = "StartMosesBpeMtPipe.bat";
+                if (this.MultilingualModel)
+                {
+                    pipeBat = "StartMosesBpeMultilingualMtPipe.bat";
+                    pipeArgs = $"{this.modelDir} {this.SourceCode} {this.TargetCode}";
+                }
+                else
+                {
+                    pipeBat = "StartMosesBpeMtPipe.bat";
+                    pipeArgs = $"{this.modelDir} {this.SourceCode}";
+                }
                 this.sentencePiecePostProcess = false;
             }
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
-            this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
+            this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(pipeBat,pipeArgs);
 
             this.utf8Writer = new StreamWriter(this.MtPipe.StandardInput.BaseStream, new UTF8Encoding(false));
 
@@ -143,7 +167,7 @@ namespace OpusCatMTEngine
             //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
             //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
 
-            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.TargetCode, this.includePlaceholderTags, this.includeTagPairs);
+            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.SourceCode, this.includePlaceholderTags, this.includeTagPairs);
 
             this.utf8Writer.WriteLine(sourceSentence);
             this.utf8Writer.Flush();

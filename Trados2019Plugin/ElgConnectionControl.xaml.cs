@@ -64,12 +64,19 @@ namespace OpusCatTranslationProvider
         public ElgConnectionControl()
         {
             InitializeComponent();
+           
             this.DataContextChanged += ConnectionControl_DataContextChanged;
 
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                Dispatcher.BeginInvoke(new Action(CheckLanguagePairs), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                //BeginInvoke just makes sure that this is performed after data context has changed
+                Dispatcher.BeginInvoke(new Action(StartCheck), System.Windows.Threading.DispatcherPriority.ContextIdle);
             }
+        }
+
+        private void StartCheck()
+        {
+            Task.Run(() => this.CheckLanguagePairs());
         }
 
         private void CheckLanguagePairs()

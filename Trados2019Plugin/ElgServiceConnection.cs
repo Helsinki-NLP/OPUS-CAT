@@ -48,8 +48,16 @@ namespace OpusCatTranslationProvider
         internal string Translate(string source, string sourceLangCode, string targetLangCode)
         {
             var translationResponse = this.ProcessTranslationRequest(source, sourceLangCode, targetLangCode);
-            TranslationResponseRoot translationObject = JsonConvert.DeserializeObject<TranslationResponseRoot>(translationResponse.Content);
-            return translationObject.response.texts[0].content;
+            if (translationResponse.IsSuccessful)
+            {
+                TranslationResponseRoot translationObject = JsonConvert.DeserializeObject<TranslationResponseRoot>(translationResponse.Content);
+                return translationObject.response.texts[0].content;
+            }
+            else
+            {
+                throw new Exception($"Problem fetching translation from ELG: {translationResponse.StatusCode}");
+                //return null;
+            }
         }
 
         internal IRestResponse ProcessTranslationRequest(string source, string sourceLangCode, string targetLangCode)
@@ -110,7 +118,7 @@ namespace OpusCatTranslationProvider
             var request = new RestRequest(Method.POST);
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             request.AddParameter("refresh_token", this.elgCreds.RefreshToken);
-            request.AddParameter("grant_type", "authorization_code");
+            request.AddParameter("grant_type", "refresh_token");
             request.AddParameter("client_id", "elg-oob");
             request.AddParameter("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
             

@@ -229,6 +229,8 @@ namespace OpusCatMTEngine
             this.onlineModels = new List<MTModel>();
 
             Log.Information($"Fetching a list of online models from {OpusCatMTEngineSettings.Default.ModelStorageUrl}");
+
+            //There might be a .NET library suitable for accessing Allas, but this works now, so stick with it
             using (var client = new WebClient())
             {
                 client.DownloadStringCompleted += modelListDownloadComplete;
@@ -327,7 +329,8 @@ namespace OpusCatMTEngine
             var ns = bucket.Root.Name.Namespace;
             var files = bucket.Descendants(ns + "Key").Select(x => x.Value);
             var models = files.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
-            this.onlineModels.AddRange(models.Select(x => new MTModel(x.Replace("models /", "").Replace(".zip", ""))));
+            
+            this.onlineModels.AddRange(models.Select(x => new MTModel(x.Replace(".zip", ""))));
 
             var nextMarker = bucket.Descendants(ns + "NextMarker").SingleOrDefault();
             if (nextMarker != null)
@@ -356,14 +359,16 @@ namespace OpusCatMTEngine
                 }
 
                 //Remove multilanguage models from the list, they aren't supported yet
-                this.onlineModels = this.onlineModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1).ToList();
+                //this.onlineModels = this.onlineModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1).ToList();
                 this.FilterOnlineModels("", "", "");
             }
         }
 
         internal string TranslateWithModel(string input, string modelName)
         {
-            return this.LocalModels.Single(x => x.Name == modelName).Translate(input).Result;
+            var model = this.LocalModels.Single(x => x.Name == modelName);
+            //This will only work properly with monolingual models, but not sure if this method is actually used anywhere.
+            return model.Translate(input,model.SourceLanguages.First(),model.TargetLanguages.First()).Result;
         }
         
 
@@ -590,7 +595,7 @@ namespace OpusCatMTEngine
                 throw new FaultException($"No MT model available for {srcLang}-{trgLang}");
             }
 
-            return mtModel.Translate(input);
+            return mtModel.Translate(input,srcLang,trgLang);
         }
 
         private MTModel GetPrimaryModel(IsoLanguage srcLang, IsoLanguage trgLang)

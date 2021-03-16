@@ -47,7 +47,11 @@ namespace OpusCatMTEngine
                         string line;
                         while ((line = reader.ReadLine()) != null)
                         {
-                            translation.Append(this.Model.Translate(line).Result+Environment.NewLine);
+                            //TODO: add language selectors to the translate window for multilingual models
+                            translation.Append(
+                                this.Model.Translate(
+                                    line,
+                                    this.Model.SourceLanguages.First(), this.Model.TargetLanguages.First()).Result+Environment.NewLine);
                         }
                     }
                     return translation.ToString();

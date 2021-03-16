@@ -125,7 +125,7 @@ namespace OpusCatMTEngine
         public FileInfo AlignmentPriorsFile {
             get { return new FileInfo(Path.Combine(this.InstallDir, "alignmentpriors.txt")); } }
 
-        private MarianProcess marianProcess;
+        private Dictionary<Tuple<string,string>,MarianProcess> marianProcesses;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -139,21 +139,47 @@ namespace OpusCatMTEngine
 
         internal void Shutdown()
         {
-            if (this.marianProcess != null)
+            if (this.marianProcesses != null)
             {
-                this.marianProcess.ShutdownMtPipe();
-                this.marianProcess = null;
+                foreach (var langpair in this.marianProcesses.Keys)
+                {
+                    this.marianProcesses[langpair].ShutdownMtPipe();
+                    this.marianProcesses[langpair] = null;
+                }
             }
+            this.marianProcesses = null;
         }
 
-        internal Task<string> Translate(string input)
+        internal Task<string> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
-            if (this.marianProcess == null)
+            //Need to get the original codes, since those are the ones the marian model uses
+            var modelOrigSourceCode =
+                this.SourceLanguages.Single(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode).OriginalCode;
+            var modelOrigTargetCode =
+                this.TargetLanguages.Single(x => x.ShortestIsoCode == targetLang.ShortestIsoCode).OriginalCode;
+
+            var modelOrigTuple = new Tuple<string, string>(modelOrigSourceCode, modelOrigTargetCode);
+            
+            //Each source language in a multilingual model requires its own marian process,
+            //since the preprocessing is different for each source language (only for BPE)
+            if (this.marianProcesses == null)
             {
-                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
+                this.marianProcesses = new Dictionary<Tuple<string, string>, MarianProcess>();
             }
 
-            return this.marianProcess.AddToTranslationQueue(input);
+            if (!this.marianProcesses.ContainsKey(modelOrigTuple))
+            {
+                 this.marianProcesses[modelOrigTuple] =
+                    new MarianProcess(
+                        this.InstallDir, 
+                        modelOrigSourceCode,
+                        modelOrigTargetCode,
+                        $"{this.SourceLanguageString}-{this.TargetLanguageString}_{this.Name}",
+                        this.targetLanguages.Count > 1,
+                        this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
+            };
+
+            return this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
         }
 
         internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -479,8 +505,15 @@ namespace OpusCatMTEngine
             }
             var pathSplit = modelPath.Split(separator);
             //Multiple source languages separated by plus symbols
-            this.SourceLanguages = pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-            this.TargetLanguages = pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+
+            //For OPUS-MT models and monolingual Tatoeba models, 
+            //languages are included in path. For multilingual Tatoeba models,
+            //language have to be fetched the metadata yml file
+            this.SourceLanguages = 
+                pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+            this.TargetLanguages = 
+                pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+            
             this.Name = pathSplit[1];
             this.ModelPath = modelPath;
         }
@@ -594,6 +627,7 @@ namespace OpusCatMTEngine
                 return this.Status == MTModelStatus.OK;
             }
         }
+
         public string SourceLanguageString
         {
             get { return String.Join("+", this.SourceLanguages); }

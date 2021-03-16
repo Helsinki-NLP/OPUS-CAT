@@ -357,8 +357,8 @@ namespace OpusCatMTEngine
             this.includeTagPairs = includeTagPairs;
             this.inDomainValidationSource = indomainValidPair.Source;
             this.inDomainValidationTarget = indomainValidPair.Target;
-            this.sourceCode = model.SourceLanguageString;
-            this.targetCode = model.TargetLanguageString;
+            this.sourceCode = model.SourceLanguages.Single().OriginalCode;
+            this.targetCode = model.TargetLanguages.Single().OriginalCode;
             this.guidedAlignment = guidedAlignment;
         }
 

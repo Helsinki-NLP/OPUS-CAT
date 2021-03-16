@@ -128,6 +128,7 @@ namespace OpusCatMTEngine
 
         public string Iso15924Script { get; set; }
         public string IsoRefName { get; }
+        public string OriginalCode { get; }
 
         //This constructor parses the code.
         //The language code may be from a MT model, Opus MT models generally have ISO-639-1 codes if possible,
@@ -141,6 +142,10 @@ namespace OpusCatMTEngine
         //The purpose of this class is to convert all these dissimilar formats to objects of one type.
         public IsoLanguage(string languageCode)
         {
+
+            //Store the original code. This is needed for e.g. picking the correct source file code for
+            //tokenization and correct target language code for multilingual models
+            this.OriginalCode = languageCode;
 
             //Format checking
             Match opusMatch = IsoLanguage.OpusMtCode.Match(languageCode);

@@ -64,31 +64,43 @@
                 ScrollViewer.CanContentScroll="True"
                 DockPanel.Dock="Bottom"
                 GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="BorderBrush" Value="LightGray" />
-                        <Setter Property="BorderThickness" Value="1,1,1,1" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.View>
-                    <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
-                            <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100"/>
-                            <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100" />
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="1,1,1,1" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
+                            <GridViewColumn Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>                                        
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelNameHeader}" Width="200"/>
                             <GridViewColumn Header="{x:Static resx:Resources.Online_InstallationProgressHeader}" x:Name="InstallProgress">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
-                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
 
-                </ListView.View>
-            </ListView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </DockPanel>
     </Grid>
