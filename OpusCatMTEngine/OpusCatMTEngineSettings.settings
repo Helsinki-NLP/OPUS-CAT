@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OpusCatMTEngine" GeneratedClassName="OpusCatMTEngineSettings">
   <Profiles />
   <Settings>
-    <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
+    <Setting Name="OpusModelStorageUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT-models/</Value>
     </Setting>
     <Setting Name="LocalOpusCatDir" Type="System.String" Scope="User">
@@ -58,6 +58,9 @@
     </Setting>
     <Setting Name="ModelDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">models</Value>
+    </Setting>
+    <Setting Name="TatoebaModelStorageUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://object.pouta.csc.fi/Tatoeba-MT-models/</Value>
     </Setting>
   </Settings>
 </SettingsFile>

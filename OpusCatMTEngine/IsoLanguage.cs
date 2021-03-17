@@ -186,14 +186,14 @@ namespace OpusCatMTEngine
 
             //If parsing has failed, store the language code as non iso
             if ((String.IsNullOrEmpty(this.Iso639_1Code) || !IsoLanguage.Iso639_1To639_3.ContainsKey(this.Iso639_1Code)) &&
-                (String.IsNullOrEmpty(this.Iso639_3Code) || !IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code)) &&
+                (String.IsNullOrEmpty(this.Iso639_3Code) || !IsoLanguage.Iso639_3ToRefName.ContainsKey(this.Iso639_3Code)) &&
                 (String.IsNullOrEmpty(this.Iso639_5Code) || !IsoLanguage.Iso639_5ToRefName.ContainsKey(this.Iso639_5Code)))
             {
                 this.NonIsoCode = languageCode;
             }
             else
             {
-                //Get iso639_1 from is639_3 code if one exists
+                //Get iso639_1 from iso639_3 code if one exists
                 if (String.IsNullOrEmpty(Iso639_1Code) &&
                     !String.IsNullOrEmpty(this.Iso639_3Code) &&
                     IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code))
@@ -209,10 +209,15 @@ namespace OpusCatMTEngine
                 {
                     this.IsoRefName = IsoLanguage.Iso639_3ToRefName[this.Iso639_3Code];
                 }
-                else
+                else if (this.Iso639_5Code != null)
                 {
                     this.IsoRefName = IsoLanguage.Iso639_5ToRefName[this.Iso639_5Code];
                 }
+                else
+                {
+
+                }
+                
             }
         }
 

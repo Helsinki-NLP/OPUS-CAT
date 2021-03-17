@@ -70,7 +70,6 @@ namespace OpusCatMTEngine
         }
 
         private DirectoryInfo opusModelDir;
-        private FileSystemWatcher watcher;
         private bool batchTranslationOngoing;
         
         public bool OverrideModelSet { get => this.overrideModel != null; }
@@ -132,7 +131,6 @@ namespace OpusCatMTEngine
 
         internal void SortOnlineModels(string header, ListSortDirection direction)
         {
-            var test = this.FilteredOnlineModels.First()[header];
             this.FilteredOnlineModels = new ObservableCollection<MTModel>(this.FilteredOnlineModels.OrderBy(x => x[header]));
             if (direction == ListSortDirection.Descending)
             {
@@ -169,8 +167,8 @@ namespace OpusCatMTEngine
         {
             var filteredModels = from model in this.onlineModels
                                  where
-                                    model.SourceLanguageString.Contains(sourceFilter) &&
-                                    model.TargetLanguageString.Contains(targetFilter) &&
+                                    model.SourceCodesString.Contains(sourceFilter) &&
+                                    model.TargetCodesString.Contains(targetFilter) &&
                                     model.Name.Contains(nameFilter)
                                  select model;
 
@@ -228,13 +226,24 @@ namespace OpusCatMTEngine
         {
             this.onlineModels = new List<MTModel>();
 
-            Log.Information($"Fetching a list of online models from {OpusCatMTEngineSettings.Default.ModelStorageUrl}");
+            var modelStorages =
+                new List<string> {
+                    OpusCatMTEngineSettings.Default.OpusModelStorageUrl,
+                    OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl
+                };
 
-            //There might be a .NET library suitable for accessing Allas, but this works now, so stick with it
-            using (var client = new WebClient())
+            foreach (var modelStorage in modelStorages)
             {
-                client.DownloadStringCompleted += modelListDownloadComplete;
-                client.DownloadStringAsync(new Uri(OpusCatMTEngineSettings.Default.ModelStorageUrl));
+                Log.Information($"Fetching a list of online models from {modelStorage}");
+
+                //There might be a .NET library suitable for accessing Allas (did not find suitable one with quick search), 
+                //but this works now, so stick with it.
+                using (var client = new WebClient())
+                {
+                    var storageUri = new Uri(modelStorage);
+                    client.DownloadStringCompleted += (x,y) => modelListDownloadComplete(storageUri,x,y);
+                    client.DownloadStringAsync(storageUri);
+                }
             }
         }
 
@@ -312,7 +321,7 @@ namespace OpusCatMTEngine
 
         }
 
-        private void modelListDownloadComplete(object sender, DownloadStringCompletedEventArgs e)
+        private void modelListDownloadComplete(Uri nextUri, object sender, DownloadStringCompletedEventArgs e)
         {
             XDocument bucket;
             try
@@ -337,8 +346,8 @@ namespace OpusCatMTEngine
             {
                 using (var client = new WebClient())
                 {
-                    client.DownloadStringCompleted += modelListDownloadComplete;
-                    var uriBuilder = new UriBuilder(OpusCatMTEngineSettings.Default.ModelStorageUrl);
+                    client.DownloadStringCompleted += (x,y) => modelListDownloadComplete(nextUri,x,y);
+                    var uriBuilder = new UriBuilder(nextUri);
                     var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                     query["marker"] = nextMarker.Value;
                     uriBuilder.Query = query.ToString();
@@ -358,8 +367,6 @@ namespace OpusCatMTEngine
                     }
                 }
 
-                //Remove multilanguage models from the list, they aren't supported yet
-                //this.onlineModels = this.onlineModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1).ToList();
                 this.FilterOnlineModels("", "", "");
             }
         }
@@ -671,7 +678,7 @@ namespace OpusCatMTEngine
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{OpusCatMTEngineSettings.Default.ModelStorageUrl}{newerModel}.zip";
+                var modelUrl = $"{OpusCatMTEngineSettings.Default.OpusModelStorageUrl}{newerModel}.zip";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
                 client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
             }
@@ -747,32 +754,6 @@ namespace OpusCatMTEngine
             //new model fetch call to check whether pair is supported
             return this.LocalModels.Any(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
         }
-
-        //Check for existence of current OPUS-CAT models in the model dir
-        public string CheckForNewerModel(string sourceLang, string targetLang)
-        {
-            string newerModel = null;
-            //var timestamps = this.GetLatestModelInfo().Select(x => Regex.Match(x, @"\d{8}").Value);
-            //order models by timestamp
-            var onlineModels = this.onlineModels.OrderBy(x => Regex.Match(x.Name, @"\d{8}").Value);
-
-            if (onlineModels != null)
-            {
-                var newestLangpairModel = onlineModels.LastOrDefault(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
-
-                if (newestLangpairModel != null)
-                {
-                    var newestModelDir = Path.Combine(
-                    OpusModelDir.FullName, Regex.Replace(newestLangpairModel.Name, @"\.zip$", ""));
-                    if (!Directory.Exists(newestModelDir))
-                    {
-                        newerModel = newestLangpairModel.Name;
-                    }
-                }
-            }
-
-            return newerModel;
-        }
-
+        
     }
 }

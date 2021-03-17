@@ -174,7 +174,7 @@ namespace OpusCatMTEngine
                         this.InstallDir, 
                         modelOrigSourceCode,
                         modelOrigTargetCode,
-                        $"{this.SourceLanguageString}-{this.TargetLanguageString}_{this.Name}",
+                        $"{this.SourceCodesString}-{this.TargetCodesString}_{this.Name}",
                         this.targetLanguages.Count > 1,
                         this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
             };
@@ -630,10 +630,20 @@ namespace OpusCatMTEngine
 
         public string SourceLanguageString
         {
+            get { return String.Join(", ", this.SourceLanguages.Select(x => x.IsoRefName)); }
+        }
+
+        public string SourceCodesString
+        {
             get { return String.Join("+", this.SourceLanguages); }
         }
 
         public string TargetLanguageString
+        {
+            get { return String.Join(", ", this.TargetLanguages.Select(x => x.IsoRefName)); }
+        }
+
+        public string TargetCodesString
         {
             get { return String.Join("+", this.TargetLanguages); }
         }

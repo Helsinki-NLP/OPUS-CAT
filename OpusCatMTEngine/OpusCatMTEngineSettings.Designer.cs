@@ -26,12 +26,12 @@ namespace OpusCatMTEngine {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/OPUS-MT-models/")]
-        public string ModelStorageUrl {
+        public string OpusModelStorageUrl {
             get {
-                return ((string)(this["ModelStorageUrl"]));
+                return ((string)(this["OpusModelStorageUrl"]));
             }
             set {
-                this["ModelStorageUrl"] = value;
+                this["OpusModelStorageUrl"] = value;
             }
         }
         
@@ -248,6 +248,18 @@ namespace OpusCatMTEngine {
             }
             set {
                 this["ModelDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/Tatoeba-MT-models/")]
+        public string TatoebaModelStorageUrl {
+            get {
+                return ((string)(this["TatoebaModelStorageUrl"]));
+            }
+            set {
+                this["TatoebaModelStorageUrl"] = value;
             }
         }
     }
