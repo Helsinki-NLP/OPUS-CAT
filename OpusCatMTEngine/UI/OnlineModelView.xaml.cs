@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,14 +20,48 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for OnlineModelView.xaml
     /// </summary>
-    public partial class OnlineModelView : UserControl
+    public partial class OnlineModelView : UserControl, INotifyPropertyChanged
     {
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private string sourceFilter = "";
         private string targetFilter = "";
         private string nameFilter = "";
         private ModelManager modelManager;
         private GridViewColumnHeader lastHeaderClicked;
         private ListSortDirection lastDirection;
+
+        private bool showBilingualModels;
+        public bool ShowBilingualModels
+        {
+            get => showBilingualModels;
+            set
+            {
+                showBilingualModels = value;
+                NotifyPropertyChanged();
+                this.FilterModels();
+            }
+        }
+
+        private bool showMultilingualModels;
+        public bool ShowMultilingualModels
+        {
+            get => showMultilingualModels;
+            set
+            {
+                showMultilingualModels = value;
+                NotifyPropertyChanged();
+                this.FilterModels();
+            }
+        }
 
         public OnlineModelView()
         {
@@ -37,6 +72,8 @@ namespace OpusCatMTEngine
         private void dataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             this.modelManager = ((ModelManager)this.DataContext);
+            this.ShowBilingualModels = true;
+            this.ShowMultilingualModels = true;
         }
 
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
@@ -59,6 +96,7 @@ namespace OpusCatMTEngine
 
                 selectedModel.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_DownloadingStatus;
                 this.modelManager.DownloadModel(
+                    selectedModel.ModelUri,
                     selectedModel.ModelPath,
                     selectedModel.DownloadProgressChanged,
                     (x, y) => DownloadCompleted(selectedModel, x, y));
@@ -76,8 +114,13 @@ namespace OpusCatMTEngine
             this.nameFilter = ((TextBox)sender).Text;
             if (this.modelManager != null)
             {
-                this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+                this.FilterModels();
             }
+        }
+
+        private void FilterModels()
+        {
+            this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter, this.showMultilingualModels, this.showBilingualModels);
         }
 
         private void sourceLangFilter_TextChanged(object sender, TextChangedEventArgs e)
@@ -85,7 +128,7 @@ namespace OpusCatMTEngine
             this.sourceFilter = ((TextBox)sender).Text;
             if (this.modelManager != null)
             {
-                this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+                this.FilterModels();
             }
         }
 
@@ -94,7 +137,7 @@ namespace OpusCatMTEngine
             this.targetFilter = ((TextBox)sender).Text;
             if (this.modelManager != null)
             {
-                this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter);
+                this.FilterModels();
             }
         }
 
@@ -123,12 +166,23 @@ namespace OpusCatMTEngine
                         }
                     }
 
+                    //DisplayMemberBinding is only available for some columns, not for e.g. those
+                    //with DataTemplates for line wrapping etc. Those need to be handled by the switch
+                    //block below
                     var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
                     var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
-
-                    if (sortBy == "Installation progress")
+                    
+                    switch (sortBy)
                     {
-                        sortBy = "InstallProgress";
+                        case "Installation progress":
+                            sortBy = "InstallProgress";
+                            break;
+                        case "Source languages":
+                            sortBy = "SourceLanguageString";
+                            break;
+                        case "Target languages":
+                            sortBy = "TargetLanguageString";
+                            break;
                     }
 
                     this.modelManager.SortOnlineModels(sortBy, direction);

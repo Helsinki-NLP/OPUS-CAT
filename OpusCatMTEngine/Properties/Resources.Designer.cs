@@ -511,6 +511,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Model URI.
+        /// </summary>
+        public static string Online_ModelUriHeader {
+            get {
+                return ResourceManager.GetString("Online_ModelUriHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source filter.
         /// </summary>
         public static string Online_SourceLangFilterLabel {

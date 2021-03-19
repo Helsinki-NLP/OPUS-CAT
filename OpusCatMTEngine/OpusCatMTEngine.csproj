@@ -129,6 +129,7 @@
     <Compile Include="Marian\MarianTrainerConfig.cs" />
     <Compile Include="Marian\MarianDecoderConfig.cs" />
     <Compile Include="IsoLanguage.cs" />
+    <Compile Include="ModelMetadata.cs" />
     <Compile Include="Preprocessing\ParallelFilePair.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />

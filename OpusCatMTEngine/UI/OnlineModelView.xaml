@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpusCatMTEngine"
              xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             x:Name="_this"
              d:DesignHeight="450" d:DesignWidth="750">
     <Grid>
         <DockPanel Margin="10" >
@@ -32,9 +33,11 @@
                 <Label Grid.Row="0" Grid.Column="1" Content="{x:Static resx:Resources.Online_TargetLangFilterLabel}"/>
                 <Label Grid.Row="0" Grid.Column="2" Content="{x:Static resx:Resources.Online_ModelNameFilterLabel}"/>
 
-                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,0,0,10" Name="txtFilter" TextChanged="sourceLangFilter_TextChanged"></TextBox>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="txtFilter1" TextChanged="targetLangFilter_TextChanged"></TextBox>
-                <TextBox Grid.Row="1" Grid.Column="2" Margin="0,0,0,10" Name="txtFilter2" TextChanged="nameFilter_TextChanged" ></TextBox>
+                <TextBox VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" Name="txtFilter" TextChanged="sourceLangFilter_TextChanged"></TextBox>
+                <TextBox VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" Name="txtFilter1" TextChanged="targetLangFilter_TextChanged"></TextBox>
+                <TextBox VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Name="txtFilter2" TextChanged="nameFilter_TextChanged" ></TextBox>
+                <CheckBox IsChecked="{Binding ElementName=_this, Path=ShowBilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="3">Bilingual models</CheckBox>
+                <CheckBox IsChecked="{Binding ElementName=_this, Path=ShowMultilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Multilingual models</CheckBox>
             </Grid>
 
             <StackPanel DockPanel.Dock="Right" Margin="0,0">
@@ -97,6 +100,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
+                            <!--<GridViewColumn DisplayMemberBinding="{Binding Path=ModelUri, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelUriHeader}" Width="200"/>-->
                         </GridView>
 
                     </ListView.View>

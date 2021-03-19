@@ -509,10 +509,17 @@ namespace OpusCatMTEngine
             //For OPUS-MT models and monolingual Tatoeba models, 
             //languages are included in path. For multilingual Tatoeba models,
             //language have to be fetched the metadata yml file
-            this.SourceLanguages = 
-                pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-            this.TargetLanguages = 
-                pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+            if (this.modelYaml == null)
+            {
+                this.SourceLanguages =
+                    pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                this.TargetLanguages =
+                    pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+            }
+            else
+            {
+                this.ParseModelYaml(this.modelYaml);
+            }
             
             this.Name = pathSplit[1];
             this.ModelPath = modelPath;
@@ -556,11 +563,57 @@ namespace OpusCatMTEngine
             this.SaveModelConfig();
         }
 
-        public MTModel(string modelPath)
+        //This is used for online models, model uri is included for later download of models
+        public MTModel(string modelPath, Uri modelUri, string yamlString=null)
         {
+            this.modelYaml = yamlString; 
+            this.ModelUri = modelUri;
             this.ParseModelPath(modelPath);
         }
-    
+        
+        private void ParseModelYaml(string yamlString)
+        {
+            var deserializer = new DeserializerBuilder().Build();
+            var res = deserializer.Deserialize<dynamic>(yamlString);
+
+            this.SourceLanguages = new List<IsoLanguage>();
+            this.TargetLanguages = new List<IsoLanguage>();
+
+            try
+            {
+                var xamlSourceLangs = res["source-languages"];
+                if (xamlSourceLangs != null)
+                {
+                    foreach (var lang in xamlSourceLangs)
+                    {
+                        this.SourceLanguages.Add(new IsoLanguage(lang.ToString()));
+                    }
+                }
+                else
+                {
+                    Log.Error($"No source langs in {this.ModelUri} yaml file.");
+                }
+
+                var xamlTargetLangs = res["target-languages"];
+                if (xamlTargetLangs != null)
+                {
+                    foreach (var lang in xamlTargetLangs)
+                    {
+                        this.TargetLanguages.Add(new IsoLanguage(lang.ToString()));
+                    }
+                }
+                else
+                {
+                    Log.Error($"No target langs in {this.ModelUri} yaml file.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"source-langs or target-langs key missing from {this.ModelUri} yaml file.");
+            }
+            
+        }
+
         //This indicates whether the model is ready for translation
         //(essentially means whether fine-tuning has finished if the model is a fine-tuned model).
         public Boolean IsReady
@@ -656,7 +709,11 @@ namespace OpusCatMTEngine
 
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
         public Process FinetuneProcess { get; set; }
-        
+
+        private string modelYaml;
+
+        public Uri ModelUri { get; private set; }
+
         private MTModelStatus status;
         private MTModelConfig modelConfig;
         private FileInfo trainingLogFileInfo;

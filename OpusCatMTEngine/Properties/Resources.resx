@@ -341,4 +341,7 @@
   <data name="Settings_StoreInAppdataCheckbox" xml:space="preserve">
     <value>Store OPUS-CAT MT Engine data in local application data folder</value>
   </data>
+  <data name="Online_ModelUriHeader" xml:space="preserve">
+    <value>Model URI</value>
+  </data>
 </root>

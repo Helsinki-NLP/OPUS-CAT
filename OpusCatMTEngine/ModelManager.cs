@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using YamlDotNet.Serialization;
 using static System.Environment;
 
 namespace OpusCatMTEngine
@@ -163,14 +164,29 @@ namespace OpusCatMTEngine
             NotifyPropertyChanged("LocalModels");
         }
 
-        internal void FilterOnlineModels(string sourceFilter, string targetFilter, string nameFilter)
+        internal void FilterOnlineModels(
+            string sourceFilter,
+            string targetFilter,
+            string nameFilter,
+            bool showMultilingual,
+            bool showBilingual)
         {
             var filteredModels = from model in this.onlineModels
                                  where
-                                    model.SourceCodesString.Contains(sourceFilter) &&
-                                    model.TargetCodesString.Contains(targetFilter) &&
-                                    model.Name.Contains(nameFilter)
+                                    model.SourceLanguageString.ToLower().Contains(sourceFilter.ToLower()) &&
+                                    model.TargetLanguageString.ToLower().Contains(targetFilter.ToLower()) &&
+                                    model.Name.ToLower().Contains(nameFilter.ToLower())
                                  select model;
+
+            if (!showBilingual)
+            {
+                filteredModels = filteredModels.Where(x => x.SourceLanguages.Count > 1 || x.TargetLanguages.Count > 1);
+            }
+
+            if (!showMultilingual)
+            {
+                filteredModels = filteredModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1);
+            }
 
             this.FilteredOnlineModels.Clear();
             foreach (var model in filteredModels)
@@ -338,8 +354,28 @@ namespace OpusCatMTEngine
             var ns = bucket.Root.Name.Namespace;
             var files = bucket.Descendants(ns + "Key").Select(x => x.Value);
             var models = files.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
-            
-            this.onlineModels.AddRange(models.Select(x => new MTModel(x.Replace(".zip", ""))));
+
+            foreach (var model in models)
+            {
+                var modelUri = new Uri(nextUri, model);
+                var yaml = files.SingleOrDefault(x => x == Regex.Replace(model, @"\.zip$", ".yml"));
+                if (yaml != null)
+                {
+                    using (var client = new WebClient())
+                    {
+                        
+                        client.DownloadStringCompleted +=
+                            (x, y) => modelYamlDownloadComplete(modelUri, model, x, y);
+                        var yamlUri = new Uri(nextUri, yaml);
+                        client.DownloadStringAsync(yamlUri);
+                    }
+                }
+                else
+                {
+                    this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
+                }
+
+            }
 
             var nextMarker = bucket.Descendants(ns + "NextMarker").SingleOrDefault();
             if (nextMarker != null)
@@ -367,8 +403,14 @@ namespace OpusCatMTEngine
                     }
                 }
 
-                this.FilterOnlineModels("", "", "");
+                this.FilterOnlineModels("", "", "",true,true);
             }
+        }
+
+        private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
+        {
+            var yamlString = Regex.Replace(e.Result, "- (>>[^<]+<<)", "- \"$1\"");
+            this.onlineModels.Add(new MTModel(model.Replace(".zip",""), modelUri, yamlString));
         }
 
         internal string TranslateWithModel(string input, string modelName)
@@ -668,19 +710,19 @@ namespace OpusCatMTEngine
         }
 
         internal void DownloadModel(
-            string newerModel,
+            Uri modelUri,
+            string modelName,
             DownloadProgressChangedEventHandler wc_DownloadProgressChanged,
             AsyncCompletedEventHandler wc_DownloadComplete)
         {
-            var downloadPath = Path.Combine(this.OpusModelDir.FullName, newerModel + ".zip");
+            var downloadPath = Path.Combine(this.OpusModelDir.FullName, modelName + ".zip");
 
             using (var client = new WebClient())
             {
                 client.DownloadProgressChanged += wc_DownloadProgressChanged;
                 client.DownloadFileCompleted += wc_DownloadComplete;
-                var modelUrl = $"{OpusCatMTEngineSettings.Default.OpusModelStorageUrl}{newerModel}.zip";
                 Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
-                client.DownloadFileAsync(new Uri(modelUrl), downloadPath);
+                client.DownloadFileAsync(modelUri, downloadPath);
             }
         }
 
