@@ -38,6 +38,8 @@
                 <TextBox VerticalAlignment="Center" Grid.Row="1" Grid.Column="2" Name="txtFilter2" TextChanged="nameFilter_TextChanged" ></TextBox>
                 <CheckBox IsChecked="{Binding ElementName=_this, Path=ShowBilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="3">Bilingual models</CheckBox>
                 <CheckBox IsChecked="{Binding ElementName=_this, Path=ShowMultilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="3">Multilingual models</CheckBox>
+                <CheckBox IsChecked="{Binding ElementName=_this, Path=ShowOpusModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="4">OPUS-MT models</CheckBox>
+                <CheckBox IsChecked="{Binding ElementName=_this, Path=ShowTatoebaModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4">Tatoeba models</CheckBox>
             </Grid>
 
             <StackPanel DockPanel.Dock="Right" Margin="0,0">
@@ -56,56 +58,54 @@
                     </Button.IsEnabled>
                 </Button>
             </StackPanel>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ListView 
+
+            <ListView 
                 Name="ModelListView" 
                 ItemsSource="{Binding FilteredOnlineModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                ScrollViewer.HorizontalScrollBarVisibility="Visible"
                 ScrollViewer.CanContentScroll="True"
                 DockPanel.Dock="Bottom"
                 GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListViewItem}">
-                            <Setter Property="BorderBrush" Value="LightGray" />
-                            <Setter Property="BorderThickness" Value="1,1,1,1" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <ListView.View>
-                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
-                            <GridViewColumn Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>                                        
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelNameHeader}" Width="200"/>
-                            <GridViewColumn Header="{x:Static resx:Resources.Online_InstallationProgressHeader}" x:Name="InstallProgress">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
-                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <!--<GridViewColumn DisplayMemberBinding="{Binding Path=ModelUri, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelUriHeader}" Width="200"/>-->
-                        </GridView>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Setter Property="BorderBrush" Value="LightGray" />
+                        <Setter Property="BorderThickness" Value="1,1,1,1" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.View>
+                    <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
+                        <GridViewColumn Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelNameHeader}" Width="200"/>
+                        <GridViewColumn Header="{x:Static resx:Resources.Online_InstallationProgressHeader}" x:Name="InstallProgress">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
+                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Path=ModelOrigin, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelUriHeader}" Width="200"/>
+                    </GridView>
 
-                    </ListView.View>
-                </ListView>
-            </Grid>
+                </ListView.View>
+            </ListView>
+
         </DockPanel>
     </Grid>
 </UserControl>

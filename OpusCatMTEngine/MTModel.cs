@@ -570,17 +570,18 @@ namespace OpusCatMTEngine
             this.ModelUri = modelUri;
             this.ParseModelPath(modelPath);
         }
-        
+
         private void ParseModelYaml(string yamlString)
         {
-            var deserializer = new DeserializerBuilder().Build();
-            var res = deserializer.Deserialize<dynamic>(yamlString);
-
-            this.SourceLanguages = new List<IsoLanguage>();
-            this.TargetLanguages = new List<IsoLanguage>();
 
             try
             {
+                this.SourceLanguages = new List<IsoLanguage>();
+                this.TargetLanguages = new List<IsoLanguage>();
+
+                var deserializer = new DeserializerBuilder().Build();
+                var res = deserializer.Deserialize<dynamic>(yamlString);
+                
                 var xamlSourceLangs = res["source-languages"];
                 if (xamlSourceLangs != null)
                 {
@@ -607,6 +608,10 @@ namespace OpusCatMTEngine
                     Log.Error($"No target langs in {this.ModelUri} yaml file.");
                 }
             }
+            catch (YamlDotNet.Core.SyntaxErrorException ex)
+            {
+                Log.Error($"Error in the syntax of the model's yaml file: {ex.Message}.\nModel: {this.ModelUri}.\nYaml: {yamlString}");
+            }
             catch (Exception ex)
             {
                 Log.Error($"source-langs or target-langs key missing from {this.ModelUri} yaml file.");
@@ -621,6 +626,15 @@ namespace OpusCatMTEngine
             get
             {
                 return this.Status == MTModelStatus.OK;
+            }
+        }
+
+        public String ModelOrigin
+        {
+            get
+            {
+                return this.ModelUri.Segments[1];
+                
             }
         }
 

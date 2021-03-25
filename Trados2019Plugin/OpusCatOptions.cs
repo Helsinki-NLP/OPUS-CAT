@@ -98,8 +98,8 @@ namespace OpusCatTranslationProvider
                 if (parameter == "" || parameter == null)
                 {
                     //Add default to URI
-                    SetStringParameter("OpusCatSource", OpusCatSource.Elg.ToString());
-                    return OpusCatSource.Elg;
+                    SetStringParameter("OpusCatSource", OpusCatSource.OpusCatMtEngine.ToString());
+                    return OpusCatSource.OpusCatMtEngine;
                 }
                 else
                 {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Web;
+using System.Windows;
 using OpusMTInterface;
 using Serilog;
 
@@ -80,7 +81,16 @@ namespace OpusCatMTEngine
             */
 
             Log.Information($"Opening the service host");
-            selfHost.Open();
+            try
+            {
+                selfHost.Open();
+            }
+            catch (AddressAlreadyInUseException ex)
+            {
+                MessageBox.Show(String.Format(
+                    OpusCatMTEngine.Properties.Resources.Service_PortNotAvailable, OpusCatMTEngineSettings.Default.HttpMtServicePort));
+                System.Windows.Application.Current.Shutdown();
+            }
             
             return selfHost;
         }

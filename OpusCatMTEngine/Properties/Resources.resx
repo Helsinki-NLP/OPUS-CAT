@@ -344,4 +344,8 @@
   <data name="Online_ModelUriHeader" xml:space="preserve">
     <value>Model URI</value>
   </data>
+  <data name="Service_PortNotAvailable" xml:space="preserve">
+    <value>The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port.</value>
+    <comment> </comment>
+  </data>
 </root>

@@ -602,6 +602,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port..
+        /// </summary>
+        public static string Service_PortNotAvailable {
+            get {
+                return ResourceManager.GetString("Service_PortNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MT service HTTP port (used with other integrations, 1024-65535):.
         /// </summary>
         public static string Settings_HttpPortLabel {

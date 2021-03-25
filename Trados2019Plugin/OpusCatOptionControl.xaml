@@ -29,7 +29,11 @@
                         </CheckBox>
                         <DockPanel>
                             <Label>Model tag</Label>
-                            <ComboBox Name="TagBox" SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ItemsSource="{Binding ElementName=ConnectionControl, Path=AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" SelectionChanged="TagBox_SelectionChanged" />
+                            <ComboBox 
+                                Name="TagBox" 
+                                SelectedValue="{Binding Path=Options.modelTag, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                ItemsSource="{Binding Path=ConnectionSelection.ConnectionControl.AllModelTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                SelectionChanged="TagBox_SelectionChanged" />
                         </DockPanel>
                     </StackPanel>
                 </Border>

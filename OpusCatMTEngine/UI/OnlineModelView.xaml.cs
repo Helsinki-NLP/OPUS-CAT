@@ -52,6 +52,9 @@ namespace OpusCatMTEngine
         }
 
         private bool showMultilingualModels;
+        private bool _showOpusModels;
+        private bool _showTatoebaModels;
+
         public bool ShowMultilingualModels
         {
             get => showMultilingualModels;
@@ -63,6 +66,27 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool ShowOpusModels
+        {
+            get => _showOpusModels;
+            set
+            {
+                _showOpusModels = value;
+                NotifyPropertyChanged();
+                this.FilterModels();
+            }
+        }
+
+        public bool ShowTatoebaModels
+        {
+            get => _showTatoebaModels;
+            set
+            {
+                _showTatoebaModels = value;
+                NotifyPropertyChanged();
+                this.FilterModels();
+            }
+        }
         public OnlineModelView()
         {
             InitializeComponent();
@@ -74,6 +98,8 @@ namespace OpusCatMTEngine
             this.modelManager = ((ModelManager)this.DataContext);
             this.ShowBilingualModels = true;
             this.ShowMultilingualModels = true;
+            this.ShowOpusModels = true;
+            this.ShowTatoebaModels = true;
         }
 
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
@@ -120,7 +146,15 @@ namespace OpusCatMTEngine
 
         private void FilterModels()
         {
-            this.modelManager.FilterOnlineModels(this.sourceFilter, this.targetFilter, this.nameFilter, this.showMultilingualModels, this.showBilingualModels);
+            this.modelManager.FilterOnlineModels(
+                this.sourceFilter, 
+                this.targetFilter, 
+                this.nameFilter, 
+                this.showMultilingualModels, 
+                this.showBilingualModels,
+                this._showOpusModels,
+                this._showTatoebaModels
+                );
         }
 
         private void sourceLangFilter_TextChanged(object sender, TextChangedEventArgs e)
@@ -171,7 +205,7 @@ namespace OpusCatMTEngine
                     //block below
                     var columnBinding = headerClicked.Column.DisplayMemberBinding as Binding;
                     var sortBy = columnBinding?.Path.Path ?? headerClicked.Column.Header as string;
-                    
+
                     switch (sortBy)
                     {
                         case "Installation progress":

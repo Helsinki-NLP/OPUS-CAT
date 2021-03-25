@@ -139,6 +139,8 @@ namespace OpusCatTranslationProvider
                 }
             }
 
+            NotifyPropertyChanged("AllModelTags");
+
         }
 
         public string ConnectionStatus
@@ -151,7 +153,15 @@ namespace OpusCatTranslationProvider
             }
         }
 
-        public ObservableCollection<string> AllModelTags { get => allModelTags; set { allModelTags = value; NotifyPropertyChanged(); } }
+        public ObservableCollection<string> AllModelTags
+        {
+            get => allModelTags;
+            set
+            {
+                allModelTags = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public bool NoConnection
         {
@@ -212,7 +222,6 @@ namespace OpusCatTranslationProvider
 
         public ConnectionControl()
         {
-            this.AllModelTags = new ObservableCollection<string>();
             InitializeComponent();
 
             this.DataContextChanged += ConnectionControl_DataContextChanged;
@@ -233,6 +242,7 @@ namespace OpusCatTranslationProvider
 
                 this.options = ((IHasOpusCatOptions)e.NewValue).Options;
             }
+            this.AllModelTags = new ObservableCollection<string>();
         }
 
         private void StartFetch()

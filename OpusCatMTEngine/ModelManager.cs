@@ -169,13 +169,17 @@ namespace OpusCatMTEngine
             string targetFilter,
             string nameFilter,
             bool showMultilingual,
-            bool showBilingual)
+            bool showBilingual,
+            bool _showOpusModels,
+            bool _showTatoebaModels)
         {
             var filteredModels = from model in this.onlineModels
                                  where
                                     model.SourceLanguageString.ToLower().Contains(sourceFilter.ToLower()) &&
                                     model.TargetLanguageString.ToLower().Contains(targetFilter.ToLower()) &&
-                                    model.Name.ToLower().Contains(nameFilter.ToLower())
+                                    model.Name.ToLower().Contains(nameFilter.ToLower()) &&
+                                    ((_showOpusModels && model.ModelOrigin.Contains("OPUS-MT")) ||
+                                    (_showTatoebaModels && model.ModelOrigin.Contains("Tatoeba-MT")))
                                  select model;
 
             if (!showBilingual)
@@ -186,6 +190,11 @@ namespace OpusCatMTEngine
             if (!showMultilingual)
             {
                 filteredModels = filteredModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1);
+            }
+
+            if (!_showOpusModels)
+            {
+
             }
 
             this.FilteredOnlineModels.Clear();
@@ -393,6 +402,8 @@ namespace OpusCatMTEngine
 
             else
             {
+                //all online models have been loaded, check which ones have already been installed
+                //and mark accordingly
                 foreach (var onlineModel in this.onlineModels)
                 {
                     var localModelPaths = this.LocalModels.Select(x => x.ModelPath.Replace("\\", "/"));
@@ -403,14 +414,15 @@ namespace OpusCatMTEngine
                     }
                 }
 
-                this.FilterOnlineModels("", "", "",true,true);
+                this.FilterOnlineModels("", "", "",true,true,true,true);
             }
         }
 
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
         {
-            var yamlString = Regex.Replace(e.Result, "- (>>[^<]+<<)", "- \"$1\"");
-            this.onlineModels.Add(new MTModel(model.Replace(".zip",""), modelUri, yamlString));
+            //var yamlString = Regex.Replace(e.Result, "- (>>[^<]+<<)", "- \"$1\"");
+            //yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
+            this.onlineModels.Add(new MTModel(model.Replace(".zip",""), modelUri, e.Result));
         }
 
         internal string TranslateWithModel(string input, string modelName)
