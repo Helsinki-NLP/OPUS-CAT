@@ -93,6 +93,7 @@ namespace OpusCatMTEngine
         private string _targetFilter;
         private string _nameFilter;
         private HashSet<Uri> yamlDownloads;
+        private bool _showNewestOnly;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
         public bool FinetuningOngoing
@@ -133,7 +134,18 @@ namespace OpusCatMTEngine
                 this.FilterOnlineModels();
             }
         }
-        
+
+        public bool ShowNewestOnly
+        {
+            get => _showNewestOnly;
+            set
+            {
+                _showNewestOnly = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
         public bool ShowTatoebaModels
         {
             get => _showTatoebaModels;
@@ -276,6 +288,27 @@ namespace OpusCatMTEngine
                 filteredModels = filteredModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1);
             }
 
+            if (this.ShowNewestOnly)
+            {
+                var onlyNew = new Dictionary<string,MTModel>();
+                foreach (var model in filteredModels)
+                {
+                    if (onlyNew.ContainsKey(model.ModelBaseName))
+                    {
+                        if (onlyNew[model.ModelBaseName].ModelDate < model.ModelDate)
+                        {
+                            onlyNew[model.ModelBaseName] = model;
+                        }
+                    }
+                    else
+                    {
+                        onlyNew[model.ModelBaseName] = model;
+                    }
+                }
+
+                filteredModels = onlyNew.Values;
+            }
+
             this.FilteredOnlineModels.Clear();
             foreach (var model in filteredModels)
             {
@@ -321,6 +354,7 @@ namespace OpusCatMTEngine
             this.ShowMultilingualModels = true;
             this.ShowOpusModels = true;
             this.ShowTatoebaModels = true;
+            this.ShowNewestOnly = true;
 
             this.GetOnlineModels();
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);

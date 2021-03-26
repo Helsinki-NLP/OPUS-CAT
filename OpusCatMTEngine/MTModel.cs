@@ -84,6 +84,8 @@ namespace OpusCatMTEngine
 
         }
 
+
+
         private List<IsoLanguage> sourceLanguages;
         private List<IsoLanguage> targetLanguages;
         private string name;
@@ -412,6 +414,32 @@ namespace OpusCatMTEngine
         public bool CanContinueCustomization
         {
             get { return this.Status == MTModelStatus.Finetuning_suspended; }
+        }
+
+        public DateTime ModelDate
+        {
+            get
+            {
+                var DateString = Regex.Match(this.ModelPath, @"\d{4}-\d{2}-\d{2}$");
+                if (DateString.Success)
+                {
+                    return DateTime.Parse(DateString.Value);
+                }
+                else
+                {
+                    return DateTime.MinValue;
+                }
+            }
+        }
+
+        //Name with language pair but without date
+        public string ModelBaseName
+        {
+            get
+            {
+                var datelessName = Regex.Replace(this.ModelPath, @"-\d{4}-\d{2}-\d{2}$","");
+                return datelessName;
+            }
         }
 
         public MTModel(string modelPath, string installDir)
