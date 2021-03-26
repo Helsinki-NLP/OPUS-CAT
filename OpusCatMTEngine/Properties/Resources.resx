@@ -341,8 +341,8 @@
   <data name="Settings_StoreInAppdataCheckbox" xml:space="preserve">
     <value>Store OPUS-CAT MT Engine data in local application data folder</value>
   </data>
-  <data name="Online_ModelUriHeader" xml:space="preserve">
-    <value>Model URI</value>
+  <data name="Online_ModelOriginHeader" xml:space="preserve">
+    <value>Model origin</value>
   </data>
   <data name="Service_PortNotAvailable" xml:space="preserve">
     <value>The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port.</value>

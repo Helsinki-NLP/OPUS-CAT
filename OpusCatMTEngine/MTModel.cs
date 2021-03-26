@@ -610,7 +610,7 @@ namespace OpusCatMTEngine
             }
             catch (YamlDotNet.Core.SyntaxErrorException ex)
             {
-                Log.Error($"Error in the syntax of the model's yaml file: {ex.Message}.\nModel: {this.ModelUri}.\nYaml: {yamlString}");
+                Log.Error($"Error in the yaml syntax of model {this.ModelUri}. Error: {ex.Message}.");
             }
             catch (Exception ex)
             {

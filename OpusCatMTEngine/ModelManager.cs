@@ -32,7 +32,7 @@ namespace OpusCatMTEngine
     /// </summary>
     public class ModelManager : INotifyPropertyChanged
     {
-        
+
 
         private List<MTModel> onlineModels;
 
@@ -40,7 +40,7 @@ namespace OpusCatMTEngine
 
         public ObservableCollection<MTModel> FilteredOnlineModels
         { get => filteredOnlineModels; set { filteredOnlineModels = value; NotifyPropertyChanged(); } }
-        
+
         private ObservableCollection<MTModel> localModels;
 
         public ObservableCollection<MTModel> LocalModels
@@ -72,7 +72,7 @@ namespace OpusCatMTEngine
 
         private DirectoryInfo opusModelDir;
         private bool batchTranslationOngoing;
-        
+
         public bool OverrideModelSet { get => this.overrideModel != null; }
         public MTModel OverrideModel
         {
@@ -85,14 +85,99 @@ namespace OpusCatMTEngine
             }
         }
         private MTModel overrideModel;
+        private bool _showBilingualModels;
+        private bool _showMultilingualModels;
+        private bool _showOpusModels;
+        private bool _showTatoebaModels;
+        private string _sourceFilter;
+        private string _targetFilter;
+        private string _nameFilter;
+        private HashSet<Uri> yamlDownloads;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
-        public bool FinetuningOngoing {
+        public bool FinetuningOngoing
+        {
             get => this.LocalModels.Any(x => x.Status == MTModelStatus.Finetuning);
         }
         public bool BatchTranslationOngoing { get => batchTranslationOngoing; set { batchTranslationOngoing = value; NotifyPropertyChanged(); } }
 
+        public bool ShowBilingualModels
+        {
+            get => _showBilingualModels;
+            set
+            {
+                _showBilingualModels = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
+        public bool ShowMultilingualModels
+        {
+            get => _showMultilingualModels;
+            set
+            {
+                _showMultilingualModels = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
+        public bool ShowOpusModels
+        {
+            get => _showOpusModels;
+            set
+            {
+                _showOpusModels = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
         
+        public bool ShowTatoebaModels
+        {
+            get => _showTatoebaModels;
+            set
+            {
+                _showTatoebaModels = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+        
+        public string SourceFilter
+        {
+            get => _sourceFilter;
+            set
+            {
+                _sourceFilter = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
+        public string TargetFilter
+        {
+            get => _targetFilter;
+            set
+            {
+                _targetFilter = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
+        public string NameFilter
+        {
+            get => _nameFilter;
+            set
+            {
+                _nameFilter = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
         internal string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
             var sourceCode = sourceLang.ShortestIsoCode;
@@ -164,37 +249,31 @@ namespace OpusCatMTEngine
             NotifyPropertyChanged("LocalModels");
         }
 
-        internal void FilterOnlineModels(
-            string sourceFilter,
-            string targetFilter,
-            string nameFilter,
-            bool showMultilingual,
-            bool showBilingual,
-            bool _showOpusModels,
-            bool _showTatoebaModels)
+        internal void FilterOnlineModels()
         {
+            if (this.onlineModels == null)
+            {
+                return;
+            }
+
             var filteredModels = from model in this.onlineModels
                                  where
-                                    model.SourceLanguageString.ToLower().Contains(sourceFilter.ToLower()) &&
-                                    model.TargetLanguageString.ToLower().Contains(targetFilter.ToLower()) &&
-                                    model.Name.ToLower().Contains(nameFilter.ToLower()) &&
-                                    ((_showOpusModels && model.ModelOrigin.Contains("OPUS-MT")) ||
-                                    (_showTatoebaModels && model.ModelOrigin.Contains("Tatoeba-MT")))
+                                    model.SourceLanguageString.ToLower().Contains(this.SourceFilter.ToLower()) &&
+                                    model.TargetLanguageString.ToLower().Contains(this.TargetFilter.ToLower()) &&
+                                    model.Name.ToLower().Contains(this.NameFilter.ToLower()) &&
+                                    ((this.ShowOpusModels && model.ModelOrigin.Contains("OPUS-MT")) ||
+                                    (this.ShowTatoebaModels && model.ModelOrigin.Contains("Tatoeba-MT")))
                                  select model;
 
-            if (!showBilingual)
+
+            if (!this.ShowBilingualModels)
             {
                 filteredModels = filteredModels.Where(x => x.SourceLanguages.Count > 1 || x.TargetLanguages.Count > 1);
             }
 
-            if (!showMultilingual)
+            if (!this.ShowMultilingualModels)
             {
                 filteredModels = filteredModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1);
-            }
-
-            if (!_showOpusModels)
-            {
-
             }
 
             this.FilteredOnlineModels.Clear();
@@ -229,12 +308,19 @@ namespace OpusCatMTEngine
                 {
                     MessageBox.Show($"Model directory can't be deleted, some other process is using it.", "Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
-                
+
             }
         }
 
         public ModelManager()
         {
+            this.SourceFilter = "";
+            this.TargetFilter = "";
+            this.NameFilter = "";
+            this.ShowBilingualModels = true;
+            this.ShowMultilingualModels = true;
+            this.ShowOpusModels = true;
+            this.ShowTatoebaModels = true;
 
             this.GetOnlineModels();
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
@@ -250,7 +336,7 @@ namespace OpusCatMTEngine
         private void GetOnlineModels()
         {
             this.onlineModels = new List<MTModel>();
-
+            this.yamlDownloads = new HashSet<Uri>();
             var modelStorages =
                 new List<string> {
                     OpusCatMTEngineSettings.Default.OpusModelStorageUrl,
@@ -266,7 +352,7 @@ namespace OpusCatMTEngine
                 using (var client = new WebClient())
                 {
                     var storageUri = new Uri(modelStorage);
-                    client.DownloadStringCompleted += (x,y) => modelListDownloadComplete(storageUri,x,y);
+                    client.DownloadStringCompleted += (x, y) => modelListDownloadComplete(storageUri, new List<string>(), x, y);
                     client.DownloadStringAsync(storageUri);
                 }
             }
@@ -274,7 +360,7 @@ namespace OpusCatMTEngine
 
         private MTModel SelectModel(IsoLanguage srcLang, IsoLanguage trgLang, string modelTag, bool includeIncomplete = false)
         {
-            
+
             MTModel mtModel;
 
             //It's possible to choose an override model, which is used to serve all requests.
@@ -308,7 +394,7 @@ namespace OpusCatMTEngine
             Log.Information($"Pretranslating a batch of translations with model tag {modelTag}, model {mtModel.Name} will be used.");
             if (mtModel.Status == MTModelStatus.OK)
             {
-                var batchProcess = mtModel.PreTranslateBatch(input,sourceLang,targetLang);
+                var batchProcess = mtModel.PreTranslateBatch(input, sourceLang, targetLang);
                 batchProcess.Exited += BatchProcess_Exited;
             }
             else
@@ -346,7 +432,7 @@ namespace OpusCatMTEngine
 
         }
 
-        private void modelListDownloadComplete(Uri nextUri, object sender, DownloadStringCompletedEventArgs e)
+        private void modelListDownloadComplete(Uri nextUri, List<string> filePaths, object sender, DownloadStringCompletedEventArgs e)
         {
             XDocument bucket;
             try
@@ -356,42 +442,20 @@ namespace OpusCatMTEngine
             catch (Exception ex) when (ex.InnerException is System.Net.WebException)
             {
                 Log.Information($"Could not connect to online model storage, check that Internet connection exists. Exception: {ex.InnerException.ToString()}");
-
                 return;
             }
 
             var ns = bucket.Root.Name.Namespace;
-            var files = bucket.Descendants(ns + "Key").Select(x => x.Value);
-            var models = files.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
+            var newFilePaths = bucket.Descendants(ns + "Key").Select(x => x.Value);
 
-            foreach (var model in models)
-            {
-                var modelUri = new Uri(nextUri, model);
-                var yaml = files.SingleOrDefault(x => x == Regex.Replace(model, @"\.zip$", ".yml"));
-                if (yaml != null)
-                {
-                    using (var client = new WebClient())
-                    {
-                        
-                        client.DownloadStringCompleted +=
-                            (x, y) => modelYamlDownloadComplete(modelUri, model, x, y);
-                        var yamlUri = new Uri(nextUri, yaml);
-                        client.DownloadStringAsync(yamlUri);
-                    }
-                }
-                else
-                {
-                    this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
-                }
-
-            }
+            filePaths.AddRange(newFilePaths);
 
             var nextMarker = bucket.Descendants(ns + "NextMarker").SingleOrDefault();
             if (nextMarker != null)
             {
                 using (var client = new WebClient())
                 {
-                    client.DownloadStringCompleted += (x,y) => modelListDownloadComplete(nextUri,x,y);
+                    client.DownloadStringCompleted += (x, y) => modelListDownloadComplete(nextUri, filePaths, x, y);
                     var uriBuilder = new UriBuilder(nextUri);
                     var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                     query["marker"] = nextMarker.Value;
@@ -399,12 +463,13 @@ namespace OpusCatMTEngine
                     client.DownloadStringAsync(uriBuilder.Uri);
                 }
             }
-
             else
             {
+                AddOnlineStorageModels(filePaths, nextUri);
+
                 //all online models have been loaded, check which ones have already been installed
                 //and mark accordingly
-                foreach (var onlineModel in this.onlineModels)
+                foreach (var onlineModel in this.onlineModels.ToList())
                 {
                     var localModelPaths = this.LocalModels.Select(x => x.ModelPath.Replace("\\", "/"));
                     if (localModelPaths.Contains(onlineModel.ModelPath))
@@ -414,24 +479,65 @@ namespace OpusCatMTEngine
                     }
                 }
 
-                this.FilterOnlineModels("", "", "",true,true,true,true);
+                this.FilterOnlineModels();
             }
+        }
+
+        private void AddOnlineStorageModels(List<string> filePaths, Uri storageUri)
+        {
+            //Get the model zips
+            var models = filePaths.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
+            var yamlHash = filePaths.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.yml")).ToHashSet();
+
+            foreach (var model in models)
+            {
+                var modelUri = new Uri(storageUri, model);
+                var yaml = Regex.Replace(model, @"\.zip$", ".yml");
+
+                if (yamlHash.Contains(yaml))
+                {
+                    using (var client = new WebClient())
+                    {
+                        this.yamlDownloads.Add(modelUri);
+                        client.DownloadStringCompleted +=
+                            (x, y) => modelYamlDownloadComplete(modelUri, model, x, y);
+                        var yamlUri = new Uri(storageUri, yaml);
+                        client.DownloadStringAsync(yamlUri);
+                    }
+                }
+                else
+                {
+                    if (storageUri.Segments[1].Contains("Tatoeba-MT"))
+                    {
+                        Log.Error($"Model {modelUri} has no corresponding yaml file in storage");
+                    }
+                    this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
+                }
+            }
+
+            this.FilterOnlineModels();
         }
 
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
         {
             //var yamlString = Regex.Replace(e.Result, "- (>>[^<]+<<)", "- \"$1\"");
             //yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
-            this.onlineModels.Add(new MTModel(model.Replace(".zip",""), modelUri, e.Result));
+            this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri, e.Result));
+
+            this.yamlDownloads.Remove(modelUri);
+            if (this.yamlDownloads.Count == 0)
+            {
+                this.FilterOnlineModels();
+            }
         }
 
         internal string TranslateWithModel(string input, string modelName)
         {
             var model = this.LocalModels.Single(x => x.Name == modelName);
             //This will only work properly with monolingual models, but not sure if this method is actually used anywhere.
-            return model.Translate(input,model.SourceLanguages.First(),model.TargetLanguages.First()).Result;
+            return model.Translate(input, model.SourceLanguages.First(), model.TargetLanguages.First()).Result;
         }
-        
+
 
         internal void StartCustomization(
             ParallelFilePair inputPair,
@@ -444,15 +550,15 @@ namespace OpusCatMTEngine
             bool includeTagPairs,
             MTModel baseModel)
         {
-            var customTask = Task.Run(() => 
+            var customTask = Task.Run(() =>
             Customize(
                 inputPair,
                 validationPair,
                 uniqueNewSegments,
                 srcLang,
                 trgLang,
-                modelTag, 
-                includePlaceholderTags, 
+                modelTag,
+                includePlaceholderTags,
                 includeTagPairs,
                 baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
@@ -467,7 +573,7 @@ namespace OpusCatMTEngine
             string modelTag,
             bool includePlaceholderTags,
             bool includeTagPairs,
-            MTModel baseModel=null)
+            MTModel baseModel = null)
         {
             var customTask = Task.Run(() => Customize(input, validation, uniqueNewSegments, srcLang, trgLang, modelTag, includePlaceholderTags, includeTagPairs, baseModel));
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
@@ -555,7 +661,7 @@ namespace OpusCatMTEngine
                     null,
                     includePlaceholderTags,
                     includeTagPairs);
-            
+
             Application.Current.Dispatcher.Invoke(() =>
                 this.LocalModels.Add(incompleteModel));
 
@@ -576,7 +682,7 @@ namespace OpusCatMTEngine
 
             customizer.ProgressChanged += incompleteModel.CustomizationProgressHandler;
             customizer.ProcessExited += incompleteModel.ExitHandler;
-            
+
             var trainProcess = customizer.Customize();
 
             //Add process to model and save its config (the directory exists at this point, 
@@ -656,15 +762,15 @@ namespace OpusCatMTEngine
                 throw new FaultException($"No MT model available for {srcLang}-{trgLang}");
             }
 
-            return mtModel.Translate(input,srcLang,trgLang);
+            return mtModel.Translate(input, srcLang, trgLang);
         }
 
         private MTModel GetPrimaryModel(IsoLanguage srcLang, IsoLanguage trgLang)
         {
-            
-            var languagePairModels = 
-                this.LocalModels.Where(x => 
-                    x.SourceLanguages.Any(y => y.IsCompatibleLanguage(srcLang)) && 
+
+            var languagePairModels =
+                this.LocalModels.Where(x =>
+                    x.SourceLanguages.Any(y => y.IsCompatibleLanguage(srcLang)) &&
                     x.TargetLanguages.Any(y => y.IsCompatibleLanguage(trgLang)));
             MTModel primaryModel;
             if (languagePairModels.Any())
@@ -808,6 +914,6 @@ namespace OpusCatMTEngine
             //new model fetch call to check whether pair is supported
             return this.LocalModels.Any(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
         }
-        
+
     }
 }

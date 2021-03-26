@@ -87,6 +87,9 @@ namespace OpusCatMTEngine
                 this.FilterModels();
             }
         }
+
+        public ModelManager ModelManager { get => modelManager; set => modelManager = value; }
+
         public OnlineModelView()
         {
             InitializeComponent();
@@ -95,19 +98,22 @@ namespace OpusCatMTEngine
 
         private void dataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            this.modelManager = ((ModelManager)this.DataContext);
-            this.ShowBilingualModels = true;
-            this.ShowMultilingualModels = true;
-            this.ShowOpusModels = true;
-            this.ShowTatoebaModels = true;
+            this.ModelManager = ((ModelManager)this.DataContext);
+            this.ModelManager.FilteredOnlineModels.CollectionChanged += FilteredOnlineModels_CollectionChanged;
+            NotifyPropertyChanged(null);
+        }
+
+        private void FilteredOnlineModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.ModelCount.GetBindingExpression(Label.ContentProperty).UpdateTarget();
         }
 
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
             model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_ExtractingStatus;
-            this.modelManager.ExtractModel(model.ModelPath);
+            this.ModelManager.ExtractModel(model.ModelPath);
             model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_InstalledStatus;
-            this.modelManager.GetLocalModels();
+            this.ModelManager.GetLocalModels();
         }
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
@@ -121,7 +127,7 @@ namespace OpusCatMTEngine
                 }
 
                 selectedModel.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_DownloadingStatus;
-                this.modelManager.DownloadModel(
+                this.ModelManager.DownloadModel(
                     selectedModel.ModelUri,
                     selectedModel.ModelPath,
                     selectedModel.DownloadProgressChanged,
@@ -138,7 +144,7 @@ namespace OpusCatMTEngine
         private void nameFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.nameFilter = ((TextBox)sender).Text;
-            if (this.modelManager != null)
+            if (this.ModelManager != null)
             {
                 this.FilterModels();
             }
@@ -146,21 +152,13 @@ namespace OpusCatMTEngine
 
         private void FilterModels()
         {
-            this.modelManager.FilterOnlineModels(
-                this.sourceFilter, 
-                this.targetFilter, 
-                this.nameFilter, 
-                this.showMultilingualModels, 
-                this.showBilingualModels,
-                this._showOpusModels,
-                this._showTatoebaModels
-                );
+            this.ModelManager.FilterOnlineModels();
         }
 
         private void sourceLangFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.sourceFilter = ((TextBox)sender).Text;
-            if (this.modelManager != null)
+            if (this.ModelManager != null)
             {
                 this.FilterModels();
             }
@@ -169,7 +167,7 @@ namespace OpusCatMTEngine
         private void targetLangFilter_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.targetFilter = ((TextBox)sender).Text;
-            if (this.modelManager != null)
+            if (this.ModelManager != null)
             {
                 this.FilterModels();
             }
@@ -219,7 +217,7 @@ namespace OpusCatMTEngine
                             break;
                     }
 
-                    this.modelManager.SortOnlineModels(sortBy, direction);
+                    this.ModelManager.SortOnlineModels(sortBy, direction);
 
                     if (direction == ListSortDirection.Ascending)
                     {
