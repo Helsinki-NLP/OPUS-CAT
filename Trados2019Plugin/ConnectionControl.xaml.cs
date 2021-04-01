@@ -103,7 +103,7 @@ namespace OpusCatTranslationProvider
             catch (Exception ex) when (ex is OpusCatEngineConnectionException)
             {
                 connectionResult.Append($"No connection to OPUS-CAT MT Engine at {host}:{port}."+Environment.NewLine);
-                connectionResult.Append("Make sure OPUS - CAT MT Engine application has been installed on your computer(check help link below) and is running and that it uses the same connection settings as the plugin(default settings should work).");
+                connectionResult.Append("Make sure OPUS-CAT MT Engine application has been installed on your computer(check help link below) and is running and that it uses the same connection settings as the plugin (default settings should work).");
                 this.NoConnection = true;
             }
 
@@ -155,7 +155,10 @@ namespace OpusCatTranslationProvider
 
         public ObservableCollection<string> AllModelTags
         {
-            get => allModelTags;
+            get
+            {
+                return allModelTags;
+            }
             set
             {
                 allModelTags = value;

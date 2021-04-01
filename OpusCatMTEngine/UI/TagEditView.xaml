@@ -58,7 +58,7 @@
                     Name="add" 
                     Click="add_Click"
                     Content="{x:Static resx:Resources.Tags_AddTagButton}"/>
-                <TextBox x:Name="TagTextBox" />
+                <TextBox Width="200" x:Name="TagTextBox" />
             </StackPanel>
         </StackPanel>
     </Grid>

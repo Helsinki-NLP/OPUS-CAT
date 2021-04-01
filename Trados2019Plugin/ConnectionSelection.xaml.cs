@@ -49,6 +49,11 @@ namespace OpusCatTranslationProvider
             }
         }
         
+        public ConnectionControl ConnectionControlElement
+        {
+            get { return this.ConnectionControl; }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

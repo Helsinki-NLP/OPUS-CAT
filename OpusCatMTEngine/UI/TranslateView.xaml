@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpusCatMTEngine"
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
-        Height="400" Width="800">
+        Height="450" Width="800">
     <Grid>
         <StackPanel Margin="10">
             <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>

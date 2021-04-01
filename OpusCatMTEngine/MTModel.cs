@@ -609,8 +609,13 @@ namespace OpusCatMTEngine
 
                 var deserializer = new DeserializerBuilder().Build();
                 var res = deserializer.Deserialize<dynamic>(yamlString);
+
+                List<object> xamlSourceLangs = null;
+                if (res.ContainsKey("source-languages"))
+                {
+                    xamlSourceLangs = res["source-languages"];
+                }
                 
-                var xamlSourceLangs = res["source-languages"];
                 if (xamlSourceLangs != null)
                 {
                     foreach (var lang in xamlSourceLangs)
@@ -622,8 +627,12 @@ namespace OpusCatMTEngine
                 {
                     Log.Error($"No source langs in {this.ModelUri} yaml file.");
                 }
+                List<object> xamlTargetLangs = null;
+                if (res.ContainsKey("target-languages"))
+                {
+                    xamlSourceLangs = res["target-languages"];
+                }
 
-                var xamlTargetLangs = res["target-languages"];
                 if (xamlTargetLangs != null)
                 {
                     foreach (var lang in xamlTargetLangs)
