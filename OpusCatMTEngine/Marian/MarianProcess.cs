@@ -32,7 +32,7 @@ namespace OpusCatMTEngine
         public Process MtProcess { get => mtPipe; set => mtPipe = value; }
         private Process preprocessPipe;
 
-        private ConcurrentStack<Task<string>> taskStack = new ConcurrentStack<Task<string>>();
+        private ConcurrentStack<Task<TranslationPair>> taskStack = new ConcurrentStack<Task<TranslationPair>>();
 
         private StreamWriter utf8PreprocessWriter;
         private StreamWriter utf8MtWriter;
@@ -162,7 +162,7 @@ namespace OpusCatMTEngine
             AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
         }
         
-        private string TranslateSentence(string rawSourceSentence)
+        private TranslationPair TranslateSentence(string rawSourceSentence)
         {
             //This preprocessing must correspond to the one used in model training. Currently
             //this is:
@@ -192,72 +192,18 @@ namespace OpusCatMTEngine
             //input per stdout readline, and marian decoder will never insert line breaks into translations.
             string translationAndAlignment = this.MtProcess.StandardOutput.ReadLine();
 
-            var lastSeparator = translationAndAlignment.LastIndexOf("|||");
-            var segmentedTranslation = translationAndAlignment.Substring(0, lastSeparator-1);
-            var alignment = translationAndAlignment.Substring(lastSeparator + 4);
+            TranslationPair alignedTranslationPair = new TranslationPair(preprocessedLine, translationAndAlignment);
 
-            string translation = null;
-            if (this.sentencePiecePostProcess)
-            {
-                translation = (segmentedTranslation.Replace(" ", "")).Replace("▁", " ").Trim();
-            }
 
-            var desegmentedAlignment = this.GenerateDesegmentedAlignment(sourceSentence, segmentedTranslation, alignment);
-
-            //TODO: Handle BPE postprocessing also
-
-            return translation;
+            return alignedTranslationPair;
+            
         }
 
-        private object GenerateDesegmentedAlignment(string sourceSentence, string segmentedTranslation, string alignment)
+        
+
+        public Task<TranslationPair> AddToTranslationQueue(string sourceText)
         {
-            //Generate a dict out of the alignment
-            var alignmentDict = new Dictionary<int, List<int>>();
-            foreach (var alignmentPair in alignment.Split(' '))
-            {
-                var pairSplit = alignmentPair.Split('-');
-                var sourceToken = int.Parse(pairSplit[0]);
-                var targetToken = int.Parse(pairSplit[1]);
-                if (alignmentDict.ContainsKey(sourceToken))
-                {
-                    alignmentDict[sourceToken].Add(targetToken);
-                }
-                else
-                {
-                    alignmentDict[sourceToken] = new List<int>();
-                }
-            }
-
-            //Now map segmented token indexes to desegmented indexes for the target
-            var targetSegmentedToDesegmented = new Dictionary<int, int>();
-            int desegmentedTokenIndex = -1;
-            var targetSegmentedTokens = segmentedTranslation.Split(' ');
-            for (var i = 0; i < targetSegmentedTokens.Length;i++)
-            {
-                if (targetSegmentedTokens[i].StartsWith("_"))
-                {
-                    desegmentedTokenIndex++;
-                }
-                targetSegmentedToDesegmented[i] = desegmentedTokenIndex;
-            }
-
-            //Next go through source mapping source desegmented tokens to target desegmented tokens
-            var desegmentedAlignment = new Dictionary<int, List<int>>();
-            desegmentedTokenIndex = -1;
-            var sourceSegmentedTokens = sourceSentence.Split(' ');
-            for (var i = 0; i < sourceSegmentedTokens.Length; i++)
-            {
-                if (sourceSegmentedTokens[i].StartsWith("_"))
-                {
-                    desegmentedTokenIndex++;
-                }
-            }
-
-        }
-
-        public Task<string> AddToTranslationQueue(string sourceText)
-        {
-            string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
+            TranslationPair existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
             if (existingTranslation != null)
             {
                 //If translation already exists, just return it
@@ -265,7 +211,7 @@ namespace OpusCatMTEngine
             }
             else
             {
-                Task<string> translationTask = new Task<string>(() => Translate(sourceText));
+                Task<TranslationPair> translationTask = new Task<TranslationPair>(() => Translate(sourceText));
                 translationTask.ContinueWith((x) => CheckTaskStack());
 
                 //if there's translation in progress, push the task to stack to wait
@@ -286,7 +232,7 @@ namespace OpusCatMTEngine
 
         private void CheckTaskStack()
         {
-            Task<string> translationTask;
+            Task<TranslationPair> translationTask;
             var success = this.taskStack.TryPop(out translationTask);
 
             if (success)
@@ -295,7 +241,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        public string Translate(string sourceText)
+        public TranslationPair Translate(string sourceText)
         {
             //This is used to determine whether a incoming translation should be immediately started
             //or queued.
@@ -310,7 +256,7 @@ namespace OpusCatMTEngine
                 throw new Exception("Opus MT functionality has stopped working. Restarting the OPUS-CAT MT Engine may resolve the problem.");
             }
 
-            string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName);
+            TranslationPair existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName);
             if (existingTranslation != null)
             {
                 translationInProgress = false;
@@ -330,21 +276,10 @@ namespace OpusCatMTEngine
                         translationInProgress = false;
                         return existingTranslation;
                     }
-
-                    //It might be the case that the source text contains multiple sentences,
-                    //potentially even line breaks, so the text needs to be split on line breaks.
-                    //(sentence splitting might be nice, but having multiple sentences on one line
-                    //doesn't break anything, while multiple lines cause desyncing problems.
-                    var splitSource = new List<string> { sourceText };// sourceText.Split(new[] {"\r\n","\r","\n"},StringSplitOptions.None);
-
-                    StringBuilder translationBuilder = new StringBuilder();
-                    foreach (var sourceSentence in splitSource)
-                    {
-                        translationBuilder.Append(this.TranslateSentence(sourceSentence));
-                    }
-
-                    var translation = translationBuilder.ToString();
-                
+                    
+                    
+                    var translation = this.TranslateSentence(sourceText);
+                    
                     TranslationDbHelper.WriteTranslationToDb(sourceText, translation, this.SystemName);
                     //sw.Stop();
 

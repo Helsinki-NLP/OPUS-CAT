@@ -24,6 +24,8 @@ namespace OpusCatMTEngine
     {
 
         private MTModel model;
+        private List<List<Run>> sourceRuns;
+        private List<List<Run>> targetRuns;
 
         internal string Title { get; set; }
 
@@ -38,28 +40,92 @@ namespace OpusCatMTEngine
 
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
-            var source = this.SourceBox.Text;
-            Task<string> translate = new Task<string>(() =>
-                {
-                    var translation = new StringBuilder();
-                    using (System.IO.StringReader reader = new System.IO.StringReader(source))
-                    {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            //TODO: add language selectors to the translate window for multilingual models
-                            translation.Append(
-                                this.Model.Translate(
-                                    line,
-                                    this.Model.SourceLanguages.First(), this.Model.TargetLanguages.First()).Result+Environment.NewLine);
-                        }
-                    }
-                    return translation.ToString();
-                }
-                );
-            translate.ContinueWith(x => Dispatcher.Invoke(() => this.TargetBox.Text = x.Result));
+            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+
+            var source = textRange.Text;
+            Task<List<TranslationPair>> translate =
+                new Task<List<TranslationPair>>(() => OrderTranslation(source));
+            translate.ContinueWith(x => Dispatcher.Invoke(() => this.PopulateBoxes(x.Result)));
             translate.Start();
 
+        }
+
+        private List<TranslationPair> OrderTranslation(string source)
+        {
+            var translation = new List<TranslationPair>();
+            using (System.IO.StringReader reader = new System.IO.StringReader(source))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    //TODO: add language selectors to the translate window for multilingual models
+                    translation.Add(
+                        this.Model.Translate(
+                            line,
+                            this.Model.SourceLanguages.First(), this.Model.TargetLanguages.First()).Result);
+                }
+            }
+
+            return translation;
+        }
+
+        private void PopulateBoxes(List<TranslationPair> translation)
+        {
+            this.TargetBox.Document.Blocks.Clear();
+            this.SourceBox.Document.Blocks.Clear();
+            this.sourceRuns = new List<List<Run>>();
+            this.targetRuns = new List<List<Run>>();
+            foreach (var (pair, pairindex) in translation.Select((x, i) => (x, i)))
+            {
+                var sourcepara = new Paragraph();
+                var runlist = new List<Run>();
+                foreach (var (token, index) in pair.SegmentedSourceSentence.Select((x, i) => (x, i)))
+                {
+                    var tokenrun = new Run(token);
+                    if (pair.SegmentedAlignment.ContainsKey(index))
+                    {
+                        var alignedTokens = pair.SegmentedAlignment[index];
+                        tokenrun.MouseEnter += (x, y) => Tokenrun_MouseEnter(alignedTokens, pairindex, x, y);
+                        tokenrun.MouseLeave += Tokenrun_MouseLeave;
+                        sourcepara.Inlines.Add(tokenrun);
+                        runlist.Add(tokenrun);
+                    }
+                }
+                this.sourceRuns.Add(runlist);
+                this.SourceBox.Document.Blocks.Add(sourcepara);
+
+                var targetpara = new Paragraph();
+
+                runlist = new List<Run>();
+                foreach (var token in pair.SegmentedTranslation)
+                {
+
+                    var tokenrun = new Run(token);
+                    //tokenrun.MouseEnter += Tokenrun_MouseEnter;
+                    tokenrun.MouseLeave += Tokenrun_MouseLeave;
+                    targetpara.Inlines.Add(tokenrun);
+                    runlist.Add(tokenrun);
+                }
+                this.targetRuns.Add(runlist);
+                this.TargetBox.Document.Blocks.Add(targetpara);
+            }
+        }
+
+        private void Tokenrun_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Run tokenrun = sender as Run;
+            tokenrun.Background = Brushes.Transparent;
+        }
+
+        private void Tokenrun_MouseEnter(List<int> alignedTokens, int pairindex, object sender, MouseEventArgs e)
+        {
+            Run tokenrun = sender as Run;
+            tokenrun.Background = Brushes.BlueViolet;
+            var runlist = this.targetRuns[pairindex];
+            foreach (var tokenIndex in alignedTokens)
+            {
+                runlist[tokenIndex].Background = Brushes.BlueViolet;
+            }
         }
     }
 }

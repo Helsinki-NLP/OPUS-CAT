@@ -152,7 +152,7 @@ namespace OpusCatMTEngine
             this.marianProcesses = null;
         }
 
-        internal Task<string> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
+        internal Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
             //Need to get the original codes, since those are the ones the marian model uses
             var modelOrigSourceCode =

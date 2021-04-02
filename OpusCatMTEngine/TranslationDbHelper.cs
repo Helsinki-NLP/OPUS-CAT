@@ -10,7 +10,7 @@ namespace OpusCatMTEngine
 {
     class TranslationDbHelper
     {
-        internal static void WriteTranslationToDb(string sourceText, string translation, string model)
+        internal static void WriteTranslationToDb(string sourceText, TranslationPair translation, string model)
         {
             var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
 
@@ -19,28 +19,30 @@ namespace OpusCatMTEngine
                 m_dbConnection.Open();
 
                 using (SQLiteCommand insert =
-                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, translation, model) VALUES (@sourcetext,@translation,@model)", m_dbConnection))
+                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, segmentedsource, segmentedtranslation, alignment, model) VALUES (@sourcetext,@segmentedsource,@segmentedtranslation,@alignment,@model)", m_dbConnection))
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
-                    insert.Parameters.Add(new SQLiteParameter("@translation", translation));
+                    insert.Parameters.Add(new SQLiteParameter("@segmentedsource", String.Join(" ",translation.SegmentedSourceSentence)));
+                    insert.Parameters.Add(new SQLiteParameter("@segmentedtranslation", String.Join(" ", translation.SegmentedTranslation)));
+                    insert.Parameters.Add(new SQLiteParameter("@alignment", translation.AlignmentString));
                     insert.Parameters.Add(new SQLiteParameter("@model", model));
                     insert.ExecuteNonQuery();
                 }
             }
         }
 
-        internal static string FetchTranslationFromDb(string sourceText, string model)
+        internal static TranslationPair FetchTranslationFromDb(string sourceText, string model)
         {
             var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
 
-            List<string> items = new List<string>();
+            List<TranslationPair> translationPairs = new List<TranslationPair>();
 
             using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
             {
                 m_dbConnection.Open();
 
                 using (SQLiteCommand fetch =
-                    new SQLiteCommand("SELECT DISTINCT translation FROM translations WHERE sourcetext=@sourcetext AND model=@model LIMIT 1", m_dbConnection))
+                    new SQLiteCommand("SELECT DISTINCT segmentedsource,segmentedtranslation,alignment FROM translations WHERE sourcetext=@sourcetext AND model=@model LIMIT 1", m_dbConnection))
                 {
                     fetch.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     fetch.Parameters.Add(new SQLiteParameter("@model", model));
@@ -48,13 +50,17 @@ namespace OpusCatMTEngine
 
                     while (r.Read())
                     {
-                        items.Add(Convert.ToString(r["translation"]));
+                        var segmentedSource = Convert.ToString(r["segmentedsource"]);
+                        var segmentedTranslation = Convert.ToString(r["segmentedtranslation"]);
+                        var alignment = Convert.ToString(r["alignment"]);
+
+                        translationPairs.Add(new TranslationPair(segmentedSource, segmentedTranslation, alignment));
                     }
                 }
 
             }
 
-            return items.SingleOrDefault();
+            return translationPairs.SingleOrDefault();
         }
     }
 }

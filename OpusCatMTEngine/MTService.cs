@@ -93,7 +93,7 @@ namespace OpusCatMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
+            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result.Translation;
         }
 
         //For integration with Wordfast
@@ -109,7 +109,7 @@ namespace OpusCatMTEngine
             var targetLang = new IsoLanguage(trgLangCode);
 
             var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
-            return new Translation(translation.Result);
+            return new Translation(translation.Result.Translation);
         }
 
 
@@ -127,7 +127,7 @@ namespace OpusCatMTEngine
             WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Server.ToString(), string.Empty);
             
             var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
-            return new MemoryStream(Encoding.UTF8.GetBytes(translation));
+            return new MemoryStream(Encoding.UTF8.GetBytes(translation.Translation));
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace OpusCatMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            return this.ModelManager.TranslateWithModel(input, modelName);
+            return this.ModelManager.TranslateWithModel(input, modelName).Translation;
         }
 
 
@@ -165,13 +165,13 @@ namespace OpusCatMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            List<string> translations = new List<string>();
+            List<TranslationPair> translations = new List<TranslationPair>();
             foreach (var sourceSegment in input)
             {
                 translations.Add(this.ModelManager.Translate(sourceSegment, sourceLang, targetLang, modelTag).Result);
             }
             
-            return translations;
+            return translations.Select(x => x.Translation).ToList();
         }
 
         /// <summary>

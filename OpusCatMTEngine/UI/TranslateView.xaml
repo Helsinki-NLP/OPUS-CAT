@@ -12,7 +12,7 @@
             <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
             <Label Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
-                <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="150"></TextBox>
+                <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="150"></RichTextBox>
             </Border>
             <StackPanel Orientation="Horizontal">
                 <Button 
@@ -21,7 +21,7 @@
             </StackPanel>
             <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
-                <TextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" TextWrapping="Wrap" Name="TargetBox" Height="150"></TextBox>
+                <RichTextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" Name="TargetBox" Height="150"></RichTextBox>
             </Border>
         </StackPanel>
     </Grid>

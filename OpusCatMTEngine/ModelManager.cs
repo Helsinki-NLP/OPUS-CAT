@@ -565,7 +565,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal string TranslateWithModel(string input, string modelName)
+        internal TranslationPair TranslateWithModel(string input, string modelName)
         {
             var model = this.LocalModels.Single(x => x.Name == modelName);
             //This will only work properly with monolingual models, but not sure if this method is actually used anywhere.
@@ -787,7 +787,7 @@ namespace OpusCatMTEngine
             return null;
         }
 
-        internal Task<string> Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
+        internal Task<TranslationPair> Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
         {
             var mtModel = this.SelectModel(srcLang, trgLang, modelTag);
 

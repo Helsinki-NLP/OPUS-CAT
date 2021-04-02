@@ -40,21 +40,21 @@ namespace OpusCatMTEngine
         private bool includePlaceholderTags;
         private bool includeTagPairs;
 
-        private void WriteToTranslationDb(object sender, EventArgs e, IEnumerable<string> input, FileInfo spOutput)
+        private void WriteToTranslationDb(object sender, EventArgs e, IEnumerable<string> input, FileInfo spInput, FileInfo transAndAlign)
         {
             Queue<string> inputQueue
                 = new Queue<string>(input);
 
-            if (spOutput.Exists)
+            if (transAndAlign.Exists)
             {
-                using (var reader = spOutput.OpenText())
+                using (var reader = transAndAlign.OpenText())
                 {
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
                         var sourceLine = inputQueue.Dequeue();
-                        TranslationDbHelper.WriteTranslationToDb(sourceLine, nonSpLine, this.SystemName);
+                        var transPair = new TranslationPair(sourceLine, line);
+                        TranslationDbHelper.WriteTranslationToDb(sourceLine, transPair, this.SystemName);
                     }
                 }
             }
@@ -104,23 +104,25 @@ namespace OpusCatMTEngine
             Boolean preprocessedInput=false,
             Boolean storeTranslations=false)
         {
-            if (storeTranslations)
-            {
-                this.OutputReady += (x, y) => this.WriteToTranslationDb(x, y, input, spOutput);
-            }
-
+            
             Log.Information($"Starting batch translator for model {this.SystemName}.");
             
             var cmd = "TranslateBatchSentencePiece.bat";
-                        
-            FileInfo spInput = this.PreprocessInput(input,preprocessedInput);
 
+            FileInfo spInput = this.PreprocessInput(input, preprocessedInput);
+            
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for
             //same systems, i.e. keep track of decoder settings)
 
             FileInfo transAndAlign = new FileInfo($"{spOutput.FullName}.transandalign");
             var args = $"{this.modelDir.FullName} {spInput.FullName} {transAndAlign.FullName} --log-level=info --quiet";
+
+            if (storeTranslations)
+            {
+                this.OutputReady += (x, y) => this.WriteToTranslationDb(x, y, input, spInput, transAndAlign);
+            }
+
 
             EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
             
@@ -131,7 +133,6 @@ namespace OpusCatMTEngine
         }
 
         private void BatchProcess_Exited(
-            
             FileInfo transAndAlignOutput,
             FileInfo spOutput,
             object sender,
