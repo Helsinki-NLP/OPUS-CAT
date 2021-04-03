@@ -30,7 +30,8 @@ namespace OpusCatMTEngine
         }
         public string[] SegmentedSourceSentence { get; private set; }
         public string[] SegmentedTranslation { get; private set; }
-        public Dictionary<int, List<int>> SegmentedAlignment { get; private set; }
+        public Dictionary<int, List<int>> SegmentedAlignmentSourceToTarget { get; private set; }
+        public Dictionary<int, List<int>> SegmentedAlignmentTargetToSource { get; private set; }
         public string AlignmentString { get; private set; }
         public SegmentationMethod SegmentationMethodUsed { get; private set; }
 
@@ -52,24 +53,45 @@ namespace OpusCatMTEngine
         {
             this.SegmentedSourceSentence = segmentedSource.Split(' ');
             this.SegmentedTranslation = segmentedTarget.Split(' ');
-            this.SegmentedAlignment = TranslationPair.ParseAlignmentString(
+            this.SegmentedAlignmentSourceToTarget = TranslationPair.ParseAlignmentString(
                 alignment,
                 SegmentedSourceSentence.Length-1,
-                SegmentedTranslation.Length-1);
+                SegmentedTranslation.Length-1,
+                false);
+
+            this.SegmentedAlignmentTargetToSource = TranslationPair.ParseAlignmentString(
+                alignment,
+                SegmentedTranslation.Length - 1,
+                SegmentedSourceSentence.Length - 1,
+                true);
+
             this.AlignmentString = alignment;
         }
 
-        public static Dictionary<int,List<int>> ParseAlignmentString(string alignmentString, int highestSourceIndex, int highestTargetIndex)
+        public static Dictionary<int,List<int>> ParseAlignmentString(
+            string alignmentString, 
+            int highestSourceIndex, 
+            int highestTargetIndex,
+            bool reverseAlignmentDirection)
         {
             var alignmentDict = new Dictionary<int, List<int>>();
             foreach (var alignmentPair in alignmentString.Split(' '))
             {
                 var pairSplit = alignmentPair.Split('-');
-                var sourceToken = int.Parse(pairSplit[0]);
-                var targetToken = int.Parse(pairSplit[1]);
+                int sourceToken, targetToken;
+                if (!reverseAlignmentDirection)
+                {
+                    sourceToken = int.Parse(pairSplit[0]);
+                    targetToken = int.Parse(pairSplit[1]);
+                }
+                else
+                {
+                    sourceToken = int.Parse(pairSplit[1]);
+                    targetToken = int.Parse(pairSplit[0]);
+                }
 
                 //Remove indexes that are larger than the actual size of the token sequence (Marian seems to
-                //align to the invisible end of sequence token?)
+                //align non-alignable to the invisible end of sequence token?)
                 if (sourceToken > highestSourceIndex || targetToken > highestTargetIndex)
                 {
                     continue;
@@ -84,6 +106,7 @@ namespace OpusCatMTEngine
                     alignmentDict[sourceToken] = new List<int>() { targetToken };
                 }
             }
+
             return alignmentDict;
         }
 

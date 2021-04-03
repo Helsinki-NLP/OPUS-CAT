@@ -75,53 +75,71 @@ namespace OpusCatMTEngine
             this.SourceBox.Document.Blocks.Clear();
             this.sourceRuns = new List<List<Run>>();
             this.targetRuns = new List<List<Run>>();
+
             foreach (var (pair, pairindex) in translation.Select((x, i) => (x, i)))
             {
                 var sourcepara = new Paragraph();
-                var runlist = new List<Run>();
-                foreach (var (token, index) in pair.SegmentedSourceSentence.Select((x, i) => (x, i)))
-                {
-                    var tokenrun = new Run(token);
-                    if (pair.SegmentedAlignment.ContainsKey(index))
-                    {
-                        var alignedTokens = pair.SegmentedAlignment[index];
-                        tokenrun.MouseEnter += (x, y) => Tokenrun_MouseEnter(alignedTokens, pairindex, x, y);
-                        tokenrun.MouseLeave += Tokenrun_MouseLeave;
-                        sourcepara.Inlines.Add(tokenrun);
-                        runlist.Add(tokenrun);
-                    }
-                }
-                this.sourceRuns.Add(runlist);
+                var sourcerunlist = this.GenerateRuns(
+                    pair.SegmentedSourceSentence,
+                    pair.SegmentedAlignmentSourceToTarget,
+                    pairindex,
+                    this.targetRuns);
+                
+                this.sourceRuns.Add(sourcerunlist);
+                sourcepara.Inlines.AddRange(sourcerunlist);
                 this.SourceBox.Document.Blocks.Add(sourcepara);
 
                 var targetpara = new Paragraph();
+                var targetrunlist = this.GenerateRuns(
+                    pair.SegmentedTranslation,
+                    pair.SegmentedAlignmentTargetToSource,
+                    pairindex,
+                    this.sourceRuns);
 
-                runlist = new List<Run>();
-                foreach (var token in pair.SegmentedTranslation)
-                {
-
-                    var tokenrun = new Run(token);
-                    //tokenrun.MouseEnter += Tokenrun_MouseEnter;
-                    tokenrun.MouseLeave += Tokenrun_MouseLeave;
-                    targetpara.Inlines.Add(tokenrun);
-                    runlist.Add(tokenrun);
-                }
-                this.targetRuns.Add(runlist);
+                this.targetRuns.Add(targetrunlist);
+                targetpara.Inlines.AddRange(targetrunlist);
                 this.TargetBox.Document.Blocks.Add(targetpara);
             }
         }
 
-        private void Tokenrun_MouseLeave(object sender, MouseEventArgs e)
+        private List<Run> GenerateRuns(
+            string[] tokens,
+            Dictionary<int,List<int>> alignment,
+            int translationIndex,
+            List<List<Run>> otherRuns)
+        {
+            var runlist = new List<Run>();
+            foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
+            {
+                var tokenrun = new Run(token);
+                if (alignment.ContainsKey(index))
+                {
+                    var alignedTokens = alignment[index];
+                    tokenrun.MouseEnter += (x, y) => Tokenrun_MouseEnter(alignedTokens, otherRuns, translationIndex, x, y);
+                    tokenrun.MouseLeave += (x, y) => Tokenrun_MouseLeave(alignedTokens, otherRuns, translationIndex, x, y);
+                    
+                }
+                runlist.Add(tokenrun);
+            }
+            return runlist;
+        }
+
+        private void Tokenrun_MouseLeave(List<int> alignedTokens, List<List<Run>> otherRuns, int pairindex,object sender, MouseEventArgs e)
         {
             Run tokenrun = sender as Run;
             tokenrun.Background = Brushes.Transparent;
+            var runlist = otherRuns[pairindex];
+            foreach (var tokenIndex in alignedTokens)
+            {
+                runlist[tokenIndex].Background = Brushes.Transparent;
+            }
         }
 
-        private void Tokenrun_MouseEnter(List<int> alignedTokens, int pairindex, object sender, MouseEventArgs e)
+        private void Tokenrun_MouseEnter(List<int> alignedTokens, List<List<Run>> otherRuns, int pairindex, object sender, MouseEventArgs e)
         {
             Run tokenrun = sender as Run;
             tokenrun.Background = Brushes.BlueViolet;
-            var runlist = this.targetRuns[pairindex];
+            var runlist = otherRuns[pairindex];
             foreach (var tokenIndex in alignedTokens)
             {
                 runlist[tokenIndex].Background = Brushes.BlueViolet;
