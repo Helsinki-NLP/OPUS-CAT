@@ -189,7 +189,11 @@ namespace OpusCatMTEngine
             this.InstallProgress = e.ProgressPercentage;
         }
 
-        public List<IsoLanguage> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
+        public List<IsoLanguage> TargetLanguages
+        {
+            get => targetLanguages;
+            set => targetLanguages = value;
+        }
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
         
@@ -445,6 +449,16 @@ namespace OpusCatMTEngine
         public MTModel(string modelPath, string installDir)
         {
             this.InstallDir = installDir;
+
+            var modelFile = Directory.GetFiles(installDir, "*.npz").Single();
+            FileInfo yamlFile = new FileInfo(Path.ChangeExtension(modelFile, "yml"));
+            if (yamlFile.Exists)
+            {
+                using (var reader = yamlFile.OpenText())
+                {
+                    this.modelYaml = reader.ReadToEnd();
+                } 
+            }
             this.ParseModelPath(modelPath);
 
             var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
@@ -626,11 +640,13 @@ namespace OpusCatMTEngine
                 else
                 {
                     Log.Error($"No source langs in {this.ModelUri} yaml file.");
+                    this.Faulted = true;
+                    this.SourceLanguages.Add(new IsoLanguage("NO SOURCE LANGUAGES"));
                 }
                 List<object> xamlTargetLangs = null;
                 if (res.ContainsKey("target-languages"))
                 {
-                    xamlSourceLangs = res["target-languages"];
+                    xamlTargetLangs = res["target-languages"];
                 }
 
                 if (xamlTargetLangs != null)
@@ -643,11 +659,15 @@ namespace OpusCatMTEngine
                 else
                 {
                     Log.Error($"No target langs in {this.ModelUri} yaml file.");
+                    this.Faulted = true;
+                    this.TargetLanguages.Add(new IsoLanguage("NO TARGET LANGUAGES"));
                 }
             }
             catch (YamlDotNet.Core.SyntaxErrorException ex)
             {
                 Log.Error($"Error in the yaml syntax of model {this.ModelUri}. Error: {ex.Message}.");
+                this.SourceLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
+                this.TargetLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
             }
             catch (Exception ex)
             {
@@ -764,6 +784,7 @@ namespace OpusCatMTEngine
         private string modelYaml;
 
         public Uri ModelUri { get; private set; }
+        public bool Faulted { get; private set; }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;

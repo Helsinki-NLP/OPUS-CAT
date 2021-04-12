@@ -6,10 +6,23 @@
         xmlns:local="clr-namespace:OpusCatMTEngine"
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
+        x:Name="_this"
         Height="450" Width="800">
     <Grid>
         <StackPanel Margin="10">
             <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
+            <StackPanel Orientation="Horizontal">
+                <Label>Source language</Label>
+                <ComboBox ItemsSource="{Binding Path=SourceLanguages}"
+                        DisplayMemberPath="IsoRefName"
+                        SelectedValue="{Binding ElementName=_this, Path=SourceLanguage, Mode=TwoWay}"
+                        Width="200"/>
+                <Label>Target language</Label>
+                <ComboBox ItemsSource="{Binding Path=TargetLanguages}"
+                        DisplayMemberPath="IsoRefName"
+                        SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
+                        Width="200"/>
+            </StackPanel>
             <Label Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
                 <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="150"></RichTextBox>

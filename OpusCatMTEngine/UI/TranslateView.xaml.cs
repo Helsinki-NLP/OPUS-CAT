@@ -1,7 +1,9 @@
 ﻿using OpusMTInterface;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,23 +22,60 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
     /// </summary>
-    public partial class TranslateView : UserControl
+    public partial class TranslateView : UserControl, INotifyPropertyChanged
     {
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private MTModel model;
         private List<List<Run>> sourceRuns;
         private List<List<Run>> targetRuns;
+
+        private IsoLanguage sourceLanguage;
+        private IsoLanguage targetLanguage;
+
 
         internal string Title { get; set; }
 
         public TranslateView(MTModel selectedModel)
         {
             this.Model = selectedModel;
+            this.DataContext = selectedModel;
+
+            this.SourceLanguage = this.Model.SourceLanguages.First();
+            this.TargetLanguage = this.Model.TargetLanguages.First();
             this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Translate_TranslateTitle, Model.Name);
             InitializeComponent();
         }
 
         public MTModel Model { get => model; set => model = value; }
+
+        public IsoLanguage SourceLanguage
+        {
+            get => sourceLanguage;
+            set
+            {
+                NotifyPropertyChanged();
+                sourceLanguage = value;
+            }
+        }
+
+        public IsoLanguage TargetLanguage
+        {
+            get => targetLanguage;
+            set
+            {
+                NotifyPropertyChanged();
+                targetLanguage = value;
+            }
+        }
 
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -62,7 +101,7 @@ namespace OpusCatMTEngine
                     translation.Add(
                         this.Model.Translate(
                             line,
-                            this.Model.SourceLanguages.First(), this.Model.TargetLanguages.First()).Result);
+                            this.SourceLanguage, this.TargetLanguage).Result);
                 }
             }
 
@@ -111,7 +150,7 @@ namespace OpusCatMTEngine
             var runlist = new List<Run>();
             foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
             {
-                var tokenrun = new Run(token);
+                var tokenrun = new Run(" "+token);
                 if (alignment.ContainsKey(index))
                 {
                     var alignedTokens = alignment[index];

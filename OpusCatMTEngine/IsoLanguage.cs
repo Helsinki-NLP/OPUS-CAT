@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -190,6 +191,8 @@ namespace OpusCatMTEngine
                 (String.IsNullOrEmpty(this.Iso639_5Code) || !IsoLanguage.Iso639_5ToRefName.ContainsKey(this.Iso639_5Code)))
             {
                 this.NonIsoCode = languageCode;
+                this.IsoRefName = languageCode;
+                Log.Debug($"Language code not recognized: {languageCode}.");
             }
             else
             {

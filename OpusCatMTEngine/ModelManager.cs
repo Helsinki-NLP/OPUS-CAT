@@ -94,6 +94,7 @@ namespace OpusCatMTEngine
         private string _nameFilter;
         private HashSet<Uri> yamlDownloads;
         private bool _showNewestOnly;
+        private bool _showFaulted;
 
         public DirectoryInfo OpusModelDir { get => opusModelDir; }
         public bool FinetuningOngoing
@@ -141,6 +142,17 @@ namespace OpusCatMTEngine
             set
             {
                 _showNewestOnly = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
+        public bool ShowFaulted
+        {
+            get => _showFaulted;
+            set
+            {
+                _showFaulted = value;
                 NotifyPropertyChanged();
                 this.FilterOnlineModels();
             }
@@ -280,12 +292,17 @@ namespace OpusCatMTEngine
 
             if (!this.ShowBilingualModels)
             {
-                filteredModels = filteredModels.Where(x => x.SourceLanguages.Count > 1 || x.TargetLanguages.Count > 1);
+                filteredModels = filteredModels.Where(x => (x.SourceLanguages.Count > 1 || x.TargetLanguages.Count > 1) || x.Faulted);
             }
 
             if (!this.ShowMultilingualModels)
             {
-                filteredModels = filteredModels.Where(x => x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1);
+                filteredModels = filteredModels.Where(x => (x.SourceLanguages.Count == 1 && x.TargetLanguages.Count == 1) || x.Faulted);
+            }
+
+            if (!this.ShowFaulted)
+            {
+                filteredModels = filteredModels.Where(x => !x.Faulted);
             }
 
             if (this.ShowNewestOnly)
@@ -505,15 +522,21 @@ namespace OpusCatMTEngine
                 //and mark accordingly
                 foreach (var onlineModel in this.onlineModels.ToList())
                 {
-                    var localModelPaths = this.LocalModels.Select(x => x.ModelPath.Replace("\\", "/"));
-                    if (localModelPaths.Contains(onlineModel.ModelPath))
-                    {
-                        onlineModel.InstallStatus = "Installed";
-                        onlineModel.InstallProgress = 100;
-                    }
+                    this.CheckIfOnlineModelInstalled(onlineModel);
                 }
 
                 this.FilterOnlineModels();
+            }
+        }
+
+        private void CheckIfOnlineModelInstalled(MTModel onlineModel)
+        {
+            var localModelPaths = this.LocalModels.Select(x => x.ModelPath.Replace("\\", "/"));
+
+            if (localModelPaths.Contains(onlineModel.ModelPath))
+            {
+                onlineModel.InstallStatus = "Installed";
+                onlineModel.InstallProgress = 100;
             }
         }
 
@@ -543,9 +566,12 @@ namespace OpusCatMTEngine
                 {
                     if (storageUri.Segments[1].Contains("Tatoeba-MT"))
                     {
-                        Log.Error($"Model {modelUri} has no corresponding yaml file in storage");
+                        Log.Error($"Model {modelUri} has no corresponding yaml file in storage, model will not be added to list of online models.");
                     }
-                    this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
+                    else
+                    {
+                        this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
+                    }
                 }
             }
 
@@ -554,9 +580,27 @@ namespace OpusCatMTEngine
 
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
         {
-            //var yamlString = Regex.Replace(e.Result, "- (>>[^<]+<<)", "- \"$1\"");
-            //yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
-            this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri, e.Result));
+            
+            var yamlString = e.Result;
+            yamlString = Regex.Replace(yamlString, "- (>>[^<]+<<)", "- \"$1\"");
+            yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
+            if (Regex.Match(yamlString, @"(?<!- )devset = top").Success)
+            {
+                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
+                yamlString = Regex.Replace(yamlString, @"(?<!- )devset = top", "devset: top");
+                
+            }
+            if (yamlString.Contains("unused dev/test data is added to training data"))
+            {
+                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
+                yamlString = Regex.Replace(
+                        yamlString,
+                        @"unused dev/test data is added to training data",
+                        "other: unused dev/test data is added to training data");
+            }
+            var onlineModel = new MTModel(model.Replace(".zip", ""), modelUri, yamlString);
+            this.CheckIfOnlineModelInstalled(onlineModel);
+            this.onlineModels.Add(onlineModel);
 
             this.yamlDownloads.Remove(modelUri);
             if (this.yamlDownloads.Count == 0)

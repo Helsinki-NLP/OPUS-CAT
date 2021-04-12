@@ -46,6 +46,7 @@
                     <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowOpusModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="5">OPUS-MT models</CheckBox>
                     <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTatoebaModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="5">Tatoeba models</CheckBox>
                     <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowNewestOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4">Newest only</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowFaulted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="5">Models with errors</CheckBox>
                 </Grid>
 
                 <StackPanel DockPanel.Dock="Right" Margin="5,0">
