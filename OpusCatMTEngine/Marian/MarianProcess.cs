@@ -97,49 +97,31 @@ namespace OpusCatMTEngine
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
             //There are scripts for monolingual and multilingual models
 
-            string pipeBat, pipeArgs, preprocessCommand, mtCommand;
+            string preprocessCommand, mtCommand;
 
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
                 preprocessCommand = $@"Preprocessing\spm_encode.exe --model {this.modelDir}\source.spm";
-                if (this.MultilingualModel)
-                {
-                    mtCommand = 
-                    pipeBat = "StartSentencePieceMultilingualMtPipe.bat";
-                    pipeArgs = $"{this.modelDir} {this.TargetCode}";
-                }
-                else
-                {
-                    pipeBat = "StartSentencePieceMtPipe.bat";
-                    pipeArgs = this.modelDir;
-                }
-                
                 this.sentencePiecePostProcess = true;
             }
             else
             {
-                preprocessCommand = $@"Preprocessing\process.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel {this.modelDir}\source.tcmodel";
-                if (this.MultilingualModel)
-                {
-                    pipeBat = "StartMosesBpeMultilingualMtPipe.bat";
-                    pipeArgs = $"{this.modelDir} {this.SourceCode} {this.TargetCode}";
-                }
-                else
-                {
-                    pipeBat = "StartMosesBpeMtPipe.bat";
-                    pipeArgs = $"{this.modelDir} {this.SourceCode}";
-                }
+                preprocessCommand = $@"Preprocessing\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel {this.modelDir}\source.tcmodel";
                 this.sentencePiecePostProcess = false;
             }
 
             mtCommand = $@"Marian\marian.exe decode --log-level=warn -c {this.modelDir}\decoder.yml --max-length=200 --max-length-crop --alignment=hard";
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
-            this.PreprocessProcess = MarianHelper.StartProcessInBackgroundWithRedirects(preprocessCommand);
-            this.MtProcess = MarianHelper.StartProcessInBackgroundWithRedirects(mtCommand);
+            this.PreprocessProcess = 
+                MarianHelper.StartProcessInBackgroundWithRedirects(preprocessCommand);
+            this.MtProcess = 
+                MarianHelper.StartProcessInBackgroundWithRedirects(mtCommand);
             
-            this.utf8PreprocessWriter = new StreamWriter(this.PreprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
-            this.utf8MtWriter = new StreamWriter(this.MtProcess.StandardInput.BaseStream, new UTF8Encoding(false));
+            this.utf8PreprocessWriter =
+                new StreamWriter(this.PreprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
+            this.utf8MtWriter =
+                new StreamWriter(this.MtProcess.StandardInput.BaseStream, new UTF8Encoding(false));
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
         }

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
+    
     class MarianHelper
     {
 
@@ -190,6 +191,10 @@ namespace OpusCatMTEngine
 
         private static void defaultErrorDataHandler(object sender, DataReceivedEventArgs e)
         {
+            if (e.Data == "sentence processed")
+            {
+                return;
+            }
             Log.Information(e.Data);
         }
 
@@ -219,17 +224,14 @@ namespace OpusCatMTEngine
 
         internal static FileInfo PreprocessLanguage(
             FileInfo languageFile,
-            DirectoryInfo directory, 
-            string languageCode, 
-            FileInfo spmModel,
+            DirectoryInfo directory,
+            string languageCode,
+            FileInfo segmentationModel,
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
             
             var preprocessedFile = new FileInfo(Path.Combine(directory.FullName, $"preprocessed_{languageFile.Name}"));
-
-            //Marian doesn't like spaces in names
-            var spFile = new FileInfo(Path.Combine(directory.FullName, $"sp_{languageFile.Name.Replace(" ", "_")}"));
 
             using (var rawFile = languageFile.OpenText())
             using (var preprocessedWriter = new StreamWriter(preprocessedFile.FullName))
@@ -242,10 +244,51 @@ namespace OpusCatMTEngine
                 }
             }
 
-            var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{spmModel.FullName}\" --output \"{spFile.FullName}\"";
-            var spmProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
-            spmProcess.WaitForExit();
-            return spFile;
+            //Marian doesn't like spaces in names
+            var segmentedFile = new FileInfo(Path.Combine(directory.FullName, $"seg_{languageFile.Name.Replace(" ", "_")}"));
+
+            switch (segmentationModel.Extension)
+            {
+                case ".spm":
+                    var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{segmentationModel.FullName}\" --output \"{segmentedFile.FullName}\"";
+                    var segmentationProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
+                    segmentationProcess.WaitForExit();
+                    break;
+                case ".bpe":
+                    //Truecasing is not used in any models, so this is a dummy tc model (empty). So it does not
+                    //matter is source.tcmodel is used for target language.
+                    var tcModelPath = $@"{directory.FullName}\source.tcmodel";
+
+                    var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                        $"type {preprocessedFile.FullName} | Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\" > {segmentedFile.FullName}");
+                    mosesProcess.WaitForExit();
+                    //Input needs to be fed through stdin for the bpe preprocessing, otherwise you get utf
+                    //problems
+                    /*using (var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                        $"Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\""))
+                    using (var mosesStdinWriter = new StreamWriter(mosesProcess.StandardInput.BaseStream, new UTF8Encoding(false)))
+                    using (var bpeSegmentationProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                        $"Preprocessing\\apply_bpe.exe -c \"{segmentationModel.FullName}\""))
+                    using (var bpeStdinWriter = new StreamWriter(bpeSegmentationProcess.StandardInput.BaseStream, new UTF8Encoding(false)))
+                    using (var preprocessedReader = preprocessedFile.OpenText())
+                    using (var bpeWriter = (segmentedFile.CreateText()))
+                    {
+                        String line;
+                        while ((line = preprocessedReader.ReadLine()) != null)
+                        {
+                            mosesStdinWriter.WriteLine(line);
+                            mosesStdinWriter.Flush();
+                            var mosesLine = mosesProcess.StandardOutput.ReadLine();
+                        }
+                    }*/
+                    break;
+                default:
+                    segmentationProcess = null;
+                    throw new Exception("No segmentation model found");
+                    break;
+            }
+         
+            return segmentedFile;
         }
 
         internal static void GenerateAlignments(FileInfo spSource, FileInfo spTarget, FileInfo alignmentFile, FileInfo priorsFile)

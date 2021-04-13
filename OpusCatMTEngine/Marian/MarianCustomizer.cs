@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using YamlDotNet.Serialization;
@@ -317,11 +318,15 @@ namespace OpusCatMTEngine
 
         private void PreprocessInput()
         {
-            var sourceSpm = this.customDir.GetFiles("source.spm").Single();
-            var targetSpm = this.customDir.GetFiles("target.spm").Single();
-
-            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags,this.includeTagPairs);
-            this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
+            FileInfo sourceSegModel = 
+                this.customDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "source.(spm|bpe)")).Single();
+            FileInfo targetSegModel =
+                this.customDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "target.(spm|bpe)")).Single();
+            
+            this.spSource = MarianHelper.PreprocessLanguage(
+                this.customSource, this.customDir, this.sourceCode, sourceSegModel, this.includePlaceholderTags,this.includeTagPairs);
+            this.spTarget = MarianHelper.PreprocessLanguage(
+                this.customTarget, this.customDir, this.targetCode, targetSegModel, this.includePlaceholderTags, this.includeTagPairs);
 
             //concatenate the out-of-domain validation set with the in-domain validation set
             ParallelFilePair tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
@@ -331,8 +336,10 @@ namespace OpusCatMTEngine
                 this.customDir.FullName,
                 OpusCatMTEngineSettings.Default.OODValidSetSize);
 
-            this.spValidSource = MarianHelper.PreprocessLanguage(combinedValid.Source, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
-            this.spValidTarget = MarianHelper.PreprocessLanguage(combinedValid.Target, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
+            this.spValidSource = MarianHelper.PreprocessLanguage(
+                combinedValid.Source, this.customDir, this.sourceCode, sourceSegModel, this.includePlaceholderTags, this.includeTagPairs);
+            this.spValidTarget = MarianHelper.PreprocessLanguage(
+                combinedValid.Target, this.customDir, this.targetCode, targetSegModel, this.includePlaceholderTags, this.includeTagPairs);
         }
         
         public MarianCustomizer(

@@ -251,6 +251,9 @@
     <EmbeddedResource Include="iso-639-3_20200515.tab" />
     <EmbeddedResource Include="iso639-5.tsv" />
     <None Include="packages.config" />
+    <None Include="Preprocessing\StartMosesBpePreprocessPipe.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -294,10 +297,11 @@
     <Content Include="Marian\marian.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Preprocessing\process.exe">
+    <Content Include="Preprocessing\mosesprocessor.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Preprocessing\process.py" />
+    <Content Include="Preprocessing\mosesprocessor.py" />
+    <Resource Include="Preprocessing\python_to_exe_instructions.txt" />
     <Content Include="Preprocessing\spm_decode.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
