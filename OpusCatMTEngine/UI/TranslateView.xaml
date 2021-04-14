@@ -8,6 +8,9 @@
         mc:Ignorable="d"
         x:Name="_this"
         Height="450" Width="800">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+    </UserControl.Resources>
     <Grid>
         <StackPanel Margin="10">
             <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
@@ -23,14 +26,18 @@
                         SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
                         Width="200"/>
             </StackPanel>
-            <Label Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
+            <DockPanel>
+                <Label DockPanel.Dock="Left" Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
+            </DockPanel>
             <Border BorderThickness="1" BorderBrush="Black">
                 <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="150"></RichTextBox>
             </Border>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Button 
                     Click="translateButton_Click" 
                     Content="{x:Static resx:Resources.Translate_TranslateButton}"/>
+                <Label Visibility="{Binding Path=DoesNotSupportWordAlignment, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}">Alignments are not available for this model</Label>
+                <Label Visibility="{Binding Path=SupportsWordAlignment, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}">Alignments are available for this model (hover over word to see its aligned words, if any)</Label>
             </StackPanel>
             <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">

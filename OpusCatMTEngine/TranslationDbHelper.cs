@@ -19,9 +19,10 @@ namespace OpusCatMTEngine
                 m_dbConnection.Open();
 
                 using (SQLiteCommand insert =
-                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, segmentedsource, segmentedtranslation, alignment, model) VALUES (@sourcetext,@segmentedsource,@segmentedtranslation,@alignment,@model)", m_dbConnection))
+                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model)", m_dbConnection))
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
+                    insert.Parameters.Add(new SQLiteParameter("@translation", translation.Translation));
                     insert.Parameters.Add(new SQLiteParameter("@segmentedsource", String.Join(" ",translation.SegmentedSourceSentence)));
                     insert.Parameters.Add(new SQLiteParameter("@segmentedtranslation", String.Join(" ", translation.SegmentedTranslation)));
                     insert.Parameters.Add(new SQLiteParameter("@alignment", translation.AlignmentString));

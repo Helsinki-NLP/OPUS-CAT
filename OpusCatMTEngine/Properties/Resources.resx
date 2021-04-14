@@ -346,6 +346,11 @@
   </data>
   <data name="Service_PortNotAvailable" xml:space="preserve">
     <value>The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port.</value>
-    <comment> </comment>
+  </data>
+  <data name="App_ConfirmDbCaption" xml:space="preserve">
+    <value>Database confirmation</value>
+  </data>
+  <data name="App_InvalidDbMessage" xml:space="preserve">
+    <value>The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking Yes.</value>
   </data>
 </root>

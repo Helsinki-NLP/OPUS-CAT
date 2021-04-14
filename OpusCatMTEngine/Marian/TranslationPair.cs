@@ -12,34 +12,21 @@ namespace OpusCatMTEngine
         public enum SegmentationMethod { SentencePiece, BPE};
 
         
-        public string Translation
-        {
-            get
-            {
-                string translation = null;
-                switch (this.SegmentationMethodUsed)
-                {
-                    case SegmentationMethod.SentencePiece:
-                        translation = (String.Concat(this.SegmentedTranslation)).Replace("▁", " ").Trim();
-                        break;
-                    case SegmentationMethod.BPE:
-                        break;
-                }
-                return translation;
-            }
-        }
+        public string Translation { get; set; }
+            
         public string[] SegmentedSourceSentence { get; private set; }
         public string[] SegmentedTranslation { get; private set; }
         public Dictionary<int, List<int>> SegmentedAlignmentSourceToTarget { get; private set; }
         public Dictionary<int, List<int>> SegmentedAlignmentTargetToSource { get; private set; }
         public string AlignmentString { get; private set; }
-        public SegmentationMethod SegmentationMethodUsed { get; private set; }
+        public string RawTranslation { get; private set; }
 
         public TranslationPair(string segmentedSource, string translationAndAlignment)
         {
             var lastSeparator = translationAndAlignment.LastIndexOf("|||");
             var segmentedTranslation = translationAndAlignment.Substring(0, lastSeparator - 1);
-            var alignment = translationAndAlignment.Substring(lastSeparator + 4);
+            this.RawTranslation = segmentedTranslation;
+            var alignment = translationAndAlignment.Substring(lastSeparator + "||| ".Length);
 
             this.Initialize(segmentedSource, segmentedTranslation, alignment);
         }
@@ -110,6 +97,13 @@ namespace OpusCatMTEngine
             return alignmentDict;
         }
 
+        /// <summary>
+        /// Desegmented alignment is the alignment after segments have been joined into tokens.
+        /// </summary>
+        /// <param name="sourceSentence"></param>
+        /// <param name="segmentedTranslation"></param>
+        /// <param name="alignment"></param>
+        /// <returns></returns>
         private Dictionary<int, List<int>> GenerateDesegmentedAlignment(string sourceSentence, string segmentedTranslation, string alignment)
         {
             //Generate a dict out of the alignment

@@ -43,6 +43,8 @@ namespace OpusCatMTEngine
         public string SystemName { get; }
         public bool MultilingualModel { get; private set; }
         public Process PreprocessProcess { get => preprocessPipe; set => preprocessPipe = value; }
+        public Process PostprocessProcess { get; private set; }
+        private StreamWriter utf8PostprocessWriter;
 
         private bool sentencePiecePostProcess;
         private static readonly Object lockObj = new Object();
@@ -108,6 +110,11 @@ namespace OpusCatMTEngine
             {
                 preprocessCommand = $@"Preprocessing\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel {this.modelDir}\source.tcmodel";
                 this.sentencePiecePostProcess = false;
+                var postprocessCommand =
+                    $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
+                this.PostprocessProcess = MarianHelper.StartProcessInBackgroundWithRedirects(postprocessCommand);
+                this.utf8PostprocessWriter =
+                    new StreamWriter(this.PostprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             }
 
             mtCommand = $@"Marian\marian.exe decode --log-level=warn -c {this.modelDir}\decoder.yml --max-length=200 --max-length-crop --alignment=hard";
@@ -176,6 +183,17 @@ namespace OpusCatMTEngine
 
             TranslationPair alignedTranslationPair = new TranslationPair(preprocessedLine, translationAndAlignment);
 
+            if (this.sentencePiecePostProcess)
+            {
+                alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace("▁", " ").Trim();
+            }
+            else
+            {
+                this.utf8PostprocessWriter.WriteLine(alignedTranslationPair.RawTranslation);
+                this.utf8PostprocessWriter.Flush();
+                string postprocessedTranslation = this.PostprocessProcess.StandardOutput.ReadLine();
+                alignedTranslationPair.Translation = postprocessedTranslation;
+            }
 
             return alignedTranslationPair;
             

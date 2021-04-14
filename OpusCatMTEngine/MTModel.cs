@@ -102,6 +102,8 @@ namespace OpusCatMTEngine
             }
         }
 
+        private bool supportsWordAlignment;
+
         public bool CanSetAsOverrideModel
         {
             get 
@@ -162,8 +164,9 @@ namespace OpusCatMTEngine
 
             var modelOrigTuple = new Tuple<string, string>(modelOrigSourceCode, modelOrigTargetCode);
             
-            //Each source language in a multilingual model requires its own marian process,
-            //since the preprocessing is different for each source language (only for BPE)
+            //TODO: Currently a new process is created for each language direction of a multilingual model.
+            //I don't see much concurrent use of multilingual model language pairs happening, but it would be
+            //nice if all requests could be directed to same model.
             if (this.marianProcesses == null)
             {
                 this.marianProcesses = new Dictionary<Tuple<string, string>, MarianProcess>();
@@ -218,11 +221,7 @@ namespace OpusCatMTEngine
             {
 
                 //Include model files, README.md, spm files, tcmodel (not needed but expected), modelconfig.yml
-                var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
-                var deserializer = new Deserializer();
-                var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-
-                foreach (var modelNpzName in decoderSettings.models)
+                foreach (var modelNpzName in this.decoderSettings.models)
                 {
                     //No point in compressing npz, it's already compressed
                     packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, modelNpzName), modelNpzName, CompressionLevel.NoCompression);
@@ -450,21 +449,29 @@ namespace OpusCatMTEngine
         {
             this.InstallDir = installDir;
 
-            var modelFile = Directory.GetFiles(installDir, "*.npz").Single();
-            FileInfo yamlFile = new FileInfo(Path.ChangeExtension(modelFile, "yml"));
-            if (yamlFile.Exists)
+            var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
+            var deserializer = new Deserializer();
+            this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+
+            this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
+
+            //Recent models have yaml files containing metadata, they have the same name as the model npz file
+            var modelFilePath = Path.Combine(this.InstallDir,this.decoderSettings.models[0]);
+            var modelYamlFilePath = Path.ChangeExtension(modelFilePath,"yml");
+            
+            if (File.Exists(modelYamlFilePath))
             {
-                using (var reader = yamlFile.OpenText())
+                using (var reader = File.OpenText(modelYamlFilePath))
                 {
                     this.modelYaml = reader.ReadToEnd();
                 } 
             }
+
             this.ParseModelPath(modelPath);
 
             var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
             if (File.Exists(modelConfigPath))
             {
-                var deserializer = new Deserializer();
                 using (var reader = new StreamReader(modelConfigPath))
                 {
                     this.ModelConfig = deserializer.Deserialize<MTModelConfig>(reader);
@@ -785,6 +792,11 @@ namespace OpusCatMTEngine
 
         public Uri ModelUri { get; private set; }
         public bool Faulted { get; private set; }
+
+        private MarianDecoderConfig decoderSettings;
+
+        public bool SupportsWordAlignment { get => supportsWordAlignment; set => supportsWordAlignment = value; }
+        public bool DoesNotSupportWordAlignment { get => !supportsWordAlignment; }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;

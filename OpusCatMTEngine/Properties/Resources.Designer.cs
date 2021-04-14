@@ -61,6 +61,24 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Database confirmation.
+        /// </summary>
+        public static string App_ConfirmDbCaption {
+            get {
+                return ResourceManager.GetString("App_ConfirmDbCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking Yes..
+        /// </summary>
+        public static string App_InvalidDbMessage {
+            get {
+                return ResourceManager.GetString("App_InvalidDbMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse.
         /// </summary>
         public static string Finetune_BrowseButton {

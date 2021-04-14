@@ -262,25 +262,6 @@ namespace OpusCatMTEngine
                     var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                         $"type {preprocessedFile.FullName} | Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\" > {segmentedFile.FullName}");
                     mosesProcess.WaitForExit();
-                    //Input needs to be fed through stdin for the bpe preprocessing, otherwise you get utf
-                    //problems
-                    /*using (var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                        $"Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\""))
-                    using (var mosesStdinWriter = new StreamWriter(mosesProcess.StandardInput.BaseStream, new UTF8Encoding(false)))
-                    using (var bpeSegmentationProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                        $"Preprocessing\\apply_bpe.exe -c \"{segmentationModel.FullName}\""))
-                    using (var bpeStdinWriter = new StreamWriter(bpeSegmentationProcess.StandardInput.BaseStream, new UTF8Encoding(false)))
-                    using (var preprocessedReader = preprocessedFile.OpenText())
-                    using (var bpeWriter = (segmentedFile.CreateText()))
-                    {
-                        String line;
-                        while ((line = preprocessedReader.ReadLine()) != null)
-                        {
-                            mosesStdinWriter.WriteLine(line);
-                            mosesStdinWriter.Flush();
-                            var mosesLine = mosesProcess.StandardOutput.ReadLine();
-                        }
-                    }*/
                     break;
                 default:
                     segmentationProcess = null;
@@ -302,11 +283,8 @@ namespace OpusCatMTEngine
             Log.Information($"Symmetrisizing alignment with args {symmetryArgs}");
             var symmetryProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Alignment\\atools.exe", symmetryArgs);
             symmetryProcess.WaitForExit();
-
         }
-
-
-
+        
         /* This uses marian-scorer to generate the alignment, but for some reason it's unstable and very slow
         internal static void GenerateAlignments(
             FileInfo spSource,
