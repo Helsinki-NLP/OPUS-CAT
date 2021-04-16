@@ -339,7 +339,7 @@
     <value>Translation:</value>
   </data>
   <data name="Settings_StoreInAppdataCheckbox" xml:space="preserve">
-    <value>Store OPUS-CAT MT Engine data in local application data folder</value>
+    <value>Store OPUS-CAT MT Engine data in local application data folder (instead of installation folder)</value>
   </data>
   <data name="Online_ModelOriginHeader" xml:space="preserve">
     <value>Model origin</value>
@@ -348,9 +348,15 @@
     <value>The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port.</value>
   </data>
   <data name="App_ConfirmDbCaption" xml:space="preserve">
-    <value>Database confirmation</value>
+    <value>New database confirmation</value>
   </data>
   <data name="App_InvalidDbMessage" xml:space="preserve">
-    <value>The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking Yes.</value>
+    <value>The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking OK.</value>
+  </data>
+  <data name="OpenModelInOverlayButton" xml:space="preserve">
+    <value>Open model as overlay</value>
+  </data>
+  <data name="Settings_RevertToDefaultsButton" xml:space="preserve">
+    <value>Revert to defaults</value>
   </data>
 </root>

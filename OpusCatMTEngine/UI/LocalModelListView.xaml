@@ -84,6 +84,16 @@
                                 Path="SelectedItem.CanTranslate"/>
                         </Button.Visibility>
                     </Button>
+                    <Button Name="openModelInOverlay" Click="btnOpenModelInOverlay_Click"
+                            Content="{x:Static resx:Resources.OpenModelInOverlayButton}">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanTranslate"/>
+                        </Button.Visibility>
+                    </Button>
                     <!-- This is disabled until the testing functionalities can be polished a bit more
                         <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
                     -->

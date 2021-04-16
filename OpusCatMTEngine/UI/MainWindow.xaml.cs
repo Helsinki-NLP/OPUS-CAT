@@ -82,6 +82,15 @@ namespace OpusCatMTEngine
             
             this.StartEngine();
             InitializeComponent();
+
+            this.Loaded += MainWindow_Loaded;
+            
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.Loaded -= MainWindow_Loaded;
+            TranslationDbHelper.SetupTranslationDb();
         }
 
         private void StartEngine()

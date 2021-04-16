@@ -31,8 +31,9 @@ namespace OpusCatMTEngine
             this.Initialize(segmentedSource, segmentedTranslation, alignment);
         }
 
-        public TranslationPair(string segmentedSource, string segmentedTarget, string alignment)
+        public TranslationPair(string translation, string segmentedSource, string segmentedTarget, string alignment)
         {
+            this.Translation = translation;
             this.Initialize(segmentedSource, segmentedTarget, alignment);
         }
 

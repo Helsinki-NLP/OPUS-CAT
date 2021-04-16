@@ -262,5 +262,41 @@ namespace OpusCatMTEngine {
                 this["TatoebaModelStorageUrl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public string DatabaseRemovalInterval {
+            get {
+                return ((string)(this["DatabaseRemovalInterval"]));
+            }
+            set {
+                this["DatabaseRemovalInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CacheMtInDatabase {
+            get {
+                return ((bool)(this["CacheMtInDatabase"]));
+            }
+            set {
+                this["CacheMtInDatabase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseDatabaseRemoval {
+            get {
+                return ((bool)(this["UseDatabaseRemoval"]));
+            }
+            set {
+                this["UseDatabaseRemoval"] = value;
+            }
+        }
     }
 }

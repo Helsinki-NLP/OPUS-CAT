@@ -37,74 +37,7 @@ namespace OpusCatMTEngine
                 .CreateLogger();
         }
 
-        private void SetupTranslationDb()
-        {
-
-            var translationTableColumns = new List<string>() { "model", "sourcetext", "translation", "segmentedsource", "segmentedtranslation", "alignment" };
-
-            var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
-
-            //Check that db structure is current
-            bool tableValid = true;
-            if (File.Exists(translationDb))
-            {
-                using (var m_dbConnection = 
-                    new SQLiteConnection($"Data Source={translationDb};Version=3;"))
-                {
-                    m_dbConnection.Open();
-
-                    using (SQLiteCommand verify_table =
-                        new SQLiteCommand("PRAGMA table_info(translations);", m_dbConnection))
-                    {
-                        SQLiteDataReader r = verify_table.ExecuteReader();
-
-                        List<string> tableColumnStrikeoutList = new List<string>(translationTableColumns);
-                        
-                        while (r.Read())
-                        {
-                            var columnName = Convert.ToString(r["name"]);
-                            if (tableColumnStrikeoutList[0] == columnName)
-                            {
-                                tableColumnStrikeoutList.RemoveAt(0);
-                            }
-                            else
-                            {
-                                tableValid = false;
-                            }
-                        }
-
-                        tableValid = tableValid && !tableColumnStrikeoutList.Any();
-                    }
-                }
-            }
-
-            if (!tableValid)
-            {
-                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.App_InvalidDbMessage,
-                                          OpusCatMTEngine.Properties.Resources.App_ConfirmDbCaption,
-                                          MessageBoxButton.YesNo,
-                                          MessageBoxImage.Question);
-                if (result != MessageBoxResult.Yes)
-                {
-                    
-                }
-            }
-            if (!File.Exists(translationDb))
-            {
-                SQLiteConnection.CreateFile(translationDb);
-                using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
-                {
-                    m_dbConnection.Open();
-
-                    string sql = "create table translations (model TEXT, sourcetext TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, PRIMARY KEY (model,sourcetext))";
-
-                    using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-        }
+        
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -119,7 +52,6 @@ namespace OpusCatMTEngine
             }
 
             this.CopyConfigs();
-            this.SetupTranslationDb();
             this.SetupLogging();
 
             //Accessing the model storage on pouta requires this.

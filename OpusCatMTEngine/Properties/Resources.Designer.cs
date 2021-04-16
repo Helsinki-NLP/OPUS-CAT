@@ -61,7 +61,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Database confirmation.
+        ///   Looks up a localized string similar to New database confirmation.
         /// </summary>
         public static string App_ConfirmDbCaption {
             get {
@@ -70,7 +70,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking Yes..
+        ///   Looks up a localized string similar to The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking OK..
         /// </summary>
         public static string App_InvalidDbMessage {
             get {
@@ -574,6 +574,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open model as overlay.
+        /// </summary>
+        public static string OpenModelInOverlayButton {
+            get {
+                return ResourceManager.GetString("OpenModelInOverlayButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap opus {
@@ -674,6 +683,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Revert to defaults.
+        /// </summary>
+        public static string Settings_RevertToDefaultsButton {
+            get {
+                return ResourceManager.GetString("Settings_RevertToDefaultsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         public static string Settings_SaveButton {
@@ -683,7 +701,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Store OPUS-CAT MT Engine data in local application data folder.
+        ///   Looks up a localized string similar to Store OPUS-CAT MT Engine data in local application data folder (instead of installation folder).
         /// </summary>
         public static string Settings_StoreInAppdataCheckbox {
             get {

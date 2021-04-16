@@ -105,6 +105,8 @@ namespace OpusCatMTEngine
 
         public Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin: *");
+
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 

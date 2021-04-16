@@ -31,7 +31,7 @@
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
 
 
-                        <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                        <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="PreviewNumberInput" VerticalAlignment="Center"></TextBox>
 
                     </DockPanel>
                     <DockPanel Margin="0,0,0,0">
@@ -39,11 +39,31 @@
                             DockPanel.Dock="Left"
                             Content="{x:Static resx:Resources.Settings_HttpPortLabel}"/>
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-                        <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                        <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="PreviewNumberInput" VerticalAlignment="Center"></TextBox>
                     </DockPanel>
                     <DockPanel Margin="0,0,0,0">
                         <CheckBox IsChecked="{Binding ElementName=_this, Path=StoreDataInAppdata, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{x:Static resx:Resources.Settings_StoreInAppdataCheckbox}" />
+
                     </DockPanel>
+                    <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel>
+                            <CheckBox 
+                                IsChecked="{Binding ElementName=_this, Path=CacheMtInDatabase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Use MT database for caching MT</CheckBox>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox 
+                                    IsChecked="{Binding ElementName=_this, Path=UseDatabaseRemoval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    VerticalAlignment="Center" />
+                                <Label>Remove MT from the database</Label>
+                                <TextBox
+                                    Name="RemovalIntervalBox"
+                                    Text="{Binding ElementName=_this, Path=DatabaseRemovalInterval, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}"
+                                    PreviewTextInput="PreviewNumberInput"
+                                    Width="20" 
+                                    VerticalAlignment="Center" />
+                                <Label VerticalAlignment="Center" Width="183">days after it has been generated</Label>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
                     <StackPanel Orientation="Horizontal">
                         <Button 
                                 Margin="5" 
@@ -51,6 +71,12 @@
                                 Width="100"  
                                 Click="saveButton_Click"
                                 Content="{x:Static resx:Resources.Settings_SaveButton}"/>
+                        <Button 
+                                Margin="5" 
+                                IsEnabled="{Binding ElementName=_this, Path=RevertToDefaultsButtonEnabled}" 
+                                Width="100"  
+                                Click="revertToDefaultsButton_Click"
+                                Content="{x:Static resx:Resources.Settings_RevertToDefaultsButton}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

@@ -39,11 +39,24 @@ namespace OpusCatMTEngine
         public OpusCatSettingsView()
         {
             InitializeComponent();
+            
+            this.Loaded += SettingsControl_Loaded;
+        }
+
+
+        private void SettingsControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.Loaded -= SettingsControl_Loaded;
+            
             this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
             this.HttpServicePortBox = OpusCatMTEngineSettings.Default.HttpMtServicePort;
             this.StoreDataInAppdata = OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
+            this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval;
+            this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
+            this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
             NotifyPropertyChanged("SaveButtonEnabled");
         }
+
 
         private void OpenCustomSettingsInEditor_Click(object sender, RoutedEventArgs e)
         {
@@ -61,7 +74,7 @@ namespace OpusCatMTEngine
             NotifyPropertyChanged("SaveButtonEnabled");
         }
 
-        private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void PreviewNumberInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]");
             e.Handled = regex.IsMatch(e.Text);
@@ -87,12 +100,45 @@ namespace OpusCatMTEngine
             }
         }
 
+        private string databaseRemovalInterval;
+        public string DatabaseRemovalInterval
+        {
+            get => databaseRemovalInterval;
+            set
+            {
+                databaseRemovalInterval = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public bool StoreDataInAppdata
         {
             get => _storeDataInAppdata;
             set
             {
                 _storeDataInAppdata = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
+            }
+        }
+
+        public bool CacheMtInDatabase
+        {
+            get => _cacheMtInDatabase;
+            set
+            {
+                _cacheMtInDatabase = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
+            }
+        }
+
+        public bool UseDatabaseRemoval
+        {
+            get => useDatabaseRemoval;
+            set
+            {
+                useDatabaseRemoval = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged("SaveButtonEnabled");
             }
@@ -117,15 +163,21 @@ namespace OpusCatMTEngine
                 bool allSettingsDefault =
                     this.ServicePortBox == OpusCatMTEngineSettings.Default.MtServicePort &&
                     this.HttpServicePortBox == OpusCatMTEngineSettings.Default.HttpMtServicePort &&
-                    this.StoreDataInAppdata == OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
-                bool validationErrors = !(this.servicePortBoxIsValid && this.httpServicePortBoxIsValid);
-                return !allSettingsDefault && !validationErrors;
+                    this.StoreDataInAppdata == OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata &&
+                    this.DatabaseRemovalInterval == OpusCatMTEngineSettings.Default.DatabaseRemovalInterval &&
+                    this.UseDatabaseRemoval == OpusCatMTEngineSettings.Default.UseDatabaseRemoval &&
+                    this.CacheMtInDatabase == OpusCatMTEngineSettings.Default.CacheMtInDatabase;
+                
+                return !allSettingsDefault && !this.validationErrors;
             }
         }
         
         private bool _storeDataInAppdata;
         private bool httpServicePortBoxIsValid;
         private bool servicePortBoxIsValid;
+        private bool _cacheMtInDatabase;
+        private bool validationErrors;
+        private bool useDatabaseRemoval;
 
         public string Error
         {
@@ -137,8 +189,25 @@ namespace OpusCatMTEngine
         {
             // Return error message if there is error on else return empty or null string
             string validationMessage = string.Empty;
+            this.validationErrors = false;
             switch (propertyName)
             {
+                case "DatabaseRemovalInterval":
+                    if (!String.IsNullOrEmpty(this.DatabaseRemovalInterval))
+                    {
+                        var interval = Int32.Parse(this.DatabaseRemovalInterval);
+                        if (interval == 0)
+                        {
+                            validationMessage = "Error";
+                            this.validationErrors = true;
+                        }
+                    }
+                    else
+                    {
+                        validationMessage = "Error";
+                        this.validationErrors = true;
+                    }
+                    break;
                 case "ServicePortBox":
                     if (this.ServicePortBox != null && this.ServicePortBox != "")
                     {
@@ -146,17 +215,13 @@ namespace OpusCatMTEngine
                         if (portNumber < 1024 || portNumber > 65535)
                         {
                             validationMessage = "Error";
-                            this.servicePortBoxIsValid = false;
-                        }
-                        else
-                        {
-                            this.servicePortBoxIsValid = true;
+                            this.validationErrors = true;
                         }
                     }
                     else
                     {
                         validationMessage = "Error";
-                        this.servicePortBoxIsValid = false;
+                        this.validationErrors = true;
                     }
 
                     break;
@@ -167,7 +232,7 @@ namespace OpusCatMTEngine
                         if (portNumber < 1024 || portNumber > 65535)
                         {
                             validationMessage = "Error";
-                            this.httpServicePortBoxIsValid = false;
+                            this.validationErrors = true;
                         }
                         else
                         {
@@ -177,15 +242,26 @@ namespace OpusCatMTEngine
                     else
                     {
                         validationMessage = "Error";
-                        this.httpServicePortBoxIsValid = false;
+                        this.validationErrors = true;
                     }
 
                     break;
             }
+
             NotifyPropertyChanged("SaveButtonEnabled");
             return validationMessage;
         }
-        
-        
+
+        private void revertToDefaultsButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpusCatMTEngineSettings.Default.Reset();
+            OpusCatMTEngineSettings.Default.Save();
+            this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
+            this.HttpServicePortBox = OpusCatMTEngineSettings.Default.HttpMtServicePort;
+            this.StoreDataInAppdata = OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
+            this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval;
+            this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
+            this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
+        }
     }
 }

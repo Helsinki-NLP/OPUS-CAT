@@ -239,6 +239,11 @@ namespace OpusCatMTEngine
                 }
             }
         }
+
+        private void btnOpenModelInOverlay_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
 }

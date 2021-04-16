@@ -11,12 +11,13 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
-    <TabControl Name="Tabs" ItemsSource="{Binding UiTabs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,2,0.333,-2.333">
-        <TabControl.ItemTemplate>
-            <DataTemplate>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Header}" />
-                    <Image 
+    <StackPanel>
+        <TabControl Name="Tabs" ItemsSource="{Binding UiTabs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,2,0.333,-2.333">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Header}" />
+                        <Image 
                         Visibility="{Binding Path=Closable, Converter={StaticResource BoolToVis}}" 
                         IsEnabled="{Binding Closable}" 
                         Source="/OpusCatMtEngine;component/UI/cross.png" 
@@ -24,13 +25,14 @@
                         Height="10" 
                         MouseUp="Image_MouseUp"
                         Margin="10,0,0,0"/>
-                </StackPanel>
-            </DataTemplate>
-        </TabControl.ItemTemplate>
-        <TabControl.ContentTemplate>
-            <DataTemplate>
-                <UserControl Content="{Binding Content}" Margin="0" />
-            </DataTemplate>
-        </TabControl.ContentTemplate>
-    </TabControl>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <UserControl Content="{Binding Content}" Margin="0" />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </StackPanel>
 </Window>
