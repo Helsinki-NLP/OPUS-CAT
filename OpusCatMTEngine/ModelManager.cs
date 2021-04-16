@@ -30,7 +30,7 @@ namespace OpusCatMTEngine
     /// This class contains methods for checking and downloading latest models from
     /// the opus cat model repository and managing the downloaded models. 
     /// </summary>
-    public class ModelManager : INotifyPropertyChanged
+    public class ModelManager : INotifyPropertyChanged, IMtProvider
     {
 
 
@@ -831,7 +831,7 @@ namespace OpusCatMTEngine
             return null;
         }
 
-        internal Task<TranslationPair> Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
+        public Task<TranslationPair> Translate(string input, IsoLanguage srcLang, IsoLanguage trgLang, string modelTag)
         {
             var mtModel = this.SelectModel(srcLang, trgLang, modelTag);
 
@@ -992,6 +992,7 @@ namespace OpusCatMTEngine
             //new model fetch call to check whether pair is supported
             return this.LocalModels.Any(x => x.Name.Contains($"{sourceLang}-{targetLang}"));
         }
+
 
     }
 }

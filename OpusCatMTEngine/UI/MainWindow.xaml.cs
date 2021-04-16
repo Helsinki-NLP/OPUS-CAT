@@ -95,8 +95,15 @@ namespace OpusCatMTEngine
 
         private void StartEngine()
         {
-            var service = new Service();
+            
             this.ModelManager = new ModelManager();
+
+            //The WCF selfhost implementation
+            var service = new Service();
+            this.serviceHost = service.StartService(this.ModelManager);
+
+            //OWIN selfhost implementation
+            var owin = new OwinMtService(this.ModelManager);
 
             this.UiTabs = new ObservableCollection<ActionTabItem>();
             var localModels = new LocalModelListView(this.ModelManager);
@@ -107,7 +114,7 @@ namespace OpusCatMTEngine
                 new ActionTabItem { Content = settings, Header = OpusCatMTEngine.Properties.Resources.Main_SettingsTabTitle, Closable = false });
 
             this.DataContext = this;
-            this.serviceHost = service.StartService(this.ModelManager);
+            
         }
         
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

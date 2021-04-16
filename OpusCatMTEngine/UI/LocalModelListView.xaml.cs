@@ -242,7 +242,7 @@ namespace OpusCatMTEngine
 
         private void btnOpenModelInOverlay_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO: open an overlay that is always on top and displays translation
         }
     }
 
