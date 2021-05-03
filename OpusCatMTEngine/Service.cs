@@ -43,7 +43,8 @@ namespace OpusCatMTEngine
             //TODO: add a checkbox (with warning) in the UI for using security mode None,
             //to allow connections from IP range (also add same checkbox to clients). 
 
-            //nettcpBinding.Security.Mode = SecurityMode.None;
+            nettcpBinding.Security.Mode = SecurityMode.None;
+
             /*nettcpBinding.Security.Mode = SecurityMode.Transport;
             nettcpBinding.Security.Transport.ClientCredentialType =
                 TcpClientCredentialType.Windows;*/

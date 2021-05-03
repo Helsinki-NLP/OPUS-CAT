@@ -26,7 +26,7 @@ namespace OpusCatTranslationProvider
             //TODO: add a checkbox (with warning) in the UI for using security mode None,
             //to allow connections from IP range (also add same checkbox to service UI).
 
-            //myBinding.Security.Mode = SecurityMode.None;
+            myBinding.Security.Mode = SecurityMode.None;
             //myBinding.Security.Mode = SecurityMode.Transport;
             //myBinding.Security.Transport.ClientCredentialType =
             //    TcpClientCredentialType.Windows;
