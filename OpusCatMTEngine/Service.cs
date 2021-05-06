@@ -10,15 +10,36 @@ using Serilog;
 namespace OpusCatMTEngine
 {
 
+    /// <summary>
+    /// This has been partly deprecated: HTTP API is handled as a OWIN service, and the
+    /// net.tcp API is only maintained for backwards compatibility (it was used in Trados and
+    /// memoQ plugins), but new versions will use HTTP to fetch translations. The
+    /// net.tcp API will remain available for a while, until the old plugins are no
+    /// longer used.
+    /// </summary>
     class Service
     {
         private ServiceHost StartNetTcpAndHttpService(ModelManager modelManager, Boolean onlyNetTcp)
         {
             Uri[] baseAddresses;
+            
+            if (OpusCatMTEngineSettings.Default.AllowRemoteUse)
+            {
+                baseAddresses = new Uri[] {
+                    new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/")
+                };
+            }
+            else
+            {
+                baseAddresses = new Uri[] {
+                    new Uri($"net.tcp://[::1]:{OpusCatMTEngineSettings.Default.MtServicePort}/")
+                };
+            }
+
+
             if (onlyNetTcp)
             {
-                //Use 127.0.0.1 instead of localhost, since local host triggers the Windows Firewall popup (and create a firewall rule).
-                //The popup is probably distracting to standard users.
+                
                 baseAddresses = new Uri[] {
                     new Uri($"net.tcp://[::1]:{OpusCatMTEngineSettings.Default.MtServicePort}/")
                 };
@@ -26,7 +47,7 @@ namespace OpusCatMTEngine
             else
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://[::1]:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
+                    new Uri($"net.tcp://{Environment.MachineName}:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
                     new Uri($"http://[::1]:{OpusCatMTEngineSettings.Default.HttpMtServicePort}/") };
             };
 
@@ -43,7 +64,7 @@ namespace OpusCatMTEngine
             //TODO: add a checkbox (with warning) in the UI for using security mode None,
             //to allow connections from IP range (also add same checkbox to clients). 
 
-            nettcpBinding.Security.Mode = SecurityMode.None;
+            //nettcpBinding.Security.Mode = SecurityMode.None;
 
             /*nettcpBinding.Security.Mode = SecurityMode.Transport;
             nettcpBinding.Security.Transport.ClientCredentialType =
@@ -105,7 +126,7 @@ namespace OpusCatMTEngine
             //Launching the http service requires that the program is run with
             //administrator privileges or that the port has been enabled for http 
             //with netsh http add urlacl
-            if (OpusCatMTEngineSettings.Default.StartHttpService)
+            if (OpusCatMTEngineSettings.Default.StartWcfHttpService)
             {
                 Log.Information("Starting OPUS-CAT MT Engine's net.tcp and HTTP APIs");
                 try

@@ -43,10 +43,6 @@ namespace OpusMTInterface
         string CheckModelStatus(string tokenCode, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
-        [WebGet]
-        string TranslateWithModel(string tokenCode, string input, string modelName);
-
-        [OperationContract]
         [WebInvoke(Method = "POST",BodyStyle = WebMessageBodyStyle.Wrapped)]
         string Customize(
             string tokenCode,

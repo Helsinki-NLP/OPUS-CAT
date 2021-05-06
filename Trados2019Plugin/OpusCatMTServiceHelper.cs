@@ -20,6 +20,8 @@ namespace OpusCatTranslationProvider
         public static IMTService getNewProxy(string host, string port)
         {
             NetTcpBinding myBinding = new NetTcpBinding();
+            myBinding.PortSharingEnabled = true;
+            
 
             //Use default net.tcp security, which is based on Windows authentication:
             //can only contact services in the same domain.

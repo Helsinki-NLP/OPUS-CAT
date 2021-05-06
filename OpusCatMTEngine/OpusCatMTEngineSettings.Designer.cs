@@ -133,13 +133,13 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool StartHttpService {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartWcfHttpService {
             get {
-                return ((bool)(this["StartHttpService"]));
+                return ((bool)(this["StartWcfHttpService"]));
             }
             set {
-                this["StartHttpService"] = value;
+                this["StartWcfHttpService"] = value;
             }
         }
         
@@ -296,6 +296,30 @@ namespace OpusCatMTEngine {
             }
             set {
                 this["UseDatabaseRemoval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("[::1]")]
+        public string MtServiceHost {
+            get {
+                return ((string)(this["MtServiceHost"]));
+            }
+            set {
+                this["MtServiceHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AllowRemoteUse {
+            get {
+                return ((bool)(this["AllowRemoteUse"]));
+            }
+            set {
+                this["AllowRemoteUse"] = value;
             }
         }
     }

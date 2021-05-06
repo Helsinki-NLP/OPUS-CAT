@@ -57,7 +57,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal List<string> GetLanguagePairModelTags(string sourceCode, string targetCode)
+        public List<string> GetLanguagePairModelTags(string sourceCode, string targetCode)
         {
             var sourceLang = new IsoLanguage(sourceCode);
             var targetLang = new IsoLanguage(targetCode);
@@ -202,7 +202,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
+        public string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
             var sourceCode = sourceLang.ShortestIsoCode;
             var targetCode = targetLang.ShortestIsoCode;
@@ -642,7 +642,7 @@ namespace OpusCatMTEngine
             customTask.ContinueWith(taskExceptionHandler, TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        internal void StartCustomization(
+        public void StartCustomization(
             List<Tuple<string, string>> input,
             List<Tuple<string, string>> validation,
             List<string> uniqueNewSegments,
@@ -877,7 +877,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal IEnumerable<string> GetAllLanguagePairs()
+        public List<string> GetAllLanguagePairs()
         {
             var languagePairs = new List<string>();
             foreach (var model in this.LocalModels)
@@ -888,7 +888,7 @@ namespace OpusCatMTEngine
                 languagePairs.AddRange(modelLanguagePairs);
             }
 
-            return languagePairs.Distinct();
+            return languagePairs.Distinct().ToList();
         }
 
         internal string GetLatestModelDir(string sourceLang, string targetLang)

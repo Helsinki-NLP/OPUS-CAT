@@ -16,19 +16,45 @@ namespace OpusCatMTEngine
     {
         public OwinMtService(ModelManager modelManager)
         {
-            var baseAddress = "http://localhost:8501";
+            //
+            string baseAddress;
+            if (OpusCatMTEngineSettings.Default.AllowRemoteUse)
+            {
+                baseAddress = $"http://+:{OpusCatMTEngineSettings.Default.HttpMtServicePort}";
+            }
+            else
+            {                
+                baseAddress = $"http://localhost:{OpusCatMTEngineSettings.Default.HttpMtServicePort}";
+            }
+
+            //First try to open the external http listener, this requires admin (or a prior
+            //preservation of the port with netsh)
+            try
+            {
+                this.StartWebApp($"http://+:{OpusCatMTEngineSettings.Default.HttpMtServicePort}", modelManager);
+            }
+            //If opening the external listener fails, open a localhost listener (works without admin).
+            catch (Exception ex)
+            {
+                this.StartWebApp($"http://localhost:{OpusCatMTEngineSettings.Default.HttpMtServicePort}", modelManager);
+            }
+
+        }
+
+        private void StartWebApp(string baseAddress, ModelManager modelManager)
+        {
             var server = WebApp.Start(baseAddress, (appBuilder) =>
             {
                 var config = new HttpConfiguration();
                 config.Routes.MapHttpRoute(
                     "DefaultApi",
-                    "api/{controller}");
+                    "{controller}/{action}");
                 var builder = new ContainerBuilder();
 
                 // Register Web API controller in executing assembly.
                 builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
 
-                // Register a logger service to be used by the controller and middleware.
+
                 //builder.Register(c => modelManager).As<IMtProvider>().SingleInstance();
                 builder.RegisterInstance<IMtProvider>(modelManager);
                 // Create and assign a dependency resolver for Web API to use.

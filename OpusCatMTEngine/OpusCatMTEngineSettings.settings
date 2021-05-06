@@ -29,8 +29,8 @@
     <Setting Name="ModelTagMaxLength" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="StartHttpService" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="StartWcfHttpService" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TatoebaDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">TatoebaTestsets</Value>
@@ -69,6 +69,12 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="UseDatabaseRemoval" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="MtServiceHost" Type="System.String" Scope="User">
+      <Value Profile="(Default)">[::1]</Value>
+    </Setting>
+    <Setting Name="AllowRemoteUse" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>

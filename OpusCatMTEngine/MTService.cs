@@ -63,7 +63,7 @@ namespace OpusCatMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
             
-            return this.ModelManager.GetAllLanguagePairs().ToList();
+            return this.ModelManager.GetAllLanguagePairs();
         }
 
         public string CheckModelStatus(string tokenCode, string sourceCode, string targetCode, string modelTag)
@@ -132,22 +132,7 @@ namespace OpusCatMTEngine
             return new MemoryStream(Encoding.UTF8.GetBytes(translation.Translation));
         }
 
-        /// <summary>
-        /// Call this method to get the translation for a single string with the named model.
-        /// </summary>
-        /// <param name="tokenCode">The token code.</param>
-        /// <param name="input">The input string.</param>
-        /// <param name="modelName">Name of the model to use.</param>
-        /// <returns>The translated input string.</returns>
-        public string TranslateWithModel(string tokenCode, string input, string modelName)
-        {
-
-            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
-                return null;
-
-            return this.ModelManager.TranslateWithModel(input, modelName).Translation;
-        }
-
+        
 
         /// <summary>
         /// Call this method to get the translation for multiple strings in batch.
@@ -178,7 +163,7 @@ namespace OpusCatMTEngine
 
         /// <summary>
         /// This will send a batch to the MT engine for pretranslation, which means
-        /// the translations will be immediately available when it is requested
+        /// the translations for the batch will be immediately available when requested
         /// </summary>
         /// <param name="tokenCode"></param>
         /// <param name="input"></param>
@@ -204,7 +189,7 @@ namespace OpusCatMTEngine
             }
 
             /* Batch preordering was done earlier with batch translation, but it doesn't seem
-             * to be much quicker than normal translation, and it has to problem of providing all
+             * to be much quicker than normal translation, and it has the problem of providing all
              * the translations at once in the end. Using normal translation means the MT is ready
              * as soon as a sentence gets translated (you could do this for batch translation as well
              * by adding an outputline handler, but it's not implemented yet). Batch translation should be
