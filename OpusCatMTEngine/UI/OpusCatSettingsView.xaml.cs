@@ -70,6 +70,9 @@ namespace OpusCatMTEngine
             OpusCatMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
             OpusCatMTEngineSettings.Default.HttpMtServicePort = this.HttpServicePortBox;
             OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata = this.StoreDataInAppdata;
+            OpusCatMTEngineSettings.Default.DatabaseRemovalInterval = this.DatabaseRemovalInterval;
+            OpusCatMTEngineSettings.Default.UseDatabaseRemoval = this.UseDatabaseRemoval;
+            OpusCatMTEngineSettings.Default.CacheMtInDatabase = this.CacheMtInDatabase;
             OpusCatMTEngineSettings.Default.Save();
             NotifyPropertyChanged("SaveButtonEnabled");
         }

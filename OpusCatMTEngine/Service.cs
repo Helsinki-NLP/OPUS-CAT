@@ -136,13 +136,14 @@ namespace OpusCatMTEngine
                 }
                 catch (System.ServiceModel.AddressAccessDeniedException ex)
                 {
-                    Log.Information("HTTP API could not be started, starting Net.tcp API. If HTTP API is required, add the relevant URL to the urlacl list with netsh.");
+                    Log.Information("HTTP API could not be started, starting net.tcp API. If HTTP API is required, add the relevant URL to the urlacl list with netsh.");
                     host = this.StartNetTcpAndHttpService(modelManager, true);
                 }
             }
             else
             {
-                Log.Information("Starting Net.tcp API only, HTTP API can be enabled in the settings.");
+                //Log.Information("Starting Net.tcp API only, HTTP API can be enabled in the settings.");
+                Log.Information("Starting Net.tcp API.");
                 host = this.StartNetTcpAndHttpService(modelManager, true);
             }
 

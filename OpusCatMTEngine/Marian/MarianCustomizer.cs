@@ -51,6 +51,7 @@ namespace OpusCatMTEngine
         private string targetCode;
         private bool guidedAlignment;
         private List<string> postCustomizationBatch;
+        private string segmentationMethod;
         private FileInfo spSource;
         private FileInfo spTarget;
         private FileInfo spValidSource;
@@ -252,10 +253,22 @@ namespace OpusCatMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            
-            trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Validate.bat");
-            File.Copy(
-                Path.Combine(processDir,"Validate.bat"), trainingConfig.validScriptPath);
+
+            switch (this.segmentationMethod)
+            {
+                case ".bpe":
+                    trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
+                    File.Copy(
+                        Path.Combine(processDir, "ValidateBpe.bat"), trainingConfig.validScriptPath);
+                    break;
+                case ".spm":
+                    trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "ValidateSp.bat");
+                    File.Copy(
+                        Path.Combine(processDir, "ValidateSp.bat"), trainingConfig.validScriptPath);
+                    break;
+                default:
+                    break;
+            }
 
             trainingConfig.validScriptArgs = 
                 new List<string> { spValidTarget.FullName, OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()};
@@ -322,7 +335,9 @@ namespace OpusCatMTEngine
                 this.customDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "source.(spm|bpe)")).Single();
             FileInfo targetSegModel =
                 this.customDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "target.(spm|bpe)")).Single();
-            
+
+            this.segmentationMethod = sourceSegModel.Extension;
+
             this.spSource = MarianHelper.PreprocessLanguage(
                 this.customSource, this.customDir, this.sourceCode, sourceSegModel, this.includePlaceholderTags,this.includeTagPairs);
             this.spTarget = MarianHelper.PreprocessLanguage(

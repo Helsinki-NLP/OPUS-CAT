@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -31,6 +32,13 @@ namespace OpusCatMTEngine
                 };
 
             var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
+            
+            //If the translation db has a size of 0, it should be deleted (size 0 dbs are caused
+            //by db creation bugs). 
+            if (translationDb.Exists && translationDb.Length == 0)
+            {
+                translationDb.Delete();
+            }
 
             //Check that db structure is current
             bool tableValid = true;
@@ -91,25 +99,41 @@ namespace OpusCatMTEngine
             translationDb.Refresh();
             if (!translationDb.Exists)
             {
-                SQLiteConnection.CreateFile(translationDb.FullName);
-                using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+                CreateTranslationDb();
+            }
+        }
+
+        private static void CreateTranslationDb()
+        {
+            var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
+            SQLiteConnection.CreateFile(translationDb.FullName);
+            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+            {
+                m_dbConnection.Open();
+
+                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, PRIMARY KEY (model,sourcetext))";
+
+                using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
                 {
-                    m_dbConnection.Open();
-
-                    string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, PRIMARY KEY (model,sourcetext))";
-
-                    using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
-                    {
-                        command.ExecuteNonQuery();
-                    }
+                    command.ExecuteNonQuery();
                 }
             }
         }
 
-        internal static void WriteTranslationToDb(string sourceText, TranslationPair translation, string model)
+        private static void WriteTranslationToSqliteDb(string sourceText, TranslationPair translation, string model)
         {
-            TranslationDbHelper.shortTermMtStorage.GetOrAdd(new Tuple<string, string>(sourceText, model), translation);
-            var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
+            
+            var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
+            
+            if (translationDb.Length == 0)
+            {
+                translationDb.Delete();
+            }
+
+            if (!translationDb.Exists)
+            {
+                TranslationDbHelper.CreateTranslationDb();
+            }
 
             using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
             {
@@ -120,7 +144,7 @@ namespace OpusCatMTEngine
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     insert.Parameters.Add(new SQLiteParameter("@translation", translation.Translation));
-                    insert.Parameters.Add(new SQLiteParameter("@segmentedsource", String.Join(" ",translation.SegmentedSourceSentence)));
+                    insert.Parameters.Add(new SQLiteParameter("@segmentedsource", String.Join(" ", translation.SegmentedSourceSentence)));
                     insert.Parameters.Add(new SQLiteParameter("@segmentedtranslation", String.Join(" ", translation.SegmentedTranslation)));
                     insert.Parameters.Add(new SQLiteParameter("@alignment", translation.AlignmentString));
                     insert.Parameters.Add(new SQLiteParameter("@model", model));
@@ -129,12 +153,27 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal static TranslationPair FetchTranslationFromDb(string sourceText, string model)
+        internal static void WriteTranslationToDb(string sourceText, TranslationPair translation, string model)
+        {
+            TranslationDbHelper.shortTermMtStorage.GetOrAdd(new Tuple<string, string>(sourceText, model), translation);
+            if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
+            {
+                try
+                {
+                    TranslationDbHelper.WriteTranslationToSqliteDb(sourceText, translation, model);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+            }
+        }
+
+        private static TranslationPair FetchTranslationFromSqliteDb(string sourceText, string model)
         {
             var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
 
             List<TranslationPair> translationPairs = new List<TranslationPair>();
-
             using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
             {
                 m_dbConnection.Open();
@@ -158,8 +197,32 @@ namespace OpusCatMTEngine
                 }
 
             }
-
             return translationPairs.SingleOrDefault();
+        }
+
+        internal static TranslationPair FetchTranslationFromDb(string sourceText, string model)
+        {
+            TranslationPair translationPair = null;
+            if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
+            {
+                try
+                {
+                    translationPair = FetchTranslationFromSqliteDb(sourceText, model);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                    translationPair = null;
+                }
+            }
+
+            if (translationPair == null)
+            {
+                TranslationDbHelper.shortTermMtStorage.TryGetValue(
+                    new Tuple<string, string>(sourceText, model), out translationPair);
+            }
+            
+            return translationPair;
         }
     }
 }

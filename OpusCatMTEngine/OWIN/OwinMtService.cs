@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Owin;
+using Serilog;
 
 namespace OpusCatMTEngine
 {
@@ -28,15 +29,17 @@ namespace OpusCatMTEngine
             }
 
             //First try to open the external http listener, this requires admin (or a prior
-            //preservation of the port with netsh)
+            //reservation of the port with netsh)
             try
             {
                 this.StartWebApp($"http://+:{OpusCatMTEngineSettings.Default.HttpMtServicePort}", modelManager);
+                Log.Information($"Started HTTP API at http://+:{OpusCatMTEngineSettings.Default.HttpMtServicePort}. This API can be accessed from remote computers, if the firewall has been configured to allow it.");
             }
             //If opening the external listener fails, open a localhost listener (works without admin).
             catch (Exception ex)
             {
                 this.StartWebApp($"http://localhost:{OpusCatMTEngineSettings.Default.HttpMtServicePort}", modelManager);
+                Log.Information($"Started HTTP API at http://localhost:{OpusCatMTEngineSettings.Default.HttpMtServicePort}. This API cannot be accessed from remote computers.");
             }
 
         }

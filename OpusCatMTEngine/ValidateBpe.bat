@@ -54,13 +54,10 @@ EXIT /B %ERRORLEVEL%
         set /a file=!line!/%nLines%
 		if !line! LEQ !nLines! (set /a line+=1)
 		set "linecontent=%%a"
-		REM Remove spaces between sentencepiece tokens
-		set "linecontent=!linecontent: =!"
-		REM Conver sentencepiece space marker into actual space
-        set "linecontent=!linecontent:▁= !"
-		REM The space after colon removes the leading space left after sentencepiece detok
+		REM Remove spaces between bpe tokens
+		set "linecontent=!linecontent:@@ =!"
 		for %%b in (!file!) do (   
-            >>"%~1_%%b.txt" echo(!linecontent:*: =!
+            >>"%~1_%%b.txt" echo(!linecontent:*:=!
         )
     )
 

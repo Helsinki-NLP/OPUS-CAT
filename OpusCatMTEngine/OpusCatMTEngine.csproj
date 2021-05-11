@@ -360,7 +360,10 @@
     <None Include="StartSentencePieceMultilingualMtPipe.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Validate.bat">
+    <None Include="ValidateBpe.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ValidateSp.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="StartMosesBpeMtPipe.bat">

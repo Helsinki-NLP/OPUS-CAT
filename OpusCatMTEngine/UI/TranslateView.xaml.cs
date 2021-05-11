@@ -1,4 +1,5 @@
 ﻿using OpusMTInterface;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -84,9 +85,25 @@ namespace OpusCatMTEngine
             var source = textRange.Text;
             Task<List<TranslationPair>> translate =
                 new Task<List<TranslationPair>>(() => OrderTranslation(source));
-            translate.ContinueWith(x => Dispatcher.Invoke(() => this.PopulateBoxes(x.Result)));
+            translate.ContinueWith(x => Dispatcher.Invoke(() =>
+                {
+                    if (x.Exception != null)
+                    {
+                        Log.Error(x.Exception.ToString());
+                        //MessageBox.Show(x.Exception.ToString());
+                        var errorRun = new Run("Error in the translation service, see log file for details");
+                        errorRun.Background = Brushes.Red;
+                        errorRun.Foreground = Brushes.White;
+                        var errorBlock = new Paragraph(errorRun);
+                        this.TargetBox.Document.Blocks.Clear();
+                        this.TargetBox.Document.Blocks.Add(errorBlock);
+                    }
+                    else
+                    {
+                        this.PopulateBoxes(x.Result);
+                    }
+                }));
             translate.Start();
-
         }
 
         private List<TranslationPair> OrderTranslation(string source)
@@ -97,7 +114,6 @@ namespace OpusCatMTEngine
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    //TODO: add language selectors to the translate window for multilingual models
                     translation.Add(
                         this.Model.Translate(
                             line,

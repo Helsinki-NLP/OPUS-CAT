@@ -60,7 +60,11 @@ namespace OpusCatMTEngine
         IncludePlaceholders
     }
 
-    
+    public enum SegmentationMethod
+    {
+        Bpe,
+        SentencePiece
+    }
 
     public class MTModel : INotifyPropertyChanged
     {
@@ -531,8 +535,23 @@ namespace OpusCatMTEngine
             int outOfDomainSize, 
             FileInfo spOutput)
         {
+
+            string validateScript;
+
+            switch (this.ModelSegmentationMethod)
+            {
+                case SegmentationMethod.Bpe:
+                    validateScript = "ValidateBpe.bat";
+                    break;
+                case SegmentationMethod.SentencePiece:
+                    validateScript = "ValidateSp.bat";
+                    break;
+                default:
+                    return;
+            }
+
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                "Validate.bat",
+                validateScript,
                 $"{refFile.FullName} {outOfDomainSize} {spOutput.FullName}");
         }
 
@@ -797,6 +816,20 @@ namespace OpusCatMTEngine
 
         public bool SupportsWordAlignment { get => supportsWordAlignment; set => supportsWordAlignment = value; }
         public bool DoesNotSupportWordAlignment { get => !supportsWordAlignment; }
+        public SegmentationMethod ModelSegmentationMethod
+        {
+            get
+            {
+                if (Directory.GetFiles(this.InstallDir).Any(x => x.EndsWith("source.bpe")))
+                {
+                    return SegmentationMethod.Bpe;
+                }
+                else
+                {
+                    return SegmentationMethod.SentencePiece;
+                }
+            }
+        }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;
