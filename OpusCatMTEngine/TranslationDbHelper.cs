@@ -101,6 +101,29 @@ namespace OpusCatMTEngine
             {
                 CreateTranslationDb();
             }
+
+            //Remove old translation from the db (time period can be set in settings)
+            TranslationDbHelper.RemoveOldTranslations();
+        }
+
+        private static void RemoveOldTranslations()
+        {
+            var translationDb = new FileInfo(
+                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
+
+            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+            {
+                m_dbConnection.Open();
+                //TODO: why does the parameter not work for days?
+                using (SQLiteCommand deleteOld =
+                    new SQLiteCommand("DELETE FROM translations WHERE additiondate <= date('now',@period)", m_dbConnection))
+                {
+                    deleteOld.Parameters.Add(
+                        new SQLiteParameter(
+                            "@period", $"-{OpusCatMTEngineSettings.Default.DatabaseRemovalInterval} days"));
+                    deleteOld.ExecuteNonQuery();
+                }
+            }
         }
 
         private static void CreateTranslationDb()
@@ -140,7 +163,7 @@ namespace OpusCatMTEngine
                 m_dbConnection.Open();
 
                 using (SQLiteCommand insert =
-                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model)", m_dbConnection))
+                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model, additiondate) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model,CURRENT_TIMESTAMP)", m_dbConnection))
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     insert.Parameters.Add(new SQLiteParameter("@translation", translation.Translation));

@@ -266,9 +266,9 @@ namespace OpusCatMTEngine {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("14")]
-        public string DatabaseRemovalInterval {
+        public int DatabaseRemovalInterval {
             get {
-                return ((string)(this["DatabaseRemovalInterval"]));
+                return ((int)(this["DatabaseRemovalInterval"]));
             }
             set {
                 this["DatabaseRemovalInterval"] = value;
@@ -301,19 +301,7 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("[::1]")]
-        public string MtServiceHost {
-            get {
-                return ((string)(this["MtServiceHost"]));
-            }
-            set {
-                this["MtServiceHost"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AllowRemoteUse {
             get {
                 return ((bool)(this["AllowRemoteUse"]));

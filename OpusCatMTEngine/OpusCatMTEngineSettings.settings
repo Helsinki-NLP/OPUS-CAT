@@ -62,7 +62,7 @@
     <Setting Name="TatoebaModelStorageUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://object.pouta.csc.fi/Tatoeba-MT-models/</Value>
     </Setting>
-    <Setting Name="DatabaseRemovalInterval" Type="System.String" Scope="User">
+    <Setting Name="DatabaseRemovalInterval" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">14</Value>
     </Setting>
     <Setting Name="CacheMtInDatabase" Type="System.Boolean" Scope="User">
@@ -71,11 +71,8 @@
     <Setting Name="UseDatabaseRemoval" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="MtServiceHost" Type="System.String" Scope="User">
-      <Value Profile="(Default)">[::1]</Value>
-    </Setting>
     <Setting Name="AllowRemoteUse" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

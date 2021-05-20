@@ -51,7 +51,7 @@ namespace OpusCatMTEngine
             this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
             this.HttpServicePortBox = OpusCatMTEngineSettings.Default.HttpMtServicePort;
             this.StoreDataInAppdata = OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
-            this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval;
+            this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString();
             this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
             this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
             NotifyPropertyChanged("SaveButtonEnabled");
@@ -70,10 +70,18 @@ namespace OpusCatMTEngine
             OpusCatMTEngineSettings.Default.MtServicePort = this.ServicePortBox;
             OpusCatMTEngineSettings.Default.HttpMtServicePort = this.HttpServicePortBox;
             OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata = this.StoreDataInAppdata;
-            OpusCatMTEngineSettings.Default.DatabaseRemovalInterval = this.DatabaseRemovalInterval;
+            OpusCatMTEngineSettings.Default.DatabaseRemovalInterval = Int32.Parse(this.DatabaseRemovalInterval);
+            if (OpusCatMTEngineSettings.Default.CacheMtInDatabase != this.CacheMtInDatabase)
+            {
+                OpusCatMTEngineSettings.Default.CacheMtInDatabase = this.CacheMtInDatabase;
+                //This checks whether the option can be enabled.
+                TranslationDbHelper.SetupTranslationDb();
+                this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
+            }
             OpusCatMTEngineSettings.Default.UseDatabaseRemoval = this.UseDatabaseRemoval;
-            OpusCatMTEngineSettings.Default.CacheMtInDatabase = this.CacheMtInDatabase;
+            
             OpusCatMTEngineSettings.Default.Save();
+
             NotifyPropertyChanged("SaveButtonEnabled");
         }
 
@@ -167,7 +175,7 @@ namespace OpusCatMTEngine
                     this.ServicePortBox == OpusCatMTEngineSettings.Default.MtServicePort &&
                     this.HttpServicePortBox == OpusCatMTEngineSettings.Default.HttpMtServicePort &&
                     this.StoreDataInAppdata == OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata &&
-                    this.DatabaseRemovalInterval == OpusCatMTEngineSettings.Default.DatabaseRemovalInterval &&
+                    this.DatabaseRemovalInterval == OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString() &&
                     this.UseDatabaseRemoval == OpusCatMTEngineSettings.Default.UseDatabaseRemoval &&
                     this.CacheMtInDatabase == OpusCatMTEngineSettings.Default.CacheMtInDatabase;
                 
@@ -262,7 +270,7 @@ namespace OpusCatMTEngine
             this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
             this.HttpServicePortBox = OpusCatMTEngineSettings.Default.HttpMtServicePort;
             this.StoreDataInAppdata = OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
-            this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval;
+            this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString();
             this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
             this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
         }

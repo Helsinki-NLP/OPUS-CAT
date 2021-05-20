@@ -36,12 +36,12 @@ namespace OpusCatMTEngine
                 };
             }
 
-
+            /*
             if (onlyNetTcp)
             {
                 
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://[::1]:{OpusCatMTEngineSettings.Default.MtServicePort}/")
+                    new Uri($"net.tcp://{Environment.MachineName}:{OpusCatMTEngineSettings.Default.MtServicePort}/")
                 };
             }
             else
@@ -50,6 +50,7 @@ namespace OpusCatMTEngine
                     new Uri($"net.tcp://{Environment.MachineName}:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
                     new Uri($"http://[::1]:{OpusCatMTEngineSettings.Default.HttpMtServicePort}/") };
             };
+            */
 
             var mtService = new MTService(modelManager);
 

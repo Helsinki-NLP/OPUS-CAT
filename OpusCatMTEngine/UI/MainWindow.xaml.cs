@@ -90,7 +90,10 @@ namespace OpusCatMTEngine
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             this.Loaded -= MainWindow_Loaded;
-            TranslationDbHelper.SetupTranslationDb();
+            if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
+            {
+                TranslationDbHelper.SetupTranslationDb();
+            }
         }
 
         private void StartEngine()
