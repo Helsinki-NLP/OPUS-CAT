@@ -15,7 +15,7 @@ You can read more about enabling the HTTP API from [here](https://github.com/Hel
 
 **Installation**
 
-Install the plugin in the *plugins* subfolder of the OmegaT installation folder.
+Copy the plugin file (_omegat-plugin-opus-mt-1.0.0.jar_) to the *plugins* subfolder of the OmegaT installation folder (usually _C:\Program Files (x86)\OmegaT_).
 
 **Usage**
 
