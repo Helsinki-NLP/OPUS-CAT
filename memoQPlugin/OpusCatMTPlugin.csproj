@@ -53,13 +53,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MemoQ.Addins.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MemoQ.Addins.Common, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References-958\MemoQ.Addins.Common.dll</HintPath>
+      <HintPath>..\References9710\MemoQ.Addins.Common.dll</HintPath>
     </Reference>
     <Reference Include="MemoQ.MTInterfaces, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References-958\MemoQ.MTInterfaces.dll</HintPath>
+      <HintPath>..\References9710\MemoQ.MTInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

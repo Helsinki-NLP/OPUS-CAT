@@ -19,6 +19,24 @@ namespace OpusCatMTEngine
     /// </summary>
     public partial class App : Application
     {
+        public static Overlay Overlay { get; private set; }
+
+        public static void OpenOverlay()
+        {
+            if (App.Overlay == null)
+            {
+                App.Overlay = new Overlay();
+            }
+        }
+
+        public static void CloseOverlay()
+        {
+            if (App.Overlay != null)
+            {
+                App.Overlay.Close();
+                App.Overlay = null;
+            }
+        }
 
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
@@ -36,9 +54,7 @@ namespace OpusCatMTEngine
                 .WriteTo.File(Path.Combine(logDir, "opuscat_log.txt"), rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
-
         
-
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;

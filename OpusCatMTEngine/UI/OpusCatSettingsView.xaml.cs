@@ -54,6 +54,7 @@ namespace OpusCatMTEngine
             this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString();
             this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
             this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
+            this.DisplayOverlay = OpusCatMTEngineSettings.Default.DisplayOverlay;
             NotifyPropertyChanged("SaveButtonEnabled");
         }
 
@@ -79,7 +80,7 @@ namespace OpusCatMTEngine
                 this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
             }
             OpusCatMTEngineSettings.Default.UseDatabaseRemoval = this.UseDatabaseRemoval;
-            
+            OpusCatMTEngineSettings.Default.DisplayOverlay = this.DisplayOverlay;
             OpusCatMTEngineSettings.Default.Save();
 
             NotifyPropertyChanged("SaveButtonEnabled");
@@ -133,6 +134,25 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool DisplayOverlay
+        {
+            get => _displayOverlay;
+            set
+            {
+                _displayOverlay = value;
+                if (value)
+                {
+                    App.OpenOverlay();
+                }
+                else
+                {
+                    App.CloseOverlay();
+                }
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
+            }
+        }
+
         public bool CacheMtInDatabase
         {
             get => _cacheMtInDatabase;
@@ -177,8 +197,9 @@ namespace OpusCatMTEngine
                     this.StoreDataInAppdata == OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata &&
                     this.DatabaseRemovalInterval == OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString() &&
                     this.UseDatabaseRemoval == OpusCatMTEngineSettings.Default.UseDatabaseRemoval &&
-                    this.CacheMtInDatabase == OpusCatMTEngineSettings.Default.CacheMtInDatabase;
-                
+                    this.CacheMtInDatabase == OpusCatMTEngineSettings.Default.CacheMtInDatabase &&
+                    this.DisplayOverlay == OpusCatMTEngineSettings.Default.DisplayOverlay;
+
                 return !allSettingsDefault && !this.validationErrors;
             }
         }
@@ -189,6 +210,7 @@ namespace OpusCatMTEngine
         private bool _cacheMtInDatabase;
         private bool validationErrors;
         private bool useDatabaseRemoval;
+        private bool _displayOverlay;
 
         public string Error
         {

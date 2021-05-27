@@ -840,7 +840,16 @@ namespace OpusCatMTEngine
                 throw new FaultException($"No MT model available for {srcLang}-{trgLang}");
             }
 
-            return mtModel.Translate(input, srcLang, trgLang);
+            var translationTask = mtModel.Translate(input, srcLang, trgLang);
+
+            if (App.Overlay != null)
+            {
+                translationTask.ContinueWith(x => Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App.Overlay.UpdateTranslation(x.Result);
+                    }));
+            }
+            return translationTask;
         }
 
         private MTModel GetPrimaryModel(IsoLanguage srcLang, IsoLanguage trgLang)

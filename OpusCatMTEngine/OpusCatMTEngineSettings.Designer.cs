@@ -310,5 +310,17 @@ namespace OpusCatMTEngine {
                 this["AllowRemoteUse"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisplayOverlay {
+            get {
+                return ((bool)(this["DisplayOverlay"]));
+            }
+            set {
+                this["DisplayOverlay"] = value;
+            }
+        }
     }
 }

@@ -29,6 +29,7 @@ myPort.onMessage.addListener(function(m) {
 
 document.addEventListener("selectionchange",notifyEngine);
 function notifyEngine(e) {
+    console.log("extract source");
     const activeSegmentPair = document.getElementsByClassName("twe_active")[0];
     const sourceSegment = activeSegmentPair.getElementsByClassName("twe_source")[0].getElementsByClassName("te_txt")[0];
 	myPort.postMessage({greeting: sourceSegment.textContent});

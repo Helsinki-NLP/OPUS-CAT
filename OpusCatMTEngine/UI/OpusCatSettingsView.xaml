@@ -64,6 +64,12 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
+                    <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel>
+                            <CheckBox 
+                                IsChecked="{Binding ElementName=_this, Path=DisplayOverlay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Show overlay displaying most recent translation</CheckBox>
+                        </StackPanel>
+                    </Border>
                     <StackPanel Orientation="Horizontal">
                         <Button 
                                 Margin="5" 
@@ -72,8 +78,7 @@
                                 Click="saveButton_Click"
                                 Content="{x:Static resx:Resources.Settings_SaveButton}"/>
                         <Button 
-                                Margin="5" 
-                                IsEnabled="{Binding ElementName=_this, Path=RevertToDefaultsButtonEnabled}" 
+                                Margin="5"  
                                 Width="100"  
                                 Click="revertToDefaultsButton_Click"
                                 Content="{x:Static resx:Resources.Settings_RevertToDefaultsButton}"/>

@@ -1,0 +1,27 @@
+{
+
+  "manifest_version": 3,
+  "name": "OPUS-CAT extension",
+  "description": "Sends source text from supported websites for translation in local OPUS-CAT MT engine.",
+  "version": "1.0",
+  "background": {
+    "service_worker": "connector.js"
+  },
+  "permissions": ["notifications","tabs","storage","commands","clipboardRead","clipboardWrite"],
+  "content_scripts": [
+    {
+      "matches": ["https://*.memsource.com/*"],
+      "js": ["extractsource.js"],
+      "all_frames": true
+    }
+  ],
+  "commands": {
+    "copy-opuscat-mt": {
+      "suggested_key": {
+        "windows": "Ctrl+Shift+5",
+        "mac": "Command+Shift+5"
+      },
+      "description": "Toggle feature foo"
+    }
+  }
+}
