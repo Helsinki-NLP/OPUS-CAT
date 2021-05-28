@@ -80,7 +80,19 @@ namespace OpusCatMTEngine
                 this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
             }
             OpusCatMTEngineSettings.Default.UseDatabaseRemoval = this.UseDatabaseRemoval;
-            OpusCatMTEngineSettings.Default.DisplayOverlay = this.DisplayOverlay;
+            if (OpusCatMTEngineSettings.Default.DisplayOverlay != this.DisplayOverlay)
+            {
+                OpusCatMTEngineSettings.Default.DisplayOverlay = this.DisplayOverlay;
+                if (this.DisplayOverlay)
+                {
+                    App.OpenOverlay();
+                }
+                else
+                {
+                    App.CloseOverlay();
+                }
+            }
+
             OpusCatMTEngineSettings.Default.Save();
 
             NotifyPropertyChanged("SaveButtonEnabled");
@@ -140,14 +152,6 @@ namespace OpusCatMTEngine
             set
             {
                 _displayOverlay = value;
-                if (value)
-                {
-                    App.OpenOverlay();
-                }
-                else
-                {
-                    App.CloseOverlay();
-                }
                 NotifyPropertyChanged();
                 NotifyPropertyChanged("SaveButtonEnabled");
             }

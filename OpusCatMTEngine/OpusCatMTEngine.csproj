@@ -390,7 +390,9 @@
     <Content Include="Evaluation\sacrebleu_wrapper.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="UI\opus.bmp" />
+    <Resource Include="..\OpusCatChromeExtension\icons\opus.bmp">
+      <Link>UI\opus.bmp</Link>
+    </Resource>
     <Content Include="Preprocessing\apply_bpe.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -188,6 +188,7 @@ namespace OpusCatMTEngine
                 catch (Exception ex)
                 {
                     Log.Error(ex.ToString());
+                    TranslationDbHelper.SetupTranslationDb();
                 }
             }
         }

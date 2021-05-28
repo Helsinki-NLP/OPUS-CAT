@@ -5,10 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
         mc:Ignorable="d"
-        Title="Overlay" Height="450" Width="800"
-        Topmost="{Binding IsChecked,ElementName=TopmostBox}">
-    <StackPanel>
-        <RichTextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" Name="TranslationBox" Height="150"></RichTextBox>
-        <CheckBox Name="TopmostBox" IsChecked="False">Show overlay on top</CheckBox>
-    </StackPanel>
+        Title="OPUS-CAT machine translation" Height="200" Width="400"
+        Icon="opus.bmp"
+        Topmost="{Binding IsChecked,ElementName=TopmostBox}"
+        x:Name="_this">
+    <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+    <DockPanel LastChildFill="True">
+        
+        <DockPanel DockPanel.Dock="Top">
+            <CheckBox DockPanel.Dock="Left" VerticalAlignment="Center" Name="TopmostBox" IsChecked="False">Show overlay on top</CheckBox>
+            <StackPanel Margin="0,0,5,0" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+                <Label>Font size:</Label>
+                <TextBox 
+                    Text="{Binding ElementName=_this, Path=MtFontSize, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}"
+                    VerticalAlignment="Center" 
+                    PreviewTextInput="PreviewNumberInput"/>
+            </StackPanel>
+        </DockPanel>
+        <Grid DockPanel.Dock="Bottom">
+            <RichTextBox 
+                FontSize="{Binding ElementName=_this, Path=MtFontSize, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  IsReadOnlyCaretVisible="True" IsReadOnly="True" Name="TranslationBox"
+                VerticalScrollBarVisibility="Auto"></RichTextBox>
+        </Grid>
+    </DockPanel>
+    </Border>
 </Window>

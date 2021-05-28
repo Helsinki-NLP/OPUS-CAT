@@ -80,6 +80,15 @@ namespace OpusCatMTEngine
             MainWindow wnd = new MainWindow();
             // Show the window
             wnd.Show();
+
+            if (OpusCatMTEngineSettings.Default.DisplayOverlay)
+            {
+                App.OpenOverlay();
+            }
+            else
+            {
+                App.CloseOverlay();
+            }
         }
 
         /// <summary>

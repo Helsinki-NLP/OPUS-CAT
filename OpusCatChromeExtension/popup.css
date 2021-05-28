@@ -1,0 +1,10 @@
+.container {
+  justify-content: space-between;
+  flex-direction: column;
+  display: flex;
+  position: relative;
+}
+.container .btn-holder {
+  justify-content: flex-end;
+  display: flex;
+}

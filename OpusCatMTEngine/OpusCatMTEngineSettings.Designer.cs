@@ -322,5 +322,17 @@ namespace OpusCatMTEngine {
                 this["DisplayOverlay"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int OverlayFontsize {
+            get {
+                return ((int)(this["OverlayFontsize"]));
+            }
+            set {
+                this["OverlayFontsize"] = value;
+            }
+        }
     }
 }

@@ -844,6 +844,7 @@ namespace OpusCatMTEngine
 
             if (App.Overlay != null)
             {
+                Application.Current.Dispatcher.Invoke(() => App.Overlay.ClearTranslation());
                 translationTask.ContinueWith(x => Application.Current.Dispatcher.Invoke(() =>
                     {
                         App.Overlay.UpdateTranslation(x.Result);

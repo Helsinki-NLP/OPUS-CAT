@@ -4,6 +4,15 @@
   "name": "OPUS-CAT extension",
   "description": "Sends source text from supported websites for translation in local OPUS-CAT MT engine.",
   "version": "1.0",
+  "action": {
+    "default_icon": {              
+      "16": "icons/opus16.png",
+      "24": "icons/opus24.png",
+      "32": "icons/opus32.png"
+    },
+    "default_title": "OPUS-CAT",
+    "default_popup": "popup.html"
+  },
   "background": {
     "service_worker": "connector.js"
   },

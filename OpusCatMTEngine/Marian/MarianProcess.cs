@@ -185,7 +185,7 @@ namespace OpusCatMTEngine
 
             if (this.sentencePiecePostProcess)
             {
-                alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace("▁", " ").Trim();
+                alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace(" ","").Replace("▁", " ").Trim();
             }
             else
             {
