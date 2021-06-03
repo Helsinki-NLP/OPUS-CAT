@@ -186,6 +186,7 @@ namespace OpusCatMTEngine
             if (this.sentencePiecePostProcess)
             {
                 alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace(" ","").Replace("▁", " ").Trim();
+                alignedTranslationPair.Segmentation = SegmentationMethod.SentencePiece;
             }
             else
             {
@@ -193,6 +194,7 @@ namespace OpusCatMTEngine
                 this.utf8PostprocessWriter.Flush();
                 string postprocessedTranslation = this.PostprocessProcess.StandardOutput.ReadLine();
                 alignedTranslationPair.Translation = postprocessedTranslation;
+                alignedTranslationPair.Segmentation = SegmentationMethod.Bpe;
             }
 
             return alignedTranslationPair;

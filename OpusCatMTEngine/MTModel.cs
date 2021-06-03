@@ -54,6 +54,8 @@ namespace OpusCatMTEngine
         }
     }
 
+    
+
     public enum TagMethod
     {
         Remove,
@@ -94,6 +96,12 @@ namespace OpusCatMTEngine
         private List<IsoLanguage> targetLanguages;
         private string name;
 
+        public string TatoebaConfigString
+        {
+            get
+            { return this.modelYaml; }
+        }
+
         private Boolean isOverrideModel;
         public bool IsOverrideModel
         {
@@ -132,7 +140,7 @@ namespace OpusCatMTEngine
 
         public FileInfo AlignmentPriorsFile {
             get { return new FileInfo(Path.Combine(this.InstallDir, "alignmentpriors.txt")); } }
-
+        
         private Dictionary<Tuple<string,string>,MarianProcess> marianProcesses;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -449,30 +457,17 @@ namespace OpusCatMTEngine
             }
         }
 
-        public MTModel(string modelPath, string installDir)
+        private void ParseDecoderConfig()
         {
-            this.InstallDir = installDir;
-
             var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
             var deserializer = new Deserializer();
             this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-
-            this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
-
-            //Recent models have yaml files containing metadata, they have the same name as the model npz file
-            var modelFilePath = Path.Combine(this.InstallDir,this.decoderSettings.models[0]);
-            var modelYamlFilePath = Path.ChangeExtension(modelFilePath,"yml");
             
-            if (File.Exists(modelYamlFilePath))
-            {
-                using (var reader = File.OpenText(modelYamlFilePath))
-                {
-                    this.modelYaml = reader.ReadToEnd();
-                } 
-            }
+        }
 
-            this.ParseModelPath(modelPath);
-
+        private void ParseModelConfig()
+        {
+            var deserializer = new Deserializer();
             var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
             if (File.Exists(modelConfigPath))
             {
@@ -492,7 +487,36 @@ namespace OpusCatMTEngine
                 this.ModelConfig = new MTModelConfig();
                 this.SaveModelConfig();
             }
+        }
 
+        private void UpdateModelYamlPath()
+        {
+            //Recent models have yaml files containing metadata, they have the same name as the model npz file
+            var modelFilePath = Path.Combine(this.InstallDir, this.decoderSettings.models[0]);
+            this.modelYamlFilePath = Path.ChangeExtension(modelFilePath, "yml");
+        }
+
+        public MTModel(string modelPath, string installDir)
+        {
+            this.InstallDir = installDir;
+
+            this.ParseDecoderConfig();
+            this.UpdateModelYamlPath();
+
+            this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
+
+            if (File.Exists(this.modelYamlFilePath))
+            {
+                using (var reader = File.OpenText(this.modelYamlFilePath))
+                {
+                    this.modelYaml = reader.ReadToEnd();
+                } 
+            }
+
+            this.ParseModelPath(modelPath);
+
+            this.ParseModelConfig();
+            
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
@@ -576,7 +600,7 @@ namespace OpusCatMTEngine
 
             //For OPUS-MT models and monolingual Tatoeba models, 
             //languages are included in path. For multilingual Tatoeba models,
-            //language have to be fetched the metadata yml file
+            //languages have to be fetched the metadata yml file
             if (this.modelYaml == null)
             {
                 this.SourceLanguages =
@@ -634,7 +658,7 @@ namespace OpusCatMTEngine
         //This is used for online models, model uri is included for later download of models
         public MTModel(string modelPath, Uri modelUri, string yamlString=null)
         {
-            this.modelYaml = yamlString; 
+            this.modelYaml = yamlString;
             this.ModelUri = modelUri;
             this.ParseModelPath(modelPath);
         }
@@ -834,6 +858,7 @@ namespace OpusCatMTEngine
         private MTModelStatus status;
         private MTModelConfig modelConfig;
         private FileInfo trainingLogFileInfo;
+        private string modelYamlFilePath;
 
         internal Process PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {

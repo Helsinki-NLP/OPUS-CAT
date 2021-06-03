@@ -76,6 +76,7 @@
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
                 ScrollViewer.CanContentScroll="True"
                 DockPanel.Dock="Bottom"
+                Height="300"
                 GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">

@@ -148,6 +148,7 @@ namespace OpusCatMTEngine
                 var targetrunlist = this.GenerateRuns(
                     pair.SegmentedTranslation,
                     pair.SegmentedAlignmentTargetToSource,
+                    pair.Segmentation,
                     pairindex,
                     this.sourceRuns);
 
@@ -160,13 +161,19 @@ namespace OpusCatMTEngine
         private List<Run> GenerateRuns(
             string[] tokens,
             Dictionary<int,List<int>> alignment,
+            SegmentationMethod segmentation,
             int translationIndex,
             List<List<Run>> otherRuns)
         {
             var runlist = new List<Run>();
             foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
             {
-                var tokenrun = new Run(" "+token);
+                //TODO: postprocess based on segmentationmethod
+                if (segmentation == SegmentationMethod.SentencePiece)
+                {
+                    var tokenrun = new Run(" " + token);
+                }
+                
                 if (alignment.ContainsKey(index))
                 {
                     var alignedTokens = alignment[index];

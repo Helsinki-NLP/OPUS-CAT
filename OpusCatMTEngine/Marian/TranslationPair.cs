@@ -9,9 +9,6 @@ namespace OpusCatMTEngine
     public class TranslationPair
     {
         
-        public enum SegmentationMethod { SentencePiece, BPE};
-
-        
         public string Translation { get; set; }
             
         public string[] SegmentedSourceSentence { get; private set; }
@@ -20,6 +17,7 @@ namespace OpusCatMTEngine
         public Dictionary<int, List<int>> SegmentedAlignmentTargetToSource { get; private set; }
         public string AlignmentString { get; private set; }
         public string RawTranslation { get; private set; }
+        public SegmentationMethod Segmentation { get; internal set; }
 
         public TranslationPair(string segmentedSource, string translationAndAlignment)
         {

@@ -30,7 +30,7 @@
                 <Label DockPanel.Dock="Left" Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
             </DockPanel>
             <Border BorderThickness="1" BorderBrush="Black">
-                <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="150"></RichTextBox>
+                <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="140"></RichTextBox>
             </Border>
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Button 
@@ -41,7 +41,11 @@
             </StackPanel>
             <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
             <Border BorderThickness="1" BorderBrush="Black">
-                <RichTextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" Name="TargetBox" Height="150"></RichTextBox>
+                <RichTextBox 
+                    IsReadOnlyCaretVisible="True" 
+                    IsReadOnly="True" 
+                    Name="TargetBox" 
+                    Height="140"></RichTextBox>
             </Border>
         </StackPanel>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -13,7 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+using YamlDotNet.Serialization;
 
 namespace OpusCatMTEngine
 {
@@ -111,7 +112,26 @@ namespace OpusCatMTEngine
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
             model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_ExtractingStatus;
-            this.ModelManager.ExtractModel(model.ModelPath);
+            var installPath = this.ModelManager.ExtractModel(model.ModelPath);
+            
+            //If model has yaml config, check whether it was included in the zip package (Tatoeba models)
+            if (!String.IsNullOrEmpty(model.TatoebaConfigString))
+            {
+                var decoderYaml = 
+                    new DirectoryInfo(installPath).GetFiles("decoder.yml").Single();
+                var deserializer = new Deserializer();
+                var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+                var modelPath = Path.Combine(installPath, decoderSettings.models[0]);
+                var yamlPath = Path.ChangeExtension(modelPath, "yml");
+                if (!File.Exists(yamlPath))
+                {
+                    using (var writer = File.CreateText(yamlPath))
+                    {
+                        writer.Write(model.TatoebaConfigString);
+                    }
+                }
+            }
+
             model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_InstalledStatus;
             this.ModelManager.GetLocalModels();
         }

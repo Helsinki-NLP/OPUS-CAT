@@ -934,7 +934,7 @@ namespace OpusCatMTEngine
 
         //This is used with automatic downloads from the object storage, where the
         //language pair is contained in the object storage path
-        internal void ExtractModel(string modelPath, bool deleteZip = false)
+        internal string ExtractModel(string modelPath, bool deleteZip = false)
         {
             string modelFolder = Path.Combine(this.OpusModelDir.FullName, modelPath);
             string zipPath = modelFolder + ".zip";
@@ -944,9 +944,10 @@ namespace OpusCatMTEngine
             {
                 File.Delete(zipPath);
             }
+            return modelFolder;
         }
 
-        //This is used for extraction from a zip, where the language pair needs to
+        //This is used for extraction from a local zip, where the language pair needs to
         //be extracted from the README.md file (some nicer metadata file might be useful)
         internal void ExtractModel(FileInfo zipFile)
         {
