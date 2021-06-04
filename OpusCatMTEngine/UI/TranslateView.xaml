@@ -7,7 +7,7 @@
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         x:Name="_this"
-        Height="450" Width="800">
+        d:DesignHeight="450" d:DesignWidth="1000">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
     </UserControl.Resources>
@@ -25,12 +25,13 @@
                         DisplayMemberPath="IsoRefName"
                         SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
                         Width="200"/>
+                <CheckBox VerticalAlignment="Center" IsChecked="{Binding ElementName=_this, Path=ShowSegmentation, Mode=TwoWay}">Show segmentation</CheckBox>
             </StackPanel>
             <DockPanel>
                 <Label DockPanel.Dock="Left" Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
             </DockPanel>
             <Border BorderThickness="1" BorderBrush="Black">
-                <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="140"></RichTextBox>
+                <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="130"></RichTextBox>
             </Border>
             <StackPanel Margin="0,5" Orientation="Horizontal">
                 <Button 
@@ -45,7 +46,7 @@
                     IsReadOnlyCaretVisible="True" 
                     IsReadOnly="True" 
                     Name="TargetBox" 
-                    Height="140"></RichTextBox>
+                    Height="130"></RichTextBox>
             </Border>
         </StackPanel>
     </Grid>

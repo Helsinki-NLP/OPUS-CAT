@@ -41,7 +41,8 @@ namespace OpusCatMTEngine
 
         private IsoLanguage sourceLanguage;
         private IsoLanguage targetLanguage;
-
+        private bool _showSegmentation;
+        private List<Run> wordsplitList;
 
         internal string Title { get; set; }
 
@@ -49,7 +50,7 @@ namespace OpusCatMTEngine
         {
             this.Model = selectedModel;
             this.DataContext = selectedModel;
-
+            this.wordsplitList = new List<Run>();
             this.SourceLanguage = this.Model.SourceLanguages.First();
             this.TargetLanguage = this.Model.TargetLanguages.First();
             this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Translate_TranslateTitle, Model.Name);
@@ -78,10 +79,35 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool ShowSegmentation
+        {
+            get => _showSegmentation;
+            set
+            {
+                _showSegmentation = value;
+                if (value)
+                {
+                    foreach (var wordsplit in this.wordsplitList)
+                    {
+                        wordsplit.Text = "|";
+                        wordsplit.Foreground = Brushes.Red;
+                    }
+                }
+                else
+                {
+                    foreach (var wordsplit in this.wordsplitList)
+                    {
+                        wordsplit.Text = "";
+                    }
+                }
+                NotifyPropertyChanged();
+            }
+        }
+
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-
+            this.wordsplitList.Clear();
             var source = textRange.Text;
             Task<List<TranslationPair>> translate =
                 new Task<List<TranslationPair>>(() => OrderTranslation(source));
@@ -137,9 +163,10 @@ namespace OpusCatMTEngine
                 var sourcerunlist = this.GenerateRuns(
                     pair.SegmentedSourceSentence,
                     pair.SegmentedAlignmentSourceToTarget,
+                    pair.Segmentation,
                     pairindex,
                     this.targetRuns);
-                
+
                 this.sourceRuns.Add(sourcerunlist);
                 sourcepara.Inlines.AddRange(sourcerunlist);
                 this.SourceBox.Document.Blocks.Add(sourcepara);
@@ -160,37 +187,82 @@ namespace OpusCatMTEngine
 
         private List<Run> GenerateRuns(
             string[] tokens,
-            Dictionary<int,List<int>> alignment,
+            Dictionary<int, List<int>> alignment,
             SegmentationMethod segmentation,
             int translationIndex,
             List<List<Run>> otherRuns)
         {
             var runlist = new List<Run>();
+            //Change this to add each token as a run, and add empty runs for space and pipe runs for segmentation
+            //visualization
             foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
             {
-                //TODO: postprocess based on segmentationmethod
-                if (segmentation == SegmentationMethod.SentencePiece)
+                string processedToken = token;
+                switch (segmentation)
                 {
-                    var tokenrun = new Run(" " + token);
+                    case SegmentationMethod.SentencePiece:
+                        if (token.StartsWith("▁"))
+                        {
+                            processedToken = processedToken.Substring(1);
+                            if (index != 0)
+                            {
+                                var spaceRun = new Run(" ");
+                                spaceRun.Tag = "space";
+                                runlist.Add(spaceRun);
+                            }
+                        }
+                        else
+                        {
+                            var wordsplitRun = new Run("");
+                            wordsplitRun.Tag = "wordsplit";
+                            runlist.Add(wordsplitRun);
+                            this.wordsplitList.Add(wordsplitRun);
+                        }
+                        break;
+                    case SegmentationMethod.Bpe:
+                        if (!token.StartsWith("@@"))
+                        {
+                            processedToken = processedToken.Substring(2);
+                            var wordsplitRun = new Run("");
+                            wordsplitRun.Tag = "wordsplit";
+                            this.wordsplitList.Add(wordsplitRun);
+                            runlist.Add(wordsplitRun);
+                        }
+                        else
+                        {
+                            var spaceRun = new Run(" ");
+                            spaceRun.Tag = "space";
+                            runlist.Add(spaceRun);
+                        }
+                        break;
+                    default:
+                        throw new Exception("Segmentation method not specified in translation.");
                 }
-                
+
+                Run tokenrun = new Run(processedToken);
+
                 if (alignment.ContainsKey(index))
                 {
                     var alignedTokens = alignment[index];
                     tokenrun.MouseEnter += (x, y) => Tokenrun_MouseEnter(alignedTokens, otherRuns, translationIndex, x, y);
                     tokenrun.MouseLeave += (x, y) => Tokenrun_MouseLeave(alignedTokens, otherRuns, translationIndex, x, y);
-                    
                 }
+                
                 runlist.Add(tokenrun);
             }
+
+            //This shows segmentation if ShowSegmentation is true
+            NotifyPropertyChanged("ShowSegmentation");
             return runlist;
         }
 
-        private void Tokenrun_MouseLeave(List<int> alignedTokens, List<List<Run>> otherRuns, int pairindex,object sender, MouseEventArgs e)
+        private void Tokenrun_MouseLeave(List<int> alignedTokens, List<List<Run>> otherRuns, int pairindex, object sender, MouseEventArgs e)
         {
             Run tokenrun = sender as Run;
             tokenrun.Background = Brushes.Transparent;
-            var runlist = otherRuns[pairindex];
+            //Ignore space and wordsplit token, since they are not included in the alignment
+            var runlist = otherRuns[pairindex].Where(x => x.Tag == null ||
+                (x.Tag.ToString() != "space" && x.Tag.ToString() != "wordsplit")).ToList();
             foreach (var tokenIndex in alignedTokens)
             {
                 runlist[tokenIndex].Background = Brushes.Transparent;
@@ -201,7 +273,9 @@ namespace OpusCatMTEngine
         {
             Run tokenrun = sender as Run;
             tokenrun.Background = Brushes.BlueViolet;
-            var runlist = otherRuns[pairindex];
+            //Ignore space and wordsplit token, since they are not included in the alignment
+            var runlist = otherRuns[pairindex].Where(x => x.Tag == null ||
+                (x.Tag.ToString() != "space" && x.Tag.ToString() != "wordsplit")).ToList();
             foreach (var tokenIndex in alignedTokens)
             {
                 runlist[tokenIndex].Background = Brushes.BlueViolet;
