@@ -50,8 +50,24 @@
         <StackPanel DockPanel.Dock="Top">
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
+                    
                     <StackPanel Margin="5,0,0,5">
                         <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TrainingFilesLabel}"/>
+                        <StackPanel 
+                            Orientation="Horizontal"
+                            Visibility="{Binding ElementName=_this, Path=SelectedModel.IsMultilingualModel,Converter={StaticResource BoolToVis}}">
+                            <Label>Source language</Label>
+                            <ComboBox ItemsSource="{Binding ElementName=_this, Path=SelectedModel.SourceLanguages}"
+                            DisplayMemberPath="IsoRefName"
+                            SelectedValue="{Binding ElementName=_this, Path=SourceLanguage, Mode=TwoWay}"
+                            Width="200"/>
+                        
+                            <Label>Target language</Label>
+                            <ComboBox ItemsSource="{Binding ElementName=_this, Path=SelectedModel.TargetLanguages}"
+                            DisplayMemberPath="IsoRefName"
+                            SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
+                            Width="200"/>
+                        </StackPanel>
                         <RadioButton 
                             IsChecked="True" 
                             Name="TmxFiles" 

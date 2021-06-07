@@ -228,7 +228,8 @@ namespace OpusCatMTEngine
             string languageCode,
             FileInfo segmentationModel,
             bool includePlaceholderTags,
-            bool includeTagPairs)
+            bool includeTagPairs,
+            string targetLanguageToPrefix = null)
         {
             
             var preprocessedFile = new FileInfo(Path.Combine(directory.FullName, $"preprocessed_{languageFile.Name}"));
@@ -269,7 +270,29 @@ namespace OpusCatMTEngine
                     break;
             }
          
-            return segmentedFile;
+            if (targetLanguageToPrefix != null)
+            {
+                var segmentedWithTargetPrefix = new FileInfo(Path.Combine(directory.FullName, $"prefix_{languageFile.Name.Replace(" ", "_")}"));
+
+                using (var segFile = segmentedFile.OpenText())
+                using (var prefixWriter = new StreamWriter(segmentedWithTargetPrefix.FullName))
+                {
+                    String line;
+                    while ((line = segFile.ReadLine()) != null)
+                    {
+                        var prefixedLine = $">>{targetLanguageToPrefix}<< {line}";
+                        prefixWriter.WriteLine(prefixedLine);
+                    }
+                }
+
+                return segmentedWithTargetPrefix;
+            }
+            else
+            {
+                return segmentedFile;
+            }
+
+            
         }
 
         internal static void GenerateAlignments(FileInfo spSource, FileInfo spTarget, FileInfo alignmentFile, FileInfo priorsFile)

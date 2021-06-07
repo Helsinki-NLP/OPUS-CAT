@@ -56,8 +56,7 @@ namespace OpusCatMTEngine
 
                 // Register Web API controller in executing assembly.
                 builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-
-
+                
                 //builder.Register(c => modelManager).As<IMtProvider>().SingleInstance();
                 builder.RegisterInstance<IMtProvider>(modelManager);
                 // Create and assign a dependency resolver for Web API to use.

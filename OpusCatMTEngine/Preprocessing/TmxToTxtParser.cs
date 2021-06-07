@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -107,9 +108,10 @@ namespace OpusCatMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
+            
             var sourceFile = new FileInfo($"{tmxFile}.{sourceLang.ShortestIsoCode}.txt");
             var targetFile = new FileInfo($"{tmxFile}.{targetLang.ShortestIsoCode}.txt");
-
+            
             XDocument tmx;
             try
             {
@@ -117,6 +119,7 @@ namespace OpusCatMTEngine
             }
             catch (System.Xml.XmlException ex)
             {
+                Log.Error($"{tmxFile} is not a valid tmx file");
                 return null;
             }
             

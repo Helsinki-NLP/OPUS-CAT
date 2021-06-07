@@ -74,6 +74,22 @@ namespace OpusCatMTEngine
 
         private string targetFile;
 
+        public IsoLanguage TargetLanguage
+        {
+            get => targetLanguage;
+            set { targetLanguage = value; NotifyPropertyChanged(); }
+        }
+
+        public IsoLanguage SourceLanguage
+        {
+            get => sourceLanguage;
+            set { sourceLanguage = value; NotifyPropertyChanged(); }
+        }
+
+        private IsoLanguage sourceLanguage;
+
+        private IsoLanguage targetLanguage;
+
         public string TmxFile { get => tmxFile; set { tmxFile = value.Trim('"'); NotifyPropertyChanged(); } }
 
         private string tmxFile;
@@ -86,6 +102,16 @@ namespace OpusCatMTEngine
             set
             {
                 _customizationNotStarted = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public MTModel SelectedModel
+        {
+            get => selectedModel;
+            set
+            {
+                selectedModel = value;
                 NotifyPropertyChanged();
             }
         }
@@ -114,7 +140,7 @@ namespace OpusCatMTEngine
                     {
                         try
                         {
-                            var customDir = new DirectoryInfo($"{this.selectedModel.InstallDir}_{this.ModelTag}");
+                            var customDir = new DirectoryInfo($"{this.SelectedModel.InstallDir}_{this.ModelTag}");
                             if (customDir.Exists)
                             {
                                 validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_ModelTagInUseMessage;
@@ -161,9 +187,11 @@ namespace OpusCatMTEngine
         public ModelCustomizerView(MTModel selectedModel)
         {
             this.CustomizationNotStarted = true;
-            this.selectedModel = selectedModel;
+            this.SelectedModel = selectedModel;
+            this.SourceLanguage = selectedModel.SourceLanguages.First();
+            this.TargetLanguage = selectedModel.TargetLanguages.First();
             
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Finetune_FineTuneWindowTitle,this.selectedModel.Name);
+            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Finetune_FineTuneWindowTitle,this.SelectedModel.Name);
             InitializeComponent();
         }
 
@@ -181,8 +209,8 @@ namespace OpusCatMTEngine
                 case InputFileType.TmxFile:
                     filePair = TmxToTxtParser.ParseTmxToParallelFiles(
                             this.TmxFile,
-                            this.selectedModel.SourceLanguages.Single(),
-                            this.selectedModel.TargetLanguages.Single(),
+                            this.SourceLanguage,
+                            this.TargetLanguage,
                             this.IncludePlaceholderTagsBox.IsChecked.Value,
                             this.IncludeTagPairBox.IsChecked.Value
                             );
@@ -217,12 +245,12 @@ namespace OpusCatMTEngine
                 filePair,
                 validPair,
                 null,
-                this.selectedModel.SourceLanguages.Single(),
-                this.selectedModel.TargetLanguages.Single(),
+                this.SourceLanguage,
+                this.TargetLanguage,
                 this.ModelTag,
                 this.IncludePlaceholderTagsBox.IsChecked.Value,
                 this.IncludeTagPairBox.IsChecked.Value,
-                this.selectedModel);
+                this.SelectedModel);
 
             this.CustomizationNotStarted = false;
         }

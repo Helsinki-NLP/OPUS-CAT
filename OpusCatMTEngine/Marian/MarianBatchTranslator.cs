@@ -109,11 +109,12 @@ namespace OpusCatMTEngine
         {
             
             Log.Information($"Starting batch translator for model {this.SystemName}.");
-            
-            var cmd = "TranslateBatchSentencePiece.bat";
+
 
             FileInfo spInput = this.PreprocessInput(input, preprocessedInput);
-            
+            //TODO: fix this to handle multilingual models
+            //FileInfo spInput = MarianHelper.PreprocessLanguage()
+
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for
             //same systems, i.e. keep track of decoder settings)
@@ -125,10 +126,10 @@ namespace OpusCatMTEngine
             {
                 this.OutputReady += (x, y) => this.WriteToTranslationDb(x, y, input, spInput, transAndAlign);
             }
-
-
-            EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
             
+            EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
+
+            var cmd = "TranslateBatchSentencePiece.bat";
             var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args, exitHandler);
             
 

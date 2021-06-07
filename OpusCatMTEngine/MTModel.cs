@@ -102,6 +102,12 @@ namespace OpusCatMTEngine
             { return this.modelYaml; }
         }
 
+        public bool IsMultilingualModel
+        {
+            get
+            { return this.SourceLanguages.Count > 1 || this.TargetLanguages.Count > 1; }
+        }
+
         private Boolean isOverrideModel;
         public bool IsOverrideModel
         {

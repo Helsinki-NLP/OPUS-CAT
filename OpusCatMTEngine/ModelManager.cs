@@ -773,7 +773,9 @@ namespace OpusCatMTEngine
                 modelTag,
                 includePlaceholderTags,
                 includeTagPairs,
-                uniqueNewSegments
+                uniqueNewSegments,
+                srcLang,
+                trgLang
                 );
 
             customizer.ProgressChanged += incompleteModel.CustomizationProgressHandler;

@@ -41,7 +41,7 @@ namespace OpusCatMTEngine
         private readonly bool includeTagPairs;
 
         public string SystemName { get; }
-        public bool MultilingualModel { get; private set; }
+        public bool TargetLanguageCodeRequired { get; private set; }
         public Process PreprocessProcess { get => preprocessPipe; set => preprocessPipe = value; }
         public Process PostprocessProcess { get; private set; }
         private StreamWriter utf8PostprocessWriter;
@@ -93,7 +93,7 @@ namespace OpusCatMTEngine
             this.includeTagPairs = includeTagPairs;
             this.modelDir = modelDir;
             this.SystemName = $"{this.SourceCode}-{this.TargetCode}_{modelName}";
-            this.MultilingualModel = multilingualModel;
+            this.TargetLanguageCodeRequired = multilingualModel;
 
             Log.Information($"Starting MT pipe for model {this.SystemName}.");
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
@@ -170,7 +170,7 @@ namespace OpusCatMTEngine
             string preprocessedLine = this.PreprocessProcess.StandardOutput.ReadLine();
 
             var lineToTranslate = preprocessedLine;
-            if (this.MultilingualModel)
+            if (this.TargetLanguageCodeRequired)
             {
                 lineToTranslate = $">>{this.TargetCode}<< {preprocessedLine}";
             }

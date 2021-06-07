@@ -338,10 +338,22 @@ namespace OpusCatMTEngine
 
             this.segmentationMethod = sourceSegModel.Extension;
 
+            var targetPrefix = this.model.TargetLanguages.Count > 1 ? this.targetCode : null;
             this.spSource = MarianHelper.PreprocessLanguage(
-                this.customSource, this.customDir, this.sourceCode, sourceSegModel, this.includePlaceholderTags,this.includeTagPairs);
+                this.customSource,
+                this.customDir,
+                this.sourceCode,
+                sourceSegModel,
+                this.includePlaceholderTags,
+                this.includeTagPairs,
+                targetPrefix);
             this.spTarget = MarianHelper.PreprocessLanguage(
-                this.customTarget, this.customDir, this.targetCode, targetSegModel, this.includePlaceholderTags, this.includeTagPairs);
+                this.customTarget, 
+                this.customDir, 
+                this.targetCode, 
+                targetSegModel, 
+                this.includePlaceholderTags, 
+                this.includeTagPairs);
 
             //concatenate the out-of-domain validation set with the in-domain validation set
             ParallelFilePair tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
@@ -352,9 +364,20 @@ namespace OpusCatMTEngine
                 OpusCatMTEngineSettings.Default.OODValidSetSize);
 
             this.spValidSource = MarianHelper.PreprocessLanguage(
-                combinedValid.Source, this.customDir, this.sourceCode, sourceSegModel, this.includePlaceholderTags, this.includeTagPairs);
+                combinedValid.Source, 
+                this.customDir, 
+                this.sourceCode, 
+                sourceSegModel, 
+                this.includePlaceholderTags, 
+                this.includeTagPairs,
+                targetPrefix);
             this.spValidTarget = MarianHelper.PreprocessLanguage(
-                combinedValid.Target, this.customDir, this.targetCode, targetSegModel, this.includePlaceholderTags, this.includeTagPairs);
+                combinedValid.Target, 
+                this.customDir, 
+                this.targetCode, 
+                targetSegModel, 
+                this.includePlaceholderTags, 
+                this.includeTagPairs);
         }
         
         public MarianCustomizer(
@@ -366,6 +389,8 @@ namespace OpusCatMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs,
             List<string> postCustomizationBatch,
+            IsoLanguage sourceLanguage,
+            IsoLanguage targetLanguage,
             bool guidedAlignment=false)
         {
             this.model = model;
@@ -379,8 +404,8 @@ namespace OpusCatMTEngine
             this.includeTagPairs = includeTagPairs;
             this.inDomainValidationSource = indomainValidPair.Source;
             this.inDomainValidationTarget = indomainValidPair.Target;
-            this.sourceCode = model.SourceLanguages.Single().OriginalCode;
-            this.targetCode = model.TargetLanguages.Single().OriginalCode;
+            this.sourceCode = sourceLanguage.OriginalCode;
+            this.targetCode = targetLanguage.OriginalCode;
             this.guidedAlignment = guidedAlignment;
         }
 
