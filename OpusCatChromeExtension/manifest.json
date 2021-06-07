@@ -19,7 +19,7 @@
   "permissions": ["notifications","tabs","storage","commands","clipboardRead","clipboardWrite"],
   "content_scripts": [
     {
-      "matches": ["https://*.memsource.com/*"],
+      "matches": ["https://*.memsource.com/*","*://*.xtm.cloud/*"],
       "js": ["extractsource.js"],
       "all_frames": true
     }

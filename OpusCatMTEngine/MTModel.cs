@@ -545,7 +545,10 @@ namespace OpusCatMTEngine
             var batchTranslator = new MarianBatchTranslator(
                 this.InstallDir,
                 this.SourceLanguages.Single(),
-                this.TargetLanguages.Single(), false, false);
+                this.TargetLanguages.Single(),
+                this.ModelSegmentationMethod,
+                false,
+                false);
 
             var sourceLines = File.ReadAllLines(sourceFile.FullName);
             batchTranslator.OutputReady += (x,y) => EvaluateTranslation(refFile, outOfDomainSize, targetFile);
@@ -867,6 +870,7 @@ namespace OpusCatMTEngine
                 this.InstallDir, 
                 sourceLang, 
                 targetLang, 
+                this.ModelSegmentationMethod,
                 this.modelConfig.IncludePlaceholderTags,
                 this.modelConfig.IncludeTagPairs);
             return batchTranslator.BatchTranslate(input,output,storeTranslations:true);

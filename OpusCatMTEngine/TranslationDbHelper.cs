@@ -28,7 +28,9 @@ namespace OpusCatMTEngine
                     "segmentedsource",
                     "segmentedtranslation",
                     "alignment",
-                    "additiondate"
+                    "additiondate",
+                    "segmentationmethod",
+                    "targetlanguage"
                 };
 
             var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
@@ -134,7 +136,7 @@ namespace OpusCatMTEngine
             {
                 m_dbConnection.Open();
 
-                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, PRIMARY KEY (model,sourcetext))";
+                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, segmentationmethod INTEGER, targetlanguage TEXT, PRIMARY KEY (model,sourcetext,targetlanguage))";
 
                 using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
                 {
@@ -143,7 +145,12 @@ namespace OpusCatMTEngine
             }
         }
 
-        private static void WriteTranslationToSqliteDb(string sourceText, TranslationPair translation, string model)
+        private static void WriteTranslationToSqliteDb(
+            string sourceText, 
+            TranslationPair translation, 
+            string model, 
+            SegmentationMethod segmentationMethod, 
+            string targetLanguage)
         {
             
             var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
@@ -163,7 +170,8 @@ namespace OpusCatMTEngine
                 m_dbConnection.Open();
 
                 using (SQLiteCommand insert =
-                    new SQLiteCommand("INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model, additiondate) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model,CURRENT_TIMESTAMP)", m_dbConnection))
+                    new SQLiteCommand(
+                        "INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model, additiondate, segmentationmethod, targetlanguage) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model,CURRENT_TIMESTAMP,@segmentationmethod,@targetlanguage)", m_dbConnection))
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     insert.Parameters.Add(new SQLiteParameter("@translation", translation.Translation));
@@ -171,19 +179,26 @@ namespace OpusCatMTEngine
                     insert.Parameters.Add(new SQLiteParameter("@segmentedtranslation", String.Join(" ", translation.SegmentedTranslation)));
                     insert.Parameters.Add(new SQLiteParameter("@alignment", translation.AlignmentString));
                     insert.Parameters.Add(new SQLiteParameter("@model", model));
+                    insert.Parameters.Add(new SQLiteParameter("@segmentationmethod", segmentationMethod.ToString()));
+                    insert.Parameters.Add(new SQLiteParameter("@targetlanguage", targetLanguage));
                     insert.ExecuteNonQuery();
                 }
             }
         }
 
-        internal static void WriteTranslationToDb(string sourceText, TranslationPair translation, string model)
+        internal static void WriteTranslationToDb(
+            string sourceText, 
+            TranslationPair translation, 
+            string model,
+            SegmentationMethod segmentationMethod,
+            string targetLanguage)
         {
             TranslationDbHelper.shortTermMtStorage.GetOrAdd(new Tuple<string, string>(sourceText, model), translation);
             if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
             {
                 try
                 {
-                    TranslationDbHelper.WriteTranslationToSqliteDb(sourceText, translation, model);
+                    TranslationDbHelper.WriteTranslationToSqliteDb(sourceText, translation, model, segmentationMethod, targetLanguage);
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +208,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        private static TranslationPair FetchTranslationFromSqliteDb(string sourceText, string model)
+        private static TranslationPair FetchTranslationFromSqliteDb(string sourceText, string model, string targetLanguage)
         {
             var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName);
 
@@ -203,10 +218,11 @@ namespace OpusCatMTEngine
                 m_dbConnection.Open();
 
                 using (SQLiteCommand fetch =
-                    new SQLiteCommand("SELECT DISTINCT translation,segmentedsource,segmentedtranslation,alignment FROM translations WHERE sourcetext=@sourcetext AND model=@model LIMIT 1", m_dbConnection))
+                    new SQLiteCommand("SELECT DISTINCT translation,segmentedsource,segmentedtranslation,alignment,segmentationmethod FROM translations WHERE sourcetext=@sourcetext AND model=@model AND targetlanguage=@targetlanguage LIMIT 1", m_dbConnection))
                 {
                     fetch.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     fetch.Parameters.Add(new SQLiteParameter("@model", model));
+                    fetch.Parameters.Add(new SQLiteParameter("@targetlanguage", targetLanguage));
                     SQLiteDataReader r = fetch.ExecuteReader();
 
                     while (r.Read())
@@ -215,8 +231,17 @@ namespace OpusCatMTEngine
                         var segmentedTranslation = Convert.ToString(r["segmentedtranslation"]);
                         var translation = Convert.ToString(r["translation"]);
                         var alignment = Convert.ToString(r["alignment"]);
-
-                        translationPairs.Add(new TranslationPair(translation, segmentedSource, segmentedTranslation, alignment));
+                        var segmentationMethodString = Convert.ToString(r["segmentationmethod"]);
+                        SegmentationMethod segmentationMethod;
+                        Enum.TryParse<SegmentationMethod>(segmentationMethodString,out segmentationMethod);
+                        translationPairs.Add(
+                            new TranslationPair(
+                                translation, 
+                                segmentedSource,
+                                segmentedTranslation, 
+                                alignment, 
+                                segmentationMethod, 
+                                targetLanguage));
                     }
                 }
 
@@ -224,14 +249,14 @@ namespace OpusCatMTEngine
             return translationPairs.SingleOrDefault();
         }
 
-        internal static TranslationPair FetchTranslationFromDb(string sourceText, string model)
+        internal static TranslationPair FetchTranslationFromDb(string sourceText, string model, string targetLanguage)
         {
             TranslationPair translationPair = null;
             if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
             {
                 try
                 {
-                    translationPair = FetchTranslationFromSqliteDb(sourceText, model);
+                    translationPair = FetchTranslationFromSqliteDb(sourceText, model,targetLanguage);
                 }
                 catch (Exception ex)
                 {

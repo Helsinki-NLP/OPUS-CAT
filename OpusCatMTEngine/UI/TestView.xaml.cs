@@ -95,7 +95,10 @@ namespace OpusCatMTEngine
             var batchTranslator = new MarianBatchTranslator(
                 this.model.InstallDir,
                 this.model.SourceLanguages.Single(),
-                this.model.TargetLanguages.Single(), false, false);
+                this.model.TargetLanguages.Single(),
+                this.model.ModelSegmentationMethod,
+                false,
+                false);
 
 
             var sourceLines = File.ReadAllLines(this.SourceFileBox.Text);

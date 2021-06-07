@@ -84,7 +84,7 @@ namespace OpusCatMTEngine
         /// <param name="trgLangCode">The code of the target language.</param>
         /// <returns>The translated input string.</returns>
         [HttpGet]
-        public string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        public string Translate(string tokenCode = "", string input = "", string srcLangCode = "", string trgLangCode = "", string modelTag = "")
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
@@ -97,7 +97,7 @@ namespace OpusCatMTEngine
 
         //For integration with Wordfast
         [HttpPost]
-        public Translation TranslatePost(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        public Translation TranslatePost(string tokenCode = "", string input = "", string srcLangCode = "", string trgLangCode = "", string modelTag = "")
         {
             var translation = this.Translate(tokenCode, input, srcLangCode, trgLangCode, modelTag);
             return new Translation(translation);
@@ -122,7 +122,7 @@ namespace OpusCatMTEngine
 
 
         [HttpGet]
-        public Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        public Stream TranslateStream(string tokenCode="", string input="", string srcLangCode="", string trgLangCode="", string modelTag="")
         {
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);

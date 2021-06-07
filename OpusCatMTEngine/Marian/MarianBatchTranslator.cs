@@ -39,6 +39,7 @@ namespace OpusCatMTEngine
 
         private bool includePlaceholderTags;
         private bool includeTagPairs;
+        private SegmentationMethod segmentation;
 
         private void WriteToTranslationDb(object sender, EventArgs e, IEnumerable<string> input, FileInfo spInput, FileInfo transAndAlign)
         {
@@ -53,8 +54,8 @@ namespace OpusCatMTEngine
                     {
                         var line = reader.ReadLine();
                         var sourceLine = inputQueue.Dequeue();
-                        var transPair = new TranslationPair(sourceLine, line);
-                        TranslationDbHelper.WriteTranslationToDb(sourceLine, transPair, this.SystemName);
+                        var transPair = new TranslationPair(sourceLine, line, this.segmentation, this.TargetCode);
+                        TranslationDbHelper.WriteTranslationToDb(sourceLine, transPair, this.SystemName, this.segmentation, this.TargetCode);
                     }
                 }
             }
@@ -64,13 +65,15 @@ namespace OpusCatMTEngine
         public MarianBatchTranslator(
             string modelDir, 
             IsoLanguage sourceLang,
-            IsoLanguage targetLang, 
+            IsoLanguage targetLang,
+            SegmentationMethod segmentation,
             bool includePlaceholderTags, 
             bool includeTagPairs)
         {
-            this.SourceCode = sourceLang.ShortestIsoCode;
-            this.TargetCode = targetLang.ShortestIsoCode;
-            
+            this.SourceCode = sourceLang.OriginalCode;
+            this.TargetCode = targetLang.OriginalCode;
+            this.segmentation = segmentation;
+
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
             this.modelDir = new DirectoryInfo(modelDir);

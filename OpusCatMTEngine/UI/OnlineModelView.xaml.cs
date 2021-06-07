@@ -100,6 +100,7 @@ namespace OpusCatMTEngine
         private void dataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             this.ModelManager = ((ModelManager)this.DataContext);
+            this.ModelManager.GetOnlineModels();
             this.ModelManager.FilteredOnlineModels.CollectionChanged += FilteredOnlineModels_CollectionChanged;
             NotifyPropertyChanged(null);
         }

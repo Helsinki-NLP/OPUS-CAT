@@ -19,25 +19,42 @@ namespace OpusCatMTEngine
         public string RawTranslation { get; private set; }
         public SegmentationMethod Segmentation { get; internal set; }
 
-        public TranslationPair(string segmentedSource, string translationAndAlignment)
+        public TranslationPair(
+            string segmentedSource, 
+            string translationAndAlignment, 
+            SegmentationMethod segmentationMethod,
+            string targetLanguage)
         {
             var lastSeparator = translationAndAlignment.LastIndexOf("|||");
             var segmentedTranslation = translationAndAlignment.Substring(0, lastSeparator - 1);
             this.RawTranslation = segmentedTranslation;
             var alignment = translationAndAlignment.Substring(lastSeparator + "||| ".Length);
 
-            this.Initialize(segmentedSource, segmentedTranslation, alignment);
+            this.Initialize(segmentedSource, segmentedTranslation, alignment, segmentationMethod, targetLanguage);
         }
 
-        public TranslationPair(string translation, string segmentedSource, string segmentedTarget, string alignment)
+        public TranslationPair(
+            string translation,
+            string segmentedSource,
+            string segmentedTarget,
+            string alignment,
+            SegmentationMethod segmentationMethod,
+            string targetCode)
         {
             this.Translation = translation;
-            this.Initialize(segmentedSource, segmentedTarget, alignment);
+            
+            this.Initialize(segmentedSource, segmentedTarget, alignment, segmentationMethod,targetCode);
         }
 
-        private void Initialize(string segmentedSource, string segmentedTarget, string alignment)
+        private void Initialize(
+            string segmentedSource, 
+            string segmentedTarget, 
+            string alignment, 
+            SegmentationMethod segmentationMethod,
+            string targetCode)
         {
             this.SegmentedSourceSentence = segmentedSource.Split(' ');
+            
             this.SegmentedTranslation = segmentedTarget.Split(' ');
             this.SegmentedAlignmentSourceToTarget = TranslationPair.ParseAlignmentString(
                 alignment,
@@ -52,6 +69,7 @@ namespace OpusCatMTEngine
                 true);
 
             this.AlignmentString = alignment;
+            this.Segmentation = segmentationMethod;
         }
 
         public static Dictionary<int,List<int>> ParseAlignmentString(

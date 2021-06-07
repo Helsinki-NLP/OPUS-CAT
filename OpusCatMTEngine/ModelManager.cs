@@ -201,6 +201,18 @@ namespace OpusCatMTEngine
                 this.FilterOnlineModels();
             }
         }
+        
+        public bool OnlineModelListFetched
+        {
+            get => onlineModelListFetched;
+            set
+            {
+                onlineModelListFetched = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool onlineModelListFetched;
 
         public string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
@@ -372,8 +384,7 @@ namespace OpusCatMTEngine
             this.ShowOpusModels = true;
             this.ShowTatoebaModels = true;
             this.ShowNewestOnly = true;
-
-            this.GetOnlineModels();
+            
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
             this.opusModelDir = new DirectoryInfo(modelDirPath);
             if (!this.OpusModelDir.Exists)
@@ -384,10 +395,11 @@ namespace OpusCatMTEngine
             this.GetLocalModels();
         }
 
-        private void GetOnlineModels()
+        internal void GetOnlineModels()
         {
             this.onlineModels = new List<MTModel>();
             this.yamlDownloads = new HashSet<Uri>();
+            this.OnlineModelListFetched = false;
             var modelStorages =
                 new List<string> {
                     OpusCatMTEngineSettings.Default.OpusModelStorageUrl,
@@ -564,10 +576,12 @@ namespace OpusCatMTEngine
                 }
                 else
                 {
+                    //Tatoeba models should all have yaml metadata
                     if (storageUri.Segments[1].Contains("Tatoeba-MT"))
                     {
                         Log.Error($"Model {modelUri} has no corresponding yaml file in storage, model will not be added to list of online models.");
                     }
+                    //OPUS-MT models have no yaml files, so add them as they are
                     else
                     {
                         this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
@@ -579,8 +593,7 @@ namespace OpusCatMTEngine
         }
 
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
-        {
-            
+        {           
             var yamlString = e.Result;
             yamlString = Regex.Replace(yamlString, "- (>>[^<]+<<)", "- \"$1\"");
             yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
@@ -606,6 +619,11 @@ namespace OpusCatMTEngine
             if (this.yamlDownloads.Count == 0)
             {
                 this.FilterOnlineModels();
+                this.OnlineModelListFetched = true;
+            }
+            else
+            {
+                this.OnlineModelListFetched = false;
             }
         }
 
