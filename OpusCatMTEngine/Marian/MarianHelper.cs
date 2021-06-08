@@ -295,6 +295,22 @@ namespace OpusCatMTEngine
             
         }
 
+        internal static FileInfo LinesToFile(IEnumerable<string> lines, string sourceCode)
+        {
+            var fileGuid = Guid.NewGuid();
+            var srcFile = new FileInfo(Path.Combine(Path.GetTempPath(), $"{fileGuid}.{sourceCode}"));
+
+            using (var srcStream = srcFile.CreateText())
+            {
+                foreach (var line in lines)
+                {
+                    srcStream.WriteLine(line);
+                }
+            }
+
+            return srcFile;
+        }
+
         internal static void GenerateAlignments(FileInfo spSource, FileInfo spTarget, FileInfo alignmentFile, FileInfo priorsFile)
         {
             var alignArgs = $"-s \"{spSource.FullName}\" -t \"{spTarget.FullName}\" -f \"{alignmentFile.FullName}.fwd\" -r \"{alignmentFile.FullName}.rev\"";

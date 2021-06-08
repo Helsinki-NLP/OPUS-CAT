@@ -546,12 +546,14 @@ namespace OpusCatMTEngine
             FileInfo targetFile, 
             FileInfo refFile,
             int outOfDomainSize,
+            IsoLanguage sourceLanguage,
+            IsoLanguage targetLanguage,
             Boolean preprocessedInput=false)
         {
             var batchTranslator = new MarianBatchTranslator(
                 this.InstallDir,
-                this.SourceLanguages.Single(),
-                this.TargetLanguages.Single(),
+                sourceLanguage,
+                targetLanguage,
                 this.ModelSegmentationMethod,
                 false,
                 false);
@@ -869,6 +871,7 @@ namespace OpusCatMTEngine
         private FileInfo trainingLogFileInfo;
         private string modelYamlFilePath;
 
+        //TODO: this does not currently desegment output
         internal Process PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
             FileInfo output = new FileInfo(Path.Combine(this.InstallDir, "batchoutput.txt"));

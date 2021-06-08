@@ -47,8 +47,8 @@ namespace OpusCatMTEngine
         private string customLabel;
         private readonly bool includePlaceholderTags;
         private readonly bool includeTagPairs;
-        private string sourceCode;
-        private string targetCode;
+        private IsoLanguage sourceLanguage;
+        private IsoLanguage targetLanguage;
         private bool guidedAlignment;
         private List<string> postCustomizationBatch;
         private string segmentationMethod;
@@ -90,6 +90,8 @@ namespace OpusCatMTEngine
                     new FileInfo(Path.Combine(this.customDir.FullName, "valid.final.txt")),
                     new FileInfo(this.trainingLog.TrainingConfig.ValidSets[1]),
                     OpusCatMTEngineSettings.Default.OODValidSetSize,
+                    this.sourceLanguage,
+                    this.targetLanguage,
                     true
                     );
                 finalValidProcess.WaitForExit();
@@ -199,6 +201,8 @@ namespace OpusCatMTEngine
                 new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
                 this.spValidTarget,
                 OpusCatMTEngineSettings.Default.OODValidSetSize,
+                this.sourceLanguage,
+                this.targetLanguage,
                 true
                 );
 
@@ -338,11 +342,11 @@ namespace OpusCatMTEngine
 
             this.segmentationMethod = sourceSegModel.Extension;
 
-            var targetPrefix = this.model.TargetLanguages.Count > 1 ? this.targetCode : null;
+            var targetPrefix = this.model.TargetLanguages.Count > 1 ? this.targetLanguage.OriginalCode : null;
             this.spSource = MarianHelper.PreprocessLanguage(
                 this.customSource,
                 this.customDir,
-                this.sourceCode,
+                this.sourceLanguage.OriginalCode,
                 sourceSegModel,
                 this.includePlaceholderTags,
                 this.includeTagPairs,
@@ -350,13 +354,14 @@ namespace OpusCatMTEngine
             this.spTarget = MarianHelper.PreprocessLanguage(
                 this.customTarget, 
                 this.customDir, 
-                this.targetCode, 
+                this.targetLanguage.OriginalCode, 
                 targetSegModel, 
                 this.includePlaceholderTags, 
                 this.includeTagPairs);
 
             //concatenate the out-of-domain validation set with the in-domain validation set
-            ParallelFilePair tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
+            ParallelFilePair tatoebaValidFileInfos = 
+                HelperFunctions.GetTatoebaFileInfos(this.sourceLanguage.ShortestIsoCode, this.targetLanguage.ShortestIsoCode);
             ParallelFilePair combinedValid = new ParallelFilePair(
                 tatoebaValidFileInfos,
                 new ParallelFilePair(this.inDomainValidationSource, this.inDomainValidationTarget),
@@ -366,7 +371,7 @@ namespace OpusCatMTEngine
             this.spValidSource = MarianHelper.PreprocessLanguage(
                 combinedValid.Source, 
                 this.customDir, 
-                this.sourceCode, 
+                this.sourceLanguage.OriginalCode, 
                 sourceSegModel, 
                 this.includePlaceholderTags, 
                 this.includeTagPairs,
@@ -374,7 +379,7 @@ namespace OpusCatMTEngine
             this.spValidTarget = MarianHelper.PreprocessLanguage(
                 combinedValid.Target, 
                 this.customDir, 
-                this.targetCode, 
+                this.targetLanguage.OriginalCode, 
                 targetSegModel, 
                 this.includePlaceholderTags, 
                 this.includeTagPairs);
@@ -404,8 +409,8 @@ namespace OpusCatMTEngine
             this.includeTagPairs = includeTagPairs;
             this.inDomainValidationSource = indomainValidPair.Source;
             this.inDomainValidationTarget = indomainValidPair.Target;
-            this.sourceCode = sourceLanguage.OriginalCode;
-            this.targetCode = targetLanguage.OriginalCode;
+            this.sourceLanguage = sourceLanguage;
+            this.targetLanguage = targetLanguage;
             this.guidedAlignment = guidedAlignment;
         }
 

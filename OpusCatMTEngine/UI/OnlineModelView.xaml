@@ -30,7 +30,7 @@
                         <ColumnDefinition Width="10" />
                         <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="150" />
-                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="25"></RowDefinition>
@@ -61,16 +61,16 @@
                     <Label Grid.Row="1" Grid.Column="0" Content="{x:Static resx:Resources.Online_SourceLangFilterLabel}"/>
                     <Label Grid.Row="1" Grid.Column="1" Content="{x:Static resx:Resources.Online_TargetLangFilterLabel}"/>
                     <Label Grid.Row="1" Grid.Column="2" Content="{x:Static resx:Resources.Online_ModelNameFilterLabel}"/>
-                    <Border Margin="0,0,0,2" BorderThickness="1" BorderBrush="Black" Grid.Column="4" Grid.RowSpan="3" Grid.ColumnSpan="2"></Border>
+                    <Border Margin="0,0,5,2" BorderThickness="1" BorderBrush="Black" Grid.Column="4" Grid.RowSpan="3" Grid.ColumnSpan="3"></Border>
                     <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" Name="txtFilter" Text="{Binding ElementName=_this, Path=ModelManager.SourceFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Name="txtFilter1" Text="{Binding ElementName=_this, Path=ModelManager.TargetFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <TextBox VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Name="txtFilter2" Text="{Binding ElementName=_this, Path=ModelManager.NameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowBilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="4">Bilingual models</CheckBox>
-                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowMultilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4">Multilingual models</CheckBox>
-                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowOpusModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="5">OPUS-MT models</CheckBox>
-                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTatoebaModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="5">Tatoeba models</CheckBox>
-                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowNewestOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4">Newest only</CheckBox>
-                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowFaulted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="5">Models with errors</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowBilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="5">Bilingual models</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowMultilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3">Multilingual models (usually lower quality than bilingual models, use with caution)</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowOpusModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="4">OPUS-MT models</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTatoebaModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4">Tatoeba models</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowNewestOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="5">Newest only</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowFaulted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="6">Models with errors</CheckBox>
                 </Grid>
 
                 <StackPanel DockPanel.Dock="Right" Margin="5,0">

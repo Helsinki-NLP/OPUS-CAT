@@ -348,12 +348,16 @@ namespace OpusCatMTEngine
 
         internal void UninstallModel(MTModel selectedModel)
         {
-            var onlineModel = this.onlineModels.SingleOrDefault(
-                x => x.ModelPath.Replace("/", "\\") == selectedModel.ModelPath);
-            if (onlineModel != null)
+            //change the model status in online models, if they have been loaded
+            if (this.onlineModels != null)
             {
-                onlineModel.InstallStatus = "";
-                onlineModel.InstallProgress = 0;
+                var onlineModel = this.onlineModels.SingleOrDefault(
+                    x => x.ModelPath.Replace("/", "\\") == selectedModel.ModelPath);
+                if (onlineModel != null)
+                {
+                    onlineModel.InstallStatus = "";
+                    onlineModel.InstallProgress = 0;
+                }
             }
 
             this.LocalModels.Remove(selectedModel);
@@ -380,7 +384,7 @@ namespace OpusCatMTEngine
             this.TargetFilter = "";
             this.NameFilter = "";
             this.ShowBilingualModels = true;
-            this.ShowMultilingualModels = true;
+            this.ShowMultilingualModels = false;
             this.ShowOpusModels = true;
             this.ShowTatoebaModels = true;
             this.ShowNewestOnly = true;
@@ -448,6 +452,8 @@ namespace OpusCatMTEngine
             return mtModel;
         }
 
+
+        //TODO: this does not currently desegment output (or the underlying code doesn't), but it's not used anywhere
         internal void PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
             this.BatchTranslationOngoing = true;
@@ -749,8 +755,8 @@ namespace OpusCatMTEngine
             var incompleteModel = new MTModel(
                     $"{baseModel.Name}_{modelTag}",
                     modelPath,
-                    new List<IsoLanguage>() { srcLang },
-                    new List<IsoLanguage>() { trgLang },
+                    baseModel.SourceLanguages,
+                    baseModel.TargetLanguages,
                     MTModelStatus.Finetuning,
                     modelTag,
                     customDir,

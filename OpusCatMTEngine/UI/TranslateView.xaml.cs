@@ -81,11 +81,9 @@ namespace OpusCatMTEngine
 
         public bool ShowSegmentation
         {
-            get => _showSegmentation;
-            set
+            get
             {
-                _showSegmentation = value;
-                if (value)
+                if (_showSegmentation)
                 {
                     foreach (var wordsplit in this.wordsplitList)
                     {
@@ -100,13 +98,27 @@ namespace OpusCatMTEngine
                         wordsplit.Text = "";
                     }
                 }
+
+                return _showSegmentation;
+            }
+            set
+            {
+                _showSegmentation = value;
                 NotifyPropertyChanged();
             }
         }
 
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
+            this.TargetBox.Document.Blocks.Clear();
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+
+            //If the source text is segmented (happens if segmented text is retranslated),
+            //set the segment split to empty before translating.
+            foreach (var wordsplit in this.wordsplitList)
+            {
+                wordsplit.Text = "";
+            }
             this.wordsplitList.Clear();
             var source = textRange.Text;
             Task<List<TranslationPair>> translate =
@@ -152,7 +164,6 @@ namespace OpusCatMTEngine
 
         private void PopulateBoxes(List<TranslationPair> translation)
         {
-            this.TargetBox.Document.Blocks.Clear();
             this.SourceBox.Document.Blocks.Clear();
             this.sourceRuns = new List<List<Run>>();
             this.targetRuns = new List<List<Run>>();
@@ -220,7 +231,7 @@ namespace OpusCatMTEngine
                         }
                         break;
                     case SegmentationMethod.Bpe:
-                        if (!token.StartsWith("@@"))
+                        if (token.StartsWith("@@"))
                         {
                             processedToken = processedToken.Substring(2);
                             var wordsplitRun = new Run("");

@@ -99,8 +99,10 @@ namespace OpusCatMTEngine
             }
 
         }
+
         
-        //Callback can be used to do different things with translation output/input (default is to save in translation cache)
+        
+        
         internal Process BatchTranslate(
             IEnumerable<string> input,
             FileInfo spOutput,
@@ -110,10 +112,26 @@ namespace OpusCatMTEngine
             
             Log.Information($"Starting batch translator for model {this.SystemName}.");
 
+            var srcFile = MarianHelper.LinesToFile(input, this.SourceCode);
+            FileInfo spInput;
+            if (!preprocessedInput)
+            {
+                
+                FileInfo sourceSegModel =
+                    this.modelDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "source.(spm|bpe)")).Single();
 
-            FileInfo spInput = this.PreprocessInput(input, preprocessedInput);
-            //TODO: fix this to handle multilingual models
-            //FileInfo spInput = MarianHelper.PreprocessLanguage()
+                spInput = MarianHelper.PreprocessLanguage(
+                    srcFile,
+                    new DirectoryInfo(Path.GetTempPath()),
+                    this.TargetCode,
+                    sourceSegModel,
+                    this.includePlaceholderTags,
+                    this.includeTagPairs);
+            }
+            else
+            {
+                spInput = srcFile;
+            }
 
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for
@@ -168,33 +186,6 @@ namespace OpusCatMTEngine
             this.OnOutputReady(e);
         }
 
-
-
-        internal FileInfo PreprocessInput(IEnumerable<string> input, Boolean preprocessedInput=false)
-        {
-            var fileGuid = Guid.NewGuid();
-            var srcFile = new FileInfo(Path.Combine(Path.GetTempPath(), $"{fileGuid}.{this.SourceCode}"));
-
-            using (var srcStream = new StreamWriter(srcFile.FullName, true, Encoding.UTF8))
-            {
-                foreach (var line in input)
-                {
-                    srcStream.WriteLine(line);
-                }
-            }
-
-            FileInfo spSrcFile;
-            if (!preprocessedInput)
-            {
-                var spmModel = this.modelDir.GetFiles("source.spm").Single();
-                spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.includePlaceholderTags, this.includeTagPairs);
-            }
-            else
-            {
-                spSrcFile = srcFile;
-            }
-            return spSrcFile;
-        }
 
         private void errorDataHandler(object sender, DataReceivedEventArgs e)
         {

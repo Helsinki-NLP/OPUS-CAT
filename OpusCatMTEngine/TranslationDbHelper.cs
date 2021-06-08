@@ -136,7 +136,7 @@ namespace OpusCatMTEngine
             {
                 m_dbConnection.Open();
 
-                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, segmentationmethod INTEGER, targetlanguage TEXT, PRIMARY KEY (model,sourcetext,targetlanguage))";
+                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, segmentationmethod TEXT, targetlanguage TEXT, PRIMARY KEY (model,sourcetext,targetlanguage))";
 
                 using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
                 {
