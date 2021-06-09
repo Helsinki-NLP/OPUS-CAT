@@ -257,25 +257,30 @@ namespace OpusCatMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-
             switch (this.segmentationMethod)
             {
                 case ".bpe":
-                    trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
+                    string validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
+                    trainingConfig.validScriptPath = 
+                        $"\"{validScriptPath}\"";
                     File.Copy(
-                        Path.Combine(processDir, "ValidateBpe.bat"), trainingConfig.validScriptPath);
+                        Path.Combine(processDir, "ValidateBpe.bat"), validScriptPath);
                     break;
                 case ".spm":
-                    trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "ValidateSp.bat");
+                    validScriptPath = Path.Combine(this.customDir.FullName, "ValidateSp.bat");
+                    trainingConfig.validScriptPath =
+                        $"\"{validScriptPath}\"";
                     File.Copy(
-                        Path.Combine(processDir, "ValidateSp.bat"), trainingConfig.validScriptPath);
+                        Path.Combine(processDir, "ValidateSp.bat"), validScriptPath);
                     break;
                 default:
                     break;
             }
 
             trainingConfig.validScriptArgs = 
-                new List<string> { spValidTarget.FullName, OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()};
+                new List<string> {
+                    $"{spValidTarget.FullName}",
+                    $"OOD{OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()}" };
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             if (this.guidedAlignment)
@@ -319,7 +324,7 @@ namespace OpusCatMTEngine
             this.trainingLog.TrainingConfig = trainingConfig;
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
-            var trainingArgs = $"--config {configPath} --log-level=info"; // --quiet";
+            var trainingArgs = $"--config \"{configPath}\" --log-level=info"; // --quiet";
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
@@ -362,6 +367,11 @@ namespace OpusCatMTEngine
             //concatenate the out-of-domain validation set with the in-domain validation set
             ParallelFilePair tatoebaValidFileInfos = 
                 HelperFunctions.GetTatoebaFileInfos(this.sourceLanguage.ShortestIsoCode, this.targetLanguage.ShortestIsoCode);
+            if (tatoebaValidFileInfos == null)
+            {
+                tatoebaValidFileInfos = HelperFunctions.GenerateDummyOODValidSet(this.customDir);
+            }
+
             ParallelFilePair combinedValid = new ParallelFilePair(
                 tatoebaValidFileInfos,
                 new ParallelFilePair(this.inDomainValidationSource, this.inDomainValidationTarget),

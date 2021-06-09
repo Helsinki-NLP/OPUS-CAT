@@ -55,9 +55,31 @@ namespace OpusCatMTEngine
                 .CreateLogger();
         }
         
+        public static bool HasAvxSupport()
+        {
+            try
+            {
+                return (GetEnabledXStateFeatures() & 4) != 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        private static extern long GetEnabledXStateFeatures();
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+
+            if (!App.HasAvxSupport())
+            {
+                MessageBox.Show(
+                    "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.");
+                Application.Current.Shutdown(1);
+            }
 
             //Create data dir
 

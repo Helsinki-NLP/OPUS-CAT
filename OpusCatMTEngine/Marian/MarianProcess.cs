@@ -103,12 +103,12 @@ namespace OpusCatMTEngine
 
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
-                preprocessCommand = $@"Preprocessing\spm_encode.exe --model {this.modelDir}\source.spm";
+                preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
                 this.segmentation = SegmentationMethod.SentencePiece;
             }
             else
             {
-                preprocessCommand = $@"Preprocessing\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel {this.modelDir}\source.tcmodel";
+                preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\"";
                 this.segmentation = SegmentationMethod.Bpe;
                 var postprocessCommand =
                     $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
@@ -117,7 +117,7 @@ namespace OpusCatMTEngine
                     new StreamWriter(this.PostprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             }
 
-            mtCommand = $@"Marian\marian.exe decode --log-level=warn -c {this.modelDir}\decoder.yml --max-length=200 --max-length-crop --alignment=hard";
+            mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
             this.PreprocessProcess = 

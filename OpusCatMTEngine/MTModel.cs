@@ -587,7 +587,7 @@ namespace OpusCatMTEngine
 
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 validateScript,
-                $"{refFile.FullName} {outOfDomainSize} {spOutput.FullName}");
+                $"{refFile.FullName} OOD{outOfDomainSize} {spOutput.FullName}");
         }
 
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -863,6 +863,20 @@ namespace OpusCatMTEngine
                 {
                     return SegmentationMethod.SentencePiece;
                 }
+            }
+        }
+
+        private bool? hasOODValidSet;
+        public bool HasOODValidSet
+        {
+            get
+            {
+                if (!hasOODValidSet.HasValue)
+                {
+                    var dummyOOD = Directory.GetFiles(this.InstallDir, "dummyOOD*");
+                    hasOODValidSet = !dummyOOD.Any();
+                }
+                return hasOODValidSet.Value;
             }
         }
 

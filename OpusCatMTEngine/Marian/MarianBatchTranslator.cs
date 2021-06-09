@@ -138,7 +138,7 @@ namespace OpusCatMTEngine
             //same systems, i.e. keep track of decoder settings)
 
             FileInfo transAndAlign = new FileInfo($"{spOutput.FullName}.transandalign");
-            var args = $"{this.modelDir.FullName} {spInput.FullName} {transAndAlign.FullName} --log-level=info --quiet";
+            var args = $"\"{this.modelDir.FullName}\" \"{spInput.FullName}\" \"{transAndAlign.FullName}\" --log-level=info --quiet";
 
             if (storeTranslations)
             {
