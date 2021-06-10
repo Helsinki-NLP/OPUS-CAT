@@ -17,7 +17,7 @@ namespace OpusCatMTEngine
     {
         public OwinMtService(ModelManager modelManager)
         {
-            //
+            
             string baseAddress;
             if (OpusCatMTEngineSettings.Default.AllowRemoteUse)
             {

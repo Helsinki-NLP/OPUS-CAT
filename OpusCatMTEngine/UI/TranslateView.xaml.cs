@@ -252,7 +252,7 @@ namespace OpusCatMTEngine
 
                 Run tokenrun = new Run(processedToken);
 
-                if (alignment.ContainsKey(index))
+                if (this.model.SupportsWordAlignment && alignment.ContainsKey(index))
                 {
                     var alignedTokens = alignment[index];
                     tokenrun.MouseEnter += (x, y) => Tokenrun_MouseEnter(alignedTokens, otherRuns, translationIndex, x, y);

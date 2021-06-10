@@ -25,7 +25,7 @@
                         DisplayMemberPath="IsoRefName"
                         SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
                         Width="200"/>
-                <CheckBox VerticalAlignment="Center" IsChecked="{Binding ElementName=_this, Path=ShowSegmentation, Mode=TwoWay}">Show segmentation</CheckBox>
+                <CheckBox VerticalAlignment="Center" IsChecked="{Binding ElementName=_this, Path=ShowSegmentation, Mode=TwoWay}">Show subword segmentation</CheckBox>
             </StackPanel>
             <DockPanel>
                 <Label DockPanel.Dock="Left" Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
