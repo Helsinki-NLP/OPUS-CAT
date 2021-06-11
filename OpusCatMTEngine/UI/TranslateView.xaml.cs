@@ -209,18 +209,23 @@ namespace OpusCatMTEngine
             foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
             {
                 string processedToken = token;
+                Run tokenrun;
                 switch (segmentation)
                 {
                     case SegmentationMethod.SentencePiece:
                         if (token.StartsWith("▁"))
                         {
-                            processedToken = processedToken.Substring(1);
+                            
                             if (index != 0)
                             {
                                 var spaceRun = new Run(" ");
                                 spaceRun.Tag = "space";
                                 runlist.Add(spaceRun);
                             }
+
+                            processedToken = processedToken.Substring(1);
+                            tokenrun = new Run(processedToken);
+                            runlist.Add(tokenrun);
                         }
                         else
                         {
@@ -228,12 +233,18 @@ namespace OpusCatMTEngine
                             wordsplitRun.Tag = "wordsplit";
                             runlist.Add(wordsplitRun);
                             this.wordsplitList.Add(wordsplitRun);
+
+                            tokenrun = new Run(processedToken);
+                            runlist.Add(tokenrun);
                         }
                         break;
                     case SegmentationMethod.Bpe:
-                        if (token.StartsWith("@@"))
+                        if (token.EndsWith("@@"))
                         {
-                            processedToken = processedToken.Substring(2);
+                            processedToken = processedToken.Substring(0,processedToken.Length-2);
+                            tokenrun = new Run(processedToken);
+                            runlist.Add(tokenrun);
+
                             var wordsplitRun = new Run("");
                             wordsplitRun.Tag = "wordsplit";
                             this.wordsplitList.Add(wordsplitRun);
@@ -241,16 +252,21 @@ namespace OpusCatMTEngine
                         }
                         else
                         {
-                            var spaceRun = new Run(" ");
-                            spaceRun.Tag = "space";
-                            runlist.Add(spaceRun);
+                            tokenrun = new Run(processedToken);
+                            runlist.Add(tokenrun);
+
+                            if (index != tokens.Length - 1)
+                            {
+                                var spaceRun = new Run(" ");
+                                spaceRun.Tag = "space";
+                                runlist.Add(spaceRun);
+                            }
                         }
                         break;
                     default:
                         throw new Exception("Segmentation method not specified in translation.");
                 }
-
-                Run tokenrun = new Run(processedToken);
+                
 
                 if (this.model.SupportsWordAlignment && alignment.ContainsKey(index))
                 {
@@ -259,7 +275,6 @@ namespace OpusCatMTEngine
                     tokenrun.MouseLeave += (x, y) => Tokenrun_MouseLeave(alignedTokens, otherRuns, translationIndex, x, y);
                 }
                 
-                runlist.Add(tokenrun);
             }
 
             //This shows segmentation if ShowSegmentation is true

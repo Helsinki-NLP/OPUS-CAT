@@ -175,10 +175,29 @@ namespace OpusCatMTEngine
         internal Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
             //Need to get the original codes, since those are the ones the marian model uses
-            var modelOrigSourceCode =
-                this.SourceLanguages.Single(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode).OriginalCode;
-            var modelOrigTargetCode =
-                this.TargetLanguages.Single(x => x.ShortestIsoCode == targetLang.ShortestIsoCode).OriginalCode;
+            var modelSourceLang =
+                this.SourceLanguages.SingleOrDefault(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode);
+            string modelOrigSourceCode;
+            if (modelSourceLang == null)
+            {
+                modelOrigSourceCode = this.SourceLanguages.First().OriginalCode;
+            }
+            else
+            {
+                modelOrigSourceCode = modelSourceLang.OriginalCode;
+            }
+
+            var modelTargetLang =
+                this.TargetLanguages.SingleOrDefault(x => x.ShortestIsoCode == targetLang.ShortestIsoCode);
+            string modelOrigTargetCode;
+            if (modelTargetLang == null)
+            {
+                modelOrigTargetCode = this.TargetLanguages.First().OriginalCode;
+            }
+            else
+            {
+                modelOrigTargetCode = modelTargetLang.OriginalCode;
+            }
 
             var modelOrigTuple = new Tuple<string, string>(modelOrigSourceCode, modelOrigTargetCode);
             

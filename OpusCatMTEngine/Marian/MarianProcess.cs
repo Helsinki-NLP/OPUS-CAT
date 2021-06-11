@@ -108,7 +108,7 @@ namespace OpusCatMTEngine
             }
             else
             {
-                preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\"";
+                preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
                 this.segmentation = SegmentationMethod.Bpe;
                 var postprocessCommand =
                     $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";

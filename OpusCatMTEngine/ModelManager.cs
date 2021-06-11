@@ -84,6 +84,7 @@ namespace OpusCatMTEngine
                 NotifyPropertyChanged("OverrideModelSet");
             }
         }
+
         private MTModel overrideModel;
         private bool _showBilingualModels;
         private bool _showMultilingualModels;
@@ -896,9 +897,22 @@ namespace OpusCatMTEngine
                 }
                 else
                 {
-                    //Pick a model that is not fine-tuned
-                    primaryModel = languagePairModels.FirstOrDefault(x => !x.ModelConfig.Finetuned);
-                    if (primaryModel == null)
+                    //Pick from models that are not fine-tuned
+                    var nonFinetuned = languagePairModels.Where(x => !x.ModelConfig.Finetuned);
+                    if (nonFinetuned.Any())
+                    {
+                        //Prefer bilingual models
+                        var bilingual = nonFinetuned.Where(x => !x.IsMultilingualModel);
+                        if (bilingual.Any())
+                        {
+                            primaryModel = bilingual.First();
+                        }
+                        else
+                        {
+                            primaryModel = nonFinetuned.First();
+                        }
+                    }
+                    else
                     {
                         //As a fallback pick any model
                         primaryModel = languagePairModels.First();

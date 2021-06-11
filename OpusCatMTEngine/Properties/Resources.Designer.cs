@@ -295,6 +295,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel override.
+        /// </summary>
+        public static string Main_CancelOverrideButton {
+            get {
+                return ResourceManager.GetString("Main_CancelOverrideButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm exit.
         /// </summary>
         public static string Main_ConfirmExitCaption {

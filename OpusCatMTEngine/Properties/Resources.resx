@@ -359,4 +359,7 @@
   <data name="Settings_RevertToDefaultsButton" xml:space="preserve">
     <value>Revert to defaults</value>
   </data>
+  <data name="Main_CancelOverrideButton" xml:space="preserve">
+    <value>Cancel override</value>
+  </data>
 </root>

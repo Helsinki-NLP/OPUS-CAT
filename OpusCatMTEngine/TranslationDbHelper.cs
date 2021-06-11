@@ -84,7 +84,7 @@ namespace OpusCatMTEngine
             {
                 MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.App_InvalidDbMessage,
                                           OpusCatMTEngine.Properties.Resources.App_ConfirmDbCaption,
-                                          MessageBoxButton.YesNo,
+                                          MessageBoxButton.OKCancel,
                                           MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {

@@ -416,7 +416,9 @@
     <Content Include="Preprocessing\spm_encode.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="ThirdPartyNotices.txt" />
+    <None Include="ThirdPartyNotices.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="TatoebaTestsets\**">

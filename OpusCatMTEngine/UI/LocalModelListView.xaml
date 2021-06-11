@@ -117,7 +117,7 @@
                         Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}"
                         Name="cancelOverride"
                         Click="btnCancelOverride_Click"
-                        Content="{x:Static resx:Resources.Main_DeleteModelButton}"/>
+                        Content="{x:Static resx:Resources.Main_CancelOverrideButton}"/>
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 
