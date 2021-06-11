@@ -124,12 +124,12 @@ namespace OpusCatMTEngine
                 var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
                 var modelPath = Path.Combine(installPath, decoderSettings.models[0]);
                 var yamlPath = Path.ChangeExtension(modelPath, "yml");
-                if (!File.Exists(yamlPath))
+
+                //The yamls inside the model zips may be corrupt, so always write the config string as yaml,
+                //as that is more current.
+                using (var writer = File.CreateText(yamlPath))
                 {
-                    using (var writer = File.CreateText(yamlPath))
-                    {
-                        writer.Write(model.TatoebaConfigString);
-                    }
+                    writer.Write(model.TatoebaConfigString);
                 }
             }
 
