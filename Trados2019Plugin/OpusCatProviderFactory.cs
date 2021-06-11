@@ -22,7 +22,7 @@ namespace OpusCatTranslationProvider
                 throw new Exception("Cannot handle URI.");
             }
 
-            OpusCatProvider tp = new OpusCatProvider(new OpusCatOptions(translationProviderUri));
+            OpusCatProvider tp = new OpusCatProvider(new OpusCatOptions(translationProviderUri),credentialStore);
 
             return tp;
         }

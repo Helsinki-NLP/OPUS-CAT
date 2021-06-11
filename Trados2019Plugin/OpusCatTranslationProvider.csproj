@@ -42,8 +42,8 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RestSharp, Version=106.3.1.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.106.3.1\lib\net452\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=106.11.7.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.11.7\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="Sdl.Core.Globalization">
       <HintPath>$(ProgramFiles)\SDL\SDL Trados Studio\Studio15\Sdl.Core.Globalization.dll</HintPath>
@@ -163,9 +163,17 @@
     <Compile Include="..\OpusMTInterface\Translation.cs">
       <Link>Translation.cs</Link>
     </Compile>
+    <Compile Include="ConnectionSelection.xaml.cs">
+      <DependentUpon>ConnectionSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ElgConnectionControl.xaml.cs">
+      <DependentUpon>ElgConnectionControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConnectionControl.xaml.cs">
       <DependentUpon>ConnectionControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ElgServiceConnection.cs" />
+    <Compile Include="ElgTokenResponse.cs" />
     <Compile Include="FileReader.cs" />
     <Compile Include="FinetuneBatchTaskControl.cs">
       <SubType>UserControl</SubType>
@@ -177,6 +185,7 @@
     <Compile Include="FinetuneWpfControl.xaml.cs">
       <DependentUpon>FinetuneWpfControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IElgCredentials.cs" />
     <Compile Include="OpusCatMarkupDataVisitor.cs" />
     <Compile Include="OpusCatOptionControl.xaml.cs">
       <DependentUpon>OpusCatOptionControl.xaml</DependentUpon>
@@ -217,7 +226,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RestSharp\Deserializers\JsonDeserializer.cs" />
     <Compile Include="TestsetExtractor.cs" />
+    <Compile Include="TradosElgCredentialWrapper.cs" />
+    <Compile Include="TranslationResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ThirdPartyNotices.txt">
@@ -258,6 +270,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ConnectionSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ElgConnectionControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ConnectionControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

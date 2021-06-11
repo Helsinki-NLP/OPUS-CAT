@@ -63,7 +63,7 @@ namespace OpusCatMTEngine
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
             
-            return this.ModelManager.GetAllLanguagePairs().ToList();
+            return this.ModelManager.GetAllLanguagePairs();
         }
 
         public string CheckModelStatus(string tokenCode, string sourceCode, string targetCode, string modelTag)
@@ -93,17 +93,27 @@ namespace OpusCatMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
+            return this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result.Translation;
+        }
+
+        //For integration with Wordfast
+        public Translation TranslatePost(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
+        {
+            var translation = this.Translate(tokenCode, input, srcLangCode, trgLangCode, modelTag);
+            return new Translation(translation);
         }
 
         public Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin: *");
+
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
             var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag);
-            return new Translation(translation.Result);
+            return new Translation(translation.Result.Translation);
         }
+
 
         public Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag)
         {
@@ -119,25 +129,10 @@ namespace OpusCatMTEngine
             WebOperationContext.Current.OutgoingResponse.Headers.Add(HttpResponseHeader.Server.ToString(), string.Empty);
             
             var translation = this.ModelManager.Translate(input, sourceLang, targetLang, modelTag).Result;
-            return new MemoryStream(Encoding.UTF8.GetBytes(translation));
+            return new MemoryStream(Encoding.UTF8.GetBytes(translation.Translation));
         }
 
-        /// <summary>
-        /// Call this method to get the translation for a single string with the named model.
-        /// </summary>
-        /// <param name="tokenCode">The token code.</param>
-        /// <param name="input">The input string.</param>
-        /// <param name="modelName">Name of the model to use.</param>
-        /// <returns>The translated input string.</returns>
-        public string TranslateWithModel(string tokenCode, string input, string modelName)
-        {
-
-            if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
-                return null;
-
-            return this.ModelManager.TranslateWithModel(input, modelName);
-        }
-
+        
 
         /// <summary>
         /// Call this method to get the translation for multiple strings in batch.
@@ -157,18 +152,18 @@ namespace OpusCatMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            List<string> translations = new List<string>();
+            List<TranslationPair> translations = new List<TranslationPair>();
             foreach (var sourceSegment in input)
             {
                 translations.Add(this.ModelManager.Translate(sourceSegment, sourceLang, targetLang, modelTag).Result);
             }
             
-            return translations;
+            return translations.Select(x => x.Translation).ToList();
         }
 
         /// <summary>
         /// This will send a batch to the MT engine for pretranslation, which means
-        /// the translations will be immediately available when it is requested
+        /// the translations for the batch will be immediately available when requested
         /// </summary>
         /// <param name="tokenCode"></param>
         /// <param name="input"></param>
@@ -194,7 +189,7 @@ namespace OpusCatMTEngine
             }
 
             /* Batch preordering was done earlier with batch translation, but it doesn't seem
-             * to be much quicker than normal translation, and it has to problem of providing all
+             * to be much quicker than normal translation, and it has the problem of providing all
              * the translations at once in the end. Using normal translation means the MT is ready
              * as soon as a sentence gets translated (you could do this for batch translation as well
              * by adding an outputline handler, but it's not implemented yet). Batch translation should be
@@ -262,6 +257,6 @@ namespace OpusCatMTEngine
                 throw new FaultException($"Batch translation or customization already in process in the MT engine");
             }
         }
-
+        
     }
 }

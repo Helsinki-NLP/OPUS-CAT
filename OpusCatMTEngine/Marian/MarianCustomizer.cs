@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using YamlDotNet.Serialization;
@@ -46,10 +47,11 @@ namespace OpusCatMTEngine
         private string customLabel;
         private readonly bool includePlaceholderTags;
         private readonly bool includeTagPairs;
-        private string sourceCode;
-        private string targetCode;
+        private IsoLanguage sourceLanguage;
+        private IsoLanguage targetLanguage;
         private bool guidedAlignment;
         private List<string> postCustomizationBatch;
+        private string segmentationMethod;
         private FileInfo spSource;
         private FileInfo spTarget;
         private FileInfo spValidSource;
@@ -88,6 +90,8 @@ namespace OpusCatMTEngine
                     new FileInfo(Path.Combine(this.customDir.FullName, "valid.final.txt")),
                     new FileInfo(this.trainingLog.TrainingConfig.ValidSets[1]),
                     OpusCatMTEngineSettings.Default.OODValidSetSize,
+                    this.sourceLanguage,
+                    this.targetLanguage,
                     true
                     );
                 finalValidProcess.WaitForExit();
@@ -197,6 +201,8 @@ namespace OpusCatMTEngine
                 new FileInfo(Path.Combine(this.customDir.FullName, "valid.0.txt")),
                 this.spValidTarget,
                 OpusCatMTEngineSettings.Default.OODValidSetSize,
+                this.sourceLanguage,
+                this.targetLanguage,
                 true
                 );
 
@@ -251,13 +257,30 @@ namespace OpusCatMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            
-            trainingConfig.validScriptPath = Path.Combine(this.customDir.FullName, "Validate.bat");
-            File.Copy(
-                Path.Combine(processDir,"Validate.bat"), trainingConfig.validScriptPath);
+            switch (this.segmentationMethod)
+            {
+                case ".bpe":
+                    string validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
+                    trainingConfig.validScriptPath = 
+                        $"\"{validScriptPath}\"";
+                    File.Copy(
+                        Path.Combine(processDir, "ValidateBpe.bat"), validScriptPath);
+                    break;
+                case ".spm":
+                    validScriptPath = Path.Combine(this.customDir.FullName, "ValidateSp.bat");
+                    trainingConfig.validScriptPath =
+                        $"\"{validScriptPath}\"";
+                    File.Copy(
+                        Path.Combine(processDir, "ValidateSp.bat"), validScriptPath);
+                    break;
+                default:
+                    break;
+            }
 
             trainingConfig.validScriptArgs = 
-                new List<string> { spValidTarget.FullName, OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()};
+                new List<string> {
+                    $"{spValidTarget.FullName}",
+                    $"OOD{OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()}" };
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             if (this.guidedAlignment)
@@ -301,7 +324,7 @@ namespace OpusCatMTEngine
             this.trainingLog.TrainingConfig = trainingConfig;
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
-            var trainingArgs = $"--config {configPath} --log-level=info"; // --quiet";
+            var trainingArgs = $"--config \"{configPath}\" --log-level=info"; // --quiet";
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
@@ -317,22 +340,59 @@ namespace OpusCatMTEngine
 
         private void PreprocessInput()
         {
-            var sourceSpm = this.customDir.GetFiles("source.spm").Single();
-            var targetSpm = this.customDir.GetFiles("target.spm").Single();
+            FileInfo sourceSegModel = 
+                this.customDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "source.(spm|bpe)")).Single();
+            FileInfo targetSegModel =
+                this.customDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "target.(spm|bpe)")).Single();
 
-            this.spSource = MarianHelper.PreprocessLanguage(this.customSource, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags,this.includeTagPairs);
-            this.spTarget = MarianHelper.PreprocessLanguage(this.customTarget, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
+            this.segmentationMethod = sourceSegModel.Extension;
+
+            var targetPrefix = this.model.TargetLanguages.Count > 1 ? this.targetLanguage.OriginalCode : null;
+            this.spSource = MarianHelper.PreprocessLanguage(
+                this.customSource,
+                this.customDir,
+                this.sourceLanguage.OriginalCode,
+                sourceSegModel,
+                this.includePlaceholderTags,
+                this.includeTagPairs,
+                targetPrefix);
+            this.spTarget = MarianHelper.PreprocessLanguage(
+                this.customTarget, 
+                this.customDir, 
+                this.targetLanguage.OriginalCode, 
+                targetSegModel, 
+                this.includePlaceholderTags, 
+                this.includeTagPairs);
 
             //concatenate the out-of-domain validation set with the in-domain validation set
-            ParallelFilePair tatoebaValidFileInfos = HelperFunctions.GetTatoebaFileInfos(this.sourceCode, this.targetCode);
+            ParallelFilePair tatoebaValidFileInfos = 
+                HelperFunctions.GetTatoebaFileInfos(this.sourceLanguage.ShortestIsoCode, this.targetLanguage.ShortestIsoCode);
+            if (tatoebaValidFileInfos == null)
+            {
+                tatoebaValidFileInfos = HelperFunctions.GenerateDummyOODValidSet(this.customDir);
+            }
+
             ParallelFilePair combinedValid = new ParallelFilePair(
                 tatoebaValidFileInfos,
                 new ParallelFilePair(this.inDomainValidationSource, this.inDomainValidationTarget),
                 this.customDir.FullName,
                 OpusCatMTEngineSettings.Default.OODValidSetSize);
 
-            this.spValidSource = MarianHelper.PreprocessLanguage(combinedValid.Source, this.customDir, this.sourceCode, sourceSpm, this.includePlaceholderTags, this.includeTagPairs);
-            this.spValidTarget = MarianHelper.PreprocessLanguage(combinedValid.Target, this.customDir, this.targetCode, targetSpm, this.includePlaceholderTags, this.includeTagPairs);
+            this.spValidSource = MarianHelper.PreprocessLanguage(
+                combinedValid.Source, 
+                this.customDir, 
+                this.sourceLanguage.OriginalCode, 
+                sourceSegModel, 
+                this.includePlaceholderTags, 
+                this.includeTagPairs,
+                targetPrefix);
+            this.spValidTarget = MarianHelper.PreprocessLanguage(
+                combinedValid.Target, 
+                this.customDir, 
+                this.targetLanguage.OriginalCode, 
+                targetSegModel, 
+                this.includePlaceholderTags, 
+                this.includeTagPairs);
         }
         
         public MarianCustomizer(
@@ -344,6 +404,8 @@ namespace OpusCatMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs,
             List<string> postCustomizationBatch,
+            IsoLanguage sourceLanguage,
+            IsoLanguage targetLanguage,
             bool guidedAlignment=false)
         {
             this.model = model;
@@ -357,8 +419,8 @@ namespace OpusCatMTEngine
             this.includeTagPairs = includeTagPairs;
             this.inDomainValidationSource = indomainValidPair.Source;
             this.inDomainValidationTarget = indomainValidPair.Target;
-            this.sourceCode = model.SourceLanguageString;
-            this.targetCode = model.TargetLanguageString;
+            this.sourceLanguage = sourceLanguage;
+            this.targetLanguage = targetLanguage;
             this.guidedAlignment = guidedAlignment;
         }
 

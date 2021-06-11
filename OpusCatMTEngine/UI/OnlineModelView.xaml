@@ -4,89 +4,144 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpusCatMTEngine"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="750">
-    <Grid>
-        <DockPanel Margin="10" >
-            <StackPanel DockPanel.Dock="Right" Margin="10,0">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="0,0,0,5" />
-                    </Style>
-                </StackPanel.Resources>
-            </StackPanel>
-            <Grid DockPanel.Dock="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="150" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25"></RowDefinition>
-                    <RowDefinition Height="30"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Label Grid.Row="0" Grid.Column="0">Source filter</Label>
-                <Label Grid.Row="0" Grid.Column="1">Target filter</Label>
-                <Label Grid.Row="0" Grid.Column="2">Model name filter</Label>
+             xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
+             mc:Ignorable="d"
+             x:Name="_this"
+             d:DesignHeight="450" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+        <local:BooleanToVisibilityInverseConverter x:Key="VisibleIfFalseConverter" />
+    </UserControl.Resources>
+    <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+        <Grid>
+            <DockPanel Margin="10" >
+                <StackPanel DockPanel.Dock="Right" Margin="10,0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="0,0,0,5" />
+                        </Style>
+                    </StackPanel.Resources>
+                </StackPanel>
+                <Grid DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"></RowDefinition>
+                        <RowDefinition Height="25"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label 
+                        Margin="0,-10,0,0" 
+                        FontSize="20" 
+                        Grid.ColumnSpan="3" 
+                        Grid.Column="0" 
+                        Grid.Row="0">
 
-                <TextBox Grid.Row="1" Grid.Column="0" Margin="0,0,0,10" Name="txtFilter" TextChanged="sourceLangFilter_TextChanged"></TextBox>
-                <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" Name="txtFilter1" TextChanged="targetLangFilter_TextChanged"></TextBox>
-                <TextBox Grid.Row="1" Grid.Column="2" Margin="0,0,0,10" Name="txtFilter2" TextChanged="nameFilter_TextChanged" ></TextBox>
-            </Grid>
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=_this, Path=ModelManager.OnlineModelListFetched}" Value="true">
+                                        <Setter Property="Content" Value="Downloadable online models" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=_this, Path=ModelManager.OnlineModelListFetched}" Value="false">
+                                        <Setter Property="Content" Value="Fetching list of online models, please wait..." />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
 
-            <StackPanel DockPanel.Dock="Right" Margin="0,0">
-                <StackPanel.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="0,0,0,0" />
-                        <Setter Property="Padding" Value="10,10,10,10" />
-                    </Style>
-                </StackPanel.Resources>
-                <Button Name="installModel" Click="btnInstall_Click">
-                    <Button.IsEnabled>
-                        <Binding ElementName="ModelListView" Path="SelectedItems.Count"></Binding>
-                    </Button.IsEnabled>
-                    Install model locally
-                </Button>
-            </StackPanel>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                    <Label Grid.Row="1" Grid.Column="0" Content="{x:Static resx:Resources.Online_SourceLangFilterLabel}"/>
+                    <Label Grid.Row="1" Grid.Column="1" Content="{x:Static resx:Resources.Online_TargetLangFilterLabel}"/>
+                    <Label Grid.Row="1" Grid.Column="2" Content="{x:Static resx:Resources.Online_ModelNameFilterLabel}"/>
+                    <Border Margin="0,0,5,2" BorderThickness="1" BorderBrush="Black" Grid.Column="4" Grid.RowSpan="3" Grid.ColumnSpan="3"></Border>
+                    <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" Name="txtFilter" Text="{Binding ElementName=_this, Path=ModelManager.SourceFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Name="txtFilter1" Text="{Binding ElementName=_this, Path=ModelManager.TargetFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <TextBox VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Name="txtFilter2" Text="{Binding ElementName=_this, Path=ModelManager.NameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowBilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="5">Bilingual models</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowMultilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3">Multilingual models (usually lower quality than bilingual models, use with caution)</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowOpusModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="4">OPUS-MT models</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTatoebaModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4">Tatoeba models</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowNewestOnly, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="5">Newest only</CheckBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowFaulted, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="6">Models with errors</CheckBox>
+                </Grid>
+
+                <StackPanel DockPanel.Dock="Right" Margin="5,0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Margin" Value="0,0,0,0" />
+                            <Setter Property="Padding" Value="10,10,10,10" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button 
+                    Name="installModel" 
+                    Click="btnInstall_Click" 
+                    Content="{x:Static resx:Resources.Online_InstallModelLocallyButton}">
+                        <Button.IsEnabled>
+                            <Binding ElementName="ModelListView" Path="SelectedItems.Count"></Binding>
+                        </Button.IsEnabled>
+                    </Button>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                    <Label HorizontalAlignment="Center">Total amount of filtered models:</Label>
+                    <Label HorizontalAlignment="Center" Name="ModelCount" Content="{Binding FilteredOnlineModels.Count, Mode=OneWay, UpdateSourceTrigger=Explicit}"/>
+                </StackPanel>
                 <ListView 
                 Name="ModelListView" 
                 ItemsSource="{Binding FilteredOnlineModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                ScrollViewer.HorizontalScrollBarVisibility="Visible"
                 ScrollViewer.CanContentScroll="True"
                 DockPanel.Dock="Bottom"
+                Height="300"
                 GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <Setter Property="BorderBrush" Value="LightGray" />
-                        <Setter Property="BorderThickness" Value="1,1,1,1" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.View>
-                    <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=SourceLanguageString, Mode=OneWay}" Header="Source languages" Width="100"/>
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
-                        <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
-                        <GridViewColumn Header="Installation progress" x:Name="InstallProgress">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
-                                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="1,1,1,1" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Models">
+                            <GridViewColumn Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelNameHeader}" Width="200"/>
+                            <GridViewColumn Header="{x:Static resx:Resources.Online_InstallationProgressHeader}" x:Name="InstallProgress">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <ProgressBar Width="200" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
+                                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=ModelOrigin, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelOriginHeader}" Width="200"/>
+                        </GridView>
 
-                </ListView.View>
-            </ListView>
-            </Grid>
-        </DockPanel>
-    </Grid>
+                    </ListView.View>
+                </ListView>
+
+            </DockPanel>
+        </Grid>
+    </Border>
 </UserControl>

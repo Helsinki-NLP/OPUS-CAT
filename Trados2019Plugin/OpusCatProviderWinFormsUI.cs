@@ -27,11 +27,11 @@ namespace OpusCatTranslationProvider
         #region "Browse"
         public ITranslationProvider[] Browse(IWin32Window owner, LanguagePair[] languagePairs, ITranslationProviderCredentialStore credentialStore)
         {
-            OpusCatOptionsFormWPF dialog = new OpusCatOptionsFormWPF(new OpusCatOptions(), languagePairs);
+            OpusCatOptionsFormWPF dialog = new OpusCatOptionsFormWPF(new OpusCatOptions(), languagePairs, credentialStore);
              
             if (dialog.ShowDialog(owner) == DialogResult.OK)
             {
-                OpusCatProvider testProvider = new OpusCatProvider(dialog.Options);
+                OpusCatProvider testProvider = new OpusCatProvider(dialog.Options,credentialStore);
                 return new ITranslationProvider[] { testProvider };
             }
             return null;
@@ -71,7 +71,7 @@ namespace OpusCatTranslationProvider
                 return false;
             }
             
-            OpusCatOptionsFormWPF dialog = new OpusCatOptionsFormWPF(editProvider.Options, languagePairs);
+            OpusCatOptionsFormWPF dialog = new OpusCatOptionsFormWPF(editProvider.Options, languagePairs, credentialStore);
             if (dialog.ShowDialog(owner) == DialogResult.OK)
             {
                 return true;

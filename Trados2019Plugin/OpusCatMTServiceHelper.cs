@@ -20,13 +20,15 @@ namespace OpusCatTranslationProvider
         public static IMTService getNewProxy(string host, string port)
         {
             NetTcpBinding myBinding = new NetTcpBinding();
+            myBinding.PortSharingEnabled = true;
+            
 
             //Use default net.tcp security, which is based on Windows authentication:
             //can only contact services in the same domain.
             //TODO: add a checkbox (with warning) in the UI for using security mode None,
             //to allow connections from IP range (also add same checkbox to service UI).
 
-            //myBinding.Security.Mode = SecurityMode.None;
+            myBinding.Security.Mode = SecurityMode.None;
             //myBinding.Security.Mode = SecurityMode.Transport;
             //myBinding.Security.Transport.ClientCredentialType =
             //    TcpClientCredentialType.Windows;
@@ -393,7 +395,9 @@ namespace OpusCatTranslationProvider
             var proxy = getNewProxy(host, mtServicePort);
 
             //Pick out 200 sentence pairs randomly to use as tuning set
-            var randomTranslations = projectTranslations.OrderBy(x => rng.Next());
+            //There was a bug here, there was no ToList so trainingset and validset were picked
+            //from different random lists, resulting in overlap
+            var randomTranslations = projectTranslations.OrderBy(x => rng.Next()).ToList();
             var trainingSet = randomTranslations.Skip(200).ToList();
             var validSet = randomTranslations.Take(200).ToList();
             string result;

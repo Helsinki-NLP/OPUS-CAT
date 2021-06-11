@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -128,6 +129,7 @@ namespace OpusCatMTEngine
 
         public string Iso15924Script { get; set; }
         public string IsoRefName { get; }
+        public string OriginalCode { get; }
 
         //This constructor parses the code.
         //The language code may be from a MT model, Opus MT models generally have ISO-639-1 codes if possible,
@@ -141,6 +143,10 @@ namespace OpusCatMTEngine
         //The purpose of this class is to convert all these dissimilar formats to objects of one type.
         public IsoLanguage(string languageCode)
         {
+
+            //Store the original code. This is needed for e.g. picking the correct source file code for
+            //tokenization and correct target language code for multilingual models
+            this.OriginalCode = languageCode;
 
             //Format checking
             Match opusMatch = IsoLanguage.OpusMtCode.Match(languageCode);
@@ -181,14 +187,16 @@ namespace OpusCatMTEngine
 
             //If parsing has failed, store the language code as non iso
             if ((String.IsNullOrEmpty(this.Iso639_1Code) || !IsoLanguage.Iso639_1To639_3.ContainsKey(this.Iso639_1Code)) &&
-                (String.IsNullOrEmpty(this.Iso639_3Code) || !IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code)) &&
+                (String.IsNullOrEmpty(this.Iso639_3Code) || !IsoLanguage.Iso639_3ToRefName.ContainsKey(this.Iso639_3Code)) &&
                 (String.IsNullOrEmpty(this.Iso639_5Code) || !IsoLanguage.Iso639_5ToRefName.ContainsKey(this.Iso639_5Code)))
             {
                 this.NonIsoCode = languageCode;
+                this.IsoRefName = languageCode;
+                Log.Debug($"Language code not recognized: {languageCode}.");
             }
             else
             {
-                //Get iso639_1 from is639_3 code if one exists
+                //Get iso639_1 from iso639_3 code if one exists
                 if (String.IsNullOrEmpty(Iso639_1Code) &&
                     !String.IsNullOrEmpty(this.Iso639_3Code) &&
                     IsoLanguage.Iso639_3To639_1.ContainsKey(this.Iso639_3Code))
@@ -204,10 +212,15 @@ namespace OpusCatMTEngine
                 {
                     this.IsoRefName = IsoLanguage.Iso639_3ToRefName[this.Iso639_3Code];
                 }
-                else
+                else if (this.Iso639_5Code != null)
                 {
                     this.IsoRefName = IsoLanguage.Iso639_5ToRefName[this.Iso639_5Code];
                 }
+                else
+                {
+
+                }
+                
             }
         }
 

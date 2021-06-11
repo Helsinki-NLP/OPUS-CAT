@@ -1,4 +1,5 @@
-﻿disp-freq: 10
+﻿beam-size: 6
+disp-freq: 10
 save-freq: 100u
 mini-batch-words: 400
 cpu-threads: 1

@@ -25,21 +25,22 @@ namespace OpusMTInterface
         [WebGet]
         string Translate(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
 
+        //Wordfast POSTs Custom MT requests, so it needs a POST method
+        [OperationContract]
+        [WebInvoke(Method = "POST", ResponseFormat=WebMessageFormat.Json, UriTemplate = "TranslatePost?tokenCode={tokenCode}&input={input}&srcLangCode={srcLangCode}&trgLangCode={trgLangCode}&modelTag={modelTag}")]
+        Translation TranslatePost(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
+
         [OperationContract]
         [WebGet(ResponseFormat = WebMessageFormat.Json)]
         Translation TranslateJson(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
-        [WebGet(ResponseFormat = WebMessageFormat.Json)]
+        [WebGet]
         Stream TranslateStream(string tokenCode, string input, string srcLangCode, string trgLangCode, string modelTag);
 
         [OperationContract]
         [WebGet]
         string CheckModelStatus(string tokenCode, string srcLangCode, string trgLangCode, string modelTag);
-
-        [OperationContract]
-        [WebGet]
-        string TranslateWithModel(string tokenCode, string input, string modelName);
 
         [OperationContract]
         [WebInvoke(Method = "POST",BodyStyle = WebMessageBodyStyle.Wrapped)]

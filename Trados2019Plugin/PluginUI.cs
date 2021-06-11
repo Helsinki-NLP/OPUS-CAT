@@ -17,15 +17,14 @@ namespace OpusCatTranslationProvider
     {
 
 
-        [Action("InsertTranslation", Icon = "opus.bmp", Description = "Insert the currently displayed OPUS-CAT translation")]
-        [Shortcut(Keys.Alt | Keys.F8)]
-        public class MyMainIconAction : AbstractAction
+        [Action("InsertOpusCatTranslation", Name ="Insert OPUS-CAT translation", Icon = "opus.bmp", Description = "Insert the currently displayed OPUS-CAT translation")]
+        public class MyMainIconAction : AbstractViewControllerAction<EditorController>
         {
             protected override void Execute()
             {
-                EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
+                
                 //get the active segment pair from the current active document in the editor
-                var activeSegmentPair = editorController.ActiveDocument.ActiveSegmentPair;
+                var activeSegmentPair = Controller.ActiveDocument.ActiveSegmentPair;
                 if (activeSegmentPair == null) return;
 
                 //Create an instance of the document item factory that is needed to create segment elements
@@ -37,7 +36,7 @@ namespace OpusCatTranslationProvider
                 IText firstText = documentItemFactory.CreateText(firstTextProp);
                 
                 activeSegmentPair.Target.Add(firstText);
-                editorController.ActiveDocument.UpdateSegmentPair(activeSegmentPair);
+                Controller.ActiveDocument.UpdateSegmentPair(activeSegmentPair);
             }
         }
     }

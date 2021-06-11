@@ -117,8 +117,249 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Finetune_BrowseButton" xml:space="preserve">
+    <value>Browse</value>
+  </data>
+  <data name="Finetune_FileDoesNotExistMessage" xml:space="preserve">
+    <value>File does not exist.</value>
+  </data>
+  <data name="Finetune_FinetunedModelTagLabel" xml:space="preserve">
+    <value>Fine-tuned model label</value>
+  </data>
+  <data name="Finetune_FineTuneWindowTitle" xml:space="preserve">
+    <value>Fine-tune model {0}</value>
+  </data>
+  <data name="Finetune_GenericValidationErrorMessage" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Finetune_IncludePlaceholderTagsCheckbox" xml:space="preserve">
+    <value>Include placeholder tags as text</value>
+  </data>
+  <data name="Finetune_IncludeTagPairsCheckbox" xml:space="preserve">
+    <value>Include tag pairs as text</value>
+  </data>
+  <data name="Finetune_ModelTagInUseMessage" xml:space="preserve">
+    <value>Model tag is already in use for this base model</value>
+  </data>
+  <data name="Finetune_ModelTagNotSpecifiedMessage" xml:space="preserve">
+    <value>Model tag not specified.</value>
+  </data>
+  <data name="Finetune_ModelTagTooLongMessage" xml:space="preserve">
+    <value>Model tag is too long.</value>
+  </data>
+  <data name="Finetune_SeparateFilesRadioButton" xml:space="preserve">
+    <value>Select separate files</value>
+  </data>
+  <data name="Finetune_SourceFileLabel" xml:space="preserve">
+    <value>Source file</value>
+  </data>
+  <data name="Finetune_SplitFromTrainingRadioButton" xml:space="preserve">
+    <value>Split validation files from the training files</value>
+  </data>
+  <data name="Finetune_StartFinetuneButton" xml:space="preserve">
+    <value>Fine-tune</value>
+  </data>
+  <data name="Finetune_TagProcessingLabel" xml:space="preserve">
+    <value>Tag processing</value>
+  </data>
+  <data name="Finetune_TargetFileLabel" xml:space="preserve">
+    <value>Target file</value>
+  </data>
+  <data name="Finetune_TmxFileLabel" xml:space="preserve">
+    <value>Tmx file</value>
+  </data>
+  <data name="Finetune_TmxFileNotValidMessage" xml:space="preserve">
+    <value>{0} is not a valid .tmx file</value>
+  </data>
+  <data name="Finetune_TmxRadioButton" xml:space="preserve">
+    <value>TMX translation memory</value>
+  </data>
+  <data name="Finetune_TrainingFilesLabel" xml:space="preserve">
+    <value>Training files</value>
+  </data>
+  <data name="Finetune_TxtFilesRadioButton" xml:space="preserve">
+    <value>Text (separate files for source and target)</value>
+  </data>
+  <data name="Finetune_ValidationFilesLabel" xml:space="preserve">
+    <value>Validation files (for monitoring the progress of training)</value>
+  </data>
+  <data name="Finetune_ValidationSourceFileLabel" xml:space="preserve">
+    <value>Validation source file</value>
+  </data>
+  <data name="Finetune_ValidationTargetFileLabel" xml:space="preserve">
+    <value>Validation target file</value>
+  </data>
+  <data name="Main_ConfirmExitCaption" xml:space="preserve">
+    <value>Confirm exit</value>
+  </data>
+  <data name="Main_ConfirmExitMessage" xml:space="preserve">
+    <value>Fine-tuning or batch translation is in progress. Fine-tuning can be resumed later from the last save point, but batch translation will be aborted permanently. Are you sure you want to close the OpusCAT MT Engine?</value>
+  </data>
+  <data name="Main_ContinueFinetuneButton" xml:space="preserve">
+    <value>Continue fine-tuning</value>
+  </data>
+  <data name="Main_CustomizationProgressButton" xml:space="preserve">
+    <value>Show fine-tuning progress</value>
+  </data>
+  <data name="Main_DeleteModelButton" xml:space="preserve">
+    <value>Delete selected model</value>
+  </data>
+  <data name="Main_DeleteModelConfirmation" xml:space="preserve">
+    <value>Are you sure you want to delete model {0}? Deletion is permanent.</value>
+  </data>
+  <data name="Main_DeleteModelConfirmationTitle" xml:space="preserve">
+    <value>Delete Confirmation</value>
+  </data>
+  <data name="Main_EditModelTagsButton" xml:space="preserve">
+    <value>Edit model tags</value>
+  </data>
+  <data name="Main_FinetuneButton" xml:space="preserve">
+    <value>Fine-tune selected model</value>
+  </data>
+  <data name="Main_InstallFromWebButton" xml:space="preserve">
+    <value>Install OPUS model from Web</value>
+  </data>
+  <data name="Main_InstallFromZipButton" xml:space="preserve">
+    <value>Install model from zip</value>
+  </data>
+  <data name="Main_ModelsTabTitle" xml:space="preserve">
+    <value>Models</value>
+  </data>
+  <data name="Main_OnlineModelsTab" xml:space="preserve">
+    <value>Online models</value>
+  </data>
+  <data name="Main_OpenModelDirButton" xml:space="preserve">
+    <value>Open model directory</value>
+  </data>
+  <data name="Main_OpusCatWindowTitle" xml:space="preserve">
+    <value>OPUS-CAT MT Engine v{0}</value>
+    <comment>{0} will be replaced with version number</comment>
+  </data>
+  <data name="Main_PackageModelButton" xml:space="preserve">
+    <value>Package fine-tuned model</value>
+  </data>
+  <data name="Main_SetAsOverrideModelButton" xml:space="preserve">
+    <value>Set as override model</value>
+  </data>
+  <data name="Main_SettingsTabTitle" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Main_TranslateWithModelButton" xml:space="preserve">
+    <value>Translate with model</value>
+  </data>
+  <data name="Online_DownloadingStatus" xml:space="preserve">
+    <value>Downloading</value>
+  </data>
+  <data name="Online_ExtractingStatus" xml:space="preserve">
+    <value>Extracting</value>
+  </data>
+  <data name="Online_InstallationProgressHeader" xml:space="preserve">
+    <value>Installation progress</value>
+  </data>
+  <data name="Online_InstalledStatus" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Online_InstallModelLocallyButton" xml:space="preserve">
+    <value>Install model locally</value>
+  </data>
+  <data name="Online_ModelNameFilterLabel" xml:space="preserve">
+    <value>Model name filter</value>
+  </data>
+  <data name="Online_ModelNameHeader" xml:space="preserve">
+    <value>Model name</value>
+  </data>
+  <data name="Online_SourceLangFilterLabel" xml:space="preserve">
+    <value>Source filter</value>
+  </data>
+  <data name="Online_SourceLanguagesHeader" xml:space="preserve">
+    <value>Source languages</value>
+  </data>
+  <data name="Online_TargetLangFilterLabel" xml:space="preserve">
+    <value>Target filter</value>
+  </data>
+  <data name="Online_TargetLanguagesHeader" xml:space="preserve">
+    <value>Target languages</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="opus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\UI\opus.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Progress_BleuAxis" xml:space="preserve">
+    <value>BLEU score</value>
+  </data>
+  <data name="Progress_InDomainSeriesName" xml:space="preserve">
+    <value>In-domain validation set</value>
+  </data>
+  <data name="Progress_OutOfDomainSeriesName" xml:space="preserve">
+    <value>Out-of-domain validation set</value>
+  </data>
+  <data name="Progress_ValidationStepAxis" xml:space="preserve">
+    <value>Validation step</value>
+  </data>
+  <data name="Settings_HttpPortLabel" xml:space="preserve">
+    <value>MT service HTTP port (used with other integrations, 1024-65535):</value>
+  </data>
+  <data name="Settings_NetTcpPortLabel" xml:space="preserve">
+    <value>MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):</value>
+  </data>
+  <data name="Settings_NoteHeading" xml:space="preserve">
+    <value>Note:</value>
+  </data>
+  <data name="Settings_OpenSettingsFileButton" xml:space="preserve">
+    <value>Open finetune settings in text editor</value>
+  </data>
+  <data name="Settings_RestartReminder" xml:space="preserve">
+    <value>Restart OPUS-CAT MT Engine after changing these values.</value>
+  </data>
+  <data name="Settings_SaveButton" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Tags_AddTagButton" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Tags_DeleteTagButton" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Tags_EditTagsTitle" xml:space="preserve">
+    <value>Edit tags for {0}</value>
+  </data>
+  <data name="Tags_ModelTagsLabel" xml:space="preserve">
+    <value>Model tags</value>
+  </data>
+  <data name="Translate_SourceTextLabel" xml:space="preserve">
+    <value>Source text:</value>
+  </data>
+  <data name="Translate_TranslateButton" xml:space="preserve">
+    <value>Translate</value>
+  </data>
+  <data name="Translate_TranslateTitle" xml:space="preserve">
+    <value>Translating with model {0}</value>
+  </data>
+  <data name="Translate_TranslationLabel" xml:space="preserve">
+    <value>Translation:</value>
+  </data>
+  <data name="Settings_StoreInAppdataCheckbox" xml:space="preserve">
+    <value>Store OPUS-CAT MT Engine data in local application data folder (instead of installation folder)</value>
+  </data>
+  <data name="Online_ModelOriginHeader" xml:space="preserve">
+    <value>Model origin</value>
+  </data>
+  <data name="Service_PortNotAvailable" xml:space="preserve">
+    <value>The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port.</value>
+  </data>
+  <data name="App_ConfirmDbCaption" xml:space="preserve">
+    <value>New database confirmation</value>
+  </data>
+  <data name="App_InvalidDbMessage" xml:space="preserve">
+    <value>The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking OK. If you click Cancel, the database will be kept, but the caching of translations into the database will disabled (it can be re-enabled in settings).</value>
+  </data>
+  <data name="OpenModelInOverlayButton" xml:space="preserve">
+    <value>Open model as overlay</value>
+  </data>
+  <data name="Settings_RevertToDefaultsButton" xml:space="preserve">
+    <value>Revert to defaults</value>
+  </data>
+  <data name="Main_CancelOverrideButton" xml:space="preserve">
+    <value>Cancel override</value>
   </data>
 </root>

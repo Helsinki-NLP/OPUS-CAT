@@ -45,7 +45,7 @@ namespace OpusCatMTEngine
             OnlineModelView onlineSelection = new OnlineModelView();
             onlineSelection.DataContext = this.DataContext;
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.AddTab(new ActionTabItem() { Content = onlineSelection, Header = "Online models", Closable = true });
+            mainWindow.AddTab(new ActionTabItem() { Content = onlineSelection, Header = OpusCatMTEngine.Properties.Resources.Main_OnlineModelsTab, Closable = true });
             
         }
 
@@ -102,10 +102,14 @@ namespace OpusCatMTEngine
 
         private void btnDeleteModel_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Are you sure?", "Delete Confirmation", System.Windows.MessageBoxButton.YesNo);
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            MessageBoxResult messageBoxResult = 
+                System.Windows.MessageBox.Show(
+                    String.Format(OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmation,selectedModel.Name),
+                    OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+                
                 ((ModelManager)this.DataContext).UninstallModel(selectedModel);
             }
         }
@@ -234,6 +238,11 @@ namespace OpusCatMTEngine
                     this.lastDirection = direction;
                 }
             }
+        }
+
+        private void btnOpenModelInOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: open an overlay that is always on top and displays translation
         }
     }
 

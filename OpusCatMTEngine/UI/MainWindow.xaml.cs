@@ -33,7 +33,7 @@ namespace OpusCatMTEngine
             get
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
-                return "OPUS-CAT MT Engine v" + version;
+                return String.Format(OpusCatMTEngine.Properties.Resources.Main_OpusCatWindowTitle, version);
             }
         }
 
@@ -43,8 +43,8 @@ namespace OpusCatMTEngine
         {
             if (this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
             {
-                MessageBoxResult result = MessageBox.Show("A customization or a batch translation is in progress. Customization can be resumed from the last save later. Are you sure you want to close the OpusCAT Engine?",
-                                          "Confirmation",
+                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.Main_ConfirmExitMessage,
+                                          OpusCatMTEngine.Properties.Resources.Main_ConfirmExitCaption,
                                           MessageBoxButton.YesNo,
                                           MessageBoxImage.Question);
                 if (result != MessageBoxResult.Yes)
@@ -82,23 +82,42 @@ namespace OpusCatMTEngine
             
             this.StartEngine();
             InitializeComponent();
+
+            this.Loaded += MainWindow_Loaded;
+            
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.Loaded -= MainWindow_Loaded;
+            if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
+            {
+                TranslationDbHelper.SetupTranslationDb();
+            }
         }
 
         private void StartEngine()
         {
-            var service = new Service();
+            
             this.ModelManager = new ModelManager();
+
+            //The WCF selfhost implementation
+            var service = new Service();
+            this.serviceHost = service.StartService(this.ModelManager);
+
+            //OWIN selfhost implementation
+            var owin = new OwinMtService(this.ModelManager);
 
             this.UiTabs = new ObservableCollection<ActionTabItem>();
             var localModels = new LocalModelListView(this.ModelManager);
             var settings = new OpusCatSettingsView();
             this.UiTabs.Add(
-                new ActionTabItem { Content = localModels, Header = "Models", Closable = false });
+                new ActionTabItem { Content = localModels, Header = OpusCatMTEngine.Properties.Resources.Main_ModelsTabTitle, Closable = false });
             this.UiTabs.Add(
-                new ActionTabItem { Content = settings, Header = "Settings", Closable = false });
+                new ActionTabItem { Content = settings, Header = OpusCatMTEngine.Properties.Resources.Main_SettingsTabTitle, Closable = false });
 
             this.DataContext = this;
-            this.serviceHost = service.StartService(this.ModelManager);
+            
         }
         
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="OpusCatTranslationProvider.ElgConnectionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpusCatTranslationProvider"
+             mc:Ignorable="d"
+             x:Name="_this"
+             d:DesignWidth="300">
+    <StackPanel Background="White">
+        <Border BorderThickness="1" BorderBrush="Black">
+            <StackPanel Margin="10,10,10,10">
+                <!--This control has multiple possible states:
+                1. Connection has not been made before, and no information is stored in the credential store
+                2. Connection has been used before, and the information in the credential store is still fresh
+                3. Connection has been used before, but the information in the credential store is stale (refresh token is expired)
+                1 and 3 can be conflated, since the action required is the same: login (maybe register) and get success code.
+                In case 2, just show a status message OK-->
+                <StackPanel>
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <TextBlock Margin="5" TextWrapping="Wrap"><Hyperlink NavigateUri="https://live.european-language-grid.eu/auth/realms/ELG/protocol/openid-connect/auth?client_id=elg-oob&amp;redirect_uri=urn:ietf:wg:oauth:2.0:oob&amp;response_type=code&amp;scope=offline_access" RequestNavigate="Hyperlink_RequestNavigate">Generate an ELG success code online</Hyperlink> (login required, registration is free) to use OPUS-MT models available through ELG. Paste the code below and click Confirm.</TextBlock>
+                    </Border>
+                    <DockPanel Margin="0,5">
+                        <Label>ELG success code</Label>
+                        <TextBox Width="100" x:Name="ElgSuccessCodeBox" />
+                        <Button Click="ConfirmCode_Click">Confirm</Button>
+                    </DockPanel>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

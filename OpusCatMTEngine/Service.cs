@@ -3,18 +3,27 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Web;
+using System.Windows;
 using OpusMTInterface;
 using Serilog;
 
 namespace OpusCatMTEngine
 {
 
+    /// <summary>
+    /// This has been partly deprecated: HTTP API is handled as a OWIN service, and the
+    /// net.tcp API is only maintained for backwards compatibility (it was used in Trados and
+    /// memoQ plugins), but new versions will use HTTP to fetch translations. The
+    /// net.tcp API will remain available for a while, until the old plugins are no
+    /// longer used.
+    /// </summary>
     class Service
     {
         private ServiceHost StartNetTcpAndHttpService(ModelManager modelManager, Boolean onlyNetTcp)
         {
             Uri[] baseAddresses;
-            if (onlyNetTcp)
+            
+            if (OpusCatMTEngineSettings.Default.AllowRemoteUse)
             {
                 baseAddresses = new Uri[] {
                     new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/")
@@ -23,9 +32,25 @@ namespace OpusCatMTEngine
             else
             {
                 baseAddresses = new Uri[] {
-                    new Uri($"net.tcp://localhost:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
-                    new Uri($"http://localhost:{OpusCatMTEngineSettings.Default.HttpMtServicePort}/") };
+                    new Uri($"net.tcp://[::1]:{OpusCatMTEngineSettings.Default.MtServicePort}/")
+                };
+            }
+
+            /*
+            if (onlyNetTcp)
+            {
+                
+                baseAddresses = new Uri[] {
+                    new Uri($"net.tcp://{Environment.MachineName}:{OpusCatMTEngineSettings.Default.MtServicePort}/")
+                };
+            }
+            else
+            {
+                baseAddresses = new Uri[] {
+                    new Uri($"net.tcp://{Environment.MachineName}:{OpusCatMTEngineSettings.Default.MtServicePort}/"),
+                    new Uri($"http://[::1]:{OpusCatMTEngineSettings.Default.HttpMtServicePort}/") };
             };
+            */
 
             var mtService = new MTService(modelManager);
 
@@ -41,6 +66,7 @@ namespace OpusCatMTEngine
             //to allow connections from IP range (also add same checkbox to clients). 
 
             //nettcpBinding.Security.Mode = SecurityMode.None;
+
             /*nettcpBinding.Security.Mode = SecurityMode.Transport;
             nettcpBinding.Security.Transport.ClientCredentialType =
                 TcpClientCredentialType.Windows;*/
@@ -78,7 +104,16 @@ namespace OpusCatMTEngine
             */
 
             Log.Information($"Opening the service host");
-            selfHost.Open();
+            try
+            {
+                selfHost.Open();
+            }
+            catch (AddressAlreadyInUseException ex)
+            {
+                MessageBox.Show(String.Format(
+                    OpusCatMTEngine.Properties.Resources.Service_PortNotAvailable, OpusCatMTEngineSettings.Default.HttpMtServicePort));
+                System.Windows.Application.Current.Shutdown();
+            }
             
             return selfHost;
         }
@@ -92,7 +127,7 @@ namespace OpusCatMTEngine
             //Launching the http service requires that the program is run with
             //administrator privileges or that the port has been enabled for http 
             //with netsh http add urlacl
-            if (OpusCatMTEngineSettings.Default.StartHttpService)
+            if (OpusCatMTEngineSettings.Default.StartWcfHttpService)
             {
                 Log.Information("Starting OPUS-CAT MT Engine's net.tcp and HTTP APIs");
                 try
@@ -102,13 +137,14 @@ namespace OpusCatMTEngine
                 }
                 catch (System.ServiceModel.AddressAccessDeniedException ex)
                 {
-                    Log.Information("HTTP API could not be started, starting Net.tcp API. If HTTP API is required, add the relevant URL to the urlacl list with netsh.");
+                    Log.Information("HTTP API could not be started, starting net.tcp API. If HTTP API is required, add the relevant URL to the urlacl list with netsh.");
                     host = this.StartNetTcpAndHttpService(modelManager, true);
                 }
             }
             else
             {
-                Log.Information("Starting Net.tcp API only, HTTP API can be enabled in the settings.");
+                //Log.Information("Starting Net.tcp API only, HTTP API can be enabled in the settings.");
+                Log.Information("Starting Net.tcp API.");
                 host = this.StartNetTcpAndHttpService(modelManager, true);
             }
 

@@ -23,26 +23,30 @@ namespace OpusCatMTEngine
         private Process bpeProcess;
         private Process decoderProcess;*/
         private Process mtPipe;
-        private string langpair;
         
         private volatile bool translationInProgress = false;
 
-        public string SourceCode { get; }
-        public string TargetCode { get; }
+        public string SourceCode { get; set; }
+        public string TargetCode { get; set; }
         public bool Faulted { get; private set; }
-        public Process MtPipe { get => mtPipe; set => mtPipe = value; }
+        public Process MtProcess { get => mtPipe; set => mtPipe = value; }
+        private Process preprocessPipe;
 
-        private ConcurrentStack<Task<string>> taskStack = new ConcurrentStack<Task<string>>();
+        private ConcurrentStack<Task<TranslationPair>> taskStack = new ConcurrentStack<Task<TranslationPair>>();
 
-        private StreamWriter utf8Writer;
+        private StreamWriter utf8PreprocessWriter;
+        private StreamWriter utf8MtWriter;
         private string modelDir;
         private readonly bool includePlaceholderTags;
         private readonly bool includeTagPairs;
 
         public string SystemName { get; }
-
-        private string mtPipeCmds;
-        private bool sentencePiecePostProcess;
+        public bool TargetLanguageCodeRequired { get; private set; }
+        public Process PreprocessProcess { get => preprocessPipe; set => preprocessPipe = value; }
+        public Process PostprocessProcess { get; private set; }
+        private StreamWriter utf8PostprocessWriter;
+        
+        private SegmentationMethod segmentation;
         private static readonly Object lockObj = new Object();
 
         //This seems like the only way to cleanly close the NMT window when Studio is closing.
@@ -75,52 +79,65 @@ namespace OpusCatMTEngine
 
         public MarianProcess(
             string modelDir, 
-            string sourceCode, 
-            string targetCode, 
+            string sourceCode,
+            string targetCode,
+            string modelName, 
+            bool multilingualModel,
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
             this.Faulted = false;
-            this.langpair = $"{sourceCode}-{targetCode}";
             this.SourceCode = sourceCode;
             this.TargetCode = targetCode;
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
             this.modelDir = modelDir;
-            this.SystemName = $"{sourceCode}-{targetCode}_" + (new DirectoryInfo(this.modelDir)).Name;
-         
+            this.SystemName = $"{this.SourceCode}-{this.TargetCode}_{modelName}";
+            this.TargetLanguageCodeRequired = multilingualModel;
+
             Log.Information($"Starting MT pipe for model {this.SystemName}.");
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
+            //There are scripts for monolingual and multilingual models
+
+            string preprocessCommand, mtCommand;
+
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
-                this.mtPipeCmds = "StartSentencePieceMtPipe.bat";
-                this.sentencePiecePostProcess = true;
+                preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
+                this.segmentation = SegmentationMethod.SentencePiece;
             }
             else
             {
-                this.mtPipeCmds = "StartMosesBpeMtPipe.bat";
-                this.sentencePiecePostProcess = false;
+                preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
+                this.segmentation = SegmentationMethod.Bpe;
+                var postprocessCommand =
+                    $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
+                this.PostprocessProcess = MarianHelper.StartProcessInBackgroundWithRedirects(postprocessCommand);
+                this.utf8PostprocessWriter =
+                    new StreamWriter(this.PostprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             }
 
-            //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
-            this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
+            mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
 
-            this.utf8Writer = new StreamWriter(this.MtPipe.StandardInput.BaseStream, new UTF8Encoding(false));
+            //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
+            this.PreprocessProcess = 
+                MarianHelper.StartProcessInBackgroundWithRedirects(preprocessCommand);
+            this.MtProcess = 
+                MarianHelper.StartProcessInBackgroundWithRedirects(mtCommand);
+            
+            this.utf8PreprocessWriter =
+                new StreamWriter(this.PreprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
+            this.utf8MtWriter =
+                new StreamWriter(this.MtProcess.StandardInput.BaseStream, new UTF8Encoding(false));
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
         }
-
+        
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             this.ShutdownMtPipe();
         }
-
-        internal List<string> BatchTranslate(List<string> input)
-        {
-            throw new NotImplementedException();
-        }
-
         
         private void errorDataHandler(object sender, DataReceivedEventArgs e)
         {
@@ -134,7 +151,7 @@ namespace OpusCatMTEngine
             AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
         }
         
-        private string TranslateSentence(string rawSourceSentence)
+        private TranslationPair TranslateSentence(string rawSourceSentence)
         {
             //This preprocessing must correspond to the one used in model training. Currently
             //this is:
@@ -143,26 +160,54 @@ namespace OpusCatMTEngine
             //${ TOKENIZER}/ normalize - punctuation.perl - l $1 |
             //sed 's/  */ /g;s/^ *//g;s/ *$$//g' |
 
-            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.TargetCode, this.includePlaceholderTags, this.includeTagPairs);
+            var sourceSentence = MarianHelper.PreprocessLine(rawSourceSentence, this.SourceCode, this.includePlaceholderTags, this.includeTagPairs);
 
-            this.utf8Writer.WriteLine(sourceSentence);
-            this.utf8Writer.Flush();
+            //Add preprocessing in here, capture preprocessed source for getting aligned tokens.
+
+            this.utf8PreprocessWriter.WriteLine(sourceSentence);
+            this.utf8PreprocessWriter.Flush();
+
+            string preprocessedLine = this.PreprocessProcess.StandardOutput.ReadLine();
+
+            var lineToTranslate = preprocessedLine;
+            if (this.TargetLanguageCodeRequired)
+            {
+                lineToTranslate = $">>{this.TargetCode}<< {preprocessedLine}";
+            }
+
+            this.utf8MtWriter.WriteLine(lineToTranslate);
+            this.utf8MtWriter.Flush();
 
             //There should only ever be a single line in the stdout, since there's only one line of
             //input per stdout readline, and marian decoder will never insert line breaks into translations.
-            string translation = this.MtPipe.StandardOutput.ReadLine();
+            string translationAndAlignment = this.MtProcess.StandardOutput.ReadLine();
 
-            if (this.sentencePiecePostProcess)
+            TranslationPair alignedTranslationPair = new TranslationPair(preprocessedLine, translationAndAlignment, this.segmentation, this.TargetCode);
+
+            switch (this.segmentation)
             {
-                translation = (translation.Replace(" ", "")).Replace("▁", " ").Trim();
+                case SegmentationMethod.SentencePiece:
+                    alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace(" ", "").Replace("▁", " ").Trim();
+                    break;
+                case SegmentationMethod.Bpe:
+                    this.utf8PostprocessWriter.WriteLine(alignedTranslationPair.RawTranslation);
+                    this.utf8PostprocessWriter.Flush();
+                    string postprocessedTranslation = this.PostprocessProcess.StandardOutput.ReadLine();
+                    alignedTranslationPair.Translation = postprocessedTranslation;
+                    break;
+                default:
+                    throw new Exception("Unknown segmentation method specified for model");
             }
 
-            return translation;
+            return alignedTranslationPair;
+            
         }
 
-        public Task<string> AddToTranslationQueue(string sourceText)
+        
+
+        public Task<TranslationPair> AddToTranslationQueue(string sourceText)
         {
-            string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
+            TranslationPair existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName, this.TargetCode);
             if (existingTranslation != null)
             {
                 //If translation already exists, just return it
@@ -170,11 +215,11 @@ namespace OpusCatMTEngine
             }
             else
             {
-                Task<string> translationTask = new Task<string>(() => Translate(sourceText));
+                Task<TranslationPair> translationTask = new Task<TranslationPair>(() => Translate(sourceText));
                 translationTask.ContinueWith((x) => CheckTaskStack());
-                
-                //if there's no translation in progress, start translation
-                
+
+                //if there's translation in progress, push the task to stack to wait
+                //otherwise start translation
                 if (this.translationInProgress)
                 {
                     this.taskStack.Push(translationTask);
@@ -191,7 +236,7 @@ namespace OpusCatMTEngine
 
         private void CheckTaskStack()
         {
-            Task<string> translationTask;
+            Task<TranslationPair> translationTask;
             var success = this.taskStack.TryPop(out translationTask);
 
             if (success)
@@ -200,7 +245,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        public string Translate(string sourceText)
+        public TranslationPair Translate(string sourceText)
         {
             //This is used to determine whether a incoming translation should be immediately started
             //or queued.
@@ -210,12 +255,12 @@ namespace OpusCatMTEngine
             //when the request arrives (this should be guaranteed by the code flow).
             translationInProgress = true;
 
-            if (this.MtPipe.HasExited)
+            if (this.MtProcess.HasExited)
             {
                 throw new Exception("Opus MT functionality has stopped working. Restarting the OPUS-CAT MT Engine may resolve the problem.");
             }
 
-            string existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName);
+            TranslationPair existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText,this.SystemName,this.TargetCode);
             if (existingTranslation != null)
             {
                 translationInProgress = false;
@@ -229,28 +274,17 @@ namespace OpusCatMTEngine
                     sw.Start();*/
                     //Check again if the translation has been produced during the lock
                     //waiting period
-                    existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName);
+                    existingTranslation = TranslationDbHelper.FetchTranslationFromDb(sourceText, this.SystemName, this.TargetCode);
                     if (existingTranslation != null)
                     {
                         translationInProgress = false;
                         return existingTranslation;
                     }
-
-                    //It might be the case that the source text contains multiple sentences,
-                    //potentially even line breaks, so the text needs to be split on line breaks.
-                    //(sentence splitting might be nice, but having multiple sentences on one line
-                    //doesn't break anything, while multiple lines cause desyncing problems.
-                    var splitSource = new List<string> { sourceText };// sourceText.Split(new[] {"\r\n","\r","\n"},StringSplitOptions.None);
-
-                    StringBuilder translationBuilder = new StringBuilder();
-                    foreach (var sourceSentence in splitSource)
-                    {
-                        translationBuilder.Append(this.TranslateSentence(sourceSentence));
-                    }
-
-                    var translation = translationBuilder.ToString();
-                
-                    TranslationDbHelper.WriteTranslationToDb(sourceText, translation, this.SystemName);
+                    
+                    
+                    var translation = this.TranslateSentence(sourceText);
+                    
+                    TranslationDbHelper.WriteTranslationToDb(sourceText, translation, this.SystemName, this.segmentation, this.TargetCode);
                     //sw.Stop();
 
                     translationInProgress = false;

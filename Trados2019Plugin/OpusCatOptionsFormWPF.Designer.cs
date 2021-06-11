@@ -35,7 +35,7 @@
             // 
             this.wpfHost.Location = new System.Drawing.Point(0, 0);
             this.wpfHost.Name = "wpfHost";
-            this.wpfHost.Size = new System.Drawing.Size(797, 454);
+            this.wpfHost.Size = new System.Drawing.Size(797, 546);
             this.wpfHost.TabIndex = 0;
             this.wpfHost.Text = "elementHost1";
             this.wpfHost.Child = null;
@@ -44,7 +44,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 550);
             this.Controls.Add(this.wpfHost);
             this.Name = "OpusCatOptionsFormWPF";
             this.Text = "OPUS-CAT settings";

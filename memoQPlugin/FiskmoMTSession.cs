@@ -107,9 +107,9 @@ namespace FiskmoMTPlugin
             switch (formattingAndTagOption)
             {
                 case FormattingAndTagsUsageOption.OnlyFormatting:
-                    return SegmentHtmlConverter.ConvertSegment2Html(segment, false);
+                    return SegmentHtmlConverter.ConvertSegment2Html(segment, false, true);
                 case FormattingAndTagsUsageOption.BothFormattingAndTags:
-                    return SegmentHtmlConverter.ConvertSegment2Html(segment, true);
+                    return SegmentHtmlConverter.ConvertSegment2Html(segment, true, true);
                 default:
                     return segment.PlainText;
             }

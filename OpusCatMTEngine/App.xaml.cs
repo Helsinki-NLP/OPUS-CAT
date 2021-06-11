@@ -19,6 +19,24 @@ namespace OpusCatMTEngine
     /// </summary>
     public partial class App : Application
     {
+        public static Overlay Overlay { get; private set; }
+
+        public static void OpenOverlay()
+        {
+            if (App.Overlay == null)
+            {
+                App.Overlay = new Overlay();
+            }
+        }
+
+        public static void CloseOverlay()
+        {
+            if (App.Overlay != null)
+            {
+                App.Overlay.Close();
+                App.Overlay = null;
+            }
+        }
 
         void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
@@ -29,57 +47,49 @@ namespace OpusCatMTEngine
 
         private void SetupLogging()
         {
-            var logDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                OpusCatMTEngineSettings.Default.LogDir);
+            var logDir = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.LogDir);
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.File(Path.Combine(logDir, "opuscat_log.txt"), rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
-
-        private void SetupTranslationDb()
+        
+        public static bool HasAvxSupport()
         {
-
-
-            var translationDb = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir,
-                OpusCatMTEngineSettings.Default.TranslationDBName);
-            if (!File.Exists(translationDb))
+            try
             {
-                SQLiteConnection.CreateFile(translationDb);
-                using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
-                {
-                    m_dbConnection.Open();
-
-                    string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, PRIMARY KEY (model,sourcetext))";
-
-                    using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                }
+                return (GetEnabledXStateFeatures() & 4) != 0;
+            }
+            catch
+            {
+                return false;
             }
         }
+
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        private static extern long GetEnabledXStateFeatures();
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
-            //Create appdata dir
-            var opusCatAppdataDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                OpusCatMTEngineSettings.Default.LocalOpusCatDir);
-            if (!Directory.Exists(opusCatAppdataDir))
+            if (!App.HasAvxSupport())
             {
-                Directory.CreateDirectory(opusCatAppdataDir);
+                MessageBox.Show(
+                    "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.");
+                Application.Current.Shutdown(1);
+            }
+
+            //Create data dir
+
+            var opusCatDataDir = HelperFunctions.GetOpusCatDataPath();
+            if (!Directory.Exists(opusCatDataDir))
+            {
+                Directory.CreateDirectory(opusCatDataDir);
             }
 
             this.CopyConfigs();
-            this.SetupTranslationDb();
             this.SetupLogging();
 
             //Accessing the model storage on pouta requires this.
@@ -92,6 +102,15 @@ namespace OpusCatMTEngine
             MainWindow wnd = new MainWindow();
             // Show the window
             wnd.Show();
+
+            if (OpusCatMTEngineSettings.Default.DisplayOverlay)
+            {
+                App.OpenOverlay();
+            }
+            else
+            {
+                App.CloseOverlay();
+            }
         }
 
         /// <summary>

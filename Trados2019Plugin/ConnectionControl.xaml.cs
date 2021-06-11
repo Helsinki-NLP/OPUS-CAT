@@ -40,8 +40,7 @@ namespace OpusCatTranslationProvider
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
-
+        
         private void ServicePortBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]");
@@ -103,14 +102,18 @@ namespace OpusCatTranslationProvider
             }
             catch (Exception ex) when (ex is OpusCatEngineConnectionException)
             {
-                connectionResult.Append($"No connection to OPUS-CAT MT Engine at {host}:{port}.");
+                connectionResult.Append($"No connection to OPUS-CAT MT Engine at {host}:{port}."+Environment.NewLine);
+                connectionResult.Append("Make sure OPUS-CAT MT Engine application has been installed on your computer(check help link below) and is running and that it uses the same connection settings as the plugin (default settings should work).");
                 this.NoConnection = true;
             }
 
             Dispatcher.Invoke(() => this.ConnectionStatus = connectionResult.ToString());
         }
 
-
+        internal void Refresh()
+        {
+            Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+        }
 
         private void UpdateModelTags(List<string> tags, string currentModelTag)
         {
@@ -136,6 +139,8 @@ namespace OpusCatTranslationProvider
                 }
             }
 
+            NotifyPropertyChanged("AllModelTags");
+
         }
 
         public string ConnectionStatus
@@ -148,11 +153,32 @@ namespace OpusCatTranslationProvider
             }
         }
 
-        public ObservableCollection<string> AllModelTags { get => allModelTags; set { allModelTags = value; NotifyPropertyChanged(); } }
+        public ObservableCollection<string> AllModelTags
+        {
+            get
+            {
+                return allModelTags;
+            }
+            set
+            {
+                allModelTags = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public bool NoConnection
         {
-            get => noConnection;
+            get
+            {
+                if (this.options.opusCatSource == OpusCatOptions.OpusCatSource.OpusCatMtEngine)
+                {
+                    return noConnection;
+                }
+                else
+                {
+                    return false;
+                }
+            }
             set
             {
                 noConnection = value;
@@ -199,7 +225,6 @@ namespace OpusCatTranslationProvider
 
         public ConnectionControl()
         {
-            this.AllModelTags = new ObservableCollection<string>();
             InitializeComponent();
 
             this.DataContextChanged += ConnectionControl_DataContextChanged;
@@ -207,7 +232,8 @@ namespace OpusCatTranslationProvider
             //Fetch data only after data context has been set and the bindings have been resolved.
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                Dispatcher.BeginInvoke(new Action(StartFetch), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                this.Refresh();
+                
             }
             
         }
@@ -219,11 +245,18 @@ namespace OpusCatTranslationProvider
 
                 this.options = ((IHasOpusCatOptions)e.NewValue).Options;
             }
+            this.AllModelTags = new ObservableCollection<string>();
         }
 
         private void StartFetch()
         {
-            
+            //If ELG has been selected as source, don't do the fetch.
+            if (this.options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
+            {
+                NotifyPropertyChanged("NoConnection");
+                return;
+            }
+
             var host = this.options.mtServiceAddress;
             var port = this.options.mtServicePort;
             this.ConnectionColor = new RadialGradientBrush(Colors.Yellow, Colors.DarkGoldenrod);

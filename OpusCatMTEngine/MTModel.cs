@@ -54,13 +54,19 @@ namespace OpusCatMTEngine
         }
     }
 
+    
+
     public enum TagMethod
     {
         Remove,
         IncludePlaceholders
     }
 
-    
+    public enum SegmentationMethod
+    {
+        Bpe,
+        SentencePiece
+    }
 
     public class MTModel : INotifyPropertyChanged
     {
@@ -84,9 +90,23 @@ namespace OpusCatMTEngine
 
         }
 
+
+
         private List<IsoLanguage> sourceLanguages;
         private List<IsoLanguage> targetLanguages;
         private string name;
+
+        public string TatoebaConfigString
+        {
+            get
+            { return this.modelYaml; }
+        }
+
+        public bool IsMultilingualModel
+        {
+            get
+            { return this.SourceLanguages.Count > 1 || this.TargetLanguages.Count > 1; }
+        }
 
         private Boolean isOverrideModel;
         public bool IsOverrideModel
@@ -99,6 +119,8 @@ namespace OpusCatMTEngine
                 NotifyPropertyChanged("IsNotOverrideModel");
             }
         }
+
+        private bool supportsWordAlignment;
 
         public bool CanSetAsOverrideModel
         {
@@ -124,8 +146,8 @@ namespace OpusCatMTEngine
 
         public FileInfo AlignmentPriorsFile {
             get { return new FileInfo(Path.Combine(this.InstallDir, "alignmentpriors.txt")); } }
-
-        private MarianProcess marianProcess;
+        
+        private Dictionary<Tuple<string,string>,MarianProcess> marianProcesses;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -139,21 +161,67 @@ namespace OpusCatMTEngine
 
         internal void Shutdown()
         {
-            if (this.marianProcess != null)
+            if (this.marianProcesses != null)
             {
-                this.marianProcess.ShutdownMtPipe();
-                this.marianProcess = null;
+                foreach (var langpair in this.marianProcesses.Keys)
+                {
+                    this.marianProcesses[langpair].ShutdownMtPipe();
+                    this.marianProcesses[langpair] = null;
+                }
             }
+            this.marianProcesses = null;
         }
 
-        internal Task<string> Translate(string input)
+        internal Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
-            if (this.marianProcess == null)
+            //Need to get the original codes, since those are the ones the marian model uses
+            var modelSourceLang =
+                this.SourceLanguages.SingleOrDefault(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode);
+            string modelOrigSourceCode;
+            if (modelSourceLang == null)
             {
-                this.marianProcess = new MarianProcess(this.InstallDir, this.SourceLanguageString, this.TargetLanguageString, this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
+                modelOrigSourceCode = this.SourceLanguages.First().OriginalCode;
+            }
+            else
+            {
+                modelOrigSourceCode = modelSourceLang.OriginalCode;
             }
 
-            return this.marianProcess.AddToTranslationQueue(input);
+            var modelTargetLang =
+                this.TargetLanguages.SingleOrDefault(x => x.ShortestIsoCode == targetLang.ShortestIsoCode);
+            string modelOrigTargetCode;
+            if (modelTargetLang == null)
+            {
+                modelOrigTargetCode = this.TargetLanguages.First().OriginalCode;
+            }
+            else
+            {
+                modelOrigTargetCode = modelTargetLang.OriginalCode;
+            }
+
+            var modelOrigTuple = new Tuple<string, string>(modelOrigSourceCode, modelOrigTargetCode);
+            
+            //TODO: Currently a new process is created for each language direction of a multilingual model.
+            //I don't see much concurrent use of multilingual model language pairs happening, but it would be
+            //nice if all requests could be directed to same model.
+            if (this.marianProcesses == null)
+            {
+                this.marianProcesses = new Dictionary<Tuple<string, string>, MarianProcess>();
+            }
+
+            if (!this.marianProcesses.ContainsKey(modelOrigTuple))
+            {
+                 this.marianProcesses[modelOrigTuple] =
+                    new MarianProcess(
+                        this.InstallDir, 
+                        modelOrigSourceCode,
+                        modelOrigTargetCode,
+                        $"{this.SourceCodesString}-{this.TargetCodesString}_{this.Name}",
+                        this.targetLanguages.Count > 1,
+                        this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
+            };
+
+            return this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
         }
 
         internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -161,7 +229,11 @@ namespace OpusCatMTEngine
             this.InstallProgress = e.ProgressPercentage;
         }
 
-        public List<IsoLanguage> TargetLanguages { get => targetLanguages; set => targetLanguages = value; }
+        public List<IsoLanguage> TargetLanguages
+        {
+            get => targetLanguages;
+            set => targetLanguages = value;
+        }
 
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
         
@@ -186,11 +258,7 @@ namespace OpusCatMTEngine
             {
 
                 //Include model files, README.md, spm files, tcmodel (not needed but expected), modelconfig.yml
-                var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
-                var deserializer = new Deserializer();
-                var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-
-                foreach (var modelNpzName in decoderSettings.models)
+                foreach (var modelNpzName in this.decoderSettings.models)
                 {
                     //No point in compressing npz, it's already compressed
                     packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, modelNpzName), modelNpzName, CompressionLevel.NoCompression);
@@ -388,15 +456,46 @@ namespace OpusCatMTEngine
             get { return this.Status == MTModelStatus.Finetuning_suspended; }
         }
 
-        public MTModel(string modelPath, string installDir)
+        public DateTime ModelDate
         {
-            this.InstallDir = installDir;
-            this.ParseModelPath(modelPath);
+            get
+            {
+                var DateString = Regex.Match(this.ModelPath, @"\d{4}-\d{2}-\d{2}$");
+                if (DateString.Success)
+                {
+                    return DateTime.Parse(DateString.Value);
+                }
+                else
+                {
+                    return DateTime.MinValue;
+                }
+            }
+        }
 
+        //Name with language pair but without date
+        public string ModelBaseName
+        {
+            get
+            {
+                var datelessName = Regex.Replace(this.ModelPath, @"-\d{4}-\d{2}-\d{2}$","");
+                return datelessName;
+            }
+        }
+
+        private void ParseDecoderConfig()
+        {
+            var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
+            var deserializer = new Deserializer();
+            this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+            
+        }
+
+        private void ParseModelConfig()
+        {
+            var deserializer = new Deserializer();
             var modelConfigPath = Path.Combine(this.InstallDir, "modelconfig.yml");
             if (File.Exists(modelConfigPath))
             {
-                var deserializer = new Deserializer();
                 using (var reader = new StreamReader(modelConfigPath))
                 {
                     this.ModelConfig = deserializer.Deserialize<MTModelConfig>(reader);
@@ -413,7 +512,36 @@ namespace OpusCatMTEngine
                 this.ModelConfig = new MTModelConfig();
                 this.SaveModelConfig();
             }
+        }
 
+        private void UpdateModelYamlPath()
+        {
+            //Recent models have yaml files containing metadata, they have the same name as the model npz file
+            var modelFilePath = Path.Combine(this.InstallDir, this.decoderSettings.models[0]);
+            this.modelYamlFilePath = Path.ChangeExtension(modelFilePath, "yml");
+        }
+
+        public MTModel(string modelPath, string installDir)
+        {
+            this.InstallDir = installDir;
+
+            this.ParseDecoderConfig();
+            this.UpdateModelYamlPath();
+
+            this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
+
+            if (File.Exists(this.modelYamlFilePath))
+            {
+                using (var reader = File.OpenText(this.modelYamlFilePath))
+                {
+                    this.modelYaml = reader.ReadToEnd();
+                } 
+            }
+
+            this.ParseModelPath(modelPath);
+
+            this.ParseModelConfig();
+            
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
@@ -437,12 +565,17 @@ namespace OpusCatMTEngine
             FileInfo targetFile, 
             FileInfo refFile,
             int outOfDomainSize,
+            IsoLanguage sourceLanguage,
+            IsoLanguage targetLanguage,
             Boolean preprocessedInput=false)
         {
             var batchTranslator = new MarianBatchTranslator(
                 this.InstallDir,
-                this.SourceLanguages.Single(),
-                this.TargetLanguages.Single(), false, false);
+                sourceLanguage,
+                targetLanguage,
+                this.ModelSegmentationMethod,
+                false,
+                false);
 
             var sourceLines = File.ReadAllLines(sourceFile.FullName);
             batchTranslator.OutputReady += (x,y) => EvaluateTranslation(refFile, outOfDomainSize, targetFile);
@@ -456,9 +589,24 @@ namespace OpusCatMTEngine
             int outOfDomainSize, 
             FileInfo spOutput)
         {
+
+            string validateScript;
+
+            switch (this.ModelSegmentationMethod)
+            {
+                case SegmentationMethod.Bpe:
+                    validateScript = "ValidateBpe.bat";
+                    break;
+                case SegmentationMethod.SentencePiece:
+                    validateScript = "ValidateSp.bat";
+                    break;
+                default:
+                    return;
+            }
+
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                "Validate.bat",
-                $"{refFile.FullName} {outOfDomainSize} {spOutput.FullName}");
+                validateScript,
+                $"{refFile.FullName} OOD{outOfDomainSize} {spOutput.FullName}");
         }
 
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -479,8 +627,22 @@ namespace OpusCatMTEngine
             }
             var pathSplit = modelPath.Split(separator);
             //Multiple source languages separated by plus symbols
-            this.SourceLanguages = pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-            this.TargetLanguages = pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+
+            //For OPUS-MT models and monolingual Tatoeba models, 
+            //languages are included in path. For multilingual Tatoeba models,
+            //languages have to be fetched the metadata yml file
+            if (this.modelYaml == null)
+            {
+                this.SourceLanguages =
+                    pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                this.TargetLanguages =
+                    pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+            }
+            else
+            {
+                this.ParseModelYaml(this.modelYaml);
+            }
+            
             this.Name = pathSplit[1];
             this.ModelPath = modelPath;
         }
@@ -523,11 +685,77 @@ namespace OpusCatMTEngine
             this.SaveModelConfig();
         }
 
-        public MTModel(string modelPath)
+        //This is used for online models, model uri is included for later download of models
+        public MTModel(string modelPath, Uri modelUri, string yamlString=null)
         {
+            this.modelYaml = yamlString;
+            this.ModelUri = modelUri;
             this.ParseModelPath(modelPath);
         }
-    
+
+        private void ParseModelYaml(string yamlString)
+        {
+
+            try
+            {
+                this.SourceLanguages = new List<IsoLanguage>();
+                this.TargetLanguages = new List<IsoLanguage>();
+
+                var deserializer = new DeserializerBuilder().Build();
+                var res = deserializer.Deserialize<dynamic>(yamlString);
+
+                List<object> xamlSourceLangs = null;
+                if (res.ContainsKey("source-languages"))
+                {
+                    xamlSourceLangs = res["source-languages"];
+                }
+                
+                if (xamlSourceLangs != null)
+                {
+                    foreach (var lang in xamlSourceLangs)
+                    {
+                        this.SourceLanguages.Add(new IsoLanguage(lang.ToString()));
+                    }
+                }
+                else
+                {
+                    Log.Error($"No source langs in {this.ModelUri} yaml file.");
+                    this.Faulted = true;
+                    this.SourceLanguages.Add(new IsoLanguage("NO SOURCE LANGUAGES"));
+                }
+                List<object> xamlTargetLangs = null;
+                if (res.ContainsKey("target-languages"))
+                {
+                    xamlTargetLangs = res["target-languages"];
+                }
+
+                if (xamlTargetLangs != null)
+                {
+                    foreach (var lang in xamlTargetLangs)
+                    {
+                        this.TargetLanguages.Add(new IsoLanguage(lang.ToString()));
+                    }
+                }
+                else
+                {
+                    Log.Error($"No target langs in {this.ModelUri} yaml file.");
+                    this.Faulted = true;
+                    this.TargetLanguages.Add(new IsoLanguage("NO TARGET LANGUAGES"));
+                }
+            }
+            catch (YamlDotNet.Core.SyntaxErrorException ex)
+            {
+                Log.Error($"Error in the yaml syntax of model {this.ModelUri}. Error: {ex.Message}.");
+                this.SourceLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
+                this.TargetLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"source-langs or target-langs key missing from {this.ModelUri} yaml file.");
+            }
+            
+        }
+
         //This indicates whether the model is ready for translation
         //(essentially means whether fine-tuning has finished if the model is a fine-tuned model).
         public Boolean IsReady
@@ -535,6 +763,15 @@ namespace OpusCatMTEngine
             get
             {
                 return this.Status == MTModelStatus.OK;
+            }
+        }
+
+        public String ModelOrigin
+        {
+            get
+            {
+                return this.ModelUri.Segments[1];
+                
             }
         }
 
@@ -594,12 +831,23 @@ namespace OpusCatMTEngine
                 return this.Status == MTModelStatus.OK;
             }
         }
+
         public string SourceLanguageString
+        {
+            get { return String.Join(", ", this.SourceLanguages.Select(x => x.IsoRefName)); }
+        }
+
+        public string SourceCodesString
         {
             get { return String.Join("+", this.SourceLanguages); }
         }
 
         public string TargetLanguageString
+        {
+            get { return String.Join(", ", this.TargetLanguages.Select(x => x.IsoRefName)); }
+        }
+
+        public string TargetCodesString
         {
             get { return String.Join("+", this.TargetLanguages); }
         }
@@ -612,11 +860,51 @@ namespace OpusCatMTEngine
 
         public MTModelConfig ModelConfig { get => modelConfig; set => modelConfig = value; }
         public Process FinetuneProcess { get; set; }
-        
+
+        private string modelYaml;
+
+        public Uri ModelUri { get; private set; }
+        public bool Faulted { get; private set; }
+
+        private MarianDecoderConfig decoderSettings;
+
+        public bool SupportsWordAlignment { get => supportsWordAlignment; set => supportsWordAlignment = value; }
+        public bool DoesNotSupportWordAlignment { get => !supportsWordAlignment; }
+        public SegmentationMethod ModelSegmentationMethod
+        {
+            get
+            {
+                if (Directory.GetFiles(this.InstallDir).Any(x => x.EndsWith("source.bpe")))
+                {
+                    return SegmentationMethod.Bpe;
+                }
+                else
+                {
+                    return SegmentationMethod.SentencePiece;
+                }
+            }
+        }
+
+        private bool? hasOODValidSet;
+        public bool HasOODValidSet
+        {
+            get
+            {
+                if (!hasOODValidSet.HasValue)
+                {
+                    var dummyOOD = Directory.GetFiles(this.InstallDir, "dummyOOD*");
+                    hasOODValidSet = !dummyOOD.Any();
+                }
+                return hasOODValidSet.Value;
+            }
+        }
+
         private MTModelStatus status;
         private MTModelConfig modelConfig;
         private FileInfo trainingLogFileInfo;
+        private string modelYamlFilePath;
 
+        //TODO: this does not currently desegment output
         internal Process PreTranslateBatch(List<string> input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
             FileInfo output = new FileInfo(Path.Combine(this.InstallDir, "batchoutput.txt"));
@@ -624,6 +912,7 @@ namespace OpusCatMTEngine
                 this.InstallDir, 
                 sourceLang, 
                 targetLang, 
+                this.ModelSegmentationMethod,
                 this.modelConfig.IncludePlaceholderTags,
                 this.modelConfig.IncludeTagPairs);
             return batchTranslator.BatchTranslate(input,output,storeTranslations:true);

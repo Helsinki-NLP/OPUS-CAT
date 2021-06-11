@@ -12,8 +12,61 @@ using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
+    
     class MarianHelper
     {
+
+        internal static Process StartProcessInBackgroundWithRedirects(
+            string command,
+            EventHandler exitCallback = null,
+            DataReceivedEventHandler errorDataHandler = null)
+        {
+            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Process ExternalProcess = new Process();
+
+            ExternalProcess.StartInfo.FileName = "cmd";
+            ExternalProcess.StartInfo.Arguments = $"/c {command}";
+            ExternalProcess.StartInfo.UseShellExecute = false;
+            //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
+            ExternalProcess.StartInfo.RedirectStandardInput = true;
+            ExternalProcess.StartInfo.RedirectStandardOutput = true;
+            ExternalProcess.StartInfo.RedirectStandardError = true;
+            ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+
+            //Async error data handler is used for tracking progress
+            if (errorDataHandler != null)
+            {
+                ExternalProcess.ErrorDataReceived += errorDataHandler;
+            }
+            else
+            {
+                ExternalProcess.ErrorDataReceived += defaultErrorDataHandler;
+            }
+
+            ExternalProcess.StartInfo.CreateNoWindow = true;
+
+            if (exitCallback != null)
+            {
+                ExternalProcess.Exited += exitCallback;
+            }
+
+            ExternalProcess.Start();
+
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+            ChildProcessTracker.AddProcess(ExternalProcess);
+
+            ExternalProcess.EnableRaisingEvents = true;
+            ExternalProcess.BeginErrorReadLine();
+
+            ExternalProcess.StandardInput.AutoFlush = true;
+
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+
+            return ExternalProcess;
+        }
 
         internal static Process StartProcessInBackgroundWithRedirects(
             string fileName, 
@@ -138,6 +191,10 @@ namespace OpusCatMTEngine
 
         private static void defaultErrorDataHandler(object sender, DataReceivedEventArgs e)
         {
+            if (e.Data == "sentence processed")
+            {
+                return;
+            }
             Log.Information(e.Data);
         }
 
@@ -167,17 +224,15 @@ namespace OpusCatMTEngine
 
         internal static FileInfo PreprocessLanguage(
             FileInfo languageFile,
-            DirectoryInfo directory, 
-            string languageCode, 
-            FileInfo spmModel,
+            DirectoryInfo directory,
+            string languageCode,
+            FileInfo segmentationModel,
             bool includePlaceholderTags,
-            bool includeTagPairs)
+            bool includeTagPairs,
+            string targetLanguageToPrefix = null)
         {
             
             var preprocessedFile = new FileInfo(Path.Combine(directory.FullName, $"preprocessed_{languageFile.Name}"));
-
-            //Marian doesn't like spaces in names
-            var spFile = new FileInfo(Path.Combine(directory.FullName, $"sp_{languageFile.Name.Replace(" ", "_")}"));
 
             using (var rawFile = languageFile.OpenText())
             using (var preprocessedWriter = new StreamWriter(preprocessedFile.FullName))
@@ -190,10 +245,70 @@ namespace OpusCatMTEngine
                 }
             }
 
-            var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{spmModel.FullName}\" --output \"{spFile.FullName}\"";
-            var spmProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
-            spmProcess.WaitForExit();
-            return spFile;
+            //Marian doesn't like spaces in names
+            var segmentedFile = new FileInfo(Path.Combine(directory.FullName, $"seg_{languageFile.Name.Replace(" ", "_")}"));
+
+            switch (segmentationModel.Extension)
+            {
+                case ".spm":
+                    var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{segmentationModel.FullName}\" --output \"{segmentedFile.FullName}\"";
+                    var segmentationProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
+                    segmentationProcess.WaitForExit();
+                    break;
+                case ".bpe":
+                    //Truecasing is not used in any models, so this is a dummy tc model (empty). So it does not
+                    //matter is source.tcmodel is used for target language.
+                    var tcModelPath = $@"{directory.FullName}\source.tcmodel";
+
+                    var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                        $"type {preprocessedFile.FullName} | Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\" > {segmentedFile.FullName}");
+                    mosesProcess.WaitForExit();
+                    break;
+                default:
+                    segmentationProcess = null;
+                    throw new Exception("No segmentation model found");
+                    break;
+            }
+         
+            if (targetLanguageToPrefix != null)
+            {
+                var segmentedWithTargetPrefix = new FileInfo(Path.Combine(directory.FullName, $"prefix_{languageFile.Name.Replace(" ", "_")}"));
+
+                using (var segFile = segmentedFile.OpenText())
+                using (var prefixWriter = new StreamWriter(segmentedWithTargetPrefix.FullName))
+                {
+                    String line;
+                    while ((line = segFile.ReadLine()) != null)
+                    {
+                        var prefixedLine = $">>{targetLanguageToPrefix}<< {line}";
+                        prefixWriter.WriteLine(prefixedLine);
+                    }
+                }
+
+                return segmentedWithTargetPrefix;
+            }
+            else
+            {
+                return segmentedFile;
+            }
+
+            
+        }
+
+        internal static FileInfo LinesToFile(IEnumerable<string> lines, string sourceCode)
+        {
+            var fileGuid = Guid.NewGuid();
+            var srcFile = new FileInfo(Path.Combine(Path.GetTempPath(), $"{fileGuid}.{sourceCode}"));
+
+            using (var srcStream = srcFile.CreateText())
+            {
+                foreach (var line in lines)
+                {
+                    srcStream.WriteLine(line);
+                }
+            }
+
+            return srcFile;
         }
 
         internal static void GenerateAlignments(FileInfo spSource, FileInfo spTarget, FileInfo alignmentFile, FileInfo priorsFile)
@@ -207,11 +322,8 @@ namespace OpusCatMTEngine
             Log.Information($"Symmetrisizing alignment with args {symmetryArgs}");
             var symmetryProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Alignment\\atools.exe", symmetryArgs);
             symmetryProcess.WaitForExit();
-
         }
-
-
-
+        
         /* This uses marian-scorer to generate the alignment, but for some reason it's unstable and very slow
         internal static void GenerateAlignments(
             FileInfo spSource,

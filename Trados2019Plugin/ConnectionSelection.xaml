@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="OpusCatTranslationProvider.ConnectionSelection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:OpusCatTranslationProvider"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="_this">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+    <StackPanel Background="White">
+        <Label>Select the source of machine translations</Label>
+        <RadioButton IsChecked="{Binding ElementName=_this,Path=UseOpusCatConnection, Mode=TwoWay}" x:Name="OpusCatRadioButton">OPUS-CAT MT Engine (local machine)</RadioButton>
+        <RadioButton IsChecked="{Binding ElementName=_this,Path=UseElgConnection, Mode=TwoWay}" x:Name="ElgRadioButton">European Language Grid (EU-funded online service)</RadioButton>
+        <local:ConnectionControl
+            Visibility="{Binding IsChecked, ElementName=OpusCatRadioButton, Converter={StaticResource BoolToVis}}" 
+            x:Name="ConnectionControl" />
+        <local:ElgConnectionControl 
+            Visibility="{Binding IsChecked, ElementName=ElgRadioButton, Converter={StaticResource BoolToVis}}" 
+            x:Name="ElgConnectionControl" />
+    </StackPanel>
+</UserControl>

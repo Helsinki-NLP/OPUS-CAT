@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OpusCatMTEngine" GeneratedClassName="OpusCatMTEngineSettings">
   <Profiles />
   <Settings>
-    <Setting Name="ModelStorageUrl" Type="System.String" Scope="User">
+    <Setting Name="OpusModelStorageUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT-models/</Value>
     </Setting>
     <Setting Name="LocalOpusCatDir" Type="System.String" Scope="User">
@@ -29,8 +29,8 @@
     <Setting Name="ModelTagMaxLength" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
-    <Setting Name="StartHttpService" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="StartWcfHttpService" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="TatoebaDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">TatoebaTestsets</Value>
@@ -52,6 +52,33 @@
     </Setting>
     <Setting Name="HttpMtServicePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">8500</Value>
+    </Setting>
+    <Setting Name="StoreOpusCatDataInLocalAppdata" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ModelDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">models</Value>
+    </Setting>
+    <Setting Name="TatoebaModelStorageUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://object.pouta.csc.fi/Tatoeba-MT-models/</Value>
+    </Setting>
+    <Setting Name="DatabaseRemovalInterval" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="CacheMtInDatabase" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UseDatabaseRemoval" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AllowRemoteUse" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DisplayOverlay" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="OverlayFontsize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8</Value>
     </Setting>
   </Settings>
 </SettingsFile>

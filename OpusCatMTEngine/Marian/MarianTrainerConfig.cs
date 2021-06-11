@@ -20,6 +20,9 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "valid-script-args", ApplyNamingConventions = false)]
         public List<string> validScriptArgs { get; set; }
 
+        [YamlMember(Alias = "beam-size", ApplyNamingConventions = false)]
+        public string beamSize { get; set; }
+
         [YamlMember(Alias = "learn-rate", ApplyNamingConventions = false)]
         public string learnRate { get; set; }
 

@@ -39,22 +39,23 @@ namespace OpusCatMTEngine
 
         private bool includePlaceholderTags;
         private bool includeTagPairs;
+        private SegmentationMethod segmentation;
 
-        private void WriteToTranslationDb(object sender, EventArgs e, IEnumerable<string> input, FileInfo spOutput)
+        private void WriteToTranslationDb(object sender, EventArgs e, IEnumerable<string> input, FileInfo spInput, FileInfo transAndAlign)
         {
             Queue<string> inputQueue
                 = new Queue<string>(input);
 
-            if (spOutput.Exists)
+            if (transAndAlign.Exists)
             {
-                using (var reader = spOutput.OpenText())
+                using (var reader = transAndAlign.OpenText())
                 {
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        var nonSpLine = (line.Replace(" ", "")).Replace("▁", " ").Trim();
                         var sourceLine = inputQueue.Dequeue();
-                        TranslationDbHelper.WriteTranslationToDb(sourceLine, nonSpLine, this.SystemName);
+                        var transPair = new TranslationPair(sourceLine, line, this.segmentation, this.TargetCode);
+                        TranslationDbHelper.WriteTranslationToDb(sourceLine, transPair, this.SystemName, this.segmentation, this.TargetCode);
                     }
                 }
             }
@@ -64,13 +65,15 @@ namespace OpusCatMTEngine
         public MarianBatchTranslator(
             string modelDir, 
             IsoLanguage sourceLang,
-            IsoLanguage targetLang, 
+            IsoLanguage targetLang,
+            SegmentationMethod segmentation,
             bool includePlaceholderTags, 
             bool includeTagPairs)
         {
-            this.SourceCode = sourceLang.ShortestIsoCode;
-            this.TargetCode = targetLang.ShortestIsoCode;
-            
+            this.SourceCode = sourceLang.OriginalCode;
+            this.TargetCode = targetLang.OriginalCode;
+            this.segmentation = segmentation;
+
             this.includePlaceholderTags = includePlaceholderTags;
             this.includeTagPairs = includeTagPairs;
             this.modelDir = new DirectoryInfo(modelDir);
@@ -96,34 +99,55 @@ namespace OpusCatMTEngine
             }
 
         }
+
         
-        //Callback can be used to do different things with translation output/input (default is to save in translation cache)
+        
+        
         internal Process BatchTranslate(
             IEnumerable<string> input,
             FileInfo spOutput,
             Boolean preprocessedInput=false,
             Boolean storeTranslations=false)
         {
-            if (storeTranslations)
-            {
-                this.OutputReady += (x, y) => this.WriteToTranslationDb(x, y, input, spOutput);
-            }
-
-            Log.Information($"Starting batch translator for model {this.SystemName}.");
             
-            var cmd = "TranslateBatchSentencePiece.bat";
-                        
-            FileInfo spInput = this.PreprocessInput(input,preprocessedInput);
+            Log.Information($"Starting batch translator for model {this.SystemName}.");
+
+            var srcFile = MarianHelper.LinesToFile(input, this.SourceCode);
+            FileInfo spInput;
+            if (!preprocessedInput)
+            {
+                
+                FileInfo sourceSegModel =
+                    this.modelDir.GetFiles().Where(x => Regex.IsMatch(x.Name, "source.(spm|bpe)")).Single();
+
+                spInput = MarianHelper.PreprocessLanguage(
+                    srcFile,
+                    new DirectoryInfo(Path.GetTempPath()),
+                    this.TargetCode,
+                    sourceSegModel,
+                    this.includePlaceholderTags,
+                    this.includeTagPairs);
+            }
+            else
+            {
+                spInput = srcFile;
+            }
 
             //TODO: check the translation cache for translations beforehand, and only translate new
             //segments (also change translation cache to account for different decoder configs for
             //same systems, i.e. keep track of decoder settings)
 
             FileInfo transAndAlign = new FileInfo($"{spOutput.FullName}.transandalign");
-            var args = $"{this.modelDir.FullName} {spInput.FullName} {transAndAlign.FullName} --log-level=info --quiet";
+            var args = $"\"{this.modelDir.FullName}\" \"{spInput.FullName}\" \"{transAndAlign.FullName}\" --log-level=info --quiet";
 
-            EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
+            if (storeTranslations)
+            {
+                this.OutputReady += (x, y) => this.WriteToTranslationDb(x, y, input, spInput, transAndAlign);
+            }
             
+            EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
+
+            var cmd = "TranslateBatchSentencePiece.bat";
             var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args, exitHandler);
             
 
@@ -131,7 +155,6 @@ namespace OpusCatMTEngine
         }
 
         private void BatchProcess_Exited(
-            
             FileInfo transAndAlignOutput,
             FileInfo spOutput,
             object sender,
@@ -163,33 +186,6 @@ namespace OpusCatMTEngine
             this.OnOutputReady(e);
         }
 
-
-
-        internal FileInfo PreprocessInput(IEnumerable<string> input, Boolean preprocessedInput=false)
-        {
-            var fileGuid = Guid.NewGuid();
-            var srcFile = new FileInfo(Path.Combine(Path.GetTempPath(), $"{fileGuid}.{this.SourceCode}"));
-
-            using (var srcStream = new StreamWriter(srcFile.FullName, true, Encoding.UTF8))
-            {
-                foreach (var line in input)
-                {
-                    srcStream.WriteLine(line);
-                }
-            }
-
-            FileInfo spSrcFile;
-            if (!preprocessedInput)
-            {
-                var spmModel = this.modelDir.GetFiles("source.spm").Single();
-                spSrcFile = MarianHelper.PreprocessLanguage(srcFile, new DirectoryInfo(Path.GetTempPath()), this.SourceCode, spmModel, this.includePlaceholderTags, this.includeTagPairs);
-            }
-            else
-            {
-                spSrcFile = srcFile;
-            }
-            return spSrcFile;
-        }
 
         private void errorDataHandler(object sender, DataReceivedEventArgs e)
         {

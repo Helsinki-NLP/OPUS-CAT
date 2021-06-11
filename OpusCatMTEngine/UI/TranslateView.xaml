@@ -4,20 +4,49 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
-        Height="400" Width="800">
+        x:Name="_this"
+        d:DesignHeight="450" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+    </UserControl.Resources>
     <Grid>
         <StackPanel Margin="10">
-            <Label>Source text:</Label>
-            <Border BorderThickness="1" BorderBrush="Black">
-                <TextBox AcceptsReturn="True"  TextWrapping="Wrap" Name="SourceBox" Height="150"></TextBox>
-            </Border>
+            <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
             <StackPanel Orientation="Horizontal">
-                <Button Click="translateButton_Click">Translate</Button>
+                <Label>Source language</Label>
+                <ComboBox ItemsSource="{Binding Path=SourceLanguages}"
+                        DisplayMemberPath="IsoRefName"
+                        SelectedValue="{Binding ElementName=_this, Path=SourceLanguage, Mode=TwoWay}"
+                        Width="200"/>
+                <Label>Target language</Label>
+                <ComboBox ItemsSource="{Binding Path=TargetLanguages}"
+                        DisplayMemberPath="IsoRefName"
+                        SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
+                        Width="200"/>
+                <CheckBox VerticalAlignment="Center" IsChecked="{Binding ElementName=_this, Path=ShowSegmentation, Mode=TwoWay}">Show subword segmentation</CheckBox>
             </StackPanel>
-            <Label>Translation:</Label>
+            <DockPanel>
+                <Label DockPanel.Dock="Left" Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
+            </DockPanel>
             <Border BorderThickness="1" BorderBrush="Black">
-                <TextBox IsReadOnlyCaretVisible="True" IsReadOnly="True" TextWrapping="Wrap" Name="TargetBox" Height="150"></TextBox>
+                <RichTextBox AcceptsReturn="True" Name="SourceBox" Height="130"></RichTextBox>
+            </Border>
+            <StackPanel Margin="0,5" Orientation="Horizontal">
+                <Button 
+                    Click="translateButton_Click" 
+                    Content="{x:Static resx:Resources.Translate_TranslateButton}"/>
+                <Label Visibility="{Binding Path=DoesNotSupportWordAlignment, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}">Alignments are not available for this model</Label>
+                <Label Visibility="{Binding Path=SupportsWordAlignment, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}">Alignments are available for this model (hover over word to see its aligned words, if any)</Label>
+            </StackPanel>
+            <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
+            <Border BorderThickness="1" BorderBrush="Black">
+                <RichTextBox 
+                    IsReadOnlyCaretVisible="True" 
+                    IsReadOnly="True" 
+                    Name="TargetBox" 
+                    Height="130"></RichTextBox>
             </Border>
         </StackPanel>
     </Grid>

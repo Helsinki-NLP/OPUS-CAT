@@ -1,0 +1,4 @@
+﻿Use pyinstaller to convert python scripts to exe files.
+To build mosesprocesser:
+1. Clone sacremoses: git clone https://github.com/alvations/sacremoses.git
+2. In the sacremoses directory run the following command:  pyinstaller --onefile --add-data 'sacremoses/data;sacremoses/data' .\mosesprocessor.py

@@ -4,36 +4,85 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:OpusCatMTEngine"
+             xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="_this">
     <Border Margin="5" BorderThickness="1" BorderBrush="Black">
         <StackPanel>
             <Border Margin="5" BorderThickness="1" BorderBrush="Black">
-                <Button HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5" Padding="5" Click="OpenCustomSettingsInEditor_Click">Open finetune settings in text editor</Button>
+                <Button 
+                    HorizontalAlignment="Left" 
+                    VerticalAlignment="Center" 
+                    Margin="5" 
+                    Padding="5" 
+                    Click="OpenCustomSettingsInEditor_Click"
+                    Content="{x:Static resx:Resources.Settings_OpenSettingsFileButton}"/>
             </Border>
             <Border Margin="5" BorderThickness="1" BorderBrush="Black">
                 <StackPanel>
                     <TextBlock Margin="5" DockPanel.Dock="Top">
-                    <Run FontWeight="Bold">Note:</Run> Restart OPUS-CAT MT Engine after changing these values.</TextBlock>
+                    <Run FontWeight="Bold" Text="{x:Static resx:Resources.Settings_NoteHeading}"/> <Run Text="{x:Static resx:Resources.Settings_RestartReminder}"/></TextBlock>
                     <DockPanel Margin="0,0,0,0">
 
-                        <Label DockPanel.Dock="Left">MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):</Label>
+                        <Label 
+                            DockPanel.Dock="Left"
+                            Content="{x:Static resx:Resources.Settings_NetTcpPortLabel}"/>
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-                        <Button Margin="5" IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}" DockPanel.Dock="Right" Width="100"  Click="saveButton_Click">Save</Button>
 
 
-                        <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                        <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="PreviewNumberInput" VerticalAlignment="Center"></TextBox>
+
                     </DockPanel>
                     <DockPanel Margin="0,0,0,0">
-
-                        <Label DockPanel.Dock="Left">MT service HTTP port (used with other integrations, 1024-65535):</Label>
+                        <Label 
+                            DockPanel.Dock="Left"
+                            Content="{x:Static resx:Resources.Settings_HttpPortLabel}"/>
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-                        <Button Margin="5" IsEnabled="{Binding ElementName=_this, Path=HttpSaveButtonEnabled}" DockPanel.Dock="Right" Width="100"  Click="httpSaveButton_Click">Save</Button>
-
-
-                        <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="ServicePortBox_PreviewTextInput" VerticalAlignment="Center"></TextBox>
+                        <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="PreviewNumberInput" VerticalAlignment="Center"></TextBox>
                     </DockPanel>
+                    <DockPanel Margin="0,0,0,0">
+                        <CheckBox IsChecked="{Binding ElementName=_this, Path=StoreDataInAppdata, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{x:Static resx:Resources.Settings_StoreInAppdataCheckbox}" />
+
+                    </DockPanel>
+                    <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel>
+                            <CheckBox 
+                                IsChecked="{Binding ElementName=_this, Path=CacheMtInDatabase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Use MT database for caching MT</CheckBox>
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox 
+                                    IsChecked="{Binding ElementName=_this, Path=UseDatabaseRemoval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    VerticalAlignment="Center" />
+                                <Label>Remove MT from the database</Label>
+                                <TextBox
+                                    Name="RemovalIntervalBox"
+                                    Text="{Binding ElementName=_this, Path=DatabaseRemovalInterval, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}"
+                                    PreviewTextInput="PreviewNumberInput"
+                                    Width="20" 
+                                    VerticalAlignment="Center" />
+                                <Label VerticalAlignment="Center" Width="183">days after it has been generated</Label>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                        <StackPanel>
+                            <CheckBox 
+                                IsChecked="{Binding ElementName=_this, Path=DisplayOverlay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Show overlay displaying most recent translation</CheckBox>
+                        </StackPanel>
+                    </Border>
+                    <StackPanel Orientation="Horizontal">
+                        <Button 
+                                Margin="5" 
+                                IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}" 
+                                Width="100"  
+                                Click="saveButton_Click"
+                                Content="{x:Static resx:Resources.Settings_SaveButton}"/>
+                        <Button 
+                                Margin="5"  
+                                Width="100"  
+                                Click="revertToDefaultsButton_Click"
+                                Content="{x:Static resx:Resources.Settings_RevertToDefaultsButton}"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </StackPanel>

@@ -25,13 +25,49 @@ namespace OpusCatMTEngine
                 return string.Empty;
             }
         }
+        
+
+        public static string GetOpusCatDataPath(string restOfPath=null)
+        {
+            if (OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata)
+            {
+                return GetLocalAppDataPath(restOfPath);
+            }
+            else
+            {
+                string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (restOfPath == null)
+                {
+                    return Path.Combine(
+                        assemblyFolder,
+                        OpusCatMTEngineSettings.Default.LocalOpusCatDir);
+                }
+                else
+                {
+                    return Path.Combine(
+                        assemblyFolder,
+                        OpusCatMTEngineSettings.Default.LocalOpusCatDir,
+                        restOfPath);
+                }
+            }
+
+        }
 
         public static string GetLocalAppDataPath(string restOfPath)
         {
-            return Path.Combine(
+            if (restOfPath == null)
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    OpusCatMTEngineSettings.Default.LocalOpusCatDir);
+            }
+            else
+            {
+                return Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     OpusCatMTEngineSettings.Default.LocalOpusCatDir,
                     restOfPath);
+            }
         }
 
         public static void SplitToFiles(List<Tuple<string, string>> biText, string srcPath, string trgPath)
@@ -54,11 +90,18 @@ namespace OpusCatMTEngine
         {
             var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var testsets = Directory.GetDirectories(Path.Combine(processDir,OpusCatMTEngineSettings.Default.TatoebaDir));            
-            var testsetDir = testsets.Single(
+            var testsetDir = testsets.SingleOrDefault(
                 x => x.EndsWith($"{sourceCode}-{targetCode}") || x.EndsWith($"{targetCode}-{sourceCode}"));
-            var source = Directory.GetFiles(testsetDir, $"tatoeba.{sourceCode}.txt").Select(x => new FileInfo(x)).Single();
-            var target = Directory.GetFiles(testsetDir, $"tatoeba.{targetCode}.txt").Select(x => new FileInfo(x)).Single();
-            return new ParallelFilePair(source, target);
+            if (testsetDir == null)
+            {
+                return null;
+            }
+            else
+            {
+                var source = Directory.GetFiles(testsetDir, $"tatoeba.{sourceCode}.txt").Select(x => new FileInfo(x)).Single();
+                var target = Directory.GetFiles(testsetDir, $"tatoeba.{targetCode}.txt").Select(x => new FileInfo(x)).Single();
+                return new ParallelFilePair(source, target);
+            }
         }
 
         internal static FileInfo CombineFiles(FileInfo file1, FileInfo file2, string combinedPath, int file1Lines, int file2Lines)
@@ -138,6 +181,23 @@ namespace OpusCatMTEngine
             return (pair1, pair2);
 
         }
-        
+
+        internal static ParallelFilePair GenerateDummyOODValidSet(DirectoryInfo modelDir)
+        {
+            FileInfo dummySource = new FileInfo(Path.Combine(modelDir.FullName,"dummyOOD.source"));
+            FileInfo dummyTarget = new FileInfo(Path.Combine(modelDir.FullName, "dummyOOD.target"));
+
+            using (var sourceWriter = dummySource.CreateText())
+            using (var targetWriter = dummyTarget.CreateText())
+            {
+                for (var i = 0; i < OpusCatMTEngineSettings.Default.OODValidSetSize;i++)
+                {
+                    sourceWriter.WriteLine("0");
+                    targetWriter.WriteLine("0");
+                }
+            }
+
+            return new ParallelFilePair(dummySource, dummyTarget);
+        }
     }
 }

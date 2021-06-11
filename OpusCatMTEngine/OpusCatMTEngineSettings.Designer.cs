@@ -26,12 +26,12 @@ namespace OpusCatMTEngine {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/OPUS-MT-models/")]
-        public string ModelStorageUrl {
+        public string OpusModelStorageUrl {
             get {
-                return ((string)(this["ModelStorageUrl"]));
+                return ((string)(this["OpusModelStorageUrl"]));
             }
             set {
-                this["ModelStorageUrl"] = value;
+                this["OpusModelStorageUrl"] = value;
             }
         }
         
@@ -133,13 +133,13 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool StartHttpService {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartWcfHttpService {
             get {
-                return ((bool)(this["StartHttpService"]));
+                return ((bool)(this["StartWcfHttpService"]));
             }
             set {
-                this["StartHttpService"] = value;
+                this["StartWcfHttpService"] = value;
             }
         }
         
@@ -224,6 +224,114 @@ namespace OpusCatMTEngine {
             }
             set {
                 this["HttpMtServicePort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool StoreOpusCatDataInLocalAppdata {
+            get {
+                return ((bool)(this["StoreOpusCatDataInLocalAppdata"]));
+            }
+            set {
+                this["StoreOpusCatDataInLocalAppdata"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("models")]
+        public string ModelDir {
+            get {
+                return ((string)(this["ModelDir"]));
+            }
+            set {
+                this["ModelDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/Tatoeba-MT-models/")]
+        public string TatoebaModelStorageUrl {
+            get {
+                return ((string)(this["TatoebaModelStorageUrl"]));
+            }
+            set {
+                this["TatoebaModelStorageUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public int DatabaseRemovalInterval {
+            get {
+                return ((int)(this["DatabaseRemovalInterval"]));
+            }
+            set {
+                this["DatabaseRemovalInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CacheMtInDatabase {
+            get {
+                return ((bool)(this["CacheMtInDatabase"]));
+            }
+            set {
+                this["CacheMtInDatabase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseDatabaseRemoval {
+            get {
+                return ((bool)(this["UseDatabaseRemoval"]));
+            }
+            set {
+                this["UseDatabaseRemoval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowRemoteUse {
+            get {
+                return ((bool)(this["AllowRemoteUse"]));
+            }
+            set {
+                this["AllowRemoteUse"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisplayOverlay {
+            get {
+                return ((bool)(this["DisplayOverlay"]));
+            }
+            set {
+                this["DisplayOverlay"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int OverlayFontsize {
+            get {
+                return ((int)(this["OverlayFontsize"]));
+            }
+            set {
+                this["OverlayFontsize"] = value;
             }
         }
     }

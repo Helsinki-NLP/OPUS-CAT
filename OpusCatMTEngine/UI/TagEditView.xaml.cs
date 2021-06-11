@@ -29,7 +29,7 @@ namespace OpusCatMTEngine
         {
             this.Model = selectedModel;
             this.DataContext = selectedModel;
-            this.Title = $"Edit tags for {Model.Name}";
+            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Tags_EditTagsTitle,Model.Name);
             InitializeComponent();
             this.TagList.ItemsSource = selectedModel.ModelConfig.ModelTags;
         }
