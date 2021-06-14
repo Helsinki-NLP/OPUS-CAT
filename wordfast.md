@@ -6,56 +6,25 @@ permalink: /wordfast
 ## Using OPUS-CAT in Wordfast Classic and Wordfast Pro
 
 OPUS-CAT can be used in different Wordfast CAT tools by using the **Custom MT** functionality offered by these products.
-**NOTE:** Using OPUS-CAT with Wordfast requires some extra configuration compared to Trados and memoQ plugins. This is because the Wordfast integration requires access tothe HTTP API of OPUS-CAT MT Engine, which has to be separately configured. 
+**NOTE:** Make sure you use latest version of OPUS-CAT MT Engine with Wordfast. Earlier versions of OPUS-CAT MT Engine required extra configuration to enable it to be used with Wordfast.
 
 ### Installing the OPUS-CAT MT Engine
 
-Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.0.0.5/OpusCatMTEngine_v1.0.0.5.zip) and install it to your computer by extracting it to a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT integrations require that the OPUS-CAT MT Engine is installed on the same computer and running when OPUS-CAT machine translation is used.
-
-### Installing machine translation models
-
-1. Start the OPUS-CAT MT Engine application by clicking *OpusCatMTEngine.exe* in the extraction folder (note that the file extension .exe may be hidden in Windows Explorer, in that case the file is shown as OpusCatMTEngine).
-2. Install models from the OPUS model repository for the language pairs that you require.
+1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.1.0.3/OpusCatMtEngine_v1.1.0.3.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
+2. Start the OPUS-CAT MT Engine application by clicking OpusCatMTEngine.exe in the extraction folder (note that the file extension .exe may be hidden in Windows Explorer, in that case the file is shown as OpusCatMTEngine).
+3. Install models from the OPUS model repository for the language pairs that you require.
    - Click **Install OPUS model from Web**.
-	<img src="./images/InstallOnlineModel.PNG?raw=true" alt="drawing" width="75%"/>
-   - Enter source and target language codes in the filtering boxes on the top row, select a model (usually the one with latest date suffix) and then click **Install locally**.
-       <img src="./images/ModelList.PNG?raw=true" alt="drawing" width="75%"/>
-3. After the model has been downloaded and installed, test that it works.
+       <img src="./images/InstallOnlineModel.PNG?raw=true" alt="drawing" width="100%"/>
+   - Next, OPUS-CAT MT Engine fetches a list of models available online. The text _Fetching list of online models, please wait..._ is displayed in the top part of the window.
+       <img src="./images/FetchingModels.png?raw=true" alt="drawing" width="100%"/>
+   - When the text in the top part of the window changes to _Downloadable online models_, enter source and target languages (or parts of them) in the filtering boxes on the top row. From the filtered models, select a model to install (it's usually best to select the one with latest date suffix) and then click **Install locally**.
+       <img src="./images/ModelList.PNG?raw=true" alt="drawing" width="100%"/>
+4. After the model has been downloaded and installed, test that it works.
     - Select model and click **Translate with model**.
-       <img src="./images/TestModel.PNG?raw=true" alt="drawing" width="75%"/>
+       <img src="./images/TestModel.PNG?raw=true" alt="drawing" width="100%"/>
     - Enter translation in the **Source text** area, click **Translate** and wait for a translation to appear in the **Translation** area (producing the first translation may take some time, as the model needs to be initialized, subsequent translations are faster).
-       <img src="./images/TestTranslation.PNG?raw=true" alt="drawing" width="75%"/>
+       <img src="./images/TestTranslation.PNG?raw=true" alt="drawing" width="100%"/>
  
-### Configuring the HTTP API
-
-Wordfast **Custom MT** fetches translations by using HTTP requests. OPUS-CAT MT Engine includes an HTTP API for this purpose, but it has to be granted a permission to receive requests before OPUS-CAT can be used in Wordfast. Granting the permission to receive requests requires system administrator permissions. If you do not have system administrator permissions on your computer, contact your IT support. 
-
-To enable the HTTP API, first open the Windows command prompt as an administrator:
-
-- Press Windows key, type *cmd*, right-click **Command prompt** app, and select **Run as administrator**.
-
-Then use the **netsh** utility with the command prompt by typing the following command: 
-
-```
-netsh http add urlacl url=http://+:8500/ user=[USERNAME]
-```
-
-Substitute your username for *[USERNAME]* (you can find out your usename by typing *whoami* into the command prompt). 8500 is the port number which the HTTP API uses by default. This command specifies that port 8500 can be used by the named user, which makes it possible to use the HTTP API of OPUS-CAT MT Engine. 
-
-To see whether the command was performed successfully, restart OPUS-CAT MT Engine, open your browser, and paste the following URL to the address bar:
-
-```
-http://localhost:8500/MTRestService/ListSupportedLanguagePairs?tokenCode=0 
-```
-
-You should see a list of language pairs for which models have been installed in OPUS-CAT MT Engine.
-
-The *netsh* command only needs to be executed once, the permission to use the port remain unless it is deleted. If you want to delete the permission, type the following command into the command prompt:
-
-```
-*netsh http delete urlacl url=http://+:8500/*
-```
-
 ### Using OPUS-CAT in Wordfast Pro
 
 1. Make sure that OPUS-CAT MT Engine is running.
