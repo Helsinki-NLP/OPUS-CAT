@@ -86,7 +86,7 @@ namespace OpusCatMTEngine
                                           OpusCatMTEngine.Properties.Resources.App_ConfirmDbCaption,
                                           MessageBoxButton.OKCancel,
                                           MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
+                if (result == MessageBoxResult.OK)
                 {
                     translationDb.Delete();
                 }
@@ -105,7 +105,10 @@ namespace OpusCatMTEngine
             }
 
             //Remove old translation from the db (time period can be set in settings)
-            TranslationDbHelper.RemoveOldTranslations();
+            if (OpusCatMTEngineSettings.Default.CacheMtInDatabase)
+            {
+                TranslationDbHelper.RemoveOldTranslations();
+            }
         }
 
         private static void RemoveOldTranslations()
@@ -116,7 +119,7 @@ namespace OpusCatMTEngine
             using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
             {
                 m_dbConnection.Open();
-                //TODO: why does the parameter not work for days?
+
                 using (SQLiteCommand deleteOld =
                     new SQLiteCommand("DELETE FROM translations WHERE additiondate <= date('now',@period)", m_dbConnection))
                 {
