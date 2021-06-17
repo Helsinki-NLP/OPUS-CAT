@@ -5,7 +5,7 @@ permalink: /install
 ---
 ## Quickstart for translators
 
-1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.1.0.3/OpusCatMtEngine_v1.1.0.3.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
+1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.1.0.4/OpusCatMtEngine_v1.1.0.4.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
 2. Download the plugin for your translation software and install it:
   - Trados Studio 2017, 2019 and 2021: Download the plugin from the [SDL AppStore](https://appstore.sdl.com/language/app/opus-cat-nmt/1160/) and double-click .sdlplugin file to install.
   - [memoQ 9.2 or older](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-05-26/FiskmoMTPlugin.dll), [memoQ 9.3 to 9.6](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2020-10-07/FiskmoMTPlugin.dll), [memoQ 9.7 or newer](https://github.com/Helsinki-NLP/OPUS-CAT/raw/develop/build/2021-05-27/FiskmoMTPlugin.dll): Copy the plugin file to the Addins subfolder in the memoQ installation folder. **IMPORTANT**: Make sure to unblock the dll file before copying it (right-click file, choose **Properties**, check the **Unblock** box in the bottom right of the **Properties** window).

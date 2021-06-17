@@ -5,7 +5,7 @@ permalink: /tradosplugin
 ---
 ## Quickstart for translators
 
-1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.1.0.3/OpusCatMtEngine_v1.1.0.3.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
+1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.1.0.4/OpusCatMtEngine_v1.1.0.4.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
 2. Download the plugin for your version of Trados Studio from the [SDL AppStore](https://appstore.sdl.com/language/app/opus-cat-nmt/1160/) and double-click .sdlplugin file to install.
 3. Start the OPUS-CAT MT Engine application by clicking OpusCatMTEngine.exe in the extraction folder (note that the file extension .exe may be hidden in Windows Explorer, in that case the file is shown as OpusCatMTEngine).
 4. Install models from the OPUS model repository for the language pairs that you require.
