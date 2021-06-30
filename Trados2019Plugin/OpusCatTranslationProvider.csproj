@@ -172,6 +172,7 @@
     <Compile Include="ConnectionControl.xaml.cs">
       <DependentUpon>ConnectionControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OpusCatMtServiceConnection.cs" />
     <Compile Include="ElgServiceConnection.cs" />
     <Compile Include="ElgTokenResponse.cs" />
     <Compile Include="FileReader.cs" />

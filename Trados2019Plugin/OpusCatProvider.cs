@@ -231,7 +231,15 @@ namespace OpusCatTranslationProvider
             {
                 //The preorder method doesn't wait for the translation, so the requests return quicker
                 var sourceSegmentTextsNeeded = sourceSegmentTexts.Take(options.pregenerateSegmentCount).ToList();
-                OpusCatMTServiceHelper.PreOrderBatch(options, sourceSegmentTextsNeeded, sourceCode, targetCode, options.modelTag);
+                System.Threading.Tasks.Task.Run(() =>
+                {
+                    OpusCatProvider.OpusCatMtEngineConnection.PreOrderBatch(
+                        options.mtServiceAddress, options.mtServicePort,
+                        sourceSegmentTextsNeeded,
+                        sourceCode,
+                        targetCode,
+                        options.modelTag);
+                });
             }
         }
 
@@ -285,6 +293,10 @@ namespace OpusCatTranslationProvider
             if (this.Options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
             {
                 OpusCatProvider.ElgConnection = new ElgServiceConnection(new TradosElgCredentialWrapper(credentialStore)); 
+            }
+            else
+            {
+                OpusCatProvider.OpusCatMtEngineConnection = new OpusCatMtServiceConnection();
             }
 
         }
@@ -451,6 +463,7 @@ namespace OpusCatTranslationProvider
         }
 
         internal static ElgServiceConnection ElgConnection { get; private set; }
+        internal static OpusCatMtServiceConnection OpusCatMtEngineConnection { get; private set; }
         #endregion
 
         #endregion

@@ -169,7 +169,7 @@ namespace OpusCatMTEngine
                 this.FilterOnlineModels();
             }
         }
-        
+
         public string SourceFilter
         {
             get => _sourceFilter;
@@ -202,7 +202,7 @@ namespace OpusCatMTEngine
                 this.FilterOnlineModels();
             }
         }
-        
+
         public bool OnlineModelListFetched
         {
             get => onlineModelListFetched;
@@ -213,7 +213,18 @@ namespace OpusCatMTEngine
             }
         }
 
+        public IsoLanguage OverrideModelTargetLanguage
+        {
+            get => _overrideModelTargetLanguage;
+            set
+            {
+                _overrideModelTargetLanguage = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private bool onlineModelListFetched;
+        private IsoLanguage _overrideModelTargetLanguage;
 
         public string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
@@ -320,7 +331,7 @@ namespace OpusCatMTEngine
 
             if (this.ShowNewestOnly)
             {
-                var onlyNew = new Dictionary<string,MTModel>();
+                var onlyNew = new Dictionary<string, MTModel>();
                 foreach (var model in filteredModels)
                 {
                     if (onlyNew.ContainsKey(model.ModelBaseName))
@@ -389,7 +400,7 @@ namespace OpusCatMTEngine
             this.ShowOpusModels = true;
             this.ShowTatoebaModels = true;
             this.ShowNewestOnly = true;
-            
+
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
             this.opusModelDir = new DirectoryInfo(modelDirPath);
             if (!this.OpusModelDir.Exists)
@@ -600,7 +611,7 @@ namespace OpusCatMTEngine
         }
 
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
-        {           
+        {
             var yamlString = e.Result;
             yamlString = Regex.Replace(yamlString, "- (>>[^<]+<<)", "- \"$1\"");
             yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
@@ -608,7 +619,7 @@ namespace OpusCatMTEngine
             {
                 Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
                 yamlString = Regex.Replace(yamlString, @"(?<!- )devset = top", "devset: top");
-                
+
             }
             if (yamlString.Contains("unused dev/test data is added to training data"))
             {
@@ -865,6 +876,14 @@ namespace OpusCatMTEngine
             if (mtModel == null)
             {
                 throw new FaultException($"No MT model available for {srcLang}-{trgLang}");
+            }
+
+            //If override model has been selected, switch target language to the
+            //target language chosen in the UI (this makes it possible to use multilingual
+            //models as override models).
+            if (this.OverrideModel != null)
+            {
+                trgLang = this.OverrideModelTargetLanguage;
             }
 
             var translationTask = mtModel.Translate(input, srcLang, trgLang);

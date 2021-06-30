@@ -24,6 +24,21 @@
                             <Setter Property="Margin" Value="0,0,0,5" />
                         </Style>
                     </StackPanel.Resources>
+                    <Border
+                        BorderBrush="Black" BorderThickness="1"
+                        Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}">
+                        <StackPanel Margin="5">
+                            <Label>Override model target language</Label>
+                        <ComboBox ItemsSource="{Binding Path=OverrideModel.TargetLanguages, Mode=TwoWay}"
+                            DisplayMemberPath="IsoRefName"
+                            SelectedValue="{Binding OverrideModelTargetLanguage, Mode=TwoWay}"
+                            Width="200"/>
+                            <Button 
+                        Name="cancelOverride"
+                        Click="btnCancelOverride_Click"
+                        Content="{x:Static resx:Resources.Main_CancelOverrideButton}"/>
+                        </StackPanel>
+                    </Border>
                     <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click" Content="{x:Static resx:Resources.Main_InstallFromWebButton}" />
                     <Button Name="addZipModel" Click="btnAddZipModel_Click" Content="{x:Static resx:Resources.Main_InstallFromZipButton}" />
                     <Button Name="customizeModel" Click="btnCustomizeModel_Click" Content="{x:Static resx:Resources.Main_FinetuneButton}">
@@ -113,11 +128,6 @@
                         Name="setAsOverride"
                         Click="btnSetOverride_Click"
                         Content="{x:Static resx:Resources.Main_SetAsOverrideModelButton}"/>
-                    <Button 
-                        Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}"
-                        Name="cancelOverride"
-                        Click="btnCancelOverride_Click"
-                        Content="{x:Static resx:Resources.Main_CancelOverrideButton}"/>
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 

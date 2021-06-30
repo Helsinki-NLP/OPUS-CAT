@@ -118,7 +118,8 @@ namespace OpusCatTranslationProvider
             string translatedSentence;
             if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.OpusCatMtEngine)
             {
-                translatedSentence = OpusCatMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode, this._options.modelTag);
+                //translatedSentence = OpusCatMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode, this._options.modelTag);
+                translatedSentence = OpusCatProvider.OpusCatMtEngineConnection.Translate(this._options.mtServiceAddress, this._options.mtServicePort, sourceText, sourceCode, targetCode, this._options.modelTag);
             }
             else if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
             {

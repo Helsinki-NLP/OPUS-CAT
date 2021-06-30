@@ -185,15 +185,15 @@ namespace OpusCatMTEngine
         /// <param name="trgLangCode"></param>
         /// 
         [HttpPost]
-        public string PreOrderBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        public string PreOrderBatch([FromBody] List<string> input, string tokenCode="", string srcLangCode="", string trgLangCode="", string modelTag="")
         {
-
+            
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return "";
 
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
-
+            
             if (input.Count == 0)
             {
                 return "input was empty";
@@ -203,7 +203,7 @@ namespace OpusCatMTEngine
             {
                 this.mtProvider.Translate(inputString, sourceLang, targetLang, modelTag);
             }
-
+            
             /* Batch preordering was done earlier with batch translation, but it doesn't seem
              * to be much quicker than normal translation, and it has the problem of providing all
              * the translations at once in the end. Using normal translation means the MT is ready

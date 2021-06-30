@@ -85,6 +85,7 @@ namespace OpusCatMTEngine
             }
             
             ((ModelManager)this.DataContext).OverrideModel = selectedModel;
+            ((ModelManager)this.DataContext).OverrideModelTargetLanguage = selectedModel.TargetLanguages.First();
             ((ModelManager)this.DataContext).MoveOverrideToTop();
         }
 
