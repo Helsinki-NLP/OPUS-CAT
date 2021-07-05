@@ -78,7 +78,7 @@ namespace OpusCatMTEngine
             Process ExternalProcess = new Process();
 
             ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {fileName} {args}";
+            ExternalProcess.StartInfo.Arguments = $"/c chcp 65001 & {fileName} {args}";
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 

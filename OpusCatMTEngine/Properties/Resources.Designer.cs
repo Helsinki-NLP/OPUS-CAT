@@ -169,6 +169,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not enough parallel segments in the TMX..
+        /// </summary>
+        public static string Finetune_NotEnoughSegmentsInTmx {
+            get {
+                return ResourceManager.GetString("Finetune_NotEnoughSegmentsInTmx", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select separate files.
         /// </summary>
         public static string Finetune_SeparateFilesRadioButton {
@@ -408,6 +417,24 @@ namespace OpusCatMTEngine.Properties {
         public static string Main_ModelsTabTitle {
             get {
                 return ResourceManager.GetString("Main_ModelsTabTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Illegal characters in path.
+        /// </summary>
+        public static string Main_NonAsciiPathCaption {
+            get {
+                return ResourceManager.GetString("Main_NonAsciiPathCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path where OPUS-CAT MT Engine stores MT models ({0}) contains the following illegal characters: {1}. Install OPUS-CAT MT Engine to a path with no illegal characters in it (for instance, in a folder in the root of the C: drive, such as C:\opuscat)..
+        /// </summary>
+        public static string Main_NonAsciiPathMessage {
+            get {
+                return ResourceManager.GetString("Main_NonAsciiPathMessage", resourceCulture);
             }
         }
         

@@ -75,10 +75,49 @@ namespace OpusCatMTEngine
 
         private ServiceHost serviceHost;
         
+        private void ValidatePath()
+        {
+            //If the model directory path contains non-ascii characters, Marian will not
+            //work properly. Should recompile Marian (or preferably switch to
+            //Bergamot version) to fix this, but needs a quick workaround.
+            var opuscatDataPath = HelperFunctions.GetOpusCatDataPath();
+            var illegalCharacters = opuscatDataPath.Where(x => x > 127);
+
+            
+
+            if (illegalCharacters.Any())
+            {
+                //Try to circumvent by using a opuscat dir in the installation folder
+                if (OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata)
+                {
+                    OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata = false;
+                    OpusCatMTEngineSettings.Default.Save();
+                    OpusCatMTEngineSettings.Default.Reload();
+
+                    //refetch the path
+                    opuscatDataPath = HelperFunctions.GetOpusCatDataPath();
+                    illegalCharacters = opuscatDataPath.Where(x => x > 127);
+                }
+
+
+                MessageBoxResult result =
+                    MessageBox.Show(
+                        String.Format(
+                            OpusCatMTEngine.Properties.Resources.Main_NonAsciiPathMessage,
+                            opuscatDataPath,
+                            String.Join(",", illegalCharacters)),
+                        OpusCatMTEngine.Properties.Resources.Main_NonAsciiPathCaption,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                System.Windows.Application.Current.Shutdown();
+            }
+        }
 
         public MainWindow()
         {
             Log.Information("Starting OPUS-CAT MT Engine");
+
+            this.ValidatePath();
             
             this.StartEngine();
             InitializeComponent();

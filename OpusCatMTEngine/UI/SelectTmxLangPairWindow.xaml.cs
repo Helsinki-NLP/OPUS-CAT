@@ -61,8 +61,15 @@ namespace OpusCatMTEngine
             }
         }
 
-        private void Close_Click(object sender, RoutedEventArgs e)
+        private void Cancel_Click(object sender, RoutedEventArgs e)
         {
+            this.DialogResult = false;
+            this.Close();
+        }
+
+        private void UseSelected_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
             this.Close();
         }
     }

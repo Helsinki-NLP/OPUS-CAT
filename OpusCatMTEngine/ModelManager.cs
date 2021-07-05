@@ -746,6 +746,7 @@ namespace OpusCatMTEngine
             MTModel baseModel)
         {
             modelTag = Regex.Replace(modelTag, @"[^\w-]", "_");
+            modelTag = String.Join("", modelTag.Select(x => x < 127 ? x : '_'));
 
             if (baseModel == null)
             {

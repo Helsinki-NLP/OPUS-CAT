@@ -150,7 +150,7 @@ namespace OpusCatMTEngine
 
             //Format checking
             Match opusMatch = IsoLanguage.OpusMtCode.Match(languageCode);
-            if (opusMatch != null)
+            if (opusMatch.Success)
             {
                 this.Iso639_1Code = opusMatch.Groups["iso639_1"].Value;
 
@@ -176,7 +176,7 @@ namespace OpusCatMTEngine
             else
             {
                 Match cultureInfoMatch = IsoLanguage.CultureInfoCode.Match(languageCode);
-                if (cultureInfoMatch != null)
+                if (cultureInfoMatch.Success)
                 {
                     this.Iso639_1Code = cultureInfoMatch.Groups["iso639_1"].Value;
                     this.Iso639_3Code = cultureInfoMatch.Groups["iso639_3"].Value;
@@ -251,7 +251,11 @@ namespace OpusCatMTEngine
             //code might contain locale after hyphen
             var languagePart = xmlLangCode.Split('-')[0];
 
-            return (languagePart == this.Iso639_1Code || languagePart == this.Iso639_3Code || languagePart == this.OriginalCode);
+            return (
+                languagePart == this.Iso639_1Code || 
+                languagePart == this.Iso639_3Code || 
+                languagePart == this.OriginalCode || 
+                xmlLangCode == this.OriginalCode);
         }
     }
 }

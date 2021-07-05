@@ -37,7 +37,7 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("opuscat/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("opuscat\\")]
         public string LocalOpusCatDir {
             get {
                 return ((string)(this["LocalOpusCatDir"]));

@@ -362,4 +362,13 @@
   <data name="Main_CancelOverrideButton" xml:space="preserve">
     <value>Cancel override</value>
   </data>
+  <data name="Finetune_NotEnoughSegmentsInTmx" xml:space="preserve">
+    <value>Not enough parallel segments in the TMX.</value>
+  </data>
+  <data name="Main_NonAsciiPathCaption" xml:space="preserve">
+    <value>Illegal characters in path</value>
+  </data>
+  <data name="Main_NonAsciiPathMessage" xml:space="preserve">
+    <value>The path where OPUS-CAT MT Engine stores MT models ({0}) contains the following illegal characters: {1}. Install OPUS-CAT MT Engine to a path with no illegal characters in it (for instance, in a folder in the root of the C: drive, such as C:\opuscat).</value>
+  </data>
 </root>
