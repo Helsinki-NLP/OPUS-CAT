@@ -207,7 +207,8 @@ namespace OpusCatMTEngine
                     filePair = new ParallelFilePair(this.SourceFile, this.TargetFile);
                     break;
                 case InputFileType.TmxFile:
-                    filePair = TmxToTxtParser.ParseTmxToParallelFiles(
+                    var tmxParser = new TmxToTxtParser();
+                    filePair = tmxParser.ParseTmxToParallelFiles(
                             this.TmxFile,
                             this.SourceLanguage,
                             this.TargetLanguage,
@@ -220,6 +221,18 @@ namespace OpusCatMTEngine
                             String.Format(
                                 OpusCatMTEngine.Properties.Resources.Finetune_TmxFileNotValidMessage,this.TmxFile));
                         return;
+                    }
+
+                    if (filePair.SentenceCount < OpusCatMTEngineSettings.Default.FinetuningSetMinSize)
+                    {
+                        var eligibleLangPairs = 
+                            tmxParser.TmxLangCounts.Where(x => x.Value > OpusCatMTEngineSettings.Default.FinetuningSetMinSize);
+                        if (eligibleLangPairs.Count() > 0)
+                        {
+                            var selectionWindow = new SelectTmxLangPairWindow(eligibleLangPairs);
+                            selectionWindow.ShowDialog();
+
+                        }
                     }
                     break;
                     

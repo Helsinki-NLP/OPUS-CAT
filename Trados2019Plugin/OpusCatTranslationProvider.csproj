@@ -157,6 +157,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\OpusCatMTEngine\OWIN\FinetuningJob.cs">
+      <Link>FinetuningJob.cs</Link>
+    </Compile>
+    <Compile Include="..\OpusCatMTEngine\OWIN\ParallelSentence.cs">
+      <Link>ParallelSentence.cs</Link>
+    </Compile>
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
     </Compile>

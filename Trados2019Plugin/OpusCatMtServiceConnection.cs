@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpusCatMTEngine;
 using OpusMTInterface;
 using RestSharp;
 using System;
@@ -12,6 +13,7 @@ namespace OpusCatTranslationProvider
 {
     public class OpusCatMtServiceConnection
     {
+        private static Random rng = new Random();
         internal OpusCatConnectionStatus Status { get; set; }
 
         internal enum OpusCatConnectionStatus
@@ -55,6 +57,33 @@ namespace OpusCatTranslationProvider
                 throw new Exception($"Problem fetching translation from OPUS-CAT MT Engine: {translationResponse.StatusCode}");
                 //return null;
             }
+        }
+
+        private IRestResponse SendPostRequest(
+            string host,
+            string port,
+            string endPoint,
+            object body,
+            Dictionary<string, string> queryParameters = null)
+        {
+            var client = new RestClient(
+                $"http://{host}:{port}/MtRestService/{endPoint}");
+            client.Timeout = -1;
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddJsonBody(body);
+            request.AddQueryParameter("tokenCode", "0");
+
+            if (queryParameters != null)
+            {
+                foreach (var queryParameter in queryParameters)
+                {
+                    request.AddQueryParameter(queryParameter.Key, queryParameter.Value);
+                }
+            }
+
+            IRestResponse restResponse = client.Execute(request);
+            return restResponse;
         }
 
         private IRestResponse SendRequest(
@@ -130,7 +159,7 @@ namespace OpusCatTranslationProvider
         {
 
             var client = new RestClient(
-            $"http://{host}:{port}/MtRestService/PreOrderBatch");
+                $"http://{host}:{port}/MtRestService/PreOrderBatch");
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
             request.AddHeader("Content-Type", "application/json");
@@ -150,6 +179,42 @@ namespace OpusCatTranslationProvider
             {
                 throw new Exception($"Problem preordering from OPUS-CAT MT Engine: {preOrderResponse.StatusCode}");
             }
+        }
+
+        internal HttpStatusCode Customize(
+            string host, 
+            string port, 
+            List<ParallelSentence> finetuneSet, 
+            List<string> uniqueNewSegments, 
+            string sourceLangCode, 
+            string targetLangCode, 
+            string modelTag, 
+            bool includePlaceholderTags, 
+            bool includeTagPairs)
+        {
+            var randomTranslations = finetuneSet.OrderBy(x => rng.Next()).ToList();
+            var trainingSet = randomTranslations.Skip(200).ToList();
+            var validSet = randomTranslations.Take(200).ToList();
+
+            FinetuningJob job =
+                new FinetuningJob(
+                    trainingSet,
+                    validSet,
+                    uniqueNewSegments,
+                    includePlaceholderTags,
+                    includeTagPairs
+                );
+
+            var finetuneResponse = this.SendPostRequest(host, port, "Customize", job,
+                new Dictionary<string, string>()
+                    {
+                        { "srcLangCode", sourceLangCode },
+                        { "trgLangCode", targetLangCode },
+                        { "modelTag", modelTag }
+                    });
+
+            return finetuneResponse.StatusCode;
+
         }
     }
 }

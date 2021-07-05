@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using OpusCatMTEngine;
 using Sdl.LanguagePlatform.TranslationMemory;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System;
@@ -62,7 +63,7 @@ namespace OpusCatTranslationProvider
         public Dictionary<int, List<TranslationUnit>> TmMatches { get => tmMatches; set => tmMatches = value; }
         public List<TranslationUnit> ConcordanceMatches { get => concordanceMatches; set => concordanceMatches = value; }
         public List<TranslationUnit> FillerUnits { get => fillerUnits; set => fillerUnits = value; }
-        public List<Tuple<string, string>> AllExtractedTranslations
+        public List<ParallelSentence> AllExtractedTranslations
         {
             get
             {
@@ -70,7 +71,7 @@ namespace OpusCatTranslationProvider
                     this.TmMatches.SelectMany(x => x.Value).Concat(
                         this.ConcordanceMatches).Concat(
                         this.FillerUnits);
-                var allTranslations = new List<Tuple<string, string>>();
+                var allTranslations = new List<ParallelSentence>();
 
                 var sourceVisitor = new OpusCatProviderElementVisitor();
                 var targetVisitor = new OpusCatProviderElementVisitor();
@@ -87,7 +88,7 @@ namespace OpusCatTranslationProvider
                         element.AcceptSegmentElementVisitor(targetVisitor);
                     }
 
-                    allTranslations.Add(new Tuple<string, string>(sourceVisitor.PlainText,targetVisitor.PlainText));
+                    allTranslations.Add(new ParallelSentence(sourceVisitor.PlainText,targetVisitor.PlainText));
                 }
 
                 return allTranslations;

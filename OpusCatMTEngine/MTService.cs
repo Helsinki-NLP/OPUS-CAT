@@ -230,8 +230,8 @@ namespace OpusCatMTEngine
 
         public string Customize(
             string tokenCode,
-            List<Tuple<string, string>> input,
-            List<Tuple<string, string>> validation,
+            List<ParallelSentence> input,
+            List<ParallelSentence> validation,
             List<string> uniqueNewSegments,
             string srcLangCode,
             string trgLangCode,

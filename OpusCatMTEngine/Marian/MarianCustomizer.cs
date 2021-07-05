@@ -107,6 +107,12 @@ namespace OpusCatMTEngine
             //Data will be null in when the process exits
             if (e.Data != null)
             {
+                //If there is no marian log file yet, log the output to opuscat log
+                var marianLog = new FileInfo(Path.Combine(this.customDir.FullName, "train.log"));
+                if (!marianLog.Exists)
+                {
+                    Log.Information(e.Data);
+                }
                 this.trainingLog.ParseTrainLogLine(e.Data);
                 //Check here for Marian error, if it happens trigger ui to show customization as suspended.
                 if (this.trainingLog.EncounteredError)
@@ -128,6 +134,7 @@ namespace OpusCatMTEngine
                 }
                 this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Finetuning, this.trainingLog.EstimatedRemainingTotalTime)));
             }
+            
         }
 
         public enum CustomizationStep {
@@ -325,6 +332,9 @@ namespace OpusCatMTEngine
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config \"{configPath}\" --log-level=info"; // --quiet";
+            
+            /*byte[] bytes = Encoding.Default.GetBytes(trainingArgs);
+            trainingArgs = Encoding.UTF8.GetString(bytes);*/
 
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);

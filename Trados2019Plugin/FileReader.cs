@@ -1,4 +1,5 @@
-﻿using Sdl.Core.Globalization;
+﻿using OpusCatMTEngine;
+using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.LanguagePlatform.TranslationMemory;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
@@ -11,7 +12,7 @@ namespace OpusCatTranslationProvider
 {
     public class FileReader : AbstractBilingualContentProcessor
     {
-        internal List<Tuple<string,string>> FileTranslations;
+        internal List<ParallelSentence> FileTranslations;
         internal List<string> FileNewSegments;
         private FinetuneBatchTaskSettings settings;
         private OpusCatMarkupDataVisitor sourceVisitor;
@@ -20,7 +21,7 @@ namespace OpusCatTranslationProvider
         public FileReader(FinetuneBatchTaskSettings settings)
         {
             this.settings = settings;
-            this.FileTranslations = new List<Tuple<string, string>>();
+            this.FileTranslations = new List<ParallelSentence>();
             this.FileNewSegments = new List<string>();
             this.sourceVisitor = new OpusCatMarkupDataVisitor();
             this.targetVisitor = new OpusCatMarkupDataVisitor();
@@ -51,7 +52,7 @@ namespace OpusCatTranslationProvider
                     //Add translation only if there's actual text content on both sides (not just tags)
                     if (this.sourceVisitor.SegmentContainsText && this.targetVisitor.SegmentContainsText)
                     {
-                        FileTranslations.Add(new Tuple<string, string>(
+                        FileTranslations.Add(new ParallelSentence(
                             this.sourceVisitor.PlainText,
                             this.targetVisitor.PlainText));
                     }

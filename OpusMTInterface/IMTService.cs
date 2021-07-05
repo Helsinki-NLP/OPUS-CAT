@@ -42,18 +42,18 @@ namespace OpusMTInterface
         [WebGet]
         string CheckModelStatus(string tokenCode, string srcLangCode, string trgLangCode, string modelTag);
 
-        [OperationContract]
+        /*[OperationContract]
         [WebInvoke(Method = "POST",BodyStyle = WebMessageBodyStyle.Wrapped)]
         string Customize(
             string tokenCode,
-            List<Tuple<string,string>> input,
-            List<Tuple<string, string>> validation,
+            List<ParallelSentence> input,
+            List<ParallelSentence> validation,
             List<string> uniqueNewSegments,
             string srcLangCode,
             string trgLangCode,
             string modelTag,
             bool includePlaceholderTags,
-            bool includeTagPairs);
+            bool includeTagPairs);*/
 
         [OperationContract]
         [WebInvoke(Method = "POST", BodyStyle = WebMessageBodyStyle.Wrapped)]

@@ -11,6 +11,17 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
         <local:BooleanToVisibilityInverseConverter x:Key="VisibleIfFalseConverter" />
+        <Style TargetType="ToolTip">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding}"  MaxWidth="400" TextWrapping='Wrap' />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Border BorderBrush="Black" BorderThickness="1" Margin="5">
         <Grid>
@@ -113,14 +124,24 @@
                             <GridViewColumn Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>
+                                        <TextBlock 
+                                            ToolTip="{Binding Path=SourceLanguageString, Mode=OneWay}"
+                                            TextWrapping="NoWrap" 
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center" 
+                                            Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
+                                        <TextBlock 
+                                            ToolTip="{Binding Path=TargetLanguageString, Mode=OneWay}"
+                                            TextWrapping="NoWrap" 
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center" 
+                                            Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

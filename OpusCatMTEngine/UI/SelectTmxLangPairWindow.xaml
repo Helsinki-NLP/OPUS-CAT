@@ -1,0 +1,15 @@
+﻿<Window x:Class="OpusCatMTEngine.SelectTmxLangPairWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
+        mc:Ignorable="d"
+        Title="SelectTmxLangPair" Height="400" Width="200">
+        <StackPanel>
+            <ListView ItemsSource="{Binding Path=EligiblePairs}"
+                                SelectedValue="{Binding Path=SelectedPair, Mode=TwoWay}"
+                                Width="200"/>
+        <Button Click="Close_Click">Close</Button>
+    </StackPanel>
+</Window>

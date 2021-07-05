@@ -1,22 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
+    [DataContract]
     public class TranslationPair
     {
-        
-        public string Translation { get; set; }
-            
+
+        //For compatibility with the previous API
+        [DataMember]
+        public string translation {get; set;}
+
+        [DataMember]
+        public string Translation
+        {
+            get { return translation; }
+            set { translation = value; }
+        }
+
+        [DataMember]
         public string[] SegmentedSourceSentence { get; private set; }
+
+        [DataMember]
         public string[] SegmentedTranslation { get; private set; }
+
+        [DataMember]
         public Dictionary<int, List<int>> SegmentedAlignmentSourceToTarget { get; private set; }
+
+        [DataMember]
         public Dictionary<int, List<int>> SegmentedAlignmentTargetToSource { get; private set; }
+
+        [DataMember]
         public string AlignmentString { get; private set; }
+
+        [DataMember]
         public string RawTranslation { get; private set; }
+
+        [DataMember]
         public SegmentationMethod Segmentation { get; internal set; }
 
         public TranslationPair(

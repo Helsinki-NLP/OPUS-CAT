@@ -679,8 +679,8 @@ namespace OpusCatMTEngine
         }
 
         public void StartCustomization(
-            List<Tuple<string, string>> input,
-            List<Tuple<string, string>> validation,
+            List<ParallelSentence> input,
+            List<ParallelSentence> validation,
             List<string> uniqueNewSegments,
             IsoLanguage srcLang,
             IsoLanguage trgLang,
@@ -699,8 +699,8 @@ namespace OpusCatMTEngine
         }
 
         internal void Customize(
-            List<Tuple<string, string>> input,
-            List<Tuple<string, string>> validation,
+            List<ParallelSentence> input,
+            List<ParallelSentence> validation,
             List<string> uniqueNewSegments,
             IsoLanguage srcLang,
             IsoLanguage trgLang,

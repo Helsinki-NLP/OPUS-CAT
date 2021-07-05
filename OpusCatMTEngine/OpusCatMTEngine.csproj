@@ -161,6 +161,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net463\System.Security.Cryptography.Algorithms.dll</HintPath>
       <Private>True</Private>
@@ -225,8 +226,10 @@
     <Compile Include="IsoLanguage.cs" />
     <Compile Include="Marian\TranslationPair.cs" />
     <Compile Include="ModelMetadata.cs" />
+    <Compile Include="OWIN\FinetuningJob.cs" />
     <Compile Include="OWIN\MachineTranslationController.cs" />
     <Compile Include="OWIN\OwinMtService.cs" />
+    <Compile Include="OWIN\ParallelSentence.cs" />
     <Compile Include="Preprocessing\ParallelFilePair.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
@@ -251,6 +254,9 @@
     <Compile Include="TokenCodeGenerator.cs" />
     <Compile Include="UI\Overlay.xaml.cs">
       <DependentUpon>Overlay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SelectTmxLangPairWindow.xaml.cs">
+      <DependentUpon>SelectTmxLangPairWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\TagEditView.xaml.cs">
       <DependentUpon>TagEditView.xaml</DependentUpon>
@@ -293,6 +299,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\Overlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SelectTmxLangPairWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

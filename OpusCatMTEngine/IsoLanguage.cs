@@ -251,7 +251,7 @@ namespace OpusCatMTEngine
             //code might contain locale after hyphen
             var languagePart = xmlLangCode.Split('-')[0];
 
-            return (languagePart == this.Iso639_1Code || languagePart == this.Iso639_3Code);
+            return (languagePart == this.Iso639_1Code || languagePart == this.Iso639_3Code || languagePart == this.OriginalCode);
         }
     }
 }

@@ -102,6 +102,7 @@ namespace OpusCatMTEngine
             var translation = this.Translate(tokenCode, input, srcLangCode, trgLangCode, modelTag);
             return new Translation(translation);
         }
+        
 
         [HttpGet]
         public HttpResponseMessage TranslateJson(string tokenCode="", string input="", string srcLangCode="", string trgLangCode="", string modelTag="")
@@ -112,7 +113,7 @@ namespace OpusCatMTEngine
 
             var translation = this.mtProvider.Translate(input, sourceLang, targetLang, modelTag);
 
-            var response = Request.CreateResponse<Translation>(HttpStatusCode.OK, new Translation(translation.Result.Translation));
+            var response = Request.CreateResponse<TranslationPair>(HttpStatusCode.OK, translation.Result);
             response.Headers.Add("Access-Control-Allow-Origin", "*");
 
 
@@ -185,18 +186,18 @@ namespace OpusCatMTEngine
         /// <param name="trgLangCode"></param>
         /// 
         [HttpPost]
-        public string PreOrderBatch([FromBody] List<string> input, string tokenCode="", string srcLangCode="", string trgLangCode="", string modelTag="")
+        public HttpResponseMessage PreOrderBatch([FromBody] List<string> input, string tokenCode="", string srcLangCode="", string trgLangCode="", string modelTag="")
         {
-            
+           
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
-                return "";
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
 
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
-            
+
             if (input.Count == 0)
             {
-                return "input was empty";
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             foreach (var inputString in input)
@@ -221,20 +222,16 @@ namespace OpusCatMTEngine
                 return "batch translation or customization already in process";
             }*/
 
-            return "preorder received";
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpPost]
-        public string Customize(
+        public HttpResponseMessage Customize(
+            [FromBody] FinetuningJob finetuningJob,
             string tokenCode,
-            List<Tuple<string, string>> input,
-            List<Tuple<string, string>> validation,
-            List<string> uniqueNewSegments,
             string srcLangCode,
             string trgLangCode,
-            string modelTag,
-            bool includePlaceholderTags,
-            bool includeTagPairs)
+            string modelTag)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
@@ -245,13 +242,18 @@ namespace OpusCatMTEngine
             if (!this.mtProvider.FinetuningOngoing && !this.mtProvider.BatchTranslationOngoing)
             {
                 this.mtProvider.StartCustomization(
-                    input, validation, uniqueNewSegments, sourceLang, targetLang, modelTag, includePlaceholderTags, includeTagPairs,null);
-                return "fine-tuning started";
+                    finetuningJob.Input,
+                    finetuningJob.Validation,
+                    finetuningJob.UniqueNewSegments, 
+                    sourceLang, targetLang, modelTag,
+                    finetuningJob.IncludePlaceholderTags,
+                    finetuningJob.IncludeTagPairs,null);
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             else
             {
                 //TODO: need to queue up customization, i.e. save data for starting later
-                throw new FaultException($"Batch translation or customization already in process in the MT engine");
+                return Request.CreateResponse(HttpStatusCode.ServiceUnavailable);
             }
         }
 
