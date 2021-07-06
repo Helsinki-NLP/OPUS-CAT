@@ -665,6 +665,24 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The TMX file does not contain languages compatible with the language codes of the MT model, or there are not enough segments for the compatible language pair. Language pairs included in the TMX file and the amount of segments per language pair are listed below. You can either select one of the language pairs to extract as fine-tuning material, or cancel fine-tuning..
+        /// </summary>
+        public static string SelectTmxLangPair_Instructions {
+            get {
+                return ResourceManager.GetString("SelectTmxLangPair_Instructions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select language pair.
+        /// </summary>
+        public static string SelectTmxLangPair_Title {
+            get {
+                return ResourceManager.GetString("SelectTmxLangPair_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port..
         /// </summary>
         public static string Service_PortNotAvailable {

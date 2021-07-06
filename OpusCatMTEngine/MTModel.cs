@@ -172,8 +172,15 @@ namespace OpusCatMTEngine
             this.marianProcesses = null;
         }
 
-        internal Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
+        public Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
         {
+            if (String.IsNullOrWhiteSpace(input))
+            {
+                var translationPair = new TranslationPair(input, input, input, "0-0", this.ModelSegmentationMethod, targetLang.OriginalCode);
+                return Task.FromResult<TranslationPair>(translationPair);
+                
+            }
+
             //Need to get the original codes, since those are the ones the marian model uses
             var modelSourceLang =
                 this.SourceLanguages.SingleOrDefault(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode);

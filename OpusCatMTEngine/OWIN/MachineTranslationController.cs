@@ -107,13 +107,19 @@ namespace OpusCatMTEngine
         [HttpGet]
         public HttpResponseMessage TranslateJson(string tokenCode="", string input="", string srcLangCode="", string trgLangCode="", string modelTag="")
         {
+            if (input == null)
+            {
+                input = "";
+            }
             //HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
             var translation = this.mtProvider.Translate(input, sourceLang, targetLang, modelTag);
 
-            var response = Request.CreateResponse<TranslationPair>(HttpStatusCode.OK, translation.Result);
+
+            var translationResult = translation.Result;
+            var response = Request.CreateResponse<TranslationPair>(HttpStatusCode.OK, translationResult);
             response.Headers.Add("Access-Control-Allow-Origin", "*");
 
 

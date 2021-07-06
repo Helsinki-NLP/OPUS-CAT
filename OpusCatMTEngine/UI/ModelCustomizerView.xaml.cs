@@ -243,12 +243,17 @@ namespace OpusCatMTEngine
                                     this.IncludeTagPairBox.IsChecked.Value
                                 );
                             }
+                            else
+                            {
+                                return;
+                            }
                         }
                         else
                         {
                             MessageBox.Show(
                                 String.Format(
                                     OpusCatMTEngine.Properties.Resources.Finetune_NotEnoughSegmentsInTmx));
+                            return;
                         }
                     }
                     break;
