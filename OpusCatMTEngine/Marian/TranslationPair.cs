@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
+    public enum SegmentationMethod
+    {
+        Bpe,
+        SentencePiece
+    }
+
     [DataContract]
     public class TranslationPair
     {
@@ -42,6 +48,11 @@ namespace OpusCatMTEngine
 
         [DataMember]
         public SegmentationMethod Segmentation { get; internal set; }
+
+        public TranslationPair()
+        {
+
+        }
 
         public TranslationPair(
             string segmentedSource, 

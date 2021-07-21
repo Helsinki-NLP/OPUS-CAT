@@ -14,7 +14,6 @@ namespace OpusCatTranslationProvider
         private StringBuilder plainText;
         private Dictionary<string, ITagPair> sourceTagStarts;
         private bool _segmentContainsText = false;
-
         public Dictionary<string, IPlaceholderTag> Placeholders { get; set; }
         public string PlainText { get => plainText.ToString(); }
         public Dictionary<string, ITagPair> TagStarts { get; set; }

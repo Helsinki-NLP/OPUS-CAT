@@ -27,7 +27,7 @@ namespace OpusCatTranslationProvider
         {
         }
         
-        internal string Translate(
+        internal TranslationPair Translate(
             string host,
             string port,
             string source, 
@@ -49,8 +49,8 @@ namespace OpusCatTranslationProvider
             
             if (translationResponse.IsSuccessful)
             {
-                Translation translationObject = JsonConvert.DeserializeObject<Translation>(translationResponse.Content);
-                return translationObject.translation;
+                TranslationPair translationObject = JsonConvert.DeserializeObject<TranslationPair>(translationResponse.Content);
+                return translationObject;
             }
             else
             {
@@ -111,7 +111,29 @@ namespace OpusCatTranslationProvider
             return client.Execute(request);
         }
 
-        internal List<string> ListSupportedLanguages(string host, string port)
+        public string CheckModelStatus(string host, string port, string sourceLangCode, string targetLangCode, string modelTag)
+        {
+            IRestResponse modelStatusResponse =
+                this.SendRequest(host, port, "CheckModelStatus", Method.GET,
+                new Dictionary<string, string>()
+                    {
+                        { "srcLangCode", sourceLangCode },
+                        { "trgLangCode", targetLangCode },
+                        { "modelTag", modelTag }
+                    });
+
+            if (modelStatusResponse.IsSuccessful)
+            {
+                string modelStatus = JsonConvert.DeserializeObject<string>(modelStatusResponse.Content);
+                return modelStatus;
+            }
+            else
+            {
+                throw new Exception($"Problem fetching model status from OPUS-CAT MT Engine: {modelStatusResponse.StatusCode}");
+            }
+        }
+
+        public List<string> ListSupportedLanguages(string host, string port)
         {
             IRestResponse supportedLanguageResponse = 
                 this.SendRequest(host,port,"ListSupportedLanguagePairs",Method.GET);

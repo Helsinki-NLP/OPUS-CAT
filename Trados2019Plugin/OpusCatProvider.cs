@@ -248,7 +248,7 @@ namespace OpusCatTranslationProvider
         //so that the translator won't have to wait for the translation to finish when opening a segment.
         //Note that Studio contains a feature called LookAhead which attempts to do a similar thing, but
         //LookAhead appears to be buggy with TMs etc., so it's better to rely on a custom caching system.
-        private static void TranslateDocumentSegments(Document doc, LanguageDirection langPair, OpusCatOptions options)
+        /*private static void TranslateDocumentSegments(Document doc, LanguageDirection langPair, OpusCatOptions options)
         {
             var visitor = new OpusCatMarkupDataVisitor();
             EditorController editorController = SdlTradosStudio.Application.GetController<EditorController>();
@@ -269,10 +269,12 @@ namespace OpusCatTranslationProvider
                 }
             }
 
-            //processedDocuments[langPair].Add(doc);
-        }
 
-        public OpusCatProvider(OpusCatOptions options, ITranslationProviderCredentialStore credentialStore)
+            //processedDocuments[langPair].Add(doc);
+
+        }*/
+
+    public OpusCatProvider(OpusCatOptions options, ITranslationProviderCredentialStore credentialStore)
         {
             Options = options;
             
@@ -462,8 +464,8 @@ namespace OpusCatTranslationProvider
             get { return Options.Uri; }
         }
 
-        internal static ElgServiceConnection ElgConnection { get; private set; }
-        internal static OpusCatMtServiceConnection OpusCatMtEngineConnection { get; private set; }
+        internal static ElgServiceConnection ElgConnection { get; set; }
+        internal static OpusCatMtServiceConnection OpusCatMtEngineConnection { get; set; }
         #endregion
 
         #endregion

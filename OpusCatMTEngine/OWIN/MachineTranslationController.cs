@@ -64,13 +64,13 @@ namespace OpusCatMTEngine
         }
 
         [HttpGet]
-        public string CheckModelStatus(string tokenCode, string sourceCode, string targetCode, string modelTag)
+        public string CheckModelStatus(string tokenCode, string srcLangCode, string trgLangCode, string modelTag)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            var sourceLang = new IsoLanguage(sourceCode);
-            var targetLang = new IsoLanguage(targetCode);
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
 
             return this.mtProvider.CheckModelStatus(sourceLang, targetLang, modelTag);
         }

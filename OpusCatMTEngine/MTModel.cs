@@ -61,13 +61,7 @@ namespace OpusCatMTEngine
         Remove,
         IncludePlaceholders
     }
-
-    public enum SegmentationMethod
-    {
-        Bpe,
-        SentencePiece
-    }
-
+    
     public class MTModel : INotifyPropertyChanged
     {
         public object this[string propertyName]
