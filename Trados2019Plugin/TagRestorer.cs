@@ -17,11 +17,15 @@ namespace OpusCatTranslationProvider
         private OpusCatProviderElementVisitor tagVisitor;
         private Segment translationSegment;
 
-        private static Regex notNumberOrLetter = new Regex(@"[^\p{L}\p{N}]");
+        //This is used to remove those characters from a string that may be added or changed
+        //during MT preprocessing. Needed because the Trados segment has to be mapped to the
+        //subword indices in the source sentence of the MT.
+        private static Regex variantCharacters = new Regex(@"[^\p{L}\p{N},.]");
+        private Dictionary<int, List<Tag>> tagDict;
 
         public TagRestorer(
-            Segment sourceSegment, 
-            TranslationPair translation, 
+            Segment sourceSegment,
+            TranslationPair translation,
             OpusCatProviderElementVisitor tagVisitor,
             Segment translationSegment)
         {
@@ -103,40 +107,154 @@ namespace OpusCatTranslationProvider
 
         }
 
-        private void AddTagsByAligment()
+        private void GetTagPositions()
         {
             //Go through the elements consuming the segmented source, fenceposting the tags with
             //segmented source indexes
-            Dictionary<int, Tag> tagDict = new Dictionary<int, Tag>();
+            this.tagDict = new Dictionary<int, List<Tag>>();
 
             Queue<string> sourceSubwordQueue = new Queue<string>(this.translation.SegmentedSourceSentence);
             int subwordIndex = 0;
             foreach (var segElement in this.sourceSegment.Elements)
             {
-                if (segElement.GetType() == typeof(Text))
+                Type elementType = segElement.GetType();
+
+                if (elementType == typeof(Text))
                 {
                     //Only check for numbers and letters, as they should be identical with both BPE
                     //and SentencePiece subwords.
-                    string elementText = notNumberOrLetter.Replace(((Text)segElement).Value,"");
+                    string elementText = variantCharacters.Replace(((Text)segElement).Value, "");
                     //consume the element from the segmented source
-                    string nextSourceSubword = notNumberOrLetter.Replace(sourceSubwordQueue.Dequeue(),"");
+                    string nextSourceSubword = variantCharacters.Replace(sourceSubwordQueue.Dequeue(), "");
+                    subwordIndex++;
 
                     while (elementText.StartsWith(nextSourceSubword))
                     {
                         elementText = elementText.Substring(nextSourceSubword.Length);
-                        if (sourceSubwordQueue.Count > 0)
+                        if (elementText.Length > 0 && sourceSubwordQueue.Count > 0)
                         {
-                            nextSourceSubword = notNumberOrLetter.Replace(sourceSubwordQueue.Dequeue(), "");
+                            nextSourceSubword =
+                                variantCharacters.Replace(sourceSubwordQueue.Dequeue(), "");
+                            subwordIndex++;
                         }
-                        subwordIndex++;
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
-                else if (segElement.GetType() == typeof(Tag))
+                else if (elementType == typeof(Tag))
                 {
-                    tagDict[subwordIndex] = (Tag)segElement;
+                    if (this.tagDict.ContainsKey(subwordIndex))
+                    {
+                        this.tagDict[subwordIndex].Add((Tag)segElement);
+                    }
+                    else
+                    {
+                        this.tagDict[subwordIndex] = new List<Tag>() { (Tag)segElement };
+                    }
                 }
             }
+        }
 
+        private void AddTagsByAligment()
+        {
+            this.GetTagPositions();
+
+            //Construct the translation segment by adding the subwords and the tags.
+            int subwordIndex = 0;
+            foreach (var subword in this.translation.SegmentedTranslation)
+            {
+                
+                if (this.translation.SegmentedAlignmentTargetToSource.ContainsKey(subwordIndex))
+                {
+                    foreach (var alignedSubwordIndex in this.translation.SegmentedAlignmentTargetToSource[subwordIndex])
+                    {
+                        if (this.tagDict.ContainsKey(alignedSubwordIndex))
+                        {
+                            this.translationSegment.AddRange(this.tagDict[alignedSubwordIndex]);
+                            //Multiple target words can be aligned to the same source position, so
+                            //remove the dict entry to avoid tags being duplicated.
+                            this.tagDict.Remove(alignedSubwordIndex);
+                        }
+                    }
+                }
+                
+                if (subwordIndex == 0)
+                {
+                    this.translationSegment.Add(subword.Replace('▁', ' ').TrimStart(' '));
+                }
+                else
+                {
+                    this.translationSegment.Add(subword.Replace('▁', ' '));
+                }
+                
+                subwordIndex++;
+            }
+
+            this.FixTagSpacing();
+        }
+
+        private void FixTagSpacing()
+        {
+
+            for (var elementIndex = 0; elementIndex < this.translationSegment.Elements.Count; elementIndex++)
+            {
+                Tag tag = this.translationSegment.Elements[elementIndex] as Tag;
+
+                Text previousElement = null;
+                if (elementIndex > 0)
+                {
+                    previousElement = this.translationSegment.Elements[elementIndex - 1] as Text;
+                }
+
+                Text nextElement = null;
+                if (elementIndex < this.translationSegment.Elements.Count - 1)
+                {
+                    nextElement = this.translationSegment.Elements[elementIndex + 1] as Text;
+                }
+
+                if (tag != null)
+                {
+                    switch (tag.Type)
+                    {
+                        case TagType.Start:
+                            if (nextElement != null && nextElement.Value.StartsWith(" "))
+                            {
+                                nextElement.Value = nextElement.Value.TrimStart(' ');
+                                if (!previousElement.Value.EndsWith(" "))
+                                {
+                                    previousElement.Value = previousElement.Value + " ";
+                                }
+                            }
+                            break;
+                        case TagType.End:
+                            if (previousElement != null && previousElement.Value.EndsWith(" "))
+                            {
+                                previousElement.Value = previousElement.Value.TrimEnd(' ');
+                                if (!nextElement.Value.StartsWith(" "))
+                                {
+                                    nextElement.Value = " " + nextElement.Value;
+                                }
+                            }
+                            break;
+                        case TagType.Standalone:
+                            if (previousElement != null && !previousElement.Value.EndsWith(" "))
+                            {
+                                previousElement.Value = previousElement.Value + " ";
+                            }
+
+                            if (nextElement != null && !nextElement.Value.StartsWith(" "))
+                            {
+                                nextElement.Value = " " + nextElement.Value;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+            }
         }
     }
 }
