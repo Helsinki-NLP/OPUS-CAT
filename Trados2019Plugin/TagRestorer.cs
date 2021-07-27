@@ -21,7 +21,8 @@ namespace OpusCatTranslationProvider
         //during MT preprocessing. Needed because the Trados segment has to be mapped to the
         //subword indices in the source sentence of the MT.
         private static Regex variantCharacters = new Regex(@"[^\p{L}\p{N},.]");
-        private Dictionary<int, List<Tag>> tagDict;
+        private Dictionary<int, List<Tag>> tagsInSourceDict;
+        private Dictionary<int, List<Tag>> tagsInTargetDict;
 
         public TagRestorer(
             Segment sourceSegment,
@@ -111,7 +112,7 @@ namespace OpusCatTranslationProvider
         {
             //Go through the elements consuming the segmented source, fenceposting the tags with
             //segmented source indexes
-            this.tagDict = new Dictionary<int, List<Tag>>();
+            this.tagsInSourceDict = new Dictionary<int, List<Tag>>();
 
             Queue<string> sourceSubwordQueue = new Queue<string>(this.translation.SegmentedSourceSentence);
             int subwordIndex = 0;
@@ -145,14 +146,34 @@ namespace OpusCatTranslationProvider
                 }
                 else if (elementType == typeof(Tag))
                 {
-                    if (this.tagDict.ContainsKey(subwordIndex))
+                    if (this.tagsInSourceDict.ContainsKey(subwordIndex))
                     {
-                        this.tagDict[subwordIndex].Add((Tag)segElement);
+                        this.tagsInSourceDict[subwordIndex].Add((Tag)segElement);
                     }
                     else
                     {
-                        this.tagDict[subwordIndex] = new List<Tag>() { (Tag)segElement };
+                        this.tagsInSourceDict[subwordIndex] = new List<Tag>() { (Tag)segElement };
                     }
+                }
+            }
+
+            this.tagsInTargetDict = new Dictionary<int, List<Tag>>();
+            //Place tags in target based on the source positions
+            foreach (var tagsInSourceIndex in this.tagsInSourceDict)
+            {
+
+                if (translation.SegmentedAlignmentSourceToTarget.ContainsKey(tagsInSourceIndex.Key))
+                {
+                    this.tagsInTargetDict[translation.SegmentedAlignmentSourceToTarget[tagsInSourceIndex.Key].First()] =
+                        tagsInSourceIndex.Value;
+                }
+                else
+                {
+                    //If there is no explicit alignment between the source and target positions, get the nearest alignment
+                    var sourcePositions = this.translation.SegmentedAlignmentSourceToTarget.Keys;
+                    var nearestAlignedPosition = sourcePositions.OrderBy(x => Math.Abs(x - tagsInSourceIndex.Key)).First();
+                    this.tagsInTargetDict[translation.SegmentedAlignmentSourceToTarget[nearestAlignedPosition].First()] =
+                        tagsInSourceIndex.Value;
                 }
             }
         }
@@ -165,21 +186,10 @@ namespace OpusCatTranslationProvider
             int subwordIndex = 0;
             foreach (var subword in this.translation.SegmentedTranslation)
             {
-                
-                if (this.translation.SegmentedAlignmentTargetToSource.ContainsKey(subwordIndex))
+                if (this.tagsInTargetDict.ContainsKey(subwordIndex))
                 {
-                    foreach (var alignedSubwordIndex in this.translation.SegmentedAlignmentTargetToSource[subwordIndex])
-                    {
-                        if (this.tagDict.ContainsKey(alignedSubwordIndex))
-                        {
-                            this.translationSegment.AddRange(this.tagDict[alignedSubwordIndex]);
-                            //Multiple target words can be aligned to the same source position, so
-                            //remove the dict entry to avoid tags being duplicated.
-                            this.tagDict.Remove(alignedSubwordIndex);
-                        }
-                    }
+                    this.translationSegment.AddRange(this.tagsInTargetDict[subwordIndex]);
                 }
-                
                 if (subwordIndex == 0)
                 {
                     this.translationSegment.Add(subword.Replace('▁', ' ').TrimStart(' '));
@@ -244,9 +254,12 @@ namespace OpusCatTranslationProvider
                                 previousElement.Value = previousElement.Value + " ";
                             }
 
-                            if (nextElement != null && !nextElement.Value.StartsWith(" "))
+                            if (nextElement != null)
                             {
-                                nextElement.Value = " " + nextElement.Value;
+
+                                nextElement.Value = Regex.Replace(nextElement.Value, @"(^[^ ,.!?:;])", @" $1");
+                                nextElement.Value = Regex.Replace(nextElement.Value, @"^ +([,.!?:;])", @"$1");
+                                
                             }
                             break;
                         default:

@@ -206,12 +206,14 @@ namespace OpusCatMTEngine
         {
             if (!includePlaceholderTags)
             {
+                line = Regex.Replace(line, @" PLACEHOLDER\d* ([.,!?:;])", "$1");
                 line = Regex.Replace(line, @"PLACEHOLDER\d*", "");
             }
 
             if (!includeTagPairs)
             {
                 line = Regex.Replace(line, @"TAGPAIRSTART\d*", "");
+                line = Regex.Replace(line, @" TAGPAIREND\d* ([.,!?:;])", "$1");
                 line = Regex.Replace(line, @"TAGPAIREND\d*", "");
             }
 
