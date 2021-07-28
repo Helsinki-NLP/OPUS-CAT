@@ -162,20 +162,50 @@ namespace OpusCatTranslationProvider
             foreach (var tagsInSourceIndex in this.tagsInSourceDict)
             {
 
+                int targetIndex;
                 if (translation.SegmentedAlignmentSourceToTarget.ContainsKey(tagsInSourceIndex.Key))
                 {
-                    this.tagsInTargetDict[translation.SegmentedAlignmentSourceToTarget[tagsInSourceIndex.Key].First()] =
-                        tagsInSourceIndex.Value;
+                    targetIndex = translation.SegmentedAlignmentSourceToTarget[tagsInSourceIndex.Key].First();
                 }
                 else
                 {
                     //If there is no explicit alignment between the source and target positions, get the nearest alignment
                     var sourcePositions = this.translation.SegmentedAlignmentSourceToTarget.Keys;
-                    var nearestAlignedPosition = sourcePositions.OrderBy(x => Math.Abs(x - tagsInSourceIndex.Key)).First();
-                    this.tagsInTargetDict[translation.SegmentedAlignmentSourceToTarget[nearestAlignedPosition].First()] =
-                        tagsInSourceIndex.Value;
+                    var closestSourceIndex = sourcePositions.OrderBy(x => Math.Abs(x - tagsInSourceIndex.Key)).First();
+                    targetIndex = translation.SegmentedAlignmentSourceToTarget[closestSourceIndex].First();
+                }
+
+                if (!this.tagsInTargetDict.ContainsKey(targetIndex))
+                {
+                    this.tagsInTargetDict[targetIndex] = new List<Tag>();
+                }
+
+                this.tagsInTargetDict[targetIndex].AddRange(tagsInSourceIndex.Value);
+            }
+
+            //If tag pairs are reversed, switch them around
+            var endTagsSoFar = new Dictionary<string,KeyValuePair<int,Tag>>();
+            //The dictionary needs to be modified during the for loop, so iterate over a copied dict
+            foreach (var tagsInIndex in this.tagsInTargetDict.OrderBy(x => x.Key))
+            {
+                foreach (var tag in new List<Tag>(tagsInIndex.Value))
+                {
+                    if (tag.Type == TagType.End)
+                    {
+                        endTagsSoFar[tag.TagID] = new KeyValuePair<int, Tag>(tagsInIndex.Key,tag);
+                    }
+                    else if (tag.Type == TagType.Start && endTagsSoFar.ContainsKey(tag.TagID))
+                    {
+                        var firstPosition = endTagsSoFar[tag.TagID].Key;
+                        var endTag = endTagsSoFar[tag.TagID].Value;
+                        this.tagsInTargetDict[firstPosition].Add(tag);
+                        this.tagsInTargetDict[firstPosition].Remove(endTag);
+                        this.tagsInTargetDict[tagsInIndex.Key].Add(endTag);
+                        this.tagsInTargetDict[tagsInIndex.Key].Remove(tag);
+                    }
                 }
             }
+
         }
 
         private void AddTagsByAligment()
@@ -232,7 +262,7 @@ namespace OpusCatTranslationProvider
                             if (nextElement != null && nextElement.Value.StartsWith(" "))
                             {
                                 nextElement.Value = nextElement.Value.TrimStart(' ');
-                                if (!previousElement.Value.EndsWith(" "))
+                                if (previousElement != null && !previousElement.Value.EndsWith(" "))
                                 {
                                     previousElement.Value = previousElement.Value + " ";
                                 }
@@ -242,7 +272,7 @@ namespace OpusCatTranslationProvider
                             if (previousElement != null && previousElement.Value.EndsWith(" "))
                             {
                                 previousElement.Value = previousElement.Value.TrimEnd(' ');
-                                if (!nextElement.Value.StartsWith(" "))
+                                if (nextElement !=null && !nextElement.Value.StartsWith(" "))
                                 {
                                     nextElement.Value = " " + nextElement.Value;
                                 }
@@ -258,8 +288,7 @@ namespace OpusCatTranslationProvider
                             {
 
                                 nextElement.Value = Regex.Replace(nextElement.Value, @"(^[^ ,.!?:;])", @" $1");
-                                nextElement.Value = Regex.Replace(nextElement.Value, @"^ +([,.!?:;])", @"$1");
-                                
+                                nextElement.Value = Regex.Replace(nextElement.Value, @"^ +([,.!?:;])", @"$1");             
                             }
                             break;
                         default:
