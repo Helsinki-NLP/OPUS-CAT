@@ -134,6 +134,10 @@ namespace OpusCatTranslationProvider
                     var tagRestorer = new TagRestorer(segment, translation, _visitor, translationSegment);
                     tagRestorer.ProcessTags();
                 }
+                else
+                {
+                    translationSegment.Add(translation.Translation);
+                }
             }
             else if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
             {

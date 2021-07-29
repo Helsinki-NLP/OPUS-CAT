@@ -87,7 +87,7 @@ namespace OpusCatTranslationProvider
                 var endTag = this.tagVisitor.TagEnds[excessStartTag.TagID];
                 translationSegment.Elements.Insert(nonEndedTagIndex + 1, endTag);
             }
-        
+
         }
 
         internal void ProcessTags()
@@ -102,13 +102,13 @@ namespace OpusCatTranslationProvider
                 this.AddTagsByAligment();
             }
 
-            
+
 
 
 
         }
 
-        private void GetTagPositions()
+        private void GetInitialPositions()
         {
             //Go through the elements consuming the segmented source, fenceposting the tags with
             //segmented source indexes
@@ -182,9 +182,13 @@ namespace OpusCatTranslationProvider
 
                 this.tagsInTargetDict[targetIndex].AddRange(tagsInSourceIndex.Value);
             }
+        }
+
+        private void CorrectReversedTagPairs()
+        {
 
             //If tag pairs are reversed, switch them around
-            var endTagsSoFar = new Dictionary<string,KeyValuePair<int,Tag>>();
+            var endTagsSoFar = new Dictionary<string, KeyValuePair<int, Tag>>();
             //The dictionary needs to be modified during the for loop, so iterate over a copied dict
             foreach (var tagsInIndex in this.tagsInTargetDict.OrderBy(x => x.Key))
             {
@@ -192,7 +196,7 @@ namespace OpusCatTranslationProvider
                 {
                     if (tag.Type == TagType.End)
                     {
-                        endTagsSoFar[tag.TagID] = new KeyValuePair<int, Tag>(tagsInIndex.Key,tag);
+                        endTagsSoFar[tag.TagID] = new KeyValuePair<int, Tag>(tagsInIndex.Key, tag);
                     }
                     else if (tag.Type == TagType.Start && endTagsSoFar.ContainsKey(tag.TagID))
                     {
@@ -205,7 +209,48 @@ namespace OpusCatTranslationProvider
                     }
                 }
             }
+        }
 
+        private void HandleCrossedTagPairs()
+        {
+            //Handle crossing tags
+            //Tag stack makes sure that the tree structure of the tags is correct (i.e. no crossing of tag
+            //boundaries)
+            Stack<Tag> tagStack = new Stack<Tag>();
+
+            foreach (var tagsInIndex in this.tagsInTargetDict.OrderBy(x => x.Key))
+            {
+                var tagIndex = 0;
+                foreach (var tag in new List<Tag>(tagsInIndex.Value))
+                {
+                    if (tag.Type == TagType.Start)
+                    {
+                        tagStack.Push(tag);
+                    }
+                    else if (tag.Type == TagType.End)
+                    {
+                        var activeStartTag = tagStack.Pop();
+                        if (activeStartTag.TagID != tag.TagID)
+                        {
+                            //Find the tag that should be placed here
+                            var correctEndTagPosition =
+                                this.tagsInTargetDict.Single(
+                                    x => x.Value.SingleOrDefault(y => y.TagID == activeStartTag.TagID && y.Type == TagType.End) != null);
+                            var correctEndTag = correctEndTagPosition.Value.Single(y => y.TagID == activeStartTag.TagID);
+                            this.tagsInTargetDict[correctEndTagPosition.Key].Remove(correctEndTag);
+                            this.tagsInTargetDict[tagsInIndex.Key].Insert(tagIndex, correctEndTag);
+                        }
+                    }
+                    tagIndex++;
+                }
+            }
+        }
+
+        private void GetTagPositions()
+        {
+            this.GetInitialPositions();
+            this.CorrectReversedTagPairs();
+            this.HandleCrossedTagPairs();
         }
 
         private void AddTagsByAligment()
@@ -214,6 +259,7 @@ namespace OpusCatTranslationProvider
 
             //Construct the translation segment by adding the subwords and the tags.
             int subwordIndex = 0;
+
             foreach (var subword in this.translation.SegmentedTranslation)
             {
                 if (this.tagsInTargetDict.ContainsKey(subwordIndex))
@@ -228,12 +274,80 @@ namespace OpusCatTranslationProvider
                 {
                     this.translationSegment.Add(subword.Replace('▁', ' '));
                 }
-                
+
                 subwordIndex++;
             }
 
             this.FixTagSpacing();
+            this.MoveTagsToWordBoundaries();
+
         }
+
+        private void MoveTagsToWordBoundaries()
+        {
+            List<int> textElementPositions = 
+                this.translationSegment.Elements.Select(
+                    (x, i) => new { el = x, idx = i}).Where(
+                    x => x.el.GetType() == typeof(Text)).Select(x => x.idx).OrderBy(x => x).ToList();
+            for (var elementIndex = 0; elementIndex < this.translationSegment.Elements.Count; elementIndex++)
+            {
+                Tag tag = this.translationSegment.Elements[elementIndex] as Tag;
+
+                if (tag == null)
+                {
+                    continue;
+                }
+
+                Text previousTextElement = null;
+                if (elementIndex > 0)
+                {
+                    var smallerElementIndexes = textElementPositions.Where(x => x < elementIndex);
+                    if (smallerElementIndexes.Any())
+                    {
+                        var previousTextElementIndex = smallerElementIndexes.Last();
+                        previousTextElement = this.translationSegment.Elements[previousTextElementIndex] as Text;
+                    }
+                }
+
+                Text nextTextElement = null;
+                if (elementIndex < this.translationSegment.Elements.Count - 1)
+                {
+                    var greaterElementIndexes = textElementPositions.Where(x => x > elementIndex);
+                    if (greaterElementIndexes.Any())
+                    {
+                        var nextTextElementIndex = greaterElementIndexes.First();
+                        nextTextElement = this.translationSegment.Elements[nextTextElementIndex] as Text;
+                    }
+                }
+
+                switch (tag.Type)
+                {
+                    case TagType.Start:
+                        if (previousTextElement != null && Char.IsLetter(previousTextElement.Value.Last()))
+                        {
+                            //Move letters from the end of previous element to the start of next text element in the segment
+                            var textToMove = Regex.Match(previousTextElement.Value, @"([\w]+)$");
+                            nextTextElement.Value = textToMove.Value + nextTextElement.Value;
+                            previousTextElement.Value = Regex.Replace(previousTextElement.Value, @"([\w]+)$","");
+                        }
+                        break;
+                    case TagType.End:
+                        if (nextTextElement != null && Char.IsLetter(nextTextElement.Value.First()))
+                        {
+                            var textToMove = Regex.Match(nextTextElement.Value, @"(^[\w]+)");
+                            previousTextElement.Value = previousTextElement.Value + textToMove.Value;
+                            nextTextElement.Value = Regex.Replace(nextTextElement.Value, @"(^[\w]+)", "");
+                        }
+                        break;
+                    case TagType.Standalone:
+                        break;
+                    default:
+                        break;
+                    
+                }
+            }
+        }
+
 
         private void FixTagSpacing()
         {
