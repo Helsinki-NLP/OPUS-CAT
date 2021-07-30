@@ -23,6 +23,11 @@
                             <Label Content="{Binding MaxPreorderString}" />
                         </StackPanel>
 
+                        <CheckBox ToolTip="If checked, OPUS-CAT will attempt to restore source tags to the MT segment"
+                                IsChecked="{Binding Path=Options.restoreTags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            Restore tags (if supported by MT model)
+                        </CheckBox>
+                        
                         <CheckBox ToolTip="If checked, the results of OPUS-CAT MT are identified as MT segments"
                                 IsChecked="{Binding Path=Options.showMtAsOrigin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                             Show MT as suggestion origin

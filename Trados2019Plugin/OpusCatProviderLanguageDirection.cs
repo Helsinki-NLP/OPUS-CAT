@@ -129,13 +129,24 @@ namespace OpusCatTranslationProvider
                     targetCode, 
                     this._options.modelTag);
 
-                if (_visitor.Placeholders.Any() || _visitor.TagStarts.Any() || _visitor.TagEnds.Any())
+                if (this._options.restoreTags &&
+                    (_visitor.Placeholders.Any() || 
+                    _visitor.TagStarts.Any() || 
+                    _visitor.TagEnds.Any()))
                 {
                     var tagRestorer = new TagRestorer(segment, translation, _visitor, translationSegment);
                     tagRestorer.ProcessTags();
                 }
                 else
                 {
+                    translationSegment.Add(translation.Translation);
+                }
+
+                //Fix potential tag problems
+                translationSegment.FillUnmatchedStartAndEndTags();
+                if (!translationSegment.IsValid())
+                {
+                    translationSegment.Clear();
                     translationSegment.Add(translation.Translation);
                 }
             }
@@ -154,6 +165,7 @@ namespace OpusCatTranslationProvider
             if (translationSegment == null)
                 return systemResults;
 
+            
             // Look up the currently selected segment in the collection (normal segment lookup).
             if (mode == SearchMode.FullSearch || mode == SearchMode.NormalSearch)
             {

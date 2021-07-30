@@ -173,6 +173,11 @@ namespace OpusCatTranslationProvider
                     var sourcePositions = this.translation.SegmentedAlignmentSourceToTarget.Keys;
                     var closestSourceIndex = sourcePositions.OrderBy(x => Math.Abs(x - tagsInSourceIndex.Key)).First();
                     targetIndex = translation.SegmentedAlignmentSourceToTarget[closestSourceIndex].First();
+                    //Adjust the position based on the direction where the closest source-aligned target word is found.
+                    //Motivation: one word in source and translation, tag in front of word and behind the word. Need to
+                    //place on tag in front of word and one behind the word also in the translation, but there is only
+                    //one aligned word, hence need to adjust target index.
+                    targetIndex = targetIndex + (Math.Sign(tagsInSourceIndex.Key - closestSourceIndex));
                 }
 
                 if (!this.tagsInTargetDict.ContainsKey(targetIndex))
@@ -278,6 +283,12 @@ namespace OpusCatTranslationProvider
                 subwordIndex++;
             }
 
+            //Add the final tags
+            if (this.tagsInTargetDict.ContainsKey(subwordIndex))
+            {
+                this.translationSegment.AddRange(this.tagsInTargetDict[subwordIndex]);
+            }
+
             this.FixTagSpacing();
             this.MoveTagsToWordBoundaries();
 
@@ -323,7 +334,11 @@ namespace OpusCatTranslationProvider
                 switch (tag.Type)
                 {
                     case TagType.Start:
-                        if (previousTextElement != null && Char.IsLetter(previousTextElement.Value.Last()))
+                        if (
+                            previousTextElement != null && 
+                            nextTextElement != null &&
+                            previousTextElement.Value.Any() &&
+                            Char.IsLetter(previousTextElement.Value.Last()))
                         {
                             //Move letters from the end of previous element to the start of next text element in the segment
                             var textToMove = Regex.Match(previousTextElement.Value, @"([\w]+)$");
@@ -332,7 +347,11 @@ namespace OpusCatTranslationProvider
                         }
                         break;
                     case TagType.End:
-                        if (nextTextElement != null && Char.IsLetter(nextTextElement.Value.First()))
+                        if (
+                            nextTextElement != null && 
+                            previousTextElement != null && 
+                            nextTextElement.Value.Any() && 
+                            Char.IsLetter(nextTextElement.Value.First()))
                         {
                             var textToMove = Regex.Match(nextTextElement.Value, @"(^[\w]+)");
                             previousTextElement.Value = previousTextElement.Value + textToMove.Value;
@@ -351,21 +370,34 @@ namespace OpusCatTranslationProvider
 
         private void FixTagSpacing()
         {
-
+            List<int> textElementPositions =
+                this.translationSegment.Elements.Select(
+                    (x, i) => new { el = x, idx = i }).Where(
+                    x => x.el.GetType() == typeof(Text)).Select(x => x.idx).OrderBy(x => x).ToList();
             for (var elementIndex = 0; elementIndex < this.translationSegment.Elements.Count; elementIndex++)
             {
                 Tag tag = this.translationSegment.Elements[elementIndex] as Tag;
 
-                Text previousElement = null;
+                Text previousTextElement = null;
                 if (elementIndex > 0)
                 {
-                    previousElement = this.translationSegment.Elements[elementIndex - 1] as Text;
+                    var smallerElementIndexes = textElementPositions.Where(x => x < elementIndex);
+                    if (smallerElementIndexes.Any())
+                    {
+                        var previousTextElementIndex = smallerElementIndexes.Last();
+                        previousTextElement = this.translationSegment.Elements[previousTextElementIndex] as Text;
+                    }
                 }
 
-                Text nextElement = null;
+                Text nextTextElement = null;
                 if (elementIndex < this.translationSegment.Elements.Count - 1)
                 {
-                    nextElement = this.translationSegment.Elements[elementIndex + 1] as Text;
+                    var greaterElementIndexes = textElementPositions.Where(x => x > elementIndex);
+                    if (greaterElementIndexes.Any())
+                    {
+                        var nextTextElementIndex = greaterElementIndexes.First();
+                        nextTextElement = this.translationSegment.Elements[nextTextElementIndex] as Text;
+                    }
                 }
 
                 if (tag != null)
@@ -373,36 +405,36 @@ namespace OpusCatTranslationProvider
                     switch (tag.Type)
                     {
                         case TagType.Start:
-                            if (nextElement != null && nextElement.Value.StartsWith(" "))
+                            if (nextTextElement != null && nextTextElement.Value.StartsWith(" "))
                             {
-                                nextElement.Value = nextElement.Value.TrimStart(' ');
-                                if (previousElement != null && !previousElement.Value.EndsWith(" "))
+                                nextTextElement.Value = nextTextElement.Value.TrimStart(' ');
+                                if (previousTextElement != null && !previousTextElement.Value.EndsWith(" "))
                                 {
-                                    previousElement.Value = previousElement.Value + " ";
+                                    previousTextElement.Value = previousTextElement.Value + " ";
                                 }
                             }
                             break;
                         case TagType.End:
-                            if (previousElement != null && previousElement.Value.EndsWith(" "))
+                            if (previousTextElement != null && previousTextElement.Value.EndsWith(" "))
                             {
-                                previousElement.Value = previousElement.Value.TrimEnd(' ');
-                                if (nextElement !=null && !nextElement.Value.StartsWith(" "))
+                                previousTextElement.Value = previousTextElement.Value.TrimEnd(' ');
+                                if (nextTextElement !=null && !nextTextElement.Value.StartsWith(" "))
                                 {
-                                    nextElement.Value = " " + nextElement.Value;
+                                    nextTextElement.Value = " " + nextTextElement.Value;
                                 }
                             }
                             break;
                         case TagType.Standalone:
-                            if (previousElement != null && !previousElement.Value.EndsWith(" "))
+                            if (previousTextElement != null && !previousTextElement.Value.EndsWith(" "))
                             {
-                                previousElement.Value = previousElement.Value + " ";
+                                previousTextElement.Value = previousTextElement.Value + " ";
                             }
 
-                            if (nextElement != null)
+                            if (nextTextElement != null)
                             {
 
-                                nextElement.Value = Regex.Replace(nextElement.Value, @"(^[^ ,.!?:;])", @" $1");
-                                nextElement.Value = Regex.Replace(nextElement.Value, @"^ +([,.!?:;])", @"$1");             
+                                nextTextElement.Value = Regex.Replace(nextTextElement.Value, @"(^[^ ,.!?:;])", @" $1");
+                                nextTextElement.Value = Regex.Replace(nextTextElement.Value, @"^ +([,.!?:;])", @"$1");             
                             }
                             break;
                         default:
