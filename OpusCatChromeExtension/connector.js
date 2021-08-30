@@ -5,9 +5,9 @@ let contentScriptTab;
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if ("opusCatSourceText" in request) {
         contentScriptTab = sender.tab;
-        var params = {tokenCode:0,input:request.opusCatSourceText,srcLangCode:"en",trgLangCode:"fi",modelTag:""};
+        var params = {tokenCode:0,input:request.opusCatSourceText,modelTag:""};
         
-        chrome.storage.local.get(['opusCatUrlSetting'], function(result) {
+        chrome.storage.local.get({'opusCatUrlSetting':"http://localhost:8500/MTRestService/TranslateJson"}, function(result) {
             let url = new URL(result.opusCatUrlSetting);
             url.search = new URLSearchParams(params).toString();
             fetch(url).then(response => response.json()).then(data => currentTranslation = data["translation"]);
