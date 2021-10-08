@@ -4,7 +4,7 @@ using System.Reflection;
 using MemoQ.Addins.Common.Utils;
 using MemoQ.MTInterfaces;
 
-namespace FiskmoMTPlugin
+namespace OpusCatMTPlugin
 {
     /// <summary>
     /// Dummy MT engine for a particular language combination.
@@ -14,7 +14,7 @@ namespace FiskmoMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    public class FiskmoMTEngine : EngineBase
+    public class OpusMTEngine : EngineBase
     {
         /// <summary>
         /// The source language.
@@ -29,9 +29,9 @@ namespace FiskmoMTPlugin
         /// <summary>
         /// Plugin options
         /// </summary>
-        private readonly FiskmoMTOptions options;
+        private readonly OpusCatMTOptions options;
 
-        public FiskmoMTEngine(string srcLangCode, string trgLangCode, FiskmoMTOptions options)
+        public OpusMTEngine(string srcLangCode, string trgLangCode, OpusCatMTOptions options)
         {
             var test = LanguageHelper.GetIsoCode2LetterFromIsoCode3Letter(trgLangCode);
             var lang = new Language(trgLangCode);
@@ -48,7 +48,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override ISession CreateLookupSession()
         {
-            return new FiskmoMTSession(srcLangCode, trgLangCode, options);
+            return new OpusCatMTSession(srcLangCode, trgLangCode, options);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace FiskmoMTPlugin
         {
             get
             {
-                var image = Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("FiskmöMTPlugin.fiskmö_small.png"));
+                var image = Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("OpusCatMTPlugin.opus.ico"));
                 return image;
             }
         }
@@ -85,7 +85,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override ISessionForStoringTranslations CreateStoreTranslationSession()
         {
-            return new FiskmoMTSession(srcLangCode, trgLangCode, options);
+            return new OpusCatMTSession(srcLangCode, trgLangCode, options);
         }
 
         #endregion

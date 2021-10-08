@@ -408,7 +408,6 @@
     </Content>
     <Resource Include="UI\cross.png" />
     <Resource Include="UI\fiskmo_zIQ_icon.ico" />
-    <Resource Include="fiskmo_zIQ_icon.ico" />
     <None Include="customize.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

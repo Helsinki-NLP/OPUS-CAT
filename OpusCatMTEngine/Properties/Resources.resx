@@ -297,10 +297,10 @@
     <value>Validation step</value>
   </data>
   <data name="Settings_HttpPortLabel" xml:space="preserve">
-    <value>MT service HTTP port (used with other integrations, 1024-65535):</value>
+    <value>MT service HTTP port (used with current plugins and integrations, 1024-65535):</value>
   </data>
   <data name="Settings_NetTcpPortLabel" xml:space="preserve">
-    <value>MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):</value>
+    <value>MT service net.tcp port (used with older Trados and memoQ plugins, 1024-65535):</value>
   </data>
   <data name="Settings_NoteHeading" xml:space="preserve">
     <value>Note:</value>

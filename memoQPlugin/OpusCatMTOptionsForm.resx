@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="instructionTextBox.Text" xml:space="preserve">
-    <value>Fiskmö MT plugin fetches translations from a Fiskmö MT service application that needs to be installed separately on the computer where the plugin is used. Start the Fiskmö MT service application and install the MT models that you need before using the plugin.</value>
+    <value>OPUS-CAT MT plugin fetches translations from a OPUS-CAT MT Engine application that needs to be installed separately on the computer where the plugin is used. Start the OPUS-CAT MT Engine application and install the MT models that you need before using the plugin.</value>
   </data>
 </root>

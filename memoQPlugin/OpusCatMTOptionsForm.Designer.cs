@@ -1,6 +1,6 @@
-﻿namespace FiskmoMTPlugin
+﻿namespace OpusCatMTPlugin
 {
-    partial class FiskmoMTOptionsForm
+    partial class OpusCatMTOptionsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FiskmoMTOptionsForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OpusCatMTOptionsForm));
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.lnkRetrieveLangs = new System.Windows.Forms.LinkLabel();
@@ -84,10 +84,10 @@
             this.lbLanguages.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbLanguages.FormattingEnabled = true;
             this.lbLanguages.ItemHeight = 20;
-            this.lbLanguages.Location = new System.Drawing.Point(18, 205);
+            this.lbLanguages.Location = new System.Drawing.Point(18, 225);
             this.lbLanguages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.lbLanguages.Name = "lbLanguages";
-            this.lbLanguages.Size = new System.Drawing.Size(660, 164);
+            this.lbLanguages.Size = new System.Drawing.Size(660, 144);
             this.lbLanguages.TabIndex = 6;
             // 
             // progressBar
@@ -107,10 +107,10 @@
             this.lblSupportedLanguages.Location = new System.Drawing.Point(12, 174);
             this.lblSupportedLanguages.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSupportedLanguages.Name = "lblSupportedLanguages";
-            this.lblSupportedLanguages.Size = new System.Drawing.Size(667, 25);
+            this.lblSupportedLanguages.Size = new System.Drawing.Size(667, 53);
             this.lblSupportedLanguages.TabIndex = 5;
-            this.lblSupportedLanguages.Text = "Local language pairs (additional language pairs can be installed in the Fiskmö MT" +
-    " application)";
+            this.lblSupportedLanguages.Text = "Local language pairs (additional language pairs can be installed in the OPUS-CAT " +
+    "MT Engine application)";
             // 
             // btnHelp
             // 
@@ -129,15 +129,15 @@
             this.mtServicePortLabel.AutoSize = true;
             this.mtServicePortLabel.Location = new System.Drawing.Point(14, 108);
             this.mtServicePortLabel.Name = "mtServicePortLabel";
-            this.mtServicePortLabel.Size = new System.Drawing.Size(546, 20);
+            this.mtServicePortLabel.Size = new System.Drawing.Size(444, 20);
             this.mtServicePortLabel.TabIndex = 11;
-            this.mtServicePortLabel.Text = "Fiskmö MT service port (must  be the same as the port in Fiskmö MT service)";
+            this.mtServicePortLabel.Text = "Port (must  be the same as the port in OPUS-CAT MT Engine)";
             // 
             // mtServicePortTextBox
             // 
-            this.mtServicePortTextBox.Location = new System.Drawing.Point(567, 105);
+            this.mtServicePortTextBox.Location = new System.Drawing.Point(477, 105);
             this.mtServicePortTextBox.Name = "mtServicePortTextBox";
-            this.mtServicePortTextBox.Size = new System.Drawing.Size(113, 26);
+            this.mtServicePortTextBox.Size = new System.Drawing.Size(203, 26);
             this.mtServicePortTextBox.TabIndex = 12;
             // 
             // instructionTextBox
@@ -152,7 +152,7 @@
             this.instructionTextBox.TabIndex = 13;
             this.instructionTextBox.Text = resources.GetString("instructionTextBox.Text");
             // 
-            // FiskmöMTOptionsForm
+            // OpusCatMTOptionsForm
             // 
             this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -173,11 +173,11 @@
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FiskmöMTOptionsForm";
+            this.Name = "OpusCatMTOptionsForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.Text = " ";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FiskmöMTOptionsForm_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OpusCatMTOptionsForm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

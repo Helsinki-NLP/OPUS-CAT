@@ -877,6 +877,15 @@ namespace OpusCatMTEngine
 
             if (mtModel == null)
             {
+                if (App.Overlay != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() => App.Overlay.ClearTranslation());
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        App.Overlay.ShowMessageInOverlay(
+                            "No languages specified, and no override model selected. If using the Chrome addin, make sure to set an override model.");
+                    });
+                }
                 throw new FaultException($"No MT model available for {srcLang}-{trgLang}");
             }
 
@@ -1012,7 +1021,7 @@ namespace OpusCatMTEngine
         //be extracted from the README.md file (some nicer metadata file might be useful)
         internal void ExtractModel(FileInfo zipFile)
         {
-            var tempExtractionPath = Path.Combine(Path.GetTempPath(), zipFile.Name);
+            var tempExtractionPath = Path.Combine(Path.Combine(Path.GetTempPath(),"opus_extract"), zipFile.Name);
             if (Directory.Exists(tempExtractionPath))
             {
                 Directory.Delete(tempExtractionPath, true);

@@ -5,24 +5,24 @@ using System.Windows.Forms;
 using MemoQ.Addins.Common.Framework;
 using MemoQ.MTInterfaces;
 
-namespace FiskmoMTPlugin
+namespace OpusCatMTPlugin
 {
     /// <summary>
     /// The main class of the Dummy MT plugin.
     /// </summary>
-    public class FiskmoMTPluginDirector : PluginDirectorBase, IModule
+    public class OpusCatMTPluginDirector : PluginDirectorBase, IModule
     {
         /// <summary>
         /// The identifier of the plugin.
         /// </summary>
-        public const string PluginId = "FiskmoMT";
+        public const string PluginId = "OpusCatMT";
 
         /// <summary>
         /// The memoQ's application environment; e.g., to provide UI language settings etc. to the plugin.
         /// </summary>
         private IEnvironment environment;
 
-        public FiskmoMTPluginDirector()
+        public OpusCatMTPluginDirector()
         {
         }
 
@@ -76,7 +76,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override string PluginID
         {
-            get { return "FiskmoMT"; }
+            get { return "OpusCatMT"; }
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override string FriendlyName
         {
-            get { return "Fiskmö MT Plugin"; }
+            get { return "OPUS-CAT MT Plugin"; }
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace FiskmoMTPlugin
         {
             get
             {
-                return Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("FiskmoMTPlugin.fiskmo_medium.png"));
+                return Image.FromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream("OpusCatMTPlugin.opus.ico"));
             }
         }
 
@@ -130,7 +130,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override IEngine2 CreateEngine(CreateEngineParams args)
         {
-            return new FiskmoMTEngine(args.SourceLangCode, args.TargetLangCode, new FiskmoMTOptions(args.PluginSettings));
+            return new OpusMTEngine(args.SourceLangCode, args.TargetLangCode, new OpusCatMTOptions(args.PluginSettings));
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace FiskmoMTPlugin
         /// </summary>
         public override PluginSettings EditOptions(IWin32Window parentForm, PluginSettings settings)
         {
-            using (var form = new FiskmoMTOptionsForm(environment) { Options = new FiskmoMTOptions(settings) })
+            using (var form = new OpusCatMTOptionsForm(environment) { Options = new OpusCatMTOptions(settings) })
             {
                 if (form.ShowDialog(parentForm) == DialogResult.OK)
                 {

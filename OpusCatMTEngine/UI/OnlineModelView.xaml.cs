@@ -113,7 +113,7 @@ namespace OpusCatMTEngine
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
             model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_ExtractingStatus;
-            var installPath = this.ModelManager.ExtractModel(model.ModelPath);
+            var installPath = this.ModelManager.ExtractModel(model.ModelPath,true);
             
             //If model has yaml config, check whether it was included in the zip package (Tatoeba models)
             if (!String.IsNullOrEmpty(model.TatoebaConfigString))

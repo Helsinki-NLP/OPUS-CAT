@@ -4,7 +4,7 @@ using MemoQ.Addins.Common.DataStructures;
 using MemoQ.Addins.Common.Utils;
 using MemoQ.MTInterfaces;
 
-namespace FiskmoMTPlugin
+namespace OpusCatMTPlugin
 {
     /// <summary>
     /// Session that perform actual translation or storing translations. Created on a segment-by-segment basis, or once for batch operations.
@@ -14,7 +14,7 @@ namespace FiskmoMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    public class FiskmoMTSession : ISession, ISessionForStoringTranslations
+    public class OpusCatMTSession : ISession, ISessionForStoringTranslations
     {
         /// <summary>
         /// The source language.
@@ -29,9 +29,9 @@ namespace FiskmoMTPlugin
         /// <summary>
         /// Options of the plugin.
         /// </summary>
-        private readonly FiskmoMTOptions options;
+        private readonly OpusCatMTOptions options;
 
-        public FiskmoMTSession(string srcLangCode, string trgLangCode, FiskmoMTOptions options)
+        public OpusCatMTSession(string srcLangCode, string trgLangCode, OpusCatMTOptions options)
         {
             this.srcLangCode = srcLangCode;
             this.trgLangCode = trgLangCode;
@@ -50,7 +50,7 @@ namespace FiskmoMTPlugin
             try
             {
                 string textToTranslate = createTextFromSegment(segm, FormattingAndTagsUsageOption.Plaintext);
-                string translation = FiskmoMTServiceHelper.Translate(options, textToTranslate, this.srcLangCode, this.trgLangCode);
+                string translation = OpusCatMTServiceHelper.Translate(options, textToTranslate, this.srcLangCode, this.trgLangCode);
                 result.Translation = createSegmentFromResult(segm, translation, FormattingAndTagsUsageOption.Plaintext);
             }
             catch (Exception e)
@@ -74,7 +74,7 @@ namespace FiskmoMTPlugin
             {
                 var texts = segs.Select(s => createTextFromSegment(s, FormattingAndTagsUsageOption.Plaintext)).ToList();
                 int i = 0;
-                foreach (string translation in FiskmoMTServiceHelper.BatchTranslate(options, texts, this.srcLangCode, this.trgLangCode))
+                foreach (string translation in OpusCatMTServiceHelper.BatchTranslate(options, texts, this.srcLangCode, this.trgLangCode))
                 {
                     results[i] = new TranslationResult();
                     results[i].Translation = createSegmentFromResult(segs[i], translation, FormattingAndTagsUsageOption.Plaintext);
@@ -144,7 +144,7 @@ namespace FiskmoMTPlugin
         {
             try
             {
-                FiskmoMTServiceHelper.StoreTranslation(options, transunit.Source.PlainText, transunit.Target.PlainText, this.srcLangCode, this.trgLangCode);
+                OpusCatMTServiceHelper.StoreTranslation(options, transunit.Source.PlainText, transunit.Target.PlainText, this.srcLangCode, this.trgLangCode);
             }
             catch (Exception e)
             {
@@ -159,7 +159,7 @@ namespace FiskmoMTPlugin
 
             try
             {
-                return FiskmoMTServiceHelper.BatchStoreTranslation(options,
+                return OpusCatMTServiceHelper.BatchStoreTranslation(options,
                                         transunits.Select(s => s.Source.PlainText).ToList(), transunits.Select(s => s.Target.PlainText).ToList(),
                                         this.srcLangCode, this.trgLangCode);
             }

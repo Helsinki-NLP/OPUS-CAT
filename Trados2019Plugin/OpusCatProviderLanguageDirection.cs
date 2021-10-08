@@ -152,7 +152,8 @@ namespace OpusCatTranslationProvider
             }
             else if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
             {
-                var translatedSentence = OpusCatProvider.ElgConnection.Translate(sourceText,
+                var taglessSourceText = Regex.Replace(sourceText, " (PLACEHOLDER|TAGPAIRSTART|TAGPAIREND) ", "");
+                var translatedSentence = OpusCatProvider.ElgConnection.Translate(taglessSourceText,
                     sourceCode, 
                     targetCode);
                 translationSegment.Add(translatedSentence);

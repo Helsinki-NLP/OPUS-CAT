@@ -61,10 +61,15 @@ namespace OpusCatMTEngine
             e.Handled = regex.IsMatch(e.Text);
         }
         
-        internal void UpdateTranslation(TranslationPair result)
+        internal void ShowMessageInOverlay(string message)
         {
             this.TranslationBox.Document.Blocks.Clear();
-            this.TranslationBox.Document.Blocks.Add(new Paragraph(new Run(result.Translation)));
+            this.TranslationBox.Document.Blocks.Add(new Paragraph(new Run(message)));
+        }
+
+        internal void UpdateTranslation(TranslationPair result)
+        {
+            this.ShowMessageInOverlay(result.Translation);
         }
 
         internal void ClearTranslation()

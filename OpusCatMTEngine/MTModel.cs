@@ -262,12 +262,28 @@ namespace OpusCatMTEngine
                 foreach (var modelNpzName in this.decoderSettings.models)
                 {
                     //No point in compressing npz, it's already compressed
-                    packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, modelNpzName), modelNpzName, CompressionLevel.NoCompression);
+                    packageZip.CreateEntryFromFile(
+                        Path.Combine(this.InstallDir, modelNpzName),
+                        modelNpzName,
+                        CompressionLevel.NoCompression);
+    
                 }
+
+
 
                 foreach (var vocabName in decoderSettings.vocabs.Distinct())
                 {
                     packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, vocabName), vocabName);
+                }
+
+                //Tatoeba models have yml configs, which may be needed for extracting info about the model
+                //(especially for multilingual models).
+                
+                if (File.Exists(this.modelYamlFilePath))
+                {
+                    packageZip.CreateEntryFromFile(
+                        this.modelYamlFilePath,
+                        Path.GetFileName(this.modelYamlFilePath));
                 }
 
                 var otherModelFiles =
@@ -281,7 +297,8 @@ namespace OpusCatMTEngine
                         "preprocess.sh",
                         "postprocess.sh",
                         "modelconfig.yml",
-                        "LICENSE"
+                        "LICENSE",
+                        "train.log"
                     };
 
                 foreach (var fileName in otherModelFiles)
@@ -289,7 +306,9 @@ namespace OpusCatMTEngine
                     packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, fileName), fileName);
                 }
             }
-            
+
+            MessageBox.Show($"Model has been packaged and saved to {zipPath}. Click OK to go to folder.","Model packaged",MessageBoxButton.OK);
+            System.Diagnostics.Process.Start("explorer.exe", Path.GetDirectoryName(zipPath));
         }
 
         public string StatusAndEstimateString

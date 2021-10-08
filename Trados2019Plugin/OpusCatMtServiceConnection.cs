@@ -54,8 +54,14 @@ namespace OpusCatTranslationProvider
             }
             else
             {
-                throw new Exception($"Problem fetching translation from OPUS-CAT MT Engine: {translationResponse.StatusCode}");
-                //return null;
+                if (translationResponse.StatusCode == 0)
+                {
+                    throw new Exception($"Connecting to OPUS-CAT MT Engine failed. Make sure that OPUS-CAT MT Engine is running on the computer and that it uses the same port as the OPUS-CAT Trados plugin.");
+                }
+                else
+                {
+                    throw new Exception($"Problem fetching translation from OPUS-CAT MT Engine: {translationResponse.StatusCode}");
+                }
             }
         }
 
@@ -129,7 +135,14 @@ namespace OpusCatTranslationProvider
             }
             else
             {
-                throw new Exception($"Problem fetching model status from OPUS-CAT MT Engine: {modelStatusResponse.StatusCode}");
+                if (modelStatusResponse.StatusCode == 0)
+                {
+                    throw new OpusCatEngineConnectionException();
+                }
+                else
+                {
+                    throw new Exception($"Problem fetching model status from OPUS-CAT MT Engine: {modelStatusResponse.StatusCode}");
+                }
             }
         }
 
@@ -145,7 +158,14 @@ namespace OpusCatTranslationProvider
             }
             else
             {
-                throw new Exception($"Problem fetching list of supported language pairs from OPUS-CAT MT Engine: {supportedLanguageResponse.StatusCode}");
+                if (supportedLanguageResponse.StatusCode == 0)
+                {
+                    throw new OpusCatEngineConnectionException($"Problem fetching list of supported language pairs from OPUS-CAT MT Engine: {supportedLanguageResponse.StatusCode}");
+                }
+                else
+                {
+                    throw new Exception($"Problem fetching list of supported language pairs from OPUS-CAT MT Engine: {supportedLanguageResponse.StatusCode}");
+                }
             }
         }
 

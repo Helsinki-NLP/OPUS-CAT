@@ -692,7 +692,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MT service HTTP port (used with other integrations, 1024-65535):.
+        ///   Looks up a localized string similar to MT service HTTP port (used with current plugins and integrations, 1024-65535):.
         /// </summary>
         public static string Settings_HttpPortLabel {
             get {
@@ -701,7 +701,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):.
+        ///   Looks up a localized string similar to MT service net.tcp port (used with older Trados and memoQ plugins, 1024-65535):.
         /// </summary>
         public static string Settings_NetTcpPortLabel {
             get {

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FiskmoMTPlugin
+namespace OpusCatMTPlugin
 {
     /// <summary>
     /// This class represents the options form of the dummy MT plugin.
@@ -18,7 +18,7 @@ namespace FiskmoMTPlugin
     ///     - 	The dialog does not call any blocking service in the user interface thread; it has to use background threads.
     ///     -   Check UI so that it is displayed correctly at high DPI settings.
     /// </remarks>
-    public partial class FiskmoMTOptionsForm : Form
+    public partial class OpusCatMTOptionsForm : Form
     {
         private delegate void LoginDelegate(string userName, string password);
         private IEnvironment environment;
@@ -34,9 +34,9 @@ namespace FiskmoMTPlugin
 
         private LoginResult loginResult;
 
-        public FiskmoMTOptions Options { get; set; }
+        public OpusCatMTOptions Options { get; set; }
 
-        public FiskmoMTOptionsForm(IEnvironment environment)
+        public OpusCatMTOptionsForm(IEnvironment environment)
         {
             InitializeComponent();
             this.environment = environment;
@@ -89,7 +89,7 @@ namespace FiskmoMTPlugin
             {
                 // try to login
                 // Do not call any blocking service in the user interface thread; it has to use background threads.
-                string tokenCode = await Task.Run(() => FiskmoMTServiceHelper.Login(userName, password, this.mtServicePortTextBox.Text));
+                string tokenCode = await Task.Run(() => OpusCatMTServiceHelper.Login(userName, password, this.mtServicePortTextBox.Text));
 
                 if (string.IsNullOrEmpty(tokenCode))
                 {
@@ -102,7 +102,7 @@ namespace FiskmoMTPlugin
                     loginResult.LoginSuccessful = true;
                     // try to get the list of the supported languages in the background
                     // Do not call any blocking service in the user interface thread; it has to use background threads.
-                    loginResult.SupportedLanguages = await Task.Run(() => FiskmoMTServiceHelper.ListSupportedLanguages(tokenCode,this.mtServicePortTextBox.Text));
+                    loginResult.SupportedLanguages = await Task.Run(() => OpusCatMTServiceHelper.ListSupportedLanguages(tokenCode,this.mtServicePortTextBox.Text));
                 }
             }
             catch (Exception ex)
@@ -156,7 +156,7 @@ namespace FiskmoMTPlugin
             progressBar.Visible = !enabled;
         }
 
-        private void FiskmöMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void OpusCatMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             
         }
@@ -169,7 +169,7 @@ namespace FiskmoMTPlugin
 
         private void btnHelp_Click(object sender, EventArgs e)
         {
-            (environment as IEnvironment2)?.ShowHelp("fiskmömt-settings.html");
+            (environment as IEnvironment2)?.ShowHelp("opuscat_help.html");
         }
 
     }

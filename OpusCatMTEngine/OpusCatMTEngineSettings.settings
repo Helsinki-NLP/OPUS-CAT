@@ -78,7 +78,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="OverlayFontsize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8</Value>
+      <Value Profile="(Default)">14</Value>
     </Setting>
     <Setting Name="FinetuningSetMinSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
