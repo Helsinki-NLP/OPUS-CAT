@@ -346,5 +346,17 @@ namespace OpusCatMTEngine {
                 this["FinetuningSetMinSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("evaluations")]
+        public string EvaluationDir {
+            get {
+                return ((string)(this["EvaluationDir"]));
+            }
+            set {
+                this["EvaluationDir"] = value;
+            }
+        }
     }
 }

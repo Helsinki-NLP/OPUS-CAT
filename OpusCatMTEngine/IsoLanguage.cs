@@ -15,7 +15,7 @@ namespace OpusCatMTEngine
     /// in Opus and Tatoeba Challenge. Some of the language codes are two-letter, some three-letter, and
     /// most don't have CultureInfos available.
     /// </summary>
-    public class IsoLanguage
+    public class IsoLanguage : IEquatable<IsoLanguage>
     {
 
         private static void ParseIso639_3()
@@ -257,5 +257,17 @@ namespace OpusCatMTEngine
                 languagePart == this.OriginalCode || 
                 xmlLangCode == this.OriginalCode);
         }
+        
+
+        public bool Equals(IsoLanguage lang)
+        {
+            return this.Iso639_3Code == lang.Iso639_3Code;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Iso639_3Code.GetHashCode();
+        }
     }
+    
 }

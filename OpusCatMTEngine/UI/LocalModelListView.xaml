@@ -113,6 +113,12 @@
                     <!-- This is disabled until the testing functionalities can be polished a bit more
                         <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
                     -->
+                    <Button
+                        Visibility="Collapsed"
+                        IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                        Name="evaluateModels" 
+                        Click="btnEvaluateModels_Click"
+                        Content="{x:Static resx:Resources.Main_EvaluateModelsButton}" />
                     <Button 
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
                         Name="addModelTag" 
@@ -133,7 +139,7 @@
                     Name="LocalModelList" 
                     Height="300" 
                     ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}" 
-                    SelectionMode="Single"
+                    SelectionMode="Extended"
                     GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">

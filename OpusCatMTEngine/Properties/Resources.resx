@@ -377,4 +377,22 @@
   <data name="SelectTmxLangPair_Title" xml:space="preserve">
     <value>Select language pair</value>
   </data>
+  <data name="Main_EvaluateModelsButton" xml:space="preserve">
+    <value>Evaluate models</value>
+  </data>
+  <data name="Evaluation_LanguagePair" xml:space="preserve">
+    <value>Language pair to evaluate</value>
+  </data>
+  <data name="Evaluation_TermbaseLabel" xml:space="preserve">
+    <value>Termbase file (.tbx)</value>
+  </data>
+  <data name="Evaluation_TermTranslationsLabel" xml:space="preserve">
+    <value>Termbase</value>
+  </data>
+  <data name="Evaluation_TestSetLabel" xml:space="preserve">
+    <value>Source text and reference translation</value>
+  </data>
+  <data name="Evaluation_EvaluateButton" xml:space="preserve">
+    <value>Evaluate</value>
+  </data>
 </root>

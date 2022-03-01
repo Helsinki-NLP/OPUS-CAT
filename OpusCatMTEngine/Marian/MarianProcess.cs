@@ -99,16 +99,23 @@ namespace OpusCatMTEngine
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
             //There are scripts for monolingual and multilingual models
 
-            string preprocessCommand, mtCommand;
+            string preprocessCommand, mtCommand, preprocessArgs, mtArgs;
 
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
-                preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
+                //preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
+
+                preprocessCommand = "Preprocessing\\spm_encode.exe";
+                preprocessArgs = $"--model \"{this.modelDir}\\source.spm\"";
                 this.segmentation = SegmentationMethod.SentencePiece;
             }
             else
             {
-                preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
+                //preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
+
+                preprocessCommand = "Preprocessing\\mosesprocessor.exe";
+                preprocessArgs = $"--stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
+
                 this.segmentation = SegmentationMethod.Bpe;
                 var postprocessCommand =
                     $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
@@ -117,13 +124,17 @@ namespace OpusCatMTEngine
                     new StreamWriter(this.PostprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             }
 
-            mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
+            //mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
+
+            mtCommand = "Marian\\marian.exe";
+            mtArgs = $"decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
+
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
             this.PreprocessProcess = 
-                MarianHelper.StartProcessInBackgroundWithRedirects(preprocessCommand);
+                MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(preprocessCommand,preprocessArgs);
             this.MtProcess = 
-                MarianHelper.StartProcessInBackgroundWithRedirects(mtCommand);
+                MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(mtCommand,mtArgs);
             
             this.utf8PreprocessWriter =
                 new StreamWriter(this.PreprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));

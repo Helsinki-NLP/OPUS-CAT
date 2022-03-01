@@ -99,6 +99,7 @@ namespace OpusCatMTEngine
             Log.Information("Opening OPUS-CAT MT Engine window");
 
             // Create the startup window
+            //TODO: make it possible to start the engine without launching UI
             MainWindow wnd = new MainWindow();
             // Show the window
             wnd.Show();

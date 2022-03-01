@@ -183,6 +183,17 @@ namespace OpusCatMTEngine
             mainWindow.AddTab(new ActionTabItem() { Content = customizeModel, Header = customizeModel.Title, Closable = true });
         }
 
+        private void btnEvaluateModels_Click(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<MTModel> selectedModels = this.LocalModelList.SelectedItems.OfType<MTModel>().ToList();
+            ModelEvaluatorView evaluateModels = new ModelEvaluatorView(selectedModels);
+
+            customizeModel.DataContext = this.DataContext;
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = evaluateModels, Header = evaluateModels.Title, Closable = true });
+        }
+
         private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
         {
             var headerClicked = e.OriginalSource as GridViewColumnHeader;
@@ -245,6 +256,8 @@ namespace OpusCatMTEngine
         {
             //TODO: open an overlay that is always on top and displays translation
         }
+
+        
     }
 
 }

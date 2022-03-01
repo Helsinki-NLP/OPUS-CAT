@@ -83,5 +83,8 @@
     <Setting Name="FinetuningSetMinSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
     </Setting>
+    <Setting Name="EvaluationDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">evaluations</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

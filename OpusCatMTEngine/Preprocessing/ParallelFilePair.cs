@@ -38,7 +38,10 @@ namespace OpusCatMTEngine
         public ParallelFilePair(string sourcePath, string targetPath)
         {
             this.Source = new FileInfo(sourcePath);
-            this.Target = new FileInfo(targetPath);
+            if (targetPath != null)
+            {
+                this.Target = new FileInfo(targetPath);
+            }
         }
 
         public ParallelFilePair(List<ParallelSentence> biText, string srcPath, string trgPath)

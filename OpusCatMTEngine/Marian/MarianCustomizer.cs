@@ -332,12 +332,24 @@ namespace OpusCatMTEngine
 
             //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config \"{configPath}\" --log-level=info"; // --quiet";
-            
+
             /*byte[] bytes = Encoding.Default.GetBytes(trainingArgs);
             trainingArgs = Encoding.UTF8.GetString(bytes);*/
 
+            // Fine-tuning tends to cause IO lockup when the model is written, so assign low priority
+            // by changing main process priority to 
+            var parent = Process.GetCurrentProcess();
+            var original = parent.PriorityClass;
+
+            parent.PriorityClass = ProcessPriorityClass.BelowNormal;
+
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
+
+            //Restore normal process priority
+            parent.PriorityClass = original;
+
+
             return trainProcess;
         }
 

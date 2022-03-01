@@ -127,7 +127,7 @@ namespace OpusCatMTEngine
             }
             catch (System.Xml.XmlException ex)
             {
-                Log.Error($"{tmxFile} is not a valid tmx file");
+                Log.Error($"{tmxFile} is not a valid tmx file: {ex.Message}");
                 return null;
             }
             

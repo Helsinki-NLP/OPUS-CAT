@@ -21,11 +21,66 @@ namespace OpusCatMTEngine
             EventHandler exitCallback = null,
             DataReceivedEventHandler errorDataHandler = null)
         {
+            var fileName = command.Split()[0];
+            var args = command.Substring(fileName.Length);
             var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process ExternalProcess = new Process();
 
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {command}";
+            ExternalProcess.StartInfo.FileName = fileName;
+            ExternalProcess.StartInfo.Arguments = args;
+            ExternalProcess.StartInfo.UseShellExecute = false;
+            //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
+            ExternalProcess.StartInfo.RedirectStandardInput = true;
+            ExternalProcess.StartInfo.RedirectStandardOutput = true;
+            ExternalProcess.StartInfo.RedirectStandardError = true;
+            ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+
+            //Async error data handler is used for tracking progress
+            if (errorDataHandler != null)
+            {
+                ExternalProcess.ErrorDataReceived += errorDataHandler;
+            }
+            else
+            {
+                ExternalProcess.ErrorDataReceived += defaultErrorDataHandler;
+            }
+
+            ExternalProcess.StartInfo.CreateNoWindow = true;
+
+            if (exitCallback != null)
+            {
+                ExternalProcess.Exited += exitCallback;
+            }
+
+            ExternalProcess.Start();
+
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+            ChildProcessTracker.AddProcess(ExternalProcess);
+
+            ExternalProcess.EnableRaisingEvents = true;
+            ExternalProcess.BeginErrorReadLine();
+
+            ExternalProcess.StandardInput.AutoFlush = true;
+
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+
+            return ExternalProcess;
+        }
+
+        internal static Process StartProcessDirectlyInBackgroundWithRedirects(
+            string command,
+            string args,
+            EventHandler exitCallback = null,
+            DataReceivedEventHandler errorDataHandler = null)
+        {
+            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Process ExternalProcess = new Process();
+
+            ExternalProcess.StartInfo.FileName = command;
+            ExternalProcess.StartInfo.Arguments = args;
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
@@ -77,8 +132,8 @@ namespace OpusCatMTEngine
             var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process ExternalProcess = new Process();
 
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c chcp 65001 & {fileName} {args}";
+            ExternalProcess.StartInfo.FileName = fileName;
+            ExternalProcess.StartInfo.Arguments = args;
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 

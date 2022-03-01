@@ -79,6 +79,51 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Evaluate.
+        /// </summary>
+        public static string Evaluation_EvaluateButton {
+            get {
+                return ResourceManager.GetString("Evaluation_EvaluateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language pair to evaluate.
+        /// </summary>
+        public static string Evaluation_LanguagePair {
+            get {
+                return ResourceManager.GetString("Evaluation_LanguagePair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Termbase file (.tbx).
+        /// </summary>
+        public static string Evaluation_TermbaseLabel {
+            get {
+                return ResourceManager.GetString("Evaluation_TermbaseLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Termbase.
+        /// </summary>
+        public static string Evaluation_TermTranslationsLabel {
+            get {
+                return ResourceManager.GetString("Evaluation_TermTranslationsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source text and reference translation.
+        /// </summary>
+        public static string Evaluation_TestSetLabel {
+            get {
+                return ResourceManager.GetString("Evaluation_TestSetLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse.
         /// </summary>
         public static string Finetune_BrowseButton {
@@ -381,6 +426,15 @@ namespace OpusCatMTEngine.Properties {
         public static string Main_EditModelTagsButton {
             get {
                 return ResourceManager.GetString("Main_EditModelTagsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Evaluate models.
+        /// </summary>
+        public static string Main_EvaluateModelsButton {
+            get {
+                return ResourceManager.GetString("Main_EvaluateModelsButton", resourceCulture);
             }
         }
         

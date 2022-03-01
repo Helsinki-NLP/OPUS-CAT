@@ -215,6 +215,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ChildProcessTracker.cs" />
+    <Compile Include="Evaluation\TermSgmFile.cs" />
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="IMtProvider.cs" />
     <Compile Include="Marian\MarianBatchTranslator.cs" />
@@ -236,6 +237,9 @@
     <Compile Include="UI\Common.cs" />
     <Compile Include="UI\CustomizationProgressView.xaml.cs">
       <DependentUpon>CustomizationProgressView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ModelEvaluatorView.xaml.cs">
+      <DependentUpon>ModelEvaluatorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ModelCustomizerView.xaml.cs">
       <DependentUpon>ModelCustomizerView.xaml</DependentUpon>
@@ -277,6 +281,10 @@
     <Page Include="UI\CustomizationProgressView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ModelEvaluatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ModelCustomizerView.xaml">
       <SubType>Designer</SubType>
