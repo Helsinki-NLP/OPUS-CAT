@@ -10,6 +10,8 @@ using System.Web.Http;
 using System.ServiceModel;
 using System.Web;
 using System.Net.Http;
+using SentenceSplitterNet;
+using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
@@ -105,7 +107,13 @@ namespace OpusCatMTEngine
         
 
         [HttpGet]
-        public HttpResponseMessage TranslateJson(string tokenCode="", string input="", string srcLangCode="", string trgLangCode="", string modelTag="")
+        public HttpResponseMessage TranslateJson(
+            string tokenCode="", 
+            string input="", 
+            string srcLangCode="", 
+            string trgLangCode="", 
+            string modelTag="",
+            Boolean segmentedInput=true)
         {
             if (input == null)
             {
@@ -115,16 +123,63 @@ namespace OpusCatMTEngine
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            var translation = this.mtProvider.Translate(input, sourceLang, targetLang, modelTag);
-
-
-            var translationResult = translation.Result;
-            var response = Request.CreateResponse<TranslationPair>(HttpStatusCode.OK, translationResult);
+            List<string> sentencesToTranslate;
+            if (segmentedInput)
+            {
+                sentencesToTranslate = new List<string>() { input };
+            }
+            else
+            {
+                var splitter = new SentenceSplitter(sourceLang.ShortestIsoCode);
+                sentencesToTranslate = splitter.Split(input);
+            }
+            
+            
+            TranslationPair finalTranslation = null;
+            foreach (var sentence in sentencesToTranslate)
+            {
+                var translationPart = this.mtProvider.Translate(sentence, sourceLang, targetLang, modelTag);
+                if (finalTranslation == null)
+                {
+                    finalTranslation = translationPart.Result;
+                }
+                else
+                {
+                    finalTranslation.AppendTranslationPair(translationPart.Result);
+                }
+            }
+            
+            var response = Request.CreateResponse<TranslationPair>(HttpStatusCode.OK, finalTranslation);
             response.Headers.Add("Access-Control-Allow-Origin", "*");
-
 
             return response;
             //return new Translation(translation.Result.Translation);
+        }
+
+        [HttpGet]
+        public string TranslateParagraphJson(string tokenCode = "", string input = "", string srcLangCode = "", string trgLangCode = "", string modelTag = "", Boolean segmentedInput = true)
+        {
+            if (input == null)
+            {
+                input = "";
+            }
+            //HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
+            var splitter = new SentenceSplitter(sourceLang.ShortestIsoCode);
+            var sentencesToTranslate = splitter.Split(input);
+
+            StringBuilder translationBuilder = new StringBuilder();
+
+            foreach (var sentence in sentencesToTranslate)
+            {
+                var translation = this.mtProvider.Translate(sentence, sourceLang, targetLang, modelTag);
+                translationBuilder.Append(translation.Result.Translation + " ");
+            }
+
+            return translationBuilder.ToString().Trim();
+            
         }
 
 

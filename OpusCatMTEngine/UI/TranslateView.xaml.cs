@@ -1,4 +1,5 @@
 ﻿using OpusMTInterface;
+using SentenceSplitterNet;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -146,16 +147,28 @@ namespace OpusCatMTEngine
 
         private List<TranslationPair> OrderTranslation(string source)
         {
+            var splitter = new SentenceSplitter(this.sourceLanguage.ShortestIsoCode);
             var translation = new List<TranslationPair>();
             using (System.IO.StringReader reader = new System.IO.StringReader(source))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    translation.Add(
-                        this.Model.Translate(
-                            line,
-                            this.SourceLanguage, this.TargetLanguage).Result);
+                    var sourceSentences = splitter.Split(line);
+                    TranslationPair finalTranslation = null;
+                    foreach (var sourceSentence in sourceSentences)
+                    {
+                        var translationPart = this.Model.Translate(sourceSentence, this.SourceLanguage, this.TargetLanguage);
+                        if (finalTranslation == null)
+                        {
+                            finalTranslation = translationPart.Result;
+                        }
+                        else
+                        {
+                            finalTranslation.AppendTranslationPair(translationPart.Result);
+                        }
+                    }
+                    translation.Add(finalTranslation);
                 }
             }
 
