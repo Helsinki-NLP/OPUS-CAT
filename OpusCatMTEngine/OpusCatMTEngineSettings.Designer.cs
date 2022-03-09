@@ -358,5 +358,17 @@ namespace OpusCatMTEngine {
                 this["EvaluationDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("python-3.8.10-embed-amd64")]
+        public string PythonDir {
+            get {
+                return ((string)(this["PythonDir"]));
+            }
+            set {
+                this["PythonDir"] = value;
+            }
+        }
     }
 }

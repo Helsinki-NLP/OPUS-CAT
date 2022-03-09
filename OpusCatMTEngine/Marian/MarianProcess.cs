@@ -42,6 +42,7 @@ namespace OpusCatMTEngine
 
         public string SystemName { get; }
         public bool TargetLanguageCodeRequired { get; private set; }
+        public IPreprocessor preprocessor;
         public Process PreprocessProcess { get => preprocessPipe; set => preprocessPipe = value; }
         public Process PostprocessProcess { get; private set; }
         private StreamWriter utf8PostprocessWriter;
@@ -103,6 +104,7 @@ namespace OpusCatMTEngine
 
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
+                this.preprocessor = new SentencePiecePreprocessor($"{this.modelDir}\\source.spm");
                 //preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
 
                 preprocessCommand = "Preprocessing\\spm_encode.exe";
@@ -115,8 +117,11 @@ namespace OpusCatMTEngine
 
                 preprocessCommand = "Preprocessing\\mosesprocessor.exe";
                 preprocessArgs = $"--stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
-
+                    
                 this.segmentation = SegmentationMethod.Bpe;
+
+                // TODO: this fails because I removed cmd.exe from the Process starts.
+                // I should combine the two py scripts, they are not used separately in any case.
                 var postprocessCommand =
                     $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
                 this.PostprocessProcess = MarianHelper.StartProcessInBackgroundWithRedirects(postprocessCommand);
@@ -175,10 +180,11 @@ namespace OpusCatMTEngine
 
             //Add preprocessing in here, capture preprocessed source for getting aligned tokens.
 
-            this.utf8PreprocessWriter.WriteLine(sourceSentence);
-            this.utf8PreprocessWriter.Flush();
+            //this.utf8PreprocessWriter.WriteLine(sourceSentence);
+            //this.utf8PreprocessWriter.Flush();
 
-            string preprocessedLine = this.PreprocessProcess.StandardOutput.ReadLine();
+            //string preprocessedLine = this.PreprocessProcess.StandardOutput.ReadLine();
+            string preprocessedLine = this.preprocessor.PreprocessSentence(sourceSentence);
 
             var lineToTranslate = preprocessedLine;
             if (this.TargetLanguageCodeRequired)

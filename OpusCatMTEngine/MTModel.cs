@@ -610,23 +610,23 @@ namespace OpusCatMTEngine
             FileInfo spOutput)
         {
 
-            string validateScript;
-
+            string segmethodArg;
+            
             switch (this.ModelSegmentationMethod)
             {
                 case SegmentationMethod.Bpe:
-                    validateScript = "ValidateBpe.bat";
+                    segmethodArg = ".bpe";
                     break;
                 case SegmentationMethod.SentencePiece:
-                    validateScript = "ValidateSp.bat";
+                    segmethodArg = ".spm";
                     break;
                 default:
                     return;
             }
 
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                validateScript,
-                $"{refFile.FullName} OOD{outOfDomainSize} {spOutput.FullName}");
+                Path.Combine(OpusCatMTEngineSettings.Default.PythonDir, "python.exe"),
+                $".\\Marian\\validate.py {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
         }
 
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

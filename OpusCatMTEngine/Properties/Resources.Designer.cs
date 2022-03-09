@@ -683,20 +683,20 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BLEU score.
-        /// </summary>
-        public static string Progress_BleuAxis {
-            get {
-                return ResourceManager.GetString("Progress_BleuAxis", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to In-domain validation set.
         /// </summary>
         public static string Progress_InDomainSeriesName {
             get {
                 return ResourceManager.GetString("Progress_InDomainSeriesName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metric score.
+        /// </summary>
+        public static string Progress_MetricAxis {
+            get {
+                return ResourceManager.GetString("Progress_MetricAxis", resourceCulture);
             }
         }
         

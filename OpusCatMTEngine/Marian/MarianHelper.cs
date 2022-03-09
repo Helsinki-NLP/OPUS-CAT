@@ -317,6 +317,8 @@ namespace OpusCatMTEngine
                     //matter is source.tcmodel is used for target language.
                     var tcModelPath = $@"{directory.FullName}\source.tcmodel";
 
+                    //TODO: this would not work, since pipes no longer work (cmd.exe was removed from start process).
+                    //Combine the py scripts and use those directly (add input file parameter).
                     var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                         $"type {preprocessedFile.FullName} | Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\" > {segmentedFile.FullName}");
                     mosesProcess.WaitForExit();

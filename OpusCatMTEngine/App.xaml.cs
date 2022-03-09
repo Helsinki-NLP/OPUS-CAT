@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Python.Runtime;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -112,6 +113,17 @@ namespace OpusCatMTEngine
             {
                 App.CloseOverlay();
             }
+
+            this.InitializePythonEngine();
+        }
+
+        private void InitializePythonEngine()
+        {
+            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll");
+            Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64");
+            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64");
+            PythonEngine.Initialize();
+            PythonEngine.BeginAllowThreads();
         }
 
         /// <summary>

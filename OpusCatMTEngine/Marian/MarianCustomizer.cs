@@ -189,6 +189,11 @@ namespace OpusCatMTEngine
 
             var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
 
+            // TODO: this is meant for generating alignments for fine-tuning models with guided alignment.
+            // However, it seems that it's not necessary to provide alignments for fine-tuning 
+            // (at least the effects are not huge), so this has not been implemented yet. Also, this 
+            // uses eflomal, which is GPL and so difficult to integrate. I'll leave this code here,
+            // but I'll remove the actual eflomal components, they can be reintroduced if needed.
             if (this.guidedAlignment)
             {
                 //Generate alignments for fine-tuning corpus
@@ -264,8 +269,10 @@ namespace OpusCatMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            switch (this.segmentationMethod)
+            /* This is the old method, using a batch file, now uses python script
+             * switch (this.segmentationMethod)
             {
+
                 case ".bpe":
                     string validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
                     trainingConfig.validScriptPath = 
@@ -282,12 +289,16 @@ namespace OpusCatMTEngine
                     break;
                 default:
                     break;
-            }
+            }*/
+
+            trainingConfig.validScriptPath =
+                Path.Combine(Path.Combine(processDir, OpusCatMTEngineSettings.Default.PythonDir), "python.exe .\\Marian\\validate.py");
 
             trainingConfig.validScriptArgs = 
                 new List<string> {
                     $"{spValidTarget.FullName}",
-                    $"OOD{OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()}" };
+                    OpusCatMTEngineSettings.Default.OODValidSetSize.ToString(),
+                    this.segmentationMethod};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             if (this.guidedAlignment)

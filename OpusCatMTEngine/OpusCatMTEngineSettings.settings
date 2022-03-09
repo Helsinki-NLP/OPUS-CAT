@@ -86,5 +86,8 @@
     <Setting Name="EvaluationDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">evaluations</Value>
     </Setting>
+    <Setting Name="PythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python-3.8.10-embed-amd64</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
