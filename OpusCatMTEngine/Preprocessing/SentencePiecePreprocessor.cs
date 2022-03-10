@@ -19,6 +19,11 @@ namespace OpusCatMTEngine
             }
         }
 
+        public string PostprocessSentence(string rawTranslation)
+        {
+            return rawTranslation.Replace(" ", "").Replace("▁", " ").Trim();
+        }
+
         public string PreprocessSentence(string sentence)
         {
             string preprocessedSentence;

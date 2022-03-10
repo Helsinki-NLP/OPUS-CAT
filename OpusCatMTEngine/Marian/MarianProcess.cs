@@ -113,7 +113,11 @@ namespace OpusCatMTEngine
             }
             else
             {
-                //preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
+                this.preprocessor = 
+                    new MosesBpePreprocessor(
+                        $"{this.modelDir}\\source.tcmodel",
+                        $"{this.modelDir}\\source.bpe",
+                        this.SourceCode, this.TargetCode);
 
                 preprocessCommand = "Preprocessing\\mosesprocessor.exe";
                 preprocessArgs = $"--stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
@@ -201,7 +205,7 @@ namespace OpusCatMTEngine
 
             TranslationPair alignedTranslationPair = new TranslationPair(preprocessedLine, translationAndAlignment, this.segmentation, this.TargetCode);
 
-            switch (this.segmentation)
+            /*switch (this.segmentation)
             {
                 case SegmentationMethod.SentencePiece:
                     alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace(" ", "").Replace("▁", " ").Trim();
@@ -214,7 +218,9 @@ namespace OpusCatMTEngine
                     break;
                 default:
                     throw new Exception("Unknown segmentation method specified for model");
-            }
+            }*/
+
+            alignedTranslationPair.Translation = this.preprocessor.PostprocessSentence(alignedTranslationPair.RawTranslation);
 
             return alignedTranslationPair;
             

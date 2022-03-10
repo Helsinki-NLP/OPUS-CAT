@@ -239,6 +239,7 @@
     <Compile Include="OWIN\ParallelSentence.cs" />
     <Compile Include="Preprocessing\IPreprocessor.cs" />
     <Compile Include="Preprocessing\ParallelFilePair.cs" />
+    <Compile Include="Preprocessing\MosesBpePreprocessor.cs" />
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />

@@ -305,14 +305,18 @@ namespace OpusCatMTEngine
             //Marian doesn't like spaces in names
             var segmentedFile = new FileInfo(Path.Combine(directory.FullName, $"seg_{languageFile.Name.Replace(" ", "_")}"));
 
+            IPreprocessor preprocessor;
             switch (segmentationModel.Extension)
             {
                 case ".spm":
-                    var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{segmentationModel.FullName}\" --output \"{segmentedFile.FullName}\"";
+                    preprocessor = new SentencePiecePreprocessor(segmentationModel.FullName);
+                    /*var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{segmentationModel.FullName}\" --output \"{segmentedFile.FullName}\"";
                     var segmentationProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
-                    segmentationProcess.WaitForExit();
+                    segmentationProcess.WaitForExit();*/
                     break;
                 case ".bpe":
+                    preprocessor = new MosesBpePreprocessor("", segmentationModel.FullName, languageCode, null);
+                    /*
                     //Truecasing is not used in any models, so this is a dummy tc model (empty). So it does not
                     //matter is source.tcmodel is used for target language.
                     var tcModelPath = $@"{directory.FullName}\source.tcmodel";
@@ -321,12 +325,22 @@ namespace OpusCatMTEngine
                     //Combine the py scripts and use those directly (add input file parameter).
                     var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                         $"type {preprocessedFile.FullName} | Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\" > {segmentedFile.FullName}");
-                    mosesProcess.WaitForExit();
+                    mosesProcess.WaitForExit();*/
                     break;
                 default:
-                    segmentationProcess = null;
                     throw new Exception("No segmentation model found");
                     break;
+            }
+
+            using (var preprocessedFileReader = preprocessedFile.OpenText())
+            using (var segmentedFileWriter = new StreamWriter(segmentedFile.FullName))
+            {
+                String line;
+                while ((line = preprocessedFileReader.ReadLine()) != null)
+                {
+                    var segmentedLine = preprocessor.PreprocessSentence(line);
+                    segmentedFileWriter.WriteLine(segmentedLine);
+                }
             }
          
             if (targetLanguageToPrefix != null)
