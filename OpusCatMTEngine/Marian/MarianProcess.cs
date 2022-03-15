@@ -30,11 +30,9 @@ namespace OpusCatMTEngine
         public string TargetCode { get; set; }
         public bool Faulted { get; private set; }
         public Process MtProcess { get => mtPipe; set => mtPipe = value; }
-        private Process preprocessPipe;
 
         private ConcurrentStack<Task<TranslationPair>> taskStack = new ConcurrentStack<Task<TranslationPair>>();
 
-        private StreamWriter utf8PreprocessWriter;
         private StreamWriter utf8MtWriter;
         private string modelDir;
         private readonly bool includePlaceholderTags;
@@ -43,9 +41,6 @@ namespace OpusCatMTEngine
         public string SystemName { get; }
         public bool TargetLanguageCodeRequired { get; private set; }
         public IPreprocessor preprocessor;
-        public Process PreprocessProcess { get => preprocessPipe; set => preprocessPipe = value; }
-        public Process PostprocessProcess { get; private set; }
-        private StreamWriter utf8PostprocessWriter;
         
         private SegmentationMethod segmentation;
         private static readonly Object lockObj = new Object();
@@ -119,18 +114,7 @@ namespace OpusCatMTEngine
                         $"{this.modelDir}\\source.bpe",
                         this.SourceCode, this.TargetCode);
 
-                preprocessCommand = "Preprocessing\\mosesprocessor.exe";
-                preprocessArgs = $"--stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
-                    
                 this.segmentation = SegmentationMethod.Bpe;
-
-                // TODO: this fails because I removed cmd.exe from the Process starts.
-                // I should combine the two py scripts, they are not used separately in any case.
-                var postprocessCommand =
-                    $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
-                this.PostprocessProcess = MarianHelper.StartProcessInBackgroundWithRedirects(postprocessCommand);
-                this.utf8PostprocessWriter =
-                    new StreamWriter(this.PostprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             }
 
             //mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
@@ -140,13 +124,11 @@ namespace OpusCatMTEngine
 
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
-            this.PreprocessProcess = 
-                MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(preprocessCommand,preprocessArgs);
+            /*this.PreprocessProcess = 
+                MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(preprocessCommand,preprocessArgs);*/
             this.MtProcess = 
                 MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(mtCommand,mtArgs);
             
-            this.utf8PreprocessWriter =
-                new StreamWriter(this.PreprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             this.utf8MtWriter =
                 new StreamWriter(this.MtProcess.StandardInput.BaseStream, new UTF8Encoding(false));
 

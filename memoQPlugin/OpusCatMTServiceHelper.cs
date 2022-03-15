@@ -14,7 +14,7 @@ namespace OpusCatMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    internal class OpusCatMTServiceHelper
+    public class OpusCatMTServiceHelper
     {
         private static DateTime TokenCodeExpires = DateTime.MinValue;
         private static string TokenCode;

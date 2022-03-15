@@ -277,9 +277,6 @@
     <Compile Include="UI\OnlineModelView.xaml.cs">
       <DependentUpon>OnlineModelView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\TestView.xaml.cs">
-      <DependentUpon>TestView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\TranslateView.xaml.cs">
       <DependentUpon>TranslateView.xaml</DependentUpon>
     </Compile>
@@ -331,10 +328,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\TestView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\TranslateView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -379,32 +372,11 @@
     <EmbeddedResource Include="iso-639-3_20200515.tab" />
     <EmbeddedResource Include="iso639-5.tsv" />
     <None Include="packages.config" />
-    <None Include="Preprocessing\StartMosesBpePreprocessPipe.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="StartMosesBpeMultilingualMtPipe.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="StartSentencePieceMultilingualMtPipe.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="ValidateBpe.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="ValidateSp.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="StartMosesBpeMtPipe.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="TranslateBatchSentencePiece.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="StartSentencePieceMtPipe.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -490,26 +462,12 @@
     <Content Include="Marian\validate.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Preprocessing\apply_bpe.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="UI\cross.png" />
     <Resource Include="UI\fiskmo_zIQ_icon.ico" />
     <None Include="customize.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="Marian\marian.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Preprocessing\mosesprocessor.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Preprocessing\mosesprocessor.py" />
-    <Resource Include="Preprocessing\python_to_exe_instructions.txt" />
-    <Content Include="Preprocessing\spm_decode.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Preprocessing\spm_encode.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="ThirdPartyNotices.txt">

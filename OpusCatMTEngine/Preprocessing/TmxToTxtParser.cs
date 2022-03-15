@@ -133,6 +133,11 @@ namespace OpusCatMTEngine
             
             var tus = tmx.Descendants("tu");
 
+            if (tus == null)
+            {
+                return null;
+            }
+
             int extractedPairCount = 0;
 
             using (var sourceWriter = sourceFile.CreateText())
@@ -142,22 +147,30 @@ namespace OpusCatMTEngine
                 {
                     var segs = tu.Descendants("seg");
 
+                    
                     XElement sourceSeg = null;
                     XElement targetSeg = null;
                     List<string> segLangs = new List<string>();
-                    foreach (var seg in segs)
+
+                    //tmx format specifies that there should be seg elements
+                    //under tu elements, but if not (in case of e.g. incorrect tmx), you will get null, so
+                    //guard against it
+                    if (segs != null)
                     {
-                        var segLang = seg.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower();
-                        segLangs.Add(segLang);
-
-                        if (sourceLang.IsCompatibleTmxLang(segLang))
+                        foreach (var seg in segs)
                         {
-                            sourceSeg = seg;
-                        }
+                            var segLang = seg.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower();
+                            segLangs.Add(segLang);
 
-                        if (targetLang.IsCompatibleTmxLang(segLang))
-                        {
-                            targetSeg = seg;
+                            if (sourceLang.IsCompatibleTmxLang(segLang))
+                            {
+                                sourceSeg = seg;
+                            }
+
+                            if (targetLang.IsCompatibleTmxLang(segLang))
+                            {
+                                targetSeg = seg;
+                            }
                         }
                     }
                     

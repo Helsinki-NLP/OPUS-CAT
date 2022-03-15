@@ -152,17 +152,7 @@ namespace OpusCatMTEngine
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.AddTab(new ActionTabItem() { Content = translateView, Header = translateView.Title, Closable = true });
         }
-
-        //TODO: Open a window where the test file is translated with the model.
-        //Show the BLEU score and translation time etc.
-        private void btnTestModel_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            TestView testView = new TestView(selectedModel);
-
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.AddTab(new ActionTabItem() { Content = testView, Header = testView.Title, Closable = true });
-        }
+        
 
         private void btnEditModelTags_Click(object sender, RoutedEventArgs e)
         {
