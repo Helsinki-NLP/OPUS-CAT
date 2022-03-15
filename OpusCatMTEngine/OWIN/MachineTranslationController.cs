@@ -113,7 +113,7 @@ namespace OpusCatMTEngine
             string srcLangCode="", 
             string trgLangCode="", 
             string modelTag="",
-            Boolean segmentedInput=true)
+            Boolean inputIsSingleSentence=true)
         {
             if (input == null)
             {
@@ -124,7 +124,7 @@ namespace OpusCatMTEngine
             var targetLang = new IsoLanguage(trgLangCode);
 
             List<string> sentencesToTranslate;
-            if (segmentedInput)
+            if (inputIsSingleSentence)
             {
                 sentencesToTranslate = new List<string>() { input };
             }
