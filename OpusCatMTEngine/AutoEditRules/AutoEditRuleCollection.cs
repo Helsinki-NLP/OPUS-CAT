@@ -7,7 +7,7 @@ using YamlDotNet.Serialization;
 
 namespace OpusCatMTEngine
 {
-    public class EditRuleCollection
+    public class AutoEditRuleCollection
     {
         [YamlMember(Alias = "edit-rules", ApplyNamingConventions = false)]
         public List<AutoEditRule> EditRules;
@@ -15,7 +15,7 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "collection-name", ApplyNamingConventions = false)]
         public string CollectionName;
 
-        public EditRuleCollection()
+        public AutoEditRuleCollection()
         {
         }
 
@@ -42,7 +42,7 @@ namespace OpusCatMTEngine
                 {
                     //Note that we check for the trigger in the unedited source (don't
                     //want to do serial rule application here)
-                    var uneditedSourceMatches = rule.sourcePatternRegex.Matches(uneditedInput);
+                    var uneditedSourceMatches = rule.SourcePatternRegex.Matches(uneditedInput);
                     if (uneditedSourceMatches.Count > 1)
                     {
                         int matchIndex = 0;
@@ -66,10 +66,11 @@ namespace OpusCatMTEngine
             return regexMatches;
         }
 
-        public string ProcessRules(string uneditedSource)
+        public AutoEditResult ProcessRules(string uneditedSource)
         {
             string editedSource = uneditedSource;
 
+            List<AutoEditRuleMatch> appliedReplacements = new List<AutoEditRuleMatch>();
             List<Tuple<int,int>> coveredUneditedSourceSpans = new List<Tuple<int, int>>();
             //Collect matches for all rules
             Dictionary<int, List<AutoEditRuleMatch>> uneditedSourceMatches = this.GetAllMatches(uneditedSource);
@@ -81,20 +82,33 @@ namespace OpusCatMTEngine
             {
                 var longestMatch = matchesAtPosition.Value.OrderBy(x => x.Match.Length).Last();
                 //Remove the original text
-                editedSource = editedSource.Remove(matchesAtPosition.Key + editingOffset, longestMatch.Match.Length);
+                var matchLength = longestMatch.Match.Length;
+                editedSource = editedSource.Remove(matchesAtPosition.Key + editingOffset, matchLength);
                 //Replace with rule replacement
-                longestMatch.Match.Result(longestMatch.Rule.Replacement);
+                var replacement = longestMatch.Match.Result(longestMatch.Rule.Replacement);
+                editedSource = editedSource.Insert(matchesAtPosition.Key + editingOffset, replacement);
+
+                longestMatch.OutputIndex = matchesAtPosition.Key + editingOffset;
+                longestMatch.OutputLength = replacement.Length;
+                appliedReplacements.Add(longestMatch);
+                
+                //Update loop counters
+                editingOffset += replacement.Length - matchLength;
+                endOfLastMatchIndex = longestMatch.Match.Index + matchLength;
+                
+                
             }
 
+            return new AutoEditResult(editedSource, appliedReplacements);
         }
 
-        public static EditRuleCollection CreateFromFile(FileInfo ruleFileInfo)
+        public static AutoEditRuleCollection CreateFromFile(FileInfo ruleFileInfo)
         {
-            EditRuleCollection editRuleCollection;
+            AutoEditRuleCollection editRuleCollection;
             var deserializer = new Deserializer();
             using (var reader = ruleFileInfo.OpenText())
             {
-                editRuleCollection = deserializer.Deserialize<EditRuleCollection>(reader);
+                editRuleCollection = deserializer.Deserialize<AutoEditRuleCollection>(reader);
             }
 
             return editRuleCollection;

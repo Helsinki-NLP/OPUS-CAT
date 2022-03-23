@@ -19,7 +19,7 @@ namespace OpusCatMTEngine
 
         //The regexes will be called over and over, so use the same instantation to prevent
         //regex recompilation
-        public Regex outputPatternRegex;
+        private Regex outputPatternRegex;
         public Regex OutputPatternRegex
         {
             get
@@ -32,7 +32,7 @@ namespace OpusCatMTEngine
             }
         }
 
-        public Regex sourcePatternRegex;
+        private Regex sourcePatternRegex;
         public Regex SourcePatternRegex
         {
             get

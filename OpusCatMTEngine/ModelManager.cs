@@ -223,8 +223,8 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal List<EditRuleCollection> AutoPreEditRuleCollections { get; private set; }
-        internal List<EditRuleCollection> AutoPostEditRuleCollections { get; private set; }
+        internal List<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
+        internal List<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
 
         private bool onlineModelListFetched;
         private IsoLanguage _overrideModelTargetLanguage;

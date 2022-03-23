@@ -20,5 +20,23 @@ namespace OpusCatMTEngine
         {
             InitializeComponent();
         }
+
+        private void PreEditTest_Click(object sender, RoutedEventArgs e)
+        {
+            var ruleCollection = new AutoEditRuleCollection();
+            ruleCollection.AddRule(
+                new AutoEditRule() {
+                    SourcePattern = this.PreEditPattern.Text, Replacement = this.PreEditReplacement.Text
+                });
+
+            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+
+            var result = ruleCollection.ProcessRules(textRange.Text);
+
+            var resultRun = new Run(result.Result);
+            var resultBlock = new Paragraph(resultRun);
+            this.EditedSourceBox.Document.Blocks.Clear();
+            this.EditedSourceBox.Document.Blocks.Add(resultBlock);
+        }
     }
 }

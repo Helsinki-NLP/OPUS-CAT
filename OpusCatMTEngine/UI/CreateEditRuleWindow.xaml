@@ -12,20 +12,20 @@
             <Border Margin="5" BorderBrush="Black" BorderThickness="1">
                 <StackPanel Margin="5">
                     <Label>Source text</Label>
-                    <RichTextBox Margin="5" />
+                    <RichTextBox Name="SourceBox" Margin="5" />
                     <DockPanel Margin="5,0">
                         <Label>Pre-edit pattern</Label>
-                        <TextBox />
+                        <TextBox Name="PreEditPattern" />
                     </DockPanel>
                     <DockPanel Margin="5,0">
                         <Label>Pre-edit replacement</Label>
-                        <TextBox />
+                        <TextBox Name="PreEditReplacement" />
                     </DockPanel>
                     <StackPanel Margin="5" Orientation="Horizontal">
                         <Button Click="PreEditTest_Click">Test</Button>
                     </StackPanel>
                     <Label>Edited source text</Label>
-                    <RichTextBox Margin="5" />
+                    <RichTextBox Name="EditedSourceBox" Margin="5" />
                 </StackPanel>
                 
             </Border>

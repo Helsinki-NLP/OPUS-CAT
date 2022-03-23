@@ -40,7 +40,9 @@ namespace OpusCatMTEngine
 
         private void CreatePreRule_Click(object sender, RoutedEventArgs e)
         {
-
+            var createRuleWindow = new CreateEditRuleWindow();
+            createRuleWindow.DataContext = ((ModelManager)this.DataContext).AutoPreEditRuleCollections;
+            var dialogResult = createRuleWindow.ShowDialog();
         }
 
         private void AddPreRuleCollection_Click(object sender, RoutedEventArgs e)

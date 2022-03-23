@@ -221,8 +221,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ChildProcessTracker.cs" />
-    <Compile Include="EditRules\AutoEditRule.cs" />
-    <Compile Include="EditRules\EditRuleCollection.cs" />
+    <Compile Include="AutoEditRules\AutoEditResult.cs" />
+    <Compile Include="AutoEditRules\AutoEditRule.cs" />
+    <Compile Include="AutoEditRules\AutoEditRuleMatch.cs" />
+    <Compile Include="AutoEditRules\AutoEditRuleCollection.cs" />
     <Compile Include="Evaluation\TermSgmFile.cs" />
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="IMtProvider.cs" />
