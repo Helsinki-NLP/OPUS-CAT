@@ -89,5 +89,8 @@
     <Setting Name="PythonDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">python-3.8.10-embed-amd64</Value>
     </Setting>
+    <Setting Name="EditRuleDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">editrules</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

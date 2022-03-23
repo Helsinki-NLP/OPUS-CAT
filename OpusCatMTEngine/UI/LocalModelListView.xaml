@@ -120,10 +120,15 @@
                         Click="btnEvaluateModels_Click"
                         Content="{x:Static resx:Resources.Main_EvaluateModelsButton}" />
                     <Button 
-                        IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
-                        Name="addModelTag" 
-                        Click="btnEditModelTags_Click"
-                        Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
+                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                            Name="addModelTag" 
+                            Click="btnEditModelTags_Click"
+                            Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
+                    <Button 
+                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                            Name="editRulesTag" 
+                            Click="EditRulesTag_Click"
+                            Content="{x:Static resx:Resources.Main_EditRulesButton}" />
                     <Button 
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
                         Name="openModelDir"

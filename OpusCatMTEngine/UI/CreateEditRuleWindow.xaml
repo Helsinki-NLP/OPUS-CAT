@@ -1,0 +1,35 @@
+﻿<Window x:Class="OpusCatMTEngine.CreateEditRuleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
+        mc:Ignorable="d"
+        Title="{x:Static resx:Resources.CreateEditRule_Title}" Height="450" Width="800">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+                <StackPanel Margin="5">
+                    <Label>Source text</Label>
+                    <RichTextBox Margin="5" />
+                    <DockPanel Margin="5,0">
+                        <Label>Pre-edit pattern</Label>
+                        <TextBox />
+                    </DockPanel>
+                    <DockPanel Margin="5,0">
+                        <Label>Pre-edit replacement</Label>
+                        <TextBox />
+                    </DockPanel>
+                    <StackPanel Margin="5" Orientation="Horizontal">
+                        <Button Click="PreEditTest_Click">Test</Button>
+                    </StackPanel>
+                    <Label>Edited source text</Label>
+                    <RichTextBox Margin="5" />
+                </StackPanel>
+                
+            </Border>
+            
+        </StackPanel>
+    </Grid>
+</Window>

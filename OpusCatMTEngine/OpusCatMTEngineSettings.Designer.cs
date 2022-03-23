@@ -370,5 +370,17 @@ namespace OpusCatMTEngine {
                 this["PythonDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("editrules")]
+        public string EditRuleDir {
+            get {
+                return ((string)(this["EditRuleDir"]));
+            }
+            set {
+                this["EditRuleDir"] = value;
+            }
+        }
     }
 }

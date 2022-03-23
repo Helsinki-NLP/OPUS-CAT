@@ -79,6 +79,7 @@ namespace OpusCatMTEngine
                         }
                     }
                     //This handles elements with inner structure that should be included in the training corpus
+                    //(such as img tags with captions to translate)
                     else
                     {
                         foreach (var node in topElement.Nodes().Reverse())
@@ -159,18 +160,28 @@ namespace OpusCatMTEngine
                     {
                         foreach (var seg in segs)
                         {
-                            var segLang = seg.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower();
-                            segLangs.Add(segLang);
-
-                            if (sourceLang.IsCompatibleTmxLang(segLang))
+                            XAttribute segLangAttribute = seg.Parent.Attribute(XNamespace.Xml + "lang");
+                            //Old tmx versions have lang attribute instead of xml:lang
+                            if (segLangAttribute == null)
                             {
-                                sourceSeg = seg;
+                                segLangAttribute = seg.Parent.Attribute("lang");
                             }
-
-                            if (targetLang.IsCompatibleTmxLang(segLang))
+                            if (segLangAttribute != null)
                             {
-                                targetSeg = seg;
+                                var segLang = segLangAttribute.Value.ToLower();
+                                segLangs.Add(segLang);
+
+                                if (sourceLang.IsCompatibleTmxLang(segLang))
+                                {
+                                    sourceSeg = seg;
+                                }
+
+                                if (targetLang.IsCompatibleTmxLang(segLang))
+                                {
+                                    targetSeg = seg;
+                                }
                             }
+                            
                         }
                     }
                     

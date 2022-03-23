@@ -61,6 +61,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add edit rule collection.
+        /// </summary>
+        public static string AddEditRuleCollection_Title {
+            get {
+                return ResourceManager.GetString("AddEditRuleCollection_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New database confirmation.
         /// </summary>
         public static string App_ConfirmDbCaption {
@@ -75,6 +84,69 @@ namespace OpusCatMTEngine.Properties {
         public static string App_InvalidDbMessage {
             get {
                 return ResourceManager.GetString("App_InvalidDbMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create edit rule.
+        /// </summary>
+        public static string CreateEditRule_Title {
+            get {
+                return ResourceManager.GetString("CreateEditRule_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add rule collection.
+        /// </summary>
+        public static string EditRules_AddRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_AddRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create rule.
+        /// </summary>
+        public static string EditRules_CreateRuleButton {
+            get {
+                return ResourceManager.GetString("EditRules_CreateRuleButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete rule collection.
+        /// </summary>
+        public static string EditRules_DeleteRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_DeleteRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rule collection.
+        /// </summary>
+        public static string EditRules_EditRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_EditRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rules.
+        /// </summary>
+        public static string EditRules_EditRulesTitle {
+            get {
+                return ResourceManager.GetString("EditRules_EditRulesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove rule collection.
+        /// </summary>
+        public static string EditRules_RemoveRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_RemoveRuleCollectionButton", resourceCulture);
             }
         }
         
@@ -426,6 +498,15 @@ namespace OpusCatMTEngine.Properties {
         public static string Main_EditModelTagsButton {
             get {
                 return ResourceManager.GetString("Main_EditModelTagsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rules.
+        /// </summary>
+        public static string Main_EditRulesButton {
+            get {
+                return ResourceManager.GetString("Main_EditRulesButton", resourceCulture);
             }
         }
         
