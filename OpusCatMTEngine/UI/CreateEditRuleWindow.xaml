@@ -12,7 +12,7 @@
             <Border Margin="5" BorderBrush="Black" BorderThickness="1">
                 <StackPanel Margin="5">
                     <Label>Source text</Label>
-                    <RichTextBox Name="SourceBox" Margin="5" />
+                    <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" />
                     <DockPanel Margin="5,0">
                         <Label>Pre-edit pattern</Label>
                         <TextBox Name="PreEditPattern" />
@@ -27,9 +27,7 @@
                     <Label>Edited source text</Label>
                     <RichTextBox Name="EditedSourceBox" Margin="5" />
                 </StackPanel>
-                
             </Border>
-            
         </StackPanel>
     </Grid>
 </Window>

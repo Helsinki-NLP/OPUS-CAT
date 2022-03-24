@@ -20,6 +20,13 @@ namespace OpusCatMTEngine
         public Match Match { get; }
         public int OutputIndex { get; set; }
         public int OutputLength { get; set; }
+        public string Output
+        {
+            get
+            {
+                return this.Match.Result(this.Rule.Replacement);
+            }
+        }
         public int MatchIndex { get; }
     }
 }

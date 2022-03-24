@@ -80,6 +80,8 @@ namespace OpusCatMTEngine
             int editingOffset = 0;
             foreach (var matchesAtPosition in uneditedSourceMatches.OrderBy(x => x.Key))
             {
+                //Select the longest match (selection could be based on other factors, but this is 
+                //the simplest)
                 var longestMatch = matchesAtPosition.Value.OrderBy(x => x.Match.Length).Last();
                 //Remove the original text
                 var matchLength = longestMatch.Match.Length;
@@ -95,7 +97,6 @@ namespace OpusCatMTEngine
                 //Update loop counters
                 editingOffset += replacement.Length - matchLength;
                 endOfLastMatchIndex = longestMatch.Match.Index + matchLength;
-                
                 
             }
 
