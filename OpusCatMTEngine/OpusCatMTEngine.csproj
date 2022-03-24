@@ -247,8 +247,8 @@
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
-    <Compile Include="UI\CreateEditRuleWindow.xaml.cs">
-      <DependentUpon>CreateEditRuleWindow.xaml</DependentUpon>
+    <Compile Include="UI\CreatePreEditRuleWindow.xaml.cs">
+      <DependentUpon>CreatePreEditRuleWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\AddEditRuleCollectionWindow.xaml.cs">
       <DependentUpon>AddEditRuleCollectionWindow.xaml</DependentUpon>
@@ -297,7 +297,7 @@
     <Compile Include="UI\OpusCatSettingsView.xaml.cs">
       <DependentUpon>OpusCatSettingsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="UI\CreateEditRuleWindow.xaml">
+    <Page Include="UI\CreatePreEditRuleWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

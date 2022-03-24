@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,9 +16,13 @@ using System.Windows.Shapes;
 
 namespace OpusCatMTEngine
 {
-    public partial class CreateEditRuleWindow : Window
+    public partial class CreatePreEditRuleWindow : Window
     {
-        public CreateEditRuleWindow()
+       
+
+        public AutoEditRule CreatedRule { get; private set; }
+
+        public CreatePreEditRuleWindow()
         {
             InitializeComponent();
         }
@@ -29,12 +35,21 @@ namespace OpusCatMTEngine
                     SourcePattern = this.PreEditPattern.Text, Replacement = this.PreEditReplacement.Text
                 });
 
+
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
             var sourceText = textRange.Text;
-            var result = ruleCollection.ProcessRules(sourceText);
+            try
+            {
+                var result = ruleCollection.ProcessRules(sourceText);
+                this.PopulateSourceBox(result);
+                this.PopulateTargetBox(result);
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"Error in regular expression: {ex.Message}");
+            }
 
-            this.PopulateSourceBox(result);
-            this.PopulateTargetBox(result);
+
         }
 
         private void PopulateSourceBox(AutoEditResult result)
@@ -113,6 +128,37 @@ namespace OpusCatMTEngine
 
             this.EditedSourceBox.Document.Blocks.Clear();
             this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.CreatedRule =
+                new AutoEditRule()
+                {
+                    SourcePattern = this.PreEditPattern.Text,
+                    Replacement = this.PreEditReplacement.Text
+                };
+
+            //Validate regex
+            try
+            {
+                var sourcePatternRegex = this.CreatedRule.SourcePatternRegex;
+                this.DialogResult = true;
+                this.Close();
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"Error in regular expression: {ex.Message}");
+            }
+
+
+            
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using OpusMTInterface;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,29 +23,60 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
     /// </summary>
-    public partial class EditRulesView: UserControl
+    public partial class EditRulesView: UserControl, INotifyPropertyChanged
     {
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         private MTModel model;
 
-        public EditRulesView(MTModel selectedModel)
+        public EditRulesView(
+            MTModel selectedModel,
+            ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
+            ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
         {
             this.Model = selectedModel;
-            this.DataContext = selectedModel;
             this.Title = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRulesTitle,Model.Name);
+            
+            this.AutoPreEditRuleCollections = autoPreEditRuleCollections;
+            this.AutoPostEditRuleCollections = autoPostEditRuleCollections;
+            this.ModelAutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
+                autoPreEditRuleCollections.Where(x => this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Contains(x.CollectionGuid)));
             InitializeComponent();
-            this.AutoPreEditRuleCollectionList.ItemsSource = selectedModel.ModelConfig.AutoPreEditRuleCollections;
-            this.AutoPostEditRuleCollectionList.ItemsSource = selectedModel.ModelConfig.AutoPostEditRuleCollections;
+            this.AutoPreEditRuleCollectionList.ItemsSource = this.ModelAutoPreEditRuleCollections;
+            this.AutoPostEditRuleCollectionList.ItemsSource = this.Model.ModelConfig.AutoPostEditRuleCollectionGuids;
+            
         }
 
         public MTModel Model { get => model; set => model = value; }
         public string Title { get; private set; }
+        public ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
+        public ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
+        public ObservableCollection<AutoEditRuleCollection> ModelAutoPreEditRuleCollections { get; set; }
 
         private void CreatePreRule_Click(object sender, RoutedEventArgs e)
         {
-            var createRuleWindow = new CreateEditRuleWindow();
-            createRuleWindow.DataContext = ((ModelManager)this.DataContext).AutoPreEditRuleCollections;
+            var createRuleWindow = new CreatePreEditRuleWindow();
+            
             var dialogResult = createRuleWindow.ShowDialog();
+
+            if (dialogResult != null && dialogResult.Value)
+            {
+                var newRuleCollection = new AutoEditRuleCollection()
+                    { CollectionName = "new collection", CollectionGuid = Guid.NewGuid().ToString() };
+                newRuleCollection.AddRule(createRuleWindow.CreatedRule);
+                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
+                this.AutoPreEditRuleCollections.Add(newRuleCollection);
+                this.ModelAutoPreEditRuleCollections.Add(newRuleCollection);
+            }
         }
 
         private void AddPreRuleCollection_Click(object sender, RoutedEventArgs e)

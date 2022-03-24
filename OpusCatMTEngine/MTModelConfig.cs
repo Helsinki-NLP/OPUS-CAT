@@ -46,17 +46,19 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "finetuning-complete", ApplyNamingConventions = false)]
         public bool FinetuningComplete { get => finetuningComplete; set { finetuningComplete = value; NotifyPropertyChanged(); } }
 
-        [YamlMember(Alias = "auto-pre-edit-rules", ApplyNamingConventions = false)]
-        public ObservableCollection<string> AutoPreEditRuleCollections { get; internal set; }
+        [YamlMember(Alias = "auto-pre-edit-rule-collection-guids", ApplyNamingConventions = false)]
+        public ObservableCollection<string> AutoPreEditRuleCollectionGuids { get; internal set; }
 
-        [YamlMember(Alias = "auto-post-edit-rules", ApplyNamingConventions = false)]
-        public ObservableCollection<string> AutoPostEditRuleCollections { get; internal set; }
+        [YamlMember(Alias = "auto-post-edit-rule-collection-guids", ApplyNamingConventions = false)]
+        public ObservableCollection<string> AutoPostEditRuleCollectionGuids { get; internal set; }
 
         private bool finetuningComplete;
 
         public MTModelConfig()
         {
             this.ModelTags = new ObservableCollection<string>();
+            this.AutoPostEditRuleCollectionGuids = new ObservableCollection<string>();
+            this.AutoPreEditRuleCollectionGuids = new ObservableCollection<string>();
         }
 
     }

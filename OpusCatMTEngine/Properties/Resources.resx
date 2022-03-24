@@ -416,10 +416,10 @@
   <data name="Main_EditRulesButton" xml:space="preserve">
     <value>Edit rules</value>
   </data>
-  <data name="AddEditRuleCollection_Title" xml:space="preserve">
+  <data name="EditRules_AddEditRuleCollectionTitle" xml:space="preserve">
     <value>Add edit rule collection</value>
   </data>
-  <data name="CreateEditRule_Title" xml:space="preserve">
+  <data name="EditRules_CreatePreEditRuleTitle" xml:space="preserve">
     <value>Create edit rule</value>
   </data>
 </root>

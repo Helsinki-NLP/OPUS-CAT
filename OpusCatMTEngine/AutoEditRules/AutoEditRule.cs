@@ -20,29 +20,47 @@ namespace OpusCatMTEngine
         //The regexes will be called over and over, so use the same instantation to prevent
         //regex recompilation
         private Regex outputPatternRegex;
+        [YamlIgnore]
         public Regex OutputPatternRegex
         {
             get
             {
                 if (this.outputPatternRegex == null)
                 {
-                    this.outputPatternRegex = new Regex(this.OutputPattern);
+                    if (this.OutputPattern != null)
+                    {
+                        this.outputPatternRegex = new Regex(this.OutputPattern);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 return outputPatternRegex;
             }
         }
 
         private Regex sourcePatternRegex;
+
+        [YamlIgnore]
         public Regex SourcePatternRegex
         {
             get
             {
                 if (this.sourcePatternRegex == null)
                 {
-                    this.sourcePatternRegex = new Regex(this.SourcePattern);
+                    if (this.SourcePattern != null)
+                    {
+                        this.sourcePatternRegex = new Regex(this.SourcePattern);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 return sourcePatternRegex;
             }
         }
+        
     }
 }

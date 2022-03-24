@@ -61,15 +61,6 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add edit rule collection.
-        /// </summary>
-        public static string AddEditRuleCollection_Title {
-            get {
-                return ResourceManager.GetString("AddEditRuleCollection_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to New database confirmation.
         /// </summary>
         public static string App_ConfirmDbCaption {
@@ -88,11 +79,11 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Create edit rule.
+        ///   Looks up a localized string similar to Add edit rule collection.
         /// </summary>
-        public static string CreateEditRule_Title {
+        public static string EditRules_AddEditRuleCollectionTitle {
             get {
-                return ResourceManager.GetString("CreateEditRule_Title", resourceCulture);
+                return ResourceManager.GetString("EditRules_AddEditRuleCollectionTitle", resourceCulture);
             }
         }
         
@@ -102,6 +93,15 @@ namespace OpusCatMTEngine.Properties {
         public static string EditRules_AddRuleCollectionButton {
             get {
                 return ResourceManager.GetString("EditRules_AddRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create edit rule.
+        /// </summary>
+        public static string EditRules_CreatePreEditRuleTitle {
+            get {
+                return ResourceManager.GetString("EditRules_CreatePreEditRuleTitle", resourceCulture);
             }
         }
         

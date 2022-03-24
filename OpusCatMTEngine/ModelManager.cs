@@ -223,8 +223,8 @@ namespace OpusCatMTEngine
             }
         }
 
-        internal List<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
-        internal List<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
+        internal ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
+        internal ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
 
         private bool onlineModelListFetched;
         private IsoLanguage _overrideModelTargetLanguage;
@@ -404,6 +404,11 @@ namespace OpusCatMTEngine
             this.ShowTatoebaModels = true;
             this.ShowNewestOnly = true;
 
+            this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.AutoPreEditRuleCollections.CollectionChanged += 
+                AutoPreEditRuleCollections_CollectionChanged;
+
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
             this.opusModelDir = new DirectoryInfo(modelDirPath);
             if (!this.OpusModelDir.Exists)
@@ -413,7 +418,32 @@ namespace OpusCatMTEngine
             
             this.GetLocalModels();
         }
-        
+
+        private void AutoPreEditRuleCollections_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            //TODO: handle deletion
+            var newRuleCollection = e.NewItems[0] as AutoEditRuleCollection;
+
+            var editRuleDir = new DirectoryInfo(
+                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.EditRuleDir));
+            if (!editRuleDir.Exists)
+            {
+                editRuleDir.Create();
+            }
+
+            if (newRuleCollection != null)
+            {
+                var ruleCollectionPath = Path.Combine(
+                    editRuleDir.FullName, $"{newRuleCollection.CollectionGuid}.yml");
+                var serializer = new Serializer();
+                using (var writer = File.CreateText(ruleCollectionPath))
+                {
+                    serializer.Serialize(writer, newRuleCollection, typeof(AutoEditRuleCollection));
+                }
+            }
+
+        }
+
         internal void GetOnlineModels()
         {
             this.onlineModels = new List<MTModel>();

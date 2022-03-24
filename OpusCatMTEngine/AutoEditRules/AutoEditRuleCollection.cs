@@ -13,7 +13,10 @@ namespace OpusCatMTEngine
         public List<AutoEditRule> EditRules;
 
         [YamlMember(Alias = "collection-name", ApplyNamingConventions = false)]
-        public string CollectionName;
+        public string CollectionName { get; set; }
+
+        [YamlMember(Alias = "collection-guid", ApplyNamingConventions = false)]
+        public string CollectionGuid;
 
         public AutoEditRuleCollection()
         {

@@ -250,7 +250,11 @@ namespace OpusCatMTEngine
         private void EditRulesTag_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            EditRulesView editRules = new EditRulesView(selectedModel);
+            EditRulesView editRules = 
+                new EditRulesView(
+                    selectedModel, 
+                    ((ModelManager)this.DataContext).AutoPreEditRuleCollections,
+                    ((ModelManager)this.DataContext).AutoPostEditRuleCollections);
             editRules.DataContext = this.DataContext;
 
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;

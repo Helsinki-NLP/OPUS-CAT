@@ -561,7 +561,9 @@ namespace OpusCatMTEngine
             this.ParseModelPath(modelPath);
 
             this.ParseModelConfig();
-            
+
+
+            this.ModelConfig.AutoPreEditRuleCollectionGuids.CollectionChanged += PreEditRuleCollectionGuids_CollectionChanged;
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
@@ -627,6 +629,11 @@ namespace OpusCatMTEngine
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMTEngineSettings.Default.PythonDir, "python.exe"),
                 $".\\Marian\\validate.py {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
+        }
+
+        private void PreEditRuleCollectionGuids_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.SaveModelConfig();
         }
 
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -917,6 +924,12 @@ namespace OpusCatMTEngine
                 }
                 return hasOODValidSet.Value;
             }
+        }
+        
+        public ObservableCollection<AutoEditRule> AutoPreEditRuleCollections
+        {
+            get;
+            internal set;
         }
 
         private MTModelStatus status;
