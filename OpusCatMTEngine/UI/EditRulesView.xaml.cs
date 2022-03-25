@@ -50,6 +50,8 @@ namespace OpusCatMTEngine
             this.AutoPostEditRuleCollections = autoPostEditRuleCollections;
             this.ModelAutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
                 autoPreEditRuleCollections.Where(x => this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Contains(x.CollectionGuid)));
+            this.ModelAutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
+                autoPostEditRuleCollections.Where(x => this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Contains(x.CollectionGuid)));
             InitializeComponent();
             this.AutoPreEditRuleCollectionList.ItemsSource = this.ModelAutoPreEditRuleCollections;
             this.AutoPostEditRuleCollectionList.ItemsSource = this.Model.ModelConfig.AutoPostEditRuleCollectionGuids;
@@ -61,6 +63,7 @@ namespace OpusCatMTEngine
         public ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
         public ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
         public ObservableCollection<AutoEditRuleCollection> ModelAutoPreEditRuleCollections { get; set; }
+        public ObservableCollection<AutoEditRuleCollection> ModelAutoPostEditRuleCollections { get; set; }
 
         private void CreatePreRule_Click(object sender, RoutedEventArgs e)
         {
@@ -103,7 +106,19 @@ namespace OpusCatMTEngine
 
         private void CreatePostRule_Click(object sender, RoutedEventArgs e)
         {
+            var createRuleWindow = new CreatePostEditRuleWindow();
 
+            var dialogResult = createRuleWindow.ShowDialog();
+
+            if (dialogResult != null && dialogResult.Value)
+            {
+                var newRuleCollection = new AutoEditRuleCollection()
+                { CollectionName = "new collection", CollectionGuid = Guid.NewGuid().ToString() };
+                newRuleCollection.AddRule(createRuleWindow.CreatedRule);
+                this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
+                this.AutoPostEditRuleCollections.Add(newRuleCollection);
+                this.ModelAutoPostEditRuleCollections.Add(newRuleCollection);
+            }
         }
 
         private void AddPostRuleCollection_Click(object sender, RoutedEventArgs e)

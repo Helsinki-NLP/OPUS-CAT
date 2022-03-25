@@ -97,6 +97,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create post-edit rule.
+        /// </summary>
+        public static string EditRules_CreatePostEditRuleTitle {
+            get {
+                return ResourceManager.GetString("EditRules_CreatePostEditRuleTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create edit rule.
         /// </summary>
         public static string EditRules_CreatePreEditRuleTitle {

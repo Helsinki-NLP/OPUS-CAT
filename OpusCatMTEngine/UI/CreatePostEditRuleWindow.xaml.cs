@@ -16,13 +16,13 @@ using System.Windows.Shapes;
 
 namespace OpusCatMTEngine
 {
-    public partial class CreatePreEditRuleWindow : Window
+    public partial class CreatePostEditRuleWindow : Window
     {
        
 
         public AutoEditRule CreatedRule { get; private set; }
 
-        public CreatePreEditRuleWindow()
+        public CreatePostEditRuleWindow()
         {
             InitializeComponent();
         }
@@ -32,16 +32,25 @@ namespace OpusCatMTEngine
             var ruleCollection = new AutoEditRuleCollection();
             ruleCollection.AddRule(
                 new AutoEditRule() {
-                    SourcePattern = this.PreEditPattern.Text, Replacement = this.PreEditReplacement.Text
+                    SourcePattern = this.SourcePattern.Text,
+                    OutputPattern = this.PostEditPattern.Text,
+                    Replacement = this.PostEditReplacement.Text
                 });
 
 
-            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text;
+            TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+            var sourceText = sourceTextRange.Text;
+
+            TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
+            var outputText = outputTextRange.Text;
             try
             {
-                var result = ruleCollection.ProcessPreEditRules(sourceText);
-                this.PopulateSourceBox(result);
+                var result = ruleCollection.ProcessPostEditRules(sourceText, outputText);
+                if (this.SourcePatternCheckbox.IsChecked.Value)
+                {
+                    this.PopulateSourceBox(result);
+                }
+                this.PopulateOutputBox(result);
                 this.PopulateTargetBox(result);
             }
             catch (ArgumentException ex)
@@ -92,6 +101,46 @@ namespace OpusCatMTEngine
             this.SourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 
+        private void PopulateOutputBox(AutoEditResult result)
+        {
+            //Store the source text, use it as basis of the source text with match highlights
+            TextRange textRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
+            var sourceText = textRange.Text;
+
+            int nonMatchStartIndex = 0;
+            Paragraph matchHighlightSource = new Paragraph();
+            foreach (var replacement in result.AppliedReplacements)
+            {
+
+                if (nonMatchStartIndex < replacement.Match.Index)
+                {
+                    var nonMatchText =
+                        sourceText.Substring(
+                            nonMatchStartIndex, replacement.Match.Index - nonMatchStartIndex);
+                    matchHighlightSource.Inlines.Add(nonMatchText);
+                }
+
+                var matchText = replacement.Match.Value;
+                var matchRun = new Run(matchText)
+                { Background = Brushes.Chartreuse, ToolTip = replacement.Rule.SourcePattern };
+
+                matchHighlightSource.Inlines.Add(matchRun);
+
+                nonMatchStartIndex = replacement.Match.Index + replacement.Match.Length;
+            }
+
+            if (nonMatchStartIndex < sourceText.Length)
+            {
+                var nonMatchText =
+                        sourceText.Substring(
+                            nonMatchStartIndex);
+                matchHighlightSource.Inlines.Add(nonMatchText);
+            }
+
+            this.OutputBox.Document.Blocks.Clear();
+            this.OutputBox.Document.Blocks.Add(matchHighlightSource);
+        }
+
         private void PopulateTargetBox(AutoEditResult result)
         {
             var editedSourceText = result.Result;
@@ -126,8 +175,8 @@ namespace OpusCatMTEngine
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
 
-            this.EditedSourceBox.Document.Blocks.Clear();
-            this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
+            this.EditedOutputBox.Document.Blocks.Clear();
+            this.EditedOutputBox.Document.Blocks.Add(matchHighlightSource);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -135,8 +184,10 @@ namespace OpusCatMTEngine
             this.CreatedRule =
                 new AutoEditRule()
                 {
-                    SourcePattern = this.PreEditPattern.Text,
-                    Replacement = this.PreEditReplacement.Text
+                    SourcePattern = this.SourcePattern.Text,
+                    OutputPattern = this.PostEditPattern.Text,
+                    Replacement = this.PostEditReplacement.Text
+
                 };
 
             //Validate regex

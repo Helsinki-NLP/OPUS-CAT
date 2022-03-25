@@ -422,4 +422,7 @@
   <data name="EditRules_CreatePreEditRuleTitle" xml:space="preserve">
     <value>Create edit rule</value>
   </data>
+  <data name="EditRules_CreatePostEditRuleTitle" xml:space="preserve">
+    <value>Create post-edit rule</value>
+  </data>
 </root>

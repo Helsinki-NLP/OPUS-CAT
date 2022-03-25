@@ -1,4 +1,4 @@
-﻿<Window x:Class="OpusCatMTEngine.CreatePreEditRuleWindow"
+﻿<Window x:Class="OpusCatMTEngine.CreatePostEditRuleWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,39 +6,54 @@
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMTEngine"
         mc:Ignorable="d"
-        Title="{x:Static resx:Resources.EditRules_CreatePreEditRuleTitle}" Height="450" Width="800">
+        Title="{x:Static resx:Resources.EditRules_CreatePostEditRuleTitle}" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+    </Window.Resources>
+    <ScrollViewer>
     <Grid>
         <StackPanel Orientation="Vertical">
             <Border Margin="5" BorderBrush="Black" BorderThickness="1">
                 <StackPanel Margin="5">
                     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>
-                            <Label FontWeight="Bold">Define pre-edit rule</Label>
+                            <Label FontWeight="Bold">Define post-edit rule</Label>
                             <DockPanel Margin="5,0">
-                                <Label>Pre-edit pattern</Label>
-                                <TextBox Name="PreEditPattern" />
+                                <CheckBox Name="SourcePatternCheckbox" Margin="0,0,5,0" VerticalAlignment="Center">Use source pattern</CheckBox>
+                                <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" />
+                            </DockPanel>
+                            <Separator Margin="5"></Separator>
+                            <DockPanel Margin="5,0">
+                                <Label>Post-edit pattern</Label>
+                                <TextBox Name="PostEditPattern" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0,5,5">
                                 <Label>Pre-edit replacement</Label>
-                                <TextBox Name="PreEditReplacement" />
+                                <TextBox Name="PostEditReplacement" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
                     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>
                             <Label FontWeight="Bold">Test pre-edit rule</Label>
-                            <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+                            <Border Visibility="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                                 <StackPanel Margin="5">
                                     <Label>Source text</Label>
                                     <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" />
+                                </StackPanel>
+                            </Border>
+                            <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+                                <StackPanel Margin="5">
+                                    <Label>Source text</Label>
+                                    <RichTextBox Name="OutputBox" Margin="5" IsDocumentEnabled="True" />
                                 </StackPanel>
                             </Border>
                             <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click">Apply pre-edit rule to source text</Button>
                             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                                 <StackPanel Margin="5">
                                     <Label>Edited source text</Label>
-                                    <RichTextBox IsReadOnly="True" Name="EditedSourceBox" IsDocumentEnabled="True" Margin="5" />
+                                    <RichTextBox IsReadOnly="True" Name="EditedOutputBox" IsDocumentEnabled="True" Margin="5" />
                                 </StackPanel>
                             </Border>
 
@@ -54,4 +69,5 @@
             </Border>
         </StackPanel>
     </Grid>
+        </ScrollViewer>
 </Window>

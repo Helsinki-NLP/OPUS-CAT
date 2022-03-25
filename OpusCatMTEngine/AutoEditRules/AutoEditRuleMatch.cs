@@ -18,6 +18,7 @@ namespace OpusCatMTEngine
 
         public AutoEditRule Rule { get; }
         public Match Match { get; }
+        public Match SourceMatch { get; set; }
         public int OutputIndex { get; set; }
         public int OutputLength { get; set; }
         public string Output
