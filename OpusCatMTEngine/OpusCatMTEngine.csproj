@@ -247,6 +247,7 @@
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
+    <Compile Include="UI\CheckBoxListItem.cs" />
     <Compile Include="UI\CreatePostEditRuleWindow.xaml.cs">
       <DependentUpon>CreatePostEditRuleWindow.xaml</DependentUpon>
     </Compile>

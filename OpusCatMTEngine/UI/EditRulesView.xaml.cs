@@ -88,8 +88,22 @@ namespace OpusCatMTEngine
 
         private void AddPreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
-            var addCollectionWindow = new AddEditRuleCollectionWindow(AutoPreEditRuleCollections);
+            var addCollectionWindow = 
+                new AddEditRuleCollectionWindow(
+                    AutoPreEditRuleCollections, 
+                    this.ModelAutoPreEditRuleCollections);
             var dialogResult = addCollectionWindow.ShowDialog();
+            if (dialogResult.Value)
+            {
+                this.ModelAutoPreEditRuleCollections.Clear();
+                foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
+                {
+                    if (collection.Checked)
+                    {
+                        this.ModelAutoPreEditRuleCollections.Add(collection.Item);
+                    }
+                }
+            }
         }
 
         private void EditPreRuleCollection_Click(object sender, RoutedEventArgs e)
