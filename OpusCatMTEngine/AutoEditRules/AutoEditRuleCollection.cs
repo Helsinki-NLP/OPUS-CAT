@@ -18,6 +18,9 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "collection-guid", ApplyNamingConventions = false)]
         public string CollectionGuid;
 
+        [YamlMember(Alias = "collection-type", ApplyNamingConventions = false)]
+        public string CollectionType;
+
         public AutoEditRuleCollection()
         {
         }
@@ -45,7 +48,7 @@ namespace OpusCatMTEngine
                     //Note that we check for the trigger in the unedited source (don't
                     //want to do serial rule application here)
                     var uneditedSourceMatches = rule.SourcePatternRegex.Matches(uneditedInput);
-                    if (uneditedSourceMatches.Count > 1)
+                    if (uneditedSourceMatches.Count > 0)
                     {
                         int matchIndex = 0;
                         foreach (Match match in uneditedSourceMatches)
@@ -84,11 +87,11 @@ namespace OpusCatMTEngine
                 }
 
                 //If source pattern exists but return no matchs, don't get matches for the rule
-                if (sourceMatches == null || sourceMatches.Count > 1)
+                if (sourceMatches == null || sourceMatches.Count > 0)
                 {
-                    var outputMatches = rule.SourcePatternRegex.Matches(uneditedOutput);
+                    var outputMatches = rule.OutputPatternRegex.Matches(uneditedOutput);
                 
-                    if (outputMatches.Count > 1)
+                    if (outputMatches.Count > 0)
                     {
                         int matchIndex = 0;
                         foreach (Match match in outputMatches)
@@ -105,7 +108,8 @@ namespace OpusCatMTEngine
                                 }
                                 else
                                 {
-                                    newRuleMatch.SourceMatch = sourceMatches[1];
+                                    newRuleMatch.RepeatedSourceMatch = true;
+                                    newRuleMatch.SourceMatch = sourceMatches[0];
                                 }
                             }
 
@@ -188,7 +192,7 @@ namespace OpusCatMTEngine
                 var replacement = longestMatch.Match.Result(longestMatch.Rule.Replacement);
 
                 var sourceGroupMatches = Regex.Matches(replacement, @"\$<(\d+)>");
-                if (sourceGroupMatches.Count > 1)
+                if (sourceGroupMatches.Count > 0)
                 {
                     foreach (Match match in sourceGroupMatches)
                     {
@@ -199,6 +203,7 @@ namespace OpusCatMTEngine
                         {
                             var sourceGroup = longestMatch.SourceMatch.Groups[sourceGroupIndex];
                             replacement = replacement.Replace($"$<{sourceGroupIndex}>", sourceGroup.Value);
+                            longestMatch.Output = replacement;
                         }
                     }
                 }

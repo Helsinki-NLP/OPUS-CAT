@@ -20,23 +20,23 @@
                             <Label FontWeight="Bold">Define post-edit rule</Label>
                             <DockPanel Margin="5,0">
                                 <CheckBox Name="SourcePatternCheckbox" Margin="0,0,5,0" VerticalAlignment="Center">Use source pattern</CheckBox>
-                                <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" />
+                                <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" TextChanged="AnyControl_TextChanged" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0">
                                 <Label>Post-edit pattern</Label>
-                                <TextBox Name="PostEditPattern" />
+                                <TextBox Name="PostEditPattern" TextChanged="AnyControl_TextChanged" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0,5,5">
-                                <Label>Pre-edit replacement</Label>
-                                <TextBox Name="PostEditReplacement" />
+                                <Label>Post-edit replacement</Label>
+                                <TextBox Name="PostEditReplacement" TextChanged="AnyControl_TextChanged" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
                     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>
-                            <Label FontWeight="Bold">Test pre-edit rule</Label>
+                            <Label FontWeight="Bold">Test post-edit rule</Label>
                             <Border Visibility="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                                 <StackPanel Margin="5">
                                     <Label>Source text</Label>
@@ -45,15 +45,15 @@
                             </Border>
                             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                                 <StackPanel Margin="5">
-                                    <Label>Source text</Label>
-                                    <RichTextBox Name="OutputBox" Margin="5" IsDocumentEnabled="True" />
+                                    <Label>MT output</Label>
+                                    <RichTextBox Name="OutputBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
                                 </StackPanel>
                             </Border>
-                            <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click">Apply pre-edit rule to source text</Button>
+                            <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click">Apply post-edit rule to MT output</Button>
                             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                                 <StackPanel Margin="5">
-                                    <Label>Edited source text</Label>
-                                    <RichTextBox IsReadOnly="True" Name="EditedOutputBox" IsDocumentEnabled="True" Margin="5" />
+                                    <Label>Post-edited MT output</Label>
+                                    <RichTextBox IsReadOnly="True" Name="EditedOutputBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
                                 </StackPanel>
                             </Border>
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,9 +20,15 @@ namespace OpusCatMTEngine
     /// </summary>
     public partial class AddEditRuleCollectionWindow : Window
     {
-        public AddEditRuleCollectionWindow()
+        public AddEditRuleCollectionWindow(ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections)
         {
             InitializeComponent();
+            this.AutoEditRuleCollectionList.ItemsSource = autoPreEditRuleCollections;
+        }
+
+        private void DeleteTag_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

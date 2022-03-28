@@ -8,7 +8,37 @@
         mc:Ignorable="d"
         Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="450" Width="800">
     <Grid>
-        <ListView Name="RuleList">
+        <ListView Name="AutoEditRuleCollectionList">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="BorderBrush" Value="LightGray" />
+                    <Setter Property="BorderThickness" Value="1,1,1,1" />
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListView.View>
+                <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button 
+                                            Name="DeleteTag" 
+                                            Tag="{Binding .}" 
+                                            Click="DeleteTag_Click"
+                                            Content="{x:Static resx:Resources.Tags_DeleteTagButton}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+            </ListView.View>
         </ListView>
     </Grid>
 </Window>

@@ -21,6 +21,7 @@ namespace OpusCatMTEngine
        
 
         public AutoEditRule CreatedRule { get; private set; }
+        public bool TestActive { get; private set; }
 
         public CreatePostEditRuleWindow()
         {
@@ -39,10 +40,10 @@ namespace OpusCatMTEngine
 
 
             TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = sourceTextRange.Text;
+            var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
 
             TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-            var outputText = outputTextRange.Text;
+            var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
             try
             {
                 var result = ruleCollection.ProcessPostEditRules(sourceText, outputText);
@@ -58,35 +59,35 @@ namespace OpusCatMTEngine
                 MessageBox.Show($"Error in regular expression: {ex.Message}");
             }
 
-
+            this.TestActive = true;
         }
 
         private void PopulateSourceBox(AutoEditResult result)
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text;
+            var sourceText = textRange.Text.TrimEnd('\r', '\n');
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
-            foreach (var replacement in result.AppliedReplacements)
+            foreach (var replacement in result.AppliedReplacements.Where(x => !x.RepeatedSourceMatch))
             {
 
-                if (nonMatchStartIndex < replacement.Match.Index)
+                if (nonMatchStartIndex < replacement.SourceMatch.Index)
                 {
                     var nonMatchText = 
                         sourceText.Substring(
-                            nonMatchStartIndex, replacement.Match.Index - nonMatchStartIndex);
+                            nonMatchStartIndex, replacement.SourceMatch.Index - nonMatchStartIndex);
                     matchHighlightSource.Inlines.Add(nonMatchText);
                 }
 
-                var matchText = replacement.Match.Value;
+                var matchText = replacement.SourceMatch.Value;
                 var matchRun = new Run(matchText)
                     { Background = Brushes.Chartreuse, ToolTip = replacement.Rule.SourcePattern };
 
                 matchHighlightSource.Inlines.Add(matchRun);
                 
-                nonMatchStartIndex = replacement.Match.Index + replacement.Match.Length;
+                nonMatchStartIndex = replacement.SourceMatch.Index + replacement.SourceMatch.Length;
             }
 
             if (nonMatchStartIndex < sourceText.Length)
@@ -105,7 +106,7 @@ namespace OpusCatMTEngine
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-            var sourceText = textRange.Text;
+            var outputText = textRange.Text.TrimEnd('\r', '\n');
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
@@ -115,24 +116,24 @@ namespace OpusCatMTEngine
                 if (nonMatchStartIndex < replacement.Match.Index)
                 {
                     var nonMatchText =
-                        sourceText.Substring(
+                        outputText.Substring(
                             nonMatchStartIndex, replacement.Match.Index - nonMatchStartIndex);
                     matchHighlightSource.Inlines.Add(nonMatchText);
                 }
 
                 var matchText = replacement.Match.Value;
                 var matchRun = new Run(matchText)
-                { Background = Brushes.Chartreuse, ToolTip = replacement.Rule.SourcePattern };
+                { Background = Brushes.Chartreuse, ToolTip = replacement.Rule.OutputPattern };
 
                 matchHighlightSource.Inlines.Add(matchRun);
 
                 nonMatchStartIndex = replacement.Match.Index + replacement.Match.Length;
             }
 
-            if (nonMatchStartIndex < sourceText.Length)
+            if (nonMatchStartIndex < outputText.Length)
             {
                 var nonMatchText =
-                        sourceText.Substring(
+                        outputText.Substring(
                             nonMatchStartIndex);
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
@@ -164,7 +165,7 @@ namespace OpusCatMTEngine
 
                 matchHighlightSource.Inlines.Add(matchRun);
 
-                nonMatchStartIndex = replacement.Match.Index + replacement.OutputLength;
+                nonMatchStartIndex = replacement.OutputIndex + replacement.OutputLength;
             }
 
             if (nonMatchStartIndex < editedSourceText.Length)
@@ -211,5 +212,30 @@ namespace OpusCatMTEngine
             this.DialogResult = false;
             this.Close();
         }
+
+        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.TestActive)
+            {
+                //Keep this on top, otherwise endless loop
+                this.TestActive = false;
+                
+                //Clear edited output
+                this.EditedOutputBox.Document.Blocks.Clear();
+
+                //Remove highlights from source and unedited output
+                TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+                var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
+                this.SourceBox.Document.Blocks.Clear();
+                this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
+
+                TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
+                var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
+                this.OutputBox.Document.Blocks.Clear();
+                this.OutputBox.Document.Blocks.Add(new Paragraph(new Run(outputText)));
+
+            }
+        }
+        
     }
 }

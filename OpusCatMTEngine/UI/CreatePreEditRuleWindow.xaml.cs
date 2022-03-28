@@ -21,6 +21,7 @@ namespace OpusCatMTEngine
        
 
         public AutoEditRule CreatedRule { get; private set; }
+        public bool TestActive { get; private set; }
 
         public CreatePreEditRuleWindow()
         {
@@ -37,7 +38,7 @@ namespace OpusCatMTEngine
 
 
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text;
+            var sourceText = textRange.Text.TrimEnd('\r', '\n');
             try
             {
                 var result = ruleCollection.ProcessPreEditRules(sourceText);
@@ -49,6 +50,7 @@ namespace OpusCatMTEngine
                 MessageBox.Show($"Error in regular expression: {ex.Message}");
             }
 
+            this.TestActive = true;
 
         }
 
@@ -56,7 +58,7 @@ namespace OpusCatMTEngine
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text;
+            var sourceText = textRange.Text.TrimEnd('\r', '\n'); ;
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
@@ -115,7 +117,7 @@ namespace OpusCatMTEngine
 
                 matchHighlightSource.Inlines.Add(matchRun);
 
-                nonMatchStartIndex = replacement.Match.Index + replacement.OutputLength;
+                nonMatchStartIndex = replacement.OutputIndex + replacement.OutputLength;
             }
 
             if (nonMatchStartIndex < editedSourceText.Length)
@@ -159,6 +161,24 @@ namespace OpusCatMTEngine
         {
             this.DialogResult = false;
             this.Close();
+        }
+
+        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.TestActive)
+            {
+                //Keep this on top, otherwise endless loop
+                this.TestActive = false;
+
+                //Clear edited output
+                this.EditedSourceBox.Document.Blocks.Clear();
+
+                //Remove highlights from source and unedited output
+                TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+                var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
+                this.SourceBox.Document.Blocks.Clear();
+                this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
+            }
         }
     }
 }

@@ -127,7 +127,7 @@
                             <GridViewColumn>
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBox Text="{Binding Path=., Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

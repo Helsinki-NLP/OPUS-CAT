@@ -393,6 +393,55 @@ namespace OpusCatMTEngine
             }
         }
 
+        private void InitializeAutoEditRuleCollections()
+        {
+            this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+
+            var editRuleDir = new DirectoryInfo(
+                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.EditRuleDir));
+
+            if (!editRuleDir.Exists)
+            {
+                editRuleDir.Create();
+            }
+            var deserializer = new Deserializer();
+            foreach (var file in editRuleDir.EnumerateFiles())
+            {
+                using (var reader = file.OpenText())
+                {
+                    try
+                    {
+                        var loadedRuleCollection = deserializer.Deserialize<AutoEditRuleCollection>(reader);
+                        switch (loadedRuleCollection.CollectionType)
+                        {
+                            case "preedit":
+                                AutoPreEditRuleCollections.Add(loadedRuleCollection);
+                                break;
+                            case "postedit":
+                                AutoPostEditRuleCollections.Add(loadedRuleCollection);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Auto edit rule deserialization failed, file {file.Name}. Exception: {ex.Message}");
+                    }
+                }
+            }
+            
+
+            this.AutoPostEditRuleCollections.CollectionChanged +=
+                AutoEditRuleCollections_CollectionChanged;
+            
+            this.AutoPreEditRuleCollections.CollectionChanged +=
+                AutoEditRuleCollections_CollectionChanged;
+
+
+        }
+
         public ModelManager()
         {
             this.SourceFilter = "";
@@ -404,10 +453,7 @@ namespace OpusCatMTEngine
             this.ShowTatoebaModels = true;
             this.ShowNewestOnly = true;
 
-            this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
-            this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
-            this.AutoPreEditRuleCollections.CollectionChanged += 
-                AutoPreEditRuleCollections_CollectionChanged;
+            this.InitializeAutoEditRuleCollections();
 
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
             this.opusModelDir = new DirectoryInfo(modelDirPath);
@@ -419,7 +465,7 @@ namespace OpusCatMTEngine
             this.GetLocalModels();
         }
 
-        private void AutoPreEditRuleCollections_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void AutoEditRuleCollections_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             //TODO: handle deletion
             var newRuleCollection = e.NewItems[0] as AutoEditRuleCollection;

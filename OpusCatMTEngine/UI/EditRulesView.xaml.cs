@@ -74,7 +74,11 @@ namespace OpusCatMTEngine
             if (dialogResult != null && dialogResult.Value)
             {
                 var newRuleCollection = new AutoEditRuleCollection()
-                    { CollectionName = "new collection", CollectionGuid = Guid.NewGuid().ToString() };
+                {
+                    CollectionName = "new collection",
+                    CollectionGuid = Guid.NewGuid().ToString(),
+                    CollectionType = "preedit"
+                };
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);
                 this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
                 this.AutoPreEditRuleCollections.Add(newRuleCollection);
@@ -84,8 +88,7 @@ namespace OpusCatMTEngine
 
         private void AddPreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
-            var addCollectionWindow = new AddEditRuleCollectionWindow();
-            addCollectionWindow.DataContext = ((ModelManager)this.DataContext).AutoPreEditRuleCollections;
+            var addCollectionWindow = new AddEditRuleCollectionWindow(AutoPreEditRuleCollections);
             var dialogResult = addCollectionWindow.ShowDialog();
         }
 
@@ -113,7 +116,12 @@ namespace OpusCatMTEngine
             if (dialogResult != null && dialogResult.Value)
             {
                 var newRuleCollection = new AutoEditRuleCollection()
-                { CollectionName = "new collection", CollectionGuid = Guid.NewGuid().ToString() };
+                {
+                    CollectionName = "new collection",
+                    CollectionGuid = Guid.NewGuid().ToString(),
+                    CollectionType = "postedit"
+                };
+
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);
                 this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
                 this.AutoPostEditRuleCollections.Add(newRuleCollection);
