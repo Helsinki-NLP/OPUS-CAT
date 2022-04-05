@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,7 +11,7 @@ namespace OpusCatMTEngine
     public class AutoEditRuleCollection
     {
         [YamlMember(Alias = "edit-rules", ApplyNamingConventions = false)]
-        public List<AutoEditRule> EditRules;
+        public ObservableCollection<AutoEditRule> EditRules { get; set; }
 
         [YamlMember(Alias = "collection-name", ApplyNamingConventions = false)]
         public string CollectionName { get; set; }
@@ -25,11 +26,47 @@ namespace OpusCatMTEngine
         {
         }
 
+        public void Save()
+        {
+            var editRuleDir = new DirectoryInfo(
+                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.EditRuleDir));
+            if (!editRuleDir.Exists)
+            {
+                editRuleDir.Create();
+            }
+
+            var ruleCollectionTempPath = Path.Combine(
+                editRuleDir.FullName, $"{this.CollectionGuid}_temp.yml");
+            var ruleCollectionPath = Path.Combine(
+                editRuleDir.FullName, $"{this.CollectionGuid}.yml");
+            var serializer = new Serializer();
+            
+            //Don't replace current file yet
+            using (var writer = File.CreateText(ruleCollectionTempPath))
+            {
+                serializer.Serialize(writer, this, typeof(AutoEditRuleCollection));
+            }
+
+            string backup = ruleCollectionPath + ".bak";
+            File.Delete(backup);
+            File.Replace(ruleCollectionTempPath, ruleCollectionPath, backup, true);
+            try
+            {
+                File.Delete(backup);
+            }
+            catch
+            {
+                // optional:
+                // filesToDeleteLater.Add(backup);
+            }
+
+        }
+
         public void AddRule(AutoEditRule rule)
         {
             if (this.EditRules == null)
             {
-                this.EditRules = new List<AutoEditRule>() { rule };
+                this.EditRules = new ObservableCollection<AutoEditRule>() { rule };
             }
             else
             {
@@ -128,6 +165,12 @@ namespace OpusCatMTEngine
             }
 
             return regexMatches;
+        }
+
+        internal void ReplaceRule(AutoEditRule rule, AutoEditRule replacement)
+        {
+            var existingIndex = this.EditRules.IndexOf(rule);
+            this.EditRules[existingIndex] = replacement;
         }
 
         public AutoEditResult ProcessPreEditRules(string unedited)

@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 
 namespace OpusCatMTEngine
 {
-    public partial class CreatePostEditRuleWindow : Window
+    public partial class CreatePostEditRuleWindow : Window, ICreateRuleWindow
     {
        
 
-        public AutoEditRule CreatedRule { get; private set; }
+        public AutoEditRule CreatedRule { get; set; }
         public bool TestActive { get; private set; }
 
         public CreatePostEditRuleWindow()

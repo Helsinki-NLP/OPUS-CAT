@@ -5,7 +5,7 @@ using YamlDotNet.Serialization;
 
 namespace OpusCatMTEngine
 {
-    
+
     public class AutoEditRule
     {
         [YamlMember(Alias = "output-pattern", ApplyNamingConventions = false)]
@@ -16,6 +16,23 @@ namespace OpusCatMTEngine
 
         [YamlMember(Alias = "source-pattern", ApplyNamingConventions = false)]
         public string SourcePattern { get; set; }
+
+        [YamlMember(Alias = "description", ApplyNamingConventions = false)]
+        public string Description
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(description))
+                {
+                    return description;
+                }
+                else
+                {
+                    return $"";
+                }
+            }
+            set => description = value;
+        }
 
         //The regexes will be called over and over, so use the same instantation to prevent
         //regex recompilation
@@ -41,6 +58,7 @@ namespace OpusCatMTEngine
         }
 
         private Regex sourcePatternRegex;
+        private string description;
 
         [YamlIgnore]
         public Regex SourcePatternRegex
@@ -61,6 +79,6 @@ namespace OpusCatMTEngine
                 return sourcePatternRegex;
             }
         }
-        
+
     }
 }

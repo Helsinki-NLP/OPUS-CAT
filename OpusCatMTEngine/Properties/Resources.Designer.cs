@@ -124,11 +124,29 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete rule.
+        /// </summary>
+        public static string EditRules_DeleteRuleButton {
+            get {
+                return ResourceManager.GetString("EditRules_DeleteRuleButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete rule collection.
         /// </summary>
         public static string EditRules_DeleteRuleCollectionButton {
             get {
                 return ResourceManager.GetString("EditRules_DeleteRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rule.
+        /// </summary>
+        public static string EditRules_EditRuleButton {
+            get {
+                return ResourceManager.GetString("EditRules_EditRuleButton", resourceCulture);
             }
         }
         

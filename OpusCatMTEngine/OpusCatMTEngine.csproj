@@ -247,6 +247,9 @@
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
+    <Compile Include="UI\EditEditRuleCollectionWindow.xaml.cs">
+      <DependentUpon>EditEditRuleCollectionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\CheckBoxListItem.cs" />
     <Compile Include="UI\CreatePostEditRuleWindow.xaml.cs">
       <DependentUpon>CreatePostEditRuleWindow.xaml</DependentUpon>
@@ -261,6 +264,7 @@
     <Compile Include="UI\CustomizationProgressView.xaml.cs">
       <DependentUpon>CustomizationProgressView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ICreateRuleWindow.cs" />
     <Compile Include="UI\ModelEvaluatorView.xaml.cs">
       <DependentUpon>ModelEvaluatorView.xaml</DependentUpon>
     </Compile>
@@ -301,6 +305,10 @@
     <Compile Include="UI\OpusCatSettingsView.xaml.cs">
       <DependentUpon>OpusCatSettingsView.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\EditEditRuleCollectionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\CreatePostEditRuleWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

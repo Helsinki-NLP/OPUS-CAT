@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -108,7 +109,10 @@ namespace OpusCatMTEngine
 
         private void EditPreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
-
+            var selectedCollection = (AutoEditRuleCollection)this.AutoPreEditRuleCollectionList.SelectedItem;
+            var editCollectionWindow = new EditEditRuleCollectionWindow(selectedCollection);
+            var dialogResult = editCollectionWindow.ShowDialog();
+            selectedCollection.Save();
         }
 
         private void RemovePreRuleCollection_Click(object sender, RoutedEventArgs e)

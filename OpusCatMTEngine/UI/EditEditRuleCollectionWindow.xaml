@@ -25,19 +25,19 @@
                         Content="{x:Static resx:Resources.EditRules_CreateRuleButton}" />
 
                         <Button 
-                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                        IsEnabled="{Binding ElementName=AutoEditRuleCollectionList, Path=SelectedItems.Count}" 
                         Name="EditRule" 
                         Click="EditRule_Click"
-                        Content="{x:Static resx:Resources.EditRules_EditRuleCollectionButton}" />
+                        Content="{x:Static resx:Resources.EditRules_EditRuleButton}" />
 
                         <Button 
-                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                        IsEnabled="{Binding ElementName=AutoEditRuleCollectionList, Path=SelectedItems.Count}" 
                         Name="DeleteRule" 
                         Click="DeleteRule_Click"
-                        Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
+                        Content="{x:Static resx:Resources.EditRules_DeleteRuleButton}" />
 
                     </StackPanel>
-                    <ListView Name="AutoPreEditRuleCollectionList">
+                    <ListView Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollection.EditRules}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="BorderBrush" Value="LightGray" />
@@ -46,26 +46,35 @@
                         </ListView.ItemContainerStyle>
 
                         <ListView.View>
-                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
+                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Rule description">
                                 <GridViewColumn>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                            <TextBox IsEnabled="False" Text="{Binding Path=Description}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
                                 <GridViewColumn>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button 
-                                            Name="DeleteTag" 
-                                            Tag="{Binding .}" 
-                                            Click="DeletePreRuleCollection_Click"
-                                            Content="{x:Static resx:Resources.Tags_DeleteTagButton}"/>
+                                            <TextBox IsEnabled="False" Text="{Binding Path=SourcePattern}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox IsEnabled="False" Text="{Binding Path=OutputPattern}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox IsEnabled="False" Text="{Binding Path=Replacement}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                             </GridView>
                         </ListView.View>
                     </ListView>

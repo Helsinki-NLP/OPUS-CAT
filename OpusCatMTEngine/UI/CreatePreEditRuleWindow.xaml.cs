@@ -16,16 +16,22 @@ using System.Windows.Shapes;
 
 namespace OpusCatMTEngine
 {
-    public partial class CreatePreEditRuleWindow : Window
+    public partial class CreatePreEditRuleWindow : Window, ICreateRuleWindow
     {
-       
-
-        public AutoEditRule CreatedRule { get; private set; }
+        
+        public AutoEditRule CreatedRule { get; set; }
         public bool TestActive { get; private set; }
 
         public CreatePreEditRuleWindow()
         {
             InitializeComponent();
+        }
+
+        public CreatePreEditRuleWindow(AutoEditRule rule)
+        {
+            InitializeComponent();
+            this.PreEditPattern.Text = rule.SourcePattern;
+            this.PreEditReplacement.Text = rule.Replacement;
         }
 
         private void PreEditTest_Click(object sender, RoutedEventArgs e)

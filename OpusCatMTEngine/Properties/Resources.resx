@@ -425,4 +425,10 @@
   <data name="EditRules_CreatePostEditRuleTitle" xml:space="preserve">
     <value>Create post-edit rule</value>
   </data>
+  <data name="EditRules_DeleteRuleButton" xml:space="preserve">
+    <value>Delete rule</value>
+  </data>
+  <data name="EditRules_EditRuleButton" xml:space="preserve">
+    <value>Edit rule</value>
+  </data>
 </root>

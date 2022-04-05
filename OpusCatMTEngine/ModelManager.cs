@@ -432,14 +432,6 @@ namespace OpusCatMTEngine
                 }
             }
             
-
-            this.AutoPostEditRuleCollections.CollectionChanged +=
-                AutoEditRuleCollections_CollectionChanged;
-            
-            this.AutoPreEditRuleCollections.CollectionChanged +=
-                AutoEditRuleCollections_CollectionChanged;
-
-
         }
 
         public ModelManager()
@@ -464,32 +456,7 @@ namespace OpusCatMTEngine
             
             this.GetLocalModels();
         }
-
-        private void AutoEditRuleCollections_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            //TODO: handle deletion
-            var newRuleCollection = e.NewItems[0] as AutoEditRuleCollection;
-
-            var editRuleDir = new DirectoryInfo(
-                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.EditRuleDir));
-            if (!editRuleDir.Exists)
-            {
-                editRuleDir.Create();
-            }
-
-            if (newRuleCollection != null)
-            {
-                var ruleCollectionPath = Path.Combine(
-                    editRuleDir.FullName, $"{newRuleCollection.CollectionGuid}.yml");
-                var serializer = new Serializer();
-                using (var writer = File.CreateText(ruleCollectionPath))
-                {
-                    serializer.Serialize(writer, newRuleCollection, typeof(AutoEditRuleCollection));
-                }
-            }
-
-        }
-
+        
         internal void GetOnlineModels()
         {
             this.onlineModels = new List<MTModel>();
