@@ -37,7 +37,9 @@
                         Content="{x:Static resx:Resources.EditRules_DeleteRuleButton}" />
 
                     </StackPanel>
-                    <ListView Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollection.EditRules}">
+                    <ListView
+                        Name="AutoEditRuleCollectionList" 
+                        ItemsSource="{Binding ElementName=_this, Path=RuleCollection.EditRules}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="BorderBrush" Value="LightGray" />
@@ -46,35 +48,11 @@
                         </ListView.ItemContainerStyle>
 
                         <ListView.View>
-                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Rule description">
-                                <GridViewColumn>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox IsEnabled="False" Text="{Binding Path=Description}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox IsEnabled="False" Text="{Binding Path=SourcePattern}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox IsEnabled="False" Text="{Binding Path=OutputPattern}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox IsEnabled="False" Text="{Binding Path=Replacement}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
+                            <GridView AllowsColumnReorder="true">
+                                <GridViewColumn Header="Description" Width="150" DisplayMemberBinding="{Binding Path=Description}" />
+                                <GridViewColumn Header="Source pattern" Width="150" DisplayMemberBinding="{Binding Path=SourcePattern}" />
+                                <GridViewColumn Header="Output pattern" Width="150" DisplayMemberBinding="{Binding Path=OutputPattern}" />
+                                <GridViewColumn Header="Replacement" Width="150" DisplayMemberBinding="{Binding Path=Replacement}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -84,7 +62,11 @@
                     <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>
                     <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>
                 </DockPanel>
+                <local:TestPreEditRuleControl 
+                    RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
+                    Title="Test rule collections"/>
             </StackPanel>
+            
         </Border>
     </Grid>
 </Window>

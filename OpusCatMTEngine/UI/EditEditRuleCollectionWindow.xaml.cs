@@ -54,7 +54,7 @@ namespace OpusCatMTEngine
             this.RuleCollection = selectedCollection;
             InitializeComponent();
         }
-
+            
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
