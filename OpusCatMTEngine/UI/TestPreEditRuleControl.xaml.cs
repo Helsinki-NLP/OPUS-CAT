@@ -32,6 +32,21 @@ namespace OpusCatMTEngine
             typeof(TestPreEditRuleControl)
             );
 
+        public static readonly DependencyProperty ButtonTextProperty = DependencyProperty.Register(
+            "ButtonText", typeof(string),
+            typeof(TestPreEditRuleControl)
+            );
+
+        public static readonly DependencyProperty PreEditReplacementBoxProperty = DependencyProperty.Register(
+            "PreEditReplacementBox", typeof(TextBox),
+            typeof(TestPreEditRuleControl)
+            );
+
+        public static readonly DependencyProperty PreEditPatternBoxProperty = DependencyProperty.Register(
+            "PreEditPatternBox", typeof(TextBox),
+            typeof(TestPreEditRuleControl)
+            );
+
         public bool TestActive { get; private set; }
         public AutoEditRuleCollection RuleCollection
         {
@@ -39,28 +54,30 @@ namespace OpusCatMTEngine
             set => SetValue(RuleCollectionProperty, value);
         }
 
-        public TextBox PreEditPattern { get; private set; }
-        public TextBox PreEditReplacement { get; private set; }
+        public TextBox PreEditPatternBox
+        {
+            get => (TextBox)GetValue(PreEditPatternBoxProperty);
+            set => SetValue(PreEditPatternBoxProperty, value);
+        }
+
+        public TextBox PreEditReplacementBox
+        {
+            get => (TextBox)GetValue(PreEditReplacementBoxProperty);
+            set => SetValue(PreEditReplacementBoxProperty, value);
+        }
+
+        public string ButtonText
+        {
+            get => (string)GetValue(ButtonTextProperty);
+            set => SetValue(ButtonTextProperty, value);
+        }
 
         public string Title
         {
             get => (string)GetValue(TitleProperty);
             set => SetValue(TitleProperty,value);
         }
-
-        //Two constructors: one for testing a single rule, other for testing whole collection
-        public TestPreEditRuleControl(TextBox PreEditPattern, TextBox PreEditReplacement)
-        {
-            this.PreEditPattern = PreEditPattern;
-            this.PreEditReplacement = PreEditReplacement;
-            InitializeComponent();
-        }
-
-        public TestPreEditRuleControl(AutoEditRuleCollection ruleCollection)
-        {
-            this.RuleCollection = ruleCollection;
-            InitializeComponent();
-        }
+        public bool textBoxHandlersAssigned = false;
 
         public TestPreEditRuleControl()
         {
@@ -71,15 +88,21 @@ namespace OpusCatMTEngine
         private void PreEditTest_Click(object sender, RoutedEventArgs e)
         {
             //If these have been defined, generate rule collection from them
-            if (this.PreEditPattern != null && this.PreEditReplacement != null)
+            if (this.PreEditPatternBox != null && this.PreEditReplacementBox != null)
             {
                 this.RuleCollection = new AutoEditRuleCollection();
                 this.RuleCollection.AddRule(
                     new AutoEditRule()
                     {
-                        SourcePattern = this.PreEditPattern.Text,
-                        Replacement = this.PreEditReplacement.Text
+                        SourcePattern = this.PreEditPatternBox.Text,
+                        Replacement = this.PreEditReplacementBox.Text
                     });
+                if (!this.textBoxHandlersAssigned)
+                {
+                    this.PreEditPatternBox.TextChanged += this.AnyControl_TextChanged;
+                    this.PreEditReplacementBox.TextChanged += this.AnyControl_TextChanged;
+                    this.textBoxHandlersAssigned = true;
+                }
             }
 
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
@@ -119,8 +142,9 @@ namespace OpusCatMTEngine
                 }
 
                 var matchText = replacement.Match.Value;
+                
                 var matchRun = new Run(matchText)
-                { Background = Brushes.Chartreuse, ToolTip = replacement.Rule.SourcePattern };
+                { Background = replacement.MatchColor, ToolTip = replacement.Rule.SourcePattern };
 
                 matchHighlightSource.Inlines.Add(matchRun);
 
@@ -158,7 +182,7 @@ namespace OpusCatMTEngine
 
                 var matchText = replacement.Output;
                 var matchRun = new Run(matchText)
-                { Background = Brushes.Chartreuse, ToolTip = replacement.Rule.Replacement };
+                { Background = replacement.MatchColor, ToolTip = replacement.Rule.Replacement };
 
                 matchHighlightSource.Inlines.Add(matchRun);
 
@@ -177,7 +201,7 @@ namespace OpusCatMTEngine
             this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 
-        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
+        public void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (this.TestActive)
             {

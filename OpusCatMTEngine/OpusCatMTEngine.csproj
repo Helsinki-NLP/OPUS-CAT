@@ -298,6 +298,9 @@
     <Compile Include="UI\OnlineModelView.xaml.cs">
       <DependentUpon>OnlineModelView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\TestPostEditRuleControl.xaml.cs">
+      <DependentUpon>TestPostEditRuleControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\TestPreEditRuleControl.xaml.cs">
       <DependentUpon>TestPreEditRuleControl.xaml</DependentUpon>
     </Compile>
@@ -371,6 +374,10 @@
     <Page Include="UI\OnlineModelView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\TestPostEditRuleControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\TestPreEditRuleControl.xaml">
       <SubType>Designer</SubType>

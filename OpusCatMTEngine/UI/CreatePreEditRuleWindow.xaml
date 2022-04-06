@@ -16,16 +16,21 @@
                             <Label FontWeight="Bold">Define pre-edit rule</Label>
                             <DockPanel Margin="5,0">
                                 <Label>Pre-edit pattern</Label>
-                                <TextBox Name="PreEditPattern" TextChanged="AnyControl_TextChanged" />
+                                <TextBox Name="PreEditPattern" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0,5,5">
                                 <Label>Pre-edit replacement</Label>
-                                <TextBox Name="PreEditReplacement" TextChanged="AnyControl_TextChanged" />
+                                <TextBox Name="PreEditReplacement" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
-                    <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+                    <local:TestPreEditRuleControl x:Name="TestControl"
+                        PreEditPatternBox="{Binding ElementName=PreEditPattern}"
+                        PreEditReplacementBox="{Binding ElementName=PreEditReplacement}"
+                        Title="Test pre-edit rule"
+                        ButtonText="Apply pre-edit rule to source text" />
+                    <!--<Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>
                             <Label FontWeight="Bold">Test pre-edit rule</Label>
                             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
@@ -44,7 +49,7 @@
 
                         </StackPanel>
 
-                    </Border>
+                    </Border>-->
                     <DockPanel LastChildFill="False" Margin="5">
                         <Button DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save rule</Button>
                         <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>

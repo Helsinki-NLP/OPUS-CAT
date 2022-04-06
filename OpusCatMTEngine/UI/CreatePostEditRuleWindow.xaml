@@ -20,21 +20,27 @@
                             <Label FontWeight="Bold">Define post-edit rule</Label>
                             <DockPanel Margin="5,0">
                                 <CheckBox Name="SourcePatternCheckbox" Margin="0,0,5,0" VerticalAlignment="Center">Use source pattern</CheckBox>
-                                <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" TextChanged="AnyControl_TextChanged" />
+                                <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0">
                                 <Label>Post-edit pattern</Label>
-                                <TextBox Name="PostEditPattern" TextChanged="AnyControl_TextChanged" />
+                                <TextBox Name="PostEditPattern" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0,5,5">
                                 <Label>Post-edit replacement</Label>
-                                <TextBox Name="PostEditReplacement" TextChanged="AnyControl_TextChanged" />
+                                <TextBox Name="PostEditReplacement" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
-                    <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+                        <local:TestPostEditRuleControl
+                            PostEditPatternBox="{Binding ElementName=PostEditPattern}"
+                            PostEditReplacementBox="{Binding ElementName=PostEditReplacement}"
+                            SourcePatternBox="{Binding ElementName=SourcePattern}"
+                            Title="Test post-edit rule"
+                            ButtonText="Apply post-edit rule to MT output"/>
+                        <!--<Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>
                             <Label FontWeight="Bold">Test post-edit rule</Label>
                             <Border Visibility="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
@@ -59,7 +65,7 @@
 
                         </StackPanel>
 
-                    </Border>
+                    </Border>-->
                     <DockPanel LastChildFill="False" Margin="5">
                         <Button DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save rule</Button>
                         <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>

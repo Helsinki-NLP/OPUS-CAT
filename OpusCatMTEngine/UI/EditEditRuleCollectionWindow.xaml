@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         x:Name="_this"
         Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="450" Width="800">
-    <Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <Border BorderBrush="Black" BorderThickness="1">
             <StackPanel>
                 <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
@@ -64,9 +64,10 @@
                 </DockPanel>
                 <local:TestPreEditRuleControl 
                     RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
-                    Title="Test rule collections"/>
+                    Title="Test rule collection (all rules will be processed sequentially)"
+                    ButtonText="Apply rules to source text sequentially" />
             </StackPanel>
             
         </Border>
-    </Grid>
+    </ScrollViewer>
 </Window>
