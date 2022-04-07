@@ -431,4 +431,7 @@
   <data name="EditRules_EditRuleButton" xml:space="preserve">
     <value>Edit rule</value>
   </data>
+  <data name="EditRules_EditRuleCollectionTitle" xml:space="preserve">
+    <value>Edit rules in collection {0}</value>
+  </data>
 </root>

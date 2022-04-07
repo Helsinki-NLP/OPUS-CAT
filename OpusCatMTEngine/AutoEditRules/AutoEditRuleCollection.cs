@@ -47,19 +47,26 @@ namespace OpusCatMTEngine
                 serializer.Serialize(writer, this, typeof(AutoEditRuleCollection));
             }
 
-            string backup = ruleCollectionPath + ".bak";
-            File.Delete(backup);
-            File.Replace(ruleCollectionTempPath, ruleCollectionPath, backup, true);
-            try
+            if (!File.Exists(ruleCollectionPath))
             {
+                File.Move(ruleCollectionTempPath, ruleCollectionPath);
+            }
+            else
+            {
+                //Safe replacement according to Jon Skeet
+                string backup = ruleCollectionPath + ".bak";
                 File.Delete(backup);
+                File.Replace(ruleCollectionTempPath, ruleCollectionPath, backup, true);
+                try
+                {
+                    File.Delete(backup);
+                }
+                catch
+                {
+                    // optional:
+                    // filesToDeleteLater.Add(backup);
+                }
             }
-            catch
-            {
-                // optional:
-                // filesToDeleteLater.Add(backup);
-            }
-
         }
 
         public void AddRule(AutoEditRule rule)
@@ -123,7 +130,7 @@ namespace OpusCatMTEngine
                     sourceMatches = rule.SourcePatternRegex.Matches(source);
                 }
 
-                //If source pattern exists but return no matchs, don't get matches for the rule
+                //If source pattern exists but return no matches, don't get matches for the rule
                 if (sourceMatches == null || sourceMatches.Count > 0)
                 {
                     var outputMatches = rule.OutputPatternRegex.Matches(uneditedOutput);

@@ -55,7 +55,7 @@ namespace OpusCatMTEngine
                 autoPostEditRuleCollections.Where(x => this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Contains(x.CollectionGuid)));
             InitializeComponent();
             this.AutoPreEditRuleCollectionList.ItemsSource = this.ModelAutoPreEditRuleCollections;
-            this.AutoPostEditRuleCollectionList.ItemsSource = this.Model.ModelConfig.AutoPostEditRuleCollectionGuids;
+            this.AutoPostEditRuleCollectionList.ItemsSource = this.ModelAutoPostEditRuleCollections;
             
         }
 
@@ -81,6 +81,7 @@ namespace OpusCatMTEngine
                     CollectionType = "preedit"
                 };
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);
+                newRuleCollection.Save();
                 this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
                 this.AutoPreEditRuleCollections.Add(newRuleCollection);
                 this.ModelAutoPreEditRuleCollections.Add(newRuleCollection);
@@ -110,7 +111,7 @@ namespace OpusCatMTEngine
         private void EditPreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
             var selectedCollection = (AutoEditRuleCollection)this.AutoPreEditRuleCollectionList.SelectedItem;
-            var editCollectionWindow = new EditEditRuleCollectionWindow(selectedCollection);
+            var editCollectionWindow = new EditPreEditRuleCollectionWindow(selectedCollection);
             var dialogResult = editCollectionWindow.ShowDialog();
             selectedCollection.Save();
         }
@@ -141,6 +142,7 @@ namespace OpusCatMTEngine
                 };
 
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);
+                newRuleCollection.Save();
                 this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
                 this.AutoPostEditRuleCollections.Add(newRuleCollection);
                 this.ModelAutoPostEditRuleCollections.Add(newRuleCollection);
@@ -154,7 +156,10 @@ namespace OpusCatMTEngine
 
         private void EditPostRuleCollection_Click(object sender, RoutedEventArgs e)
         {
-
+            var selectedCollection = (AutoEditRuleCollection)this.AutoPostEditRuleCollectionList.SelectedItem;
+            var editCollectionWindow = new EditPostEditRuleCollectionWindow(selectedCollection);
+            var dialogResult = editCollectionWindow.ShowDialog();
+            selectedCollection.Save();
         }
 
         private void RemovePostRuleCollection_Click(object sender, RoutedEventArgs e)

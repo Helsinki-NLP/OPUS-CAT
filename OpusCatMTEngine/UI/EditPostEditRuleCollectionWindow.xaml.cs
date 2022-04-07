@@ -21,7 +21,7 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for EditEditRuleCollectionWindow.xaml
     /// </summary>
-    public partial class EditEditRuleCollectionWindow : Window, INotifyPropertyChanged
+    public partial class EditPostEditRuleCollectionWindow : Window, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -49,10 +49,13 @@ namespace OpusCatMTEngine
             }
         }
 
-        public EditEditRuleCollectionWindow(AutoEditRuleCollection selectedCollection)
+        public EditPostEditRuleCollectionWindow(AutoEditRuleCollection selectedCollection)
         {
+           
             this.RuleCollection = selectedCollection;
             InitializeComponent();
+            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
+            this.WindowHeader.Content = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
         }
             
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -125,5 +128,6 @@ namespace OpusCatMTEngine
         {
 
         }
+        
     }
 }

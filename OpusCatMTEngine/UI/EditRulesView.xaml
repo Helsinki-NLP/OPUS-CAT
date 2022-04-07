@@ -7,9 +7,12 @@
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         Height="450" Width="800">
-    <Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
+            <Border BorderBrush="Black" BorderThickness="1">
+                <StackPanel>
+                    <Label FontWeight="Bold" FontSize="15">Pre-edit rule collections</Label>
             <DockPanel Margin="10">
                 <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
                     <StackPanel.Resources>
@@ -62,92 +65,74 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button 
-                                            Name="DeleteTag" 
-                                            Tag="{Binding .}" 
-                                            Click="DeletePreRuleCollection_Click"
-                                            Content="{x:Static resx:Resources.Tags_DeleteTagButton}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-
                         </GridView>
                     </ListView.View>
                 </ListView>
 
             </DockPanel>
-            <DockPanel Margin="10">
-                <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
-                    <StackPanel.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="Margin" Value="0,0,0,5" />
-                        </Style>
-                    </StackPanel.Resources>
-                    <Button 
+                </StackPanel>
+            </Border>
+            <Border BorderBrush="Black" BorderThickness="1">
+                <StackPanel>
+                    <Label FontWeight="Bold" FontSize="15">Post-edit rule collections</Label>
+                    <DockPanel Margin="10">
+                        <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Margin" Value="0,0,0,5" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button 
                         Name="createPostRule" 
                         Click="CreatePostRule_Click"
                         Content="{x:Static resx:Resources.EditRules_CreateRuleButton}" />
 
-                    <Button 
+                            <Button 
                         Name="addPostRuleCollection" 
                         Click="AddPostRuleCollection_Click"
                         Content="{x:Static resx:Resources.EditRules_AddRuleCollectionButton}" />
 
-                    <Button 
-                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                            <Button 
+                        IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}" 
                         Name="editPostRuleCollection" 
                         Click="EditPostRuleCollection_Click"
                         Content="{x:Static resx:Resources.EditRules_EditRuleCollectionButton}" />
 
-                    <Button 
-                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                            <Button 
+                        IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}" 
                         Name="removePostRuleCollection" 
                         Click="RemovePostRuleCollection_Click"
                         Content="{x:Static resx:Resources.EditRules_RemoveRuleCollectionButton}" />
-                    <Button 
-                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                            <Button 
+                        IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}" 
                         Name="deletePostRuleCollection" 
                         Click="DeletePostRuleCollection_Click"
                         Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
 
+                        </StackPanel>
+                        <ListView Name="AutoPostEditRuleCollectionList">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="BorderBrush" Value="LightGray" />
+                                    <Setter Property="BorderThickness" Value="1,1,1,1" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
+                                    <GridViewColumn>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
                 </StackPanel>
-                <ListView Name="AutoPostEditRuleCollectionList">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListViewItem}">
-                            <Setter Property="BorderBrush" Value="LightGray" />
-                            <Setter Property="BorderThickness" Value="1,1,1,1" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-
-                    <ListView.View>
-                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
-                            <GridViewColumn>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button 
-                                            Name="DeleteTag" 
-                                            Tag="{Binding .}" 
-                                            Click="DeletePostRuleCollection_Click"
-                                            Content="{x:Static resx:Resources.Tags_DeleteTagButton}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-
-            </DockPanel>
+            </Border>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

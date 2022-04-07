@@ -220,6 +220,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AutoEditRules\MatchColorPicker.cs" />
     <Compile Include="ChildProcessTracker.cs" />
     <Compile Include="AutoEditRules\AutoEditResult.cs" />
     <Compile Include="AutoEditRules\AutoEditRule.cs" />
@@ -247,8 +248,11 @@
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
-    <Compile Include="UI\EditEditRuleCollectionWindow.xaml.cs">
-      <DependentUpon>EditEditRuleCollectionWindow.xaml</DependentUpon>
+    <Compile Include="UI\EditPreEditRuleCollectionWindow.xaml.cs">
+      <DependentUpon>EditPreEditRuleCollectionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\EditPostEditRuleCollectionWindow.xaml.cs">
+      <DependentUpon>EditPostEditRuleCollectionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\CheckBoxListItem.cs" />
     <Compile Include="UI\CreatePostEditRuleWindow.xaml.cs">
@@ -311,7 +315,11 @@
     <Compile Include="UI\OpusCatSettingsView.xaml.cs">
       <DependentUpon>OpusCatSettingsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="UI\EditEditRuleCollectionWindow.xaml">
+    <Page Include="UI\EditPreEditRuleCollectionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\EditPostEditRuleCollectionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

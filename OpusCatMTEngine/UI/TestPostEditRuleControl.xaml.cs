@@ -116,16 +116,7 @@ namespace OpusCatMTEngine
                     this.textBoxHandlersAssigned = true;
                 }
             }
-
-            var ruleCollection = new AutoEditRuleCollection();
-            ruleCollection.AddRule(
-                new AutoEditRule()
-                {
-                    SourcePattern = this.SourcePatternBox.Text,
-                    OutputPattern = this.PostEditPatternBox.Text,
-                    Replacement = this.PostEditReplacementBox.Text
-                });
-
+            
 
             TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
             var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
@@ -134,8 +125,8 @@ namespace OpusCatMTEngine
             var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
             try
             {
-                var result = ruleCollection.ProcessPostEditRules(sourceText, outputText);
-                if (!String.IsNullOrWhiteSpace(this.SourcePatternBox.Text))
+                var result = this.RuleCollection.ProcessPostEditRules(sourceText, outputText);
+                if (this.RuleCollection.EditRules.Any(x => !String.IsNullOrWhiteSpace(x.SourcePattern)))
                 {
                     this.PopulateSourceBox(result);
                 }
@@ -160,6 +151,10 @@ namespace OpusCatMTEngine
             Paragraph matchHighlightSource = new Paragraph();
             foreach (var replacement in result.AppliedReplacements.Where(x => !x.RepeatedSourceMatch))
             {
+                if (replacement.SourceMatch == null)
+                {
+                    continue;
+                }
 
                 if (nonMatchStartIndex < replacement.SourceMatch.Index)
                 {
