@@ -22,6 +22,8 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "collection-type", ApplyNamingConventions = false)]
         public string CollectionType;
 
+        private FileInfo ruleCollectionFile;
+
         public AutoEditRuleCollection()
         {
         }
@@ -67,6 +69,9 @@ namespace OpusCatMTEngine
                     // filesToDeleteLater.Add(backup);
                 }
             }
+
+            //This is only set when saving the rulecollection or loading it from a file
+            this.ruleCollectionFile = new FileInfo(ruleCollectionPath);
         }
 
         public void AddRule(AutoEditRule rule)
@@ -172,6 +177,15 @@ namespace OpusCatMTEngine
             }
 
             return regexMatches;
+        }
+
+        internal void Delete()
+        {
+            
+            if (this.ruleCollectionFile != null && this.ruleCollectionFile.Exists)
+            {
+                this.ruleCollectionFile.Delete();
+            }
         }
 
         internal void ReplaceRule(AutoEditRule rule, AutoEditRule replacement)
@@ -281,7 +295,7 @@ namespace OpusCatMTEngine
             {
                 editRuleCollection = deserializer.Deserialize<AutoEditRuleCollection>(reader);
             }
-
+            editRuleCollection.ruleCollectionFile = ruleFileInfo;
             return editRuleCollection;
         }
     }

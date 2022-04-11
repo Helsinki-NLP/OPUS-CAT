@@ -57,16 +57,11 @@
                     </ListView.ItemContainerStyle>
 
                     <ListView.View>
-                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
-                            <GridViewColumn>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
+                                <GridView AllowsColumnReorder="true">
+                                    <GridViewColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                    <GridViewColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                                </GridView>
+                            </ListView.View>
                 </ListView>
 
             </DockPanel>
@@ -119,20 +114,22 @@
                             </ListView.ItemContainerStyle>
 
                             <ListView.View>
-                                <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
-                                    <GridViewColumn>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBox Text="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
+                                <GridView AllowsColumnReorder="true">
+                                    <GridViewColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                    <GridViewColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
                                 </GridView>
                             </ListView.View>
                         </ListView>
                     </DockPanel>
                 </StackPanel>
             </Border>
+            <Expander Margin="5" IsExpanded="False" Header="Rule collection tester">
+                <StackPanel>
+                <Button Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
+                <StackPanel Name="RuleTester" />
+                </StackPanel>
+            </Expander>
         </StackPanel>
+        
     </ScrollViewer>
 </UserControl>

@@ -416,10 +416,10 @@ namespace OpusCatMTEngine
                         switch (loadedRuleCollection.CollectionType)
                         {
                             case "preedit":
-                                AutoPreEditRuleCollections.Add(loadedRuleCollection);
+                                this.AutoPreEditRuleCollections.Add(loadedRuleCollection);
                                 break;
                             case "postedit":
-                                AutoPostEditRuleCollections.Add(loadedRuleCollection);
+                                this.AutoPostEditRuleCollections.Add(loadedRuleCollection);
                                 break;
                             default:
                                 break;

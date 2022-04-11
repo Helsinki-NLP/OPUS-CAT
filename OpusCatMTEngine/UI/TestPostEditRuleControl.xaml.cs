@@ -52,6 +52,16 @@ namespace OpusCatMTEngine
             typeof(TestPostEditRuleControl)
             );
 
+        public static readonly DependencyProperty InputBoxLabelProperty = DependencyProperty.Register(
+            "InputBoxLabel", typeof(string),
+            typeof(TestPostEditRuleControl), new UIPropertyMetadata("Input to collection: MT output")
+            );
+
+        public static readonly DependencyProperty TestButtonVisibilityProperty = DependencyProperty.Register(
+            "TestButtonVisibility", typeof(Visibility),
+            typeof(TestPostEditRuleControl), new UIPropertyMetadata(Visibility.Visible)
+            );
+
         public bool TestActive { get; private set; }
         public AutoEditRuleCollection RuleCollection
         {
@@ -86,8 +96,22 @@ namespace OpusCatMTEngine
         public string Title
         {
             get => (string)GetValue(TitleProperty);
-            set => SetValue(TitleProperty,value);
+            set => SetValue(TitleProperty, value);
         }
+
+        public string InputBoxLabel
+        {
+            get => (string)GetValue(InputBoxLabelProperty);
+            set => SetValue(InputBoxLabelProperty, value);
+        }
+
+        public Visibility TestButtonVisibility
+        {
+            get => (Visibility)GetValue(TestButtonVisibilityProperty);
+            set => SetValue(TestButtonVisibilityProperty, value);
+        }
+
+
         public bool textBoxHandlersAssigned = false;
 
         public TestPostEditRuleControl()

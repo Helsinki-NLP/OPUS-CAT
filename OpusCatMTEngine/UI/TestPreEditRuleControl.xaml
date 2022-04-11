@@ -11,11 +11,11 @@
             <Label Content="{Binding Title}" FontWeight="Bold" />
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label>Source text</Label>
+                    <Label Content="{Binding InputBoxLabel}" />
                     <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>
-            <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click" Content="{Binding ButtonText}" />
+            <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click" Content="{Binding ButtonText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
                     <Label>Edited source text</Label>

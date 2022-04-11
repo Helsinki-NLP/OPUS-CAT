@@ -47,6 +47,16 @@ namespace OpusCatMTEngine
             typeof(TestPreEditRuleControl)
             );
 
+        public static readonly DependencyProperty InputBoxLabelProperty = DependencyProperty.Register(
+            "InputBoxLabel", typeof(string),
+            typeof(TestPreEditRuleControl)
+            );
+
+        public static readonly DependencyProperty TestButtonVisibilityProperty = DependencyProperty.Register(
+            "TestButtonVisibility", typeof(Visibility),
+            typeof(TestPreEditRuleControl), new UIPropertyMetadata(Visibility.Visible)
+            );
+
         public bool TestActive { get; private set; }
         public AutoEditRuleCollection RuleCollection
         {
@@ -77,12 +87,71 @@ namespace OpusCatMTEngine
             get => (string)GetValue(TitleProperty);
             set => SetValue(TitleProperty,value);
         }
+
+        public string InputBoxLabel
+        {
+            get => (string)GetValue(InputBoxLabelProperty);
+            set => SetValue(InputBoxLabelProperty, value);
+        }
+
+        public Visibility TestButtonVisibility
+        {
+            get => (Visibility)GetValue(TestButtonVisibilityProperty);
+            set => SetValue(TestButtonVisibilityProperty, value);
+        }
+        public string SourceText
+        {
+            get
+            {
+                TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                return sourceText;
+            }
+            set
+            {
+                Paragraph sourcePara = new Paragraph();
+                sourcePara.Inlines.Add(new Run(value));
+                this.SourceBox.Document.Blocks.Clear();
+                this.SourceBox.Document.Blocks.Add(sourcePara);
+            }
+        }
+
+        public string OutputText
+        {
+            get
+            {
+                TextRange textRange = new TextRange(this.EditedSourceBox.Document.ContentStart, this.EditedSourceBox.Document.ContentEnd);
+                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                return sourceText;
+            }
+
+        }
+
         public bool textBoxHandlersAssigned = false;
 
         public TestPreEditRuleControl()
         {
             this.DataContext = this;
             InitializeComponent();
+        }
+        
+        public void ProcessRules()
+        {
+            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+            var sourceText = textRange.Text.TrimEnd('\r', '\n');
+
+            try
+            {
+                var result = this.RuleCollection.ProcessPreEditRules(sourceText);
+                this.PopulateSourceBox(result);
+                this.PopulateTargetBox(result);
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"Error in regular expression: {ex.Message}");
+            }
+
+            this.TestActive = true;
         }
 
         private void PreEditTest_Click(object sender, RoutedEventArgs e)
@@ -104,21 +173,8 @@ namespace OpusCatMTEngine
                     this.textBoxHandlersAssigned = true;
                 }
             }
-
-            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.TrimEnd('\r', '\n');
-            try
-            {
-                var result = this.RuleCollection.ProcessPreEditRules(sourceText);
-                this.PopulateSourceBox(result);
-                this.PopulateTargetBox(result);
-            }
-            catch (ArgumentException ex)
-            {
-                MessageBox.Show($"Error in regular expression: {ex.Message}");
-            }
-
-            this.TestActive = true;
+            
+            this.ProcessRules();
 
         }
 

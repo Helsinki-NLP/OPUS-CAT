@@ -20,11 +20,11 @@
             </Border>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label>MT output</Label>
+                    <Label Content="{Binding InputBoxLabel}" />
                     <RichTextBox Name="OutputBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>
-            <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">Apply post-edit rule to MT output</Button>
+            <Button Visibility="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">Apply post-edit rule to MT output</Button>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
                     <Label>Post-edited MT output</Label>
