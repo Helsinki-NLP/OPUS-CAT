@@ -66,7 +66,7 @@ namespace OpusCatMTEngine
             this.PreEditTesters = new List<TestPreEditRuleControl>();
             this.PostEditTesters = new List<TestPostEditRuleControl>();
             var inputBoxLabel = "Input to rule collection: Source text";
-            var testButtonVisibility = Visibility.Collapsed;
+            
             foreach (var preEditRuleCollection in this.ModelAutoPreEditRuleCollections)
             {
                 var title = $"Rule collection {preEditRuleCollection.CollectionName}";
@@ -76,12 +76,10 @@ namespace OpusCatMTEngine
                         RuleCollection = preEditRuleCollection,
                         Title = title,
                         InputBoxLabel = inputBoxLabel,
-                        TestButtonVisibility = testButtonVisibility,
+                        TestButtonVisibility = Visibility.Collapsed,
                         ButtonText = "Test all pre- and postediting rules"
                     };
 
-                //Only show test button for first collection
-                testButtonVisibility = Visibility.Collapsed;
                 inputBoxLabel = $"Input to rule collection: Output from {preEditRuleCollection.CollectionName}";
                 this.PreEditTesters.Add(testControl);
                 this.RuleTester.Children.Add(testControl);
@@ -262,15 +260,39 @@ namespace OpusCatMTEngine
         private void TestRules_Click(object sender, RoutedEventArgs e)
         {
             string previousTesterOutput = null;
+            string rawSource = null;
             foreach (var tester in this.PreEditTesters)
             {
                 if (previousTesterOutput != null)
                 {
                     tester.SourceText = previousTesterOutput;
                 }
+                else
+                {
+                    rawSource = tester.SourceText;
+                }
                 tester.ProcessRules();
                 previousTesterOutput = tester.OutputText;
             }
+
+            //previousTesterOutput will now contain the pre-edited source for machine translation,
+            //change it to MT output
+            var mtResult = this.Model.Translate(
+                previousTesterOutput,
+                this.Model.SourceLanguages.First(),
+                this.Model.SourceLanguages.First()).Result;
+
+            previousTesterOutput = mtResult.Translation;
+
+            foreach (var tester in this.PostEditTesters)
+            {
+                tester.SourceText = rawSource;
+                tester.OutputText = previousTesterOutput;
+                
+                tester.ProcessRules();
+                previousTesterOutput = tester.EditedOutputText;
+            }
+
         }
     }
 }

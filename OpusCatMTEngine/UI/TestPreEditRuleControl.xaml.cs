@@ -99,6 +99,7 @@ namespace OpusCatMTEngine
             get => (Visibility)GetValue(TestButtonVisibilityProperty);
             set => SetValue(TestButtonVisibilityProperty, value);
         }
+
         public string SourceText
         {
             get

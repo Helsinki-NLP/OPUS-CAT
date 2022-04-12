@@ -12,6 +12,10 @@
         <Border BorderBrush="Black" BorderThickness="1">
             <StackPanel>
                 <Label Name="WindowHeader" Margin="10,0,0,0" FontSize="20"></Label>
+                <DockPanel Margin="5" LastChildFill="True">
+                    <Label>Rule collection name</Label>
+                    <TextBox Text="{Binding ElementName=_this, Path=RuleCollection.CollectionName, Mode=TwoWay}" />
+                </DockPanel>
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
                         <StackPanel.Resources>
@@ -49,10 +53,27 @@
 
                         <ListView.View>
                             <GridView AllowsColumnReorder="true">
-                                <GridViewColumn Header="Description" Width="150" DisplayMemberBinding="{Binding Path=Description}" />
-                                <GridViewColumn Header="Source pattern" Width="150" DisplayMemberBinding="{Binding Path=SourcePattern}" />
-                                <GridViewColumn Header="Output pattern" Width="150" DisplayMemberBinding="{Binding Path=OutputPattern}" />
-                                <GridViewColumn Header="Replacement" Width="150" DisplayMemberBinding="{Binding Path=Replacement}" />
+                                <GridViewColumn Header="Description" Width="300">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate >
+                                            <TextBlock Text="{Binding Description}" ToolTip="{Binding Description}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Source pattern" Width="150">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate >
+                                            <TextBlock Text="{Binding SourcePattern}" ToolTip="{Binding SourcePattern}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Replacement" Width="150">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate >
+                                            <TextBlock Text="{Binding Replacement}" ToolTip="{Binding Replacement}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
                             </GridView>
                         </ListView.View>
                     </ListView>

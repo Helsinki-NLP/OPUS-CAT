@@ -10,7 +10,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
-            <Border BorderBrush="Black" BorderThickness="1">
+            <Border Margin="5" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <Label FontWeight="Bold" FontSize="15">Pre-edit rule collections</Label>
             <DockPanel Margin="10">
@@ -67,7 +67,7 @@
             </DockPanel>
                 </StackPanel>
             </Border>
-            <Border BorderBrush="Black" BorderThickness="1">
+            <Border Margin="5" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <Label FontWeight="Bold" FontSize="15">Post-edit rule collections</Label>
                     <DockPanel Margin="10">
@@ -125,7 +125,7 @@
             </Border>
             <Expander Margin="5" IsExpanded="False" Header="Rule collection tester">
                 <StackPanel>
-                <Button Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
+                <Button Margin="5" Padding="5" Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
                 <StackPanel Name="RuleTester" />
                 </StackPanel>
             </Expander>

@@ -15,6 +15,11 @@
                         <StackPanel>
                             <Label FontWeight="Bold">Define pre-edit rule</Label>
                             <DockPanel Margin="5,0">
+                                <Label>Rule description</Label>
+                                <TextBox Name="RuleDescription" />
+                            </DockPanel>
+                            <Separator Margin="5"></Separator>
+                            <DockPanel Margin="5,0">
                                 <Label>Pre-edit pattern</Label>
                                 <TextBox Name="PreEditPattern" />
                             </DockPanel>

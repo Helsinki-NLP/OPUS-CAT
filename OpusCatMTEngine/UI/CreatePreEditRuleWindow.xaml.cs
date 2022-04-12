@@ -32,6 +32,7 @@ namespace OpusCatMTEngine
             InitializeComponent();
             this.PreEditPattern.Text = rule.SourcePattern;
             this.PreEditReplacement.Text = rule.Replacement;
+            this.RuleDescription.Text = rule.Description;
         }
 
         
@@ -42,7 +43,8 @@ namespace OpusCatMTEngine
                 new AutoEditRule()
                 {
                     SourcePattern = this.PreEditPattern.Text,
-                    Replacement = this.PreEditReplacement.Text
+                    Replacement = this.PreEditReplacement.Text,
+                    Description = this.RuleDescription.Text
                 };
 
             //Validate regex

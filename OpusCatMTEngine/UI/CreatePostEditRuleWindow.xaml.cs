@@ -18,7 +18,7 @@ namespace OpusCatMTEngine
 {
     public partial class CreatePostEditRuleWindow : Window, ICreateRuleWindow
     {
-       
+        private AutoEditRule rule;
 
         public AutoEditRule CreatedRule { get; set; }
 
@@ -27,6 +27,14 @@ namespace OpusCatMTEngine
             InitializeComponent();
         }
 
+        public CreatePostEditRuleWindow(AutoEditRule rule)
+        {
+            InitializeComponent();
+            this.SourcePattern.Text = rule.SourcePattern;
+            this.PostEditReplacement.Text = rule.Replacement;
+            this.PostEditPattern.Text = rule.OutputPattern;
+            this.RuleDescription.Text = rule.Description;
+        }
         
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -36,8 +44,8 @@ namespace OpusCatMTEngine
                 {
                     SourcePattern = this.SourcePattern.Text,
                     OutputPattern = this.PostEditPattern.Text,
-                    Replacement = this.PostEditReplacement.Text
-
+                    Replacement = this.PostEditReplacement.Text,
+                    Description = this.RuleDescription.Text
                 };
 
             //Validate regex

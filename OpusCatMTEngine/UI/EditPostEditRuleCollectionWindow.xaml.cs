@@ -104,6 +104,7 @@ namespace OpusCatMTEngine
             switch (this.RuleCollection.CollectionType)
             {
                 case "postedit":
+                    createRuleWindow = new CreatePostEditRuleWindow(rule);
                     break;
                 case "preedit":
                     createRuleWindow = new CreatePreEditRuleWindow(rule);

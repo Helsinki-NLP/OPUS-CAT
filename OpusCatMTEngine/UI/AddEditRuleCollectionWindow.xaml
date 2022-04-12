@@ -11,7 +11,7 @@
     <Grid>
         <Border BorderBrush="Black" BorderThickness="1">
             <StackPanel>
-                <Label Margin="10,0,0,0" FontSize="20" Content="Select active rule collections"/>
+                <Label Margin="10,0,0,0" FontSize="20" Content="Select rule collections to use with model"/>
                 <ListView Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollectionCheckBoxList, Mode=TwoWay}">
 
             <ListView.ItemContainerStyle>
@@ -26,7 +26,7 @@
                     <GridViewColumn>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="{Binding Path=Item.CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Width="400" Text="{Binding Path=Item.CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

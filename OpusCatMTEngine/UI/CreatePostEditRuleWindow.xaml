@@ -22,12 +22,17 @@
                                 <CheckBox Name="SourcePatternCheckbox" Margin="0,0,5,0" VerticalAlignment="Center">Use source pattern</CheckBox>
                                 <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" />
                             </DockPanel>
-                            <Separator Margin="5"></Separator>
-                            <DockPanel Margin="5,0">
-                                <Label>Post-edit pattern</Label>
-                                <TextBox Name="PostEditPattern" />
+                                <Separator Margin="5"></Separator>
+                                <DockPanel Margin="5,0">
+                                <Label>Rule description</Label>
+                                <TextBox Name="RuleDescription" />
                             </DockPanel>
-                            <Separator Margin="5"></Separator>
+                                <Separator Margin="5"></Separator>
+                                <DockPanel Margin="5,0">
+                                    <Label>Post-edit pattern</Label>
+                                    <TextBox Name="PostEditPattern" />
+                                </DockPanel>
+                                <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0,5,5">
                                 <Label>Post-edit replacement</Label>
                                 <TextBox Name="PostEditReplacement" />
@@ -40,32 +45,7 @@
                             SourcePatternBox="{Binding ElementName=SourcePattern}"
                             Title="Test post-edit rule"
                             ButtonText="Apply post-edit rule to MT output"/>
-                        <!--<Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
-                        <StackPanel>
-                            <Label FontWeight="Bold">Test post-edit rule</Label>
-                            <Border Visibility="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
-                                <StackPanel Margin="5">
-                                    <Label>Source text</Label>
-                                    <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" />
-                                </StackPanel>
-                            </Border>
-                            <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
-                                <StackPanel Margin="5">
-                                    <Label>MT output</Label>
-                                    <RichTextBox Name="OutputBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
-                                </StackPanel>
-                            </Border>
-                            <Button HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click">Apply post-edit rule to MT output</Button>
-                            <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
-                                <StackPanel Margin="5">
-                                    <Label>Post-edited MT output</Label>
-                                    <RichTextBox IsReadOnly="True" Name="EditedOutputBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
-                                </StackPanel>
-                            </Border>
-
-                        </StackPanel>
-
-                    </Border>-->
+                        
                     <DockPanel LastChildFill="False" Margin="5">
                         <Button DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save rule</Button>
                         <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>

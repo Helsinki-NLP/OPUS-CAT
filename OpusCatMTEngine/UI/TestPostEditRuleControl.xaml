@@ -11,7 +11,7 @@
     </UserControl.Resources>
     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel>
-            <Label FontWeight="Bold">Test post-edit rule</Label>
+            <Label Content="{Binding Title}" FontWeight="Bold" />
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
                     <Label>Source text</Label>

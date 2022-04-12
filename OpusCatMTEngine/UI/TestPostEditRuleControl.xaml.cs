@@ -111,6 +111,50 @@ namespace OpusCatMTEngine
             set => SetValue(TestButtonVisibilityProperty, value);
         }
 
+        public string SourceText
+        {
+            get
+            {
+                TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                return sourceText;
+            }
+            set
+            {
+                Paragraph sourcePara = new Paragraph();
+                sourcePara.Inlines.Add(new Run(value));
+                this.SourceBox.Document.Blocks.Clear();
+                this.SourceBox.Document.Blocks.Add(sourcePara);
+            }
+        }
+
+        public string OutputText
+        {
+            get
+            {
+                TextRange textRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
+                var outputText = textRange.Text.TrimEnd('\r', '\n');
+                return outputText;
+            }
+            set
+            {
+                Paragraph outputPara = new Paragraph();
+                outputPara.Inlines.Add(new Run(value));
+                this.OutputBox.Document.Blocks.Clear();
+                this.OutputBox.Document.Blocks.Add(outputPara);
+            }
+        }
+
+        public string EditedOutputText
+        {
+            get
+            {
+                TextRange textRange = new TextRange(this.EditedOutputBox.Document.ContentStart, this.EditedOutputBox.Document.ContentEnd);
+                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                return sourceText;
+            }
+
+        }
 
         public bool textBoxHandlersAssigned = false;
 
@@ -118,6 +162,31 @@ namespace OpusCatMTEngine
         {
             this.DataContext = this;
             InitializeComponent();
+        }
+
+        public void ProcessRules()
+        {
+            TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
+            var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
+
+            TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
+            var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
+            try
+            {
+                var result = this.RuleCollection.ProcessPostEditRules(sourceText, outputText);
+                if (this.RuleCollection.EditRules.Any(x => !String.IsNullOrWhiteSpace(x.SourcePattern)))
+                {
+                    this.PopulateSourceBox(result);
+                }
+                this.PopulateOutputBox(result);
+                this.PopulateTargetBox(result);
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show($"Error in regular expression: {ex.Message}");
+            }
+
+            this.TestActive = true;
         }
 
         private void PostEditTest_Click(object sender, RoutedEventArgs e)
@@ -140,29 +209,8 @@ namespace OpusCatMTEngine
                     this.textBoxHandlersAssigned = true;
                 }
             }
-            
 
-            TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
-
-            TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-            var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
-            try
-            {
-                var result = this.RuleCollection.ProcessPostEditRules(sourceText, outputText);
-                if (this.RuleCollection.EditRules.Any(x => !String.IsNullOrWhiteSpace(x.SourcePattern)))
-                {
-                    this.PopulateSourceBox(result);
-                }
-                this.PopulateOutputBox(result);
-                this.PopulateTargetBox(result);
-            }
-            catch (ArgumentException ex)
-            {
-                MessageBox.Show($"Error in regular expression: {ex.Message}");
-            }
-
-            this.TestActive = true;
+            this.ProcessRules();
         }
 
         private void PopulateSourceBox(AutoEditResult result)
