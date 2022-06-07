@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows;
 using YamlDotNet.Serialization;
 
 namespace OpusCatMTEngine
@@ -21,6 +22,9 @@ namespace OpusCatMTEngine
 
         [YamlMember(Alias = "collection-type", ApplyNamingConventions = false)]
         public string CollectionType;
+
+        [YamlMember(Alias = "global-collection", ApplyNamingConventions = false)]
+        public Boolean GlobalCollection { get; set; }
 
         private FileInfo ruleCollectionFile;
 
@@ -127,12 +131,13 @@ namespace OpusCatMTEngine
             foreach (var rule in this.EditRules)
             {
                 //If source pattern exists, use it as condition for rule application
-                MatchCollection sourceMatches = null;
+                List<Match> sourceMatches = null;
                 if (!String.IsNullOrEmpty(rule.SourcePattern))
                 {
                     //Note that we check for the trigger in the unedited source (don't
                     //want to do serial rule application here)
-                    sourceMatches = rule.SourcePatternRegex.Matches(source);
+                    sourceMatches = 
+                        rule.SourcePatternRegex.Matches(source).Cast<Match>().Where(x => x.Length > 0).ToList();
                 }
 
                 //If source pattern exists but return no matches, don't get matches for the rule
@@ -145,6 +150,11 @@ namespace OpusCatMTEngine
                         int matchIndex = 0;
                         foreach (Match match in outputMatches)
                         {
+                            if (match.Length == 0)
+                            {
+                                continue;
+                            }
+
                             var newRuleMatch = new AutoEditRuleMatch(rule, match, matchIndex);
 
                             //if sourceMatches is not null, there is at least one of them
@@ -179,12 +189,18 @@ namespace OpusCatMTEngine
             return regexMatches;
         }
 
-        internal void Delete()
+        internal void Delete(Boolean requireConfirmation = true)
         {
-            
-            if (this.ruleCollectionFile != null && this.ruleCollectionFile.Exists)
+            MessageBoxResult messageBoxResult =
+                System.Windows.MessageBox.Show(
+                    String.Format(OpusCatMTEngine.Properties.Resources.Rules_DeleteRuleCollectionConfirmation, this.CollectionName),
+                    OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
+            if (messageBoxResult == MessageBoxResult.Yes)
             {
-                this.ruleCollectionFile.Delete();
+                if (this.ruleCollectionFile != null && this.ruleCollectionFile.Exists)
+                {
+                    this.ruleCollectionFile.Delete();
+                }
             }
         }
 
@@ -216,7 +232,9 @@ namespace OpusCatMTEngine
                 edited = edited.Remove(matchesAtPosition.Key + editingOffset, matchLength);
                 //Replace with rule replacement
                 var replacement = longestMatch.Match.Result(longestMatch.Rule.Replacement);
-                
+
+                replacement = this.ReplaceCasingGroups(longestMatch, replacement);
+
                 edited = edited.Insert(matchesAtPosition.Key + editingOffset, replacement);
 
                 longestMatch.OutputIndex = matchesAtPosition.Key + editingOffset;
@@ -226,8 +244,9 @@ namespace OpusCatMTEngine
                 //Update loop counters
                 editingOffset += replacement.Length - matchLength;
                 endOfLastMatchIndex = longestMatch.Match.Index + matchLength;
-
             }
+
+
 
             return new AutoEditResult(edited, appliedReplacements);
         }
@@ -252,25 +271,48 @@ namespace OpusCatMTEngine
                 //Remove the original text
                 var matchLength = longestMatch.Match.Length;
                 edited = edited.Remove(matchesAtPosition.Key + editingOffset, matchLength);
+                
                 //Replace with rule replacement
                 var replacement = longestMatch.Match.Result(longestMatch.Rule.Replacement);
 
-                var sourceGroupMatches = Regex.Matches(replacement, @"\$<(\d+)>");
+                var sourceGroupMatches = 
+                    Regex.Matches(
+                        replacement,
+                        @"(^(\$\$)*\$|[^$](\$\$)*\$)<(?<casingOperator>[LU])?(?<sourceGroup>\d+)>");
+
                 if (sourceGroupMatches.Count > 0)
                 {
                     foreach (Match match in sourceGroupMatches)
                     {
                         //source group index is guaranteed to be int, since it matches \d+
-                        int sourceGroupIndex = int.Parse(match.Groups[1].Value);
+                        int sourceGroupIndex = int.Parse(match.Groups["sourceGroup"].Value);
 
                         if (longestMatch.SourceMatch.Groups.Count > sourceGroupIndex)
                         {
                             var sourceGroup = longestMatch.SourceMatch.Groups[sourceGroupIndex];
-                            replacement = replacement.Replace($"$<{sourceGroupIndex}>", sourceGroup.Value);
+                            
+                            var casingOperator = match.Groups["casingOperator"];
+                            if (casingOperator.Success)
+                            {
+                                if (casingOperator.Value == "L")
+                                {
+                                    replacement = replacement.Replace($"$<L{sourceGroupIndex}>", sourceGroup.Value.ToLower());
+                                }
+                                else if (casingOperator.Value == "U")
+                                {
+                                    replacement = replacement.Replace($"$<U{sourceGroupIndex}>", sourceGroup.Value.ToUpper());
+                                }
+                            }
+                            else
+                            {
+                                replacement = replacement.Replace($"$<{sourceGroupIndex}>", sourceGroup.Value);
+                            }
                             longestMatch.Output = replacement;
                         }
                     }
                 }
+
+                replacement = this.ReplaceCasingGroups(longestMatch, replacement);
 
                 edited = edited.Insert(matchesAtPosition.Key + editingOffset, replacement);
 
@@ -283,8 +325,41 @@ namespace OpusCatMTEngine
                 endOfLastMatchIndex = longestMatch.Match.Index + matchLength;
 
             }
-
+            
             return new AutoEditResult(edited, appliedReplacements);
+        }
+
+        private string ReplaceCasingGroups(AutoEditRuleMatch longestMatch, string replacement)
+        {
+            var casingGroupMatches =
+                    Regex.Matches(
+                        replacement,
+                        @"(^(\$\$)*\$|[^$](\$\$)*\$)(?<casingOperator>[LU])(?<outputGroup>\d+)");
+
+            if (casingGroupMatches.Count > 0)
+            {
+                foreach (Match match in casingGroupMatches)
+                {
+                    //source group index is guaranteed to be int, since it matches \d+
+                    int outputGroupIndex = int.Parse(match.Groups["outputGroup"].Value);
+
+                    var outputGroup = longestMatch.Match.Groups[outputGroupIndex];
+
+                    var casingOperator = match.Groups["casingOperator"];
+                    if (casingOperator.Value == "L")
+                    {
+                        replacement = replacement.Replace($"$L{outputGroupIndex}", outputGroup.Value.ToLower());
+                    }
+                    else if (casingOperator.Value == "U")
+                    {
+                        replacement = replacement.Replace($"$U{outputGroupIndex}", outputGroup.Value.ToUpper());
+                    }
+                    
+                    longestMatch.Output = replacement;
+                }
+            }
+
+            return replacement;
         }
 
         public static AutoEditRuleCollection CreateFromFile(FileInfo ruleFileInfo)

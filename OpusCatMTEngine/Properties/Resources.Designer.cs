@@ -836,6 +836,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure want to permanently delete rule collection {0}?.
+        /// </summary>
+        public static string Rules_DeleteRuleCollectionConfirmation {
+            get {
+                return ResourceManager.GetString("Rules_DeleteRuleCollectionConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The TMX file does not contain languages compatible with the language codes of the MT model, or there are not enough segments for the compatible language pair. Language pairs included in the TMX file and the amount of segments per language pair are listed below. You can either select one of the language pairs to extract as fine-tuning material, or cancel fine-tuning..
         /// </summary>
         public static string SelectTmxLangPair_Instructions {

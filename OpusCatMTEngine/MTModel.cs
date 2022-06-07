@@ -660,10 +660,15 @@ namespace OpusCatMTEngine
             //languages have to be fetched the metadata yml file
             if (this.modelYaml == null)
             {
-                this.SourceLanguages =
-                    pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-                this.TargetLanguages =
-                    pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                //There may be weird paths with no hyphen separating source from target languages, e.g.
+                //just "westgermanic" (presumably both source and target languages are westgermanic).
+                if (pathSplit[0].Contains("-"))
+                {
+                    this.SourceLanguages =
+                        pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                    this.TargetLanguages =
+                        pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                }
             }
             else
             {

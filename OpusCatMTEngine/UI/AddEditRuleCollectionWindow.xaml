@@ -7,12 +7,12 @@
         xmlns:local="clr-namespace:OpusCatMTEngine"
         mc:Ignorable="d"
         x:Name="_this"
-        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="450" Width="800">
+        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="450" Width="500">
     <Grid>
-        <Border BorderBrush="Black" BorderThickness="1">
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1">
             <StackPanel>
                 <Label Margin="10,0,0,0" FontSize="20" Content="Select rule collections to use with model"/>
-                <ListView Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollectionCheckBoxList, Mode=TwoWay}">
+                <ListView Margin="5" Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollectionCheckBoxList, Mode=TwoWay}">
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="{x:Type ListViewItem}">

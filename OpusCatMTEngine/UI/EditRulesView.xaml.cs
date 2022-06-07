@@ -50,9 +50,11 @@ namespace OpusCatMTEngine
             this.AutoPreEditRuleCollections = autoPreEditRuleCollections;
             this.AutoPostEditRuleCollections = autoPostEditRuleCollections;
             this.ModelAutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
-                autoPreEditRuleCollections.Where(x => this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Contains(x.CollectionGuid)));
+                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Select(x => autoPreEditRuleCollections.SingleOrDefault(
+                    y => y.CollectionGuid == x)).Where(y => y != null));
             this.ModelAutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
-                autoPostEditRuleCollections.Where(x => this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Contains(x.CollectionGuid)));
+                this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
+                    y => y.CollectionGuid == x)).Where(y => y != null));
             InitializeComponent();
             InitializeTester();
             this.AutoPreEditRuleCollectionList.ItemsSource = this.ModelAutoPreEditRuleCollections;
@@ -69,6 +71,7 @@ namespace OpusCatMTEngine
             
             foreach (var preEditRuleCollection in this.ModelAutoPreEditRuleCollections)
             {
+                
                 var title = $"Rule collection {preEditRuleCollection.CollectionName}";
                 var testControl =
                     new TestPreEditRuleControl()
@@ -197,7 +200,8 @@ namespace OpusCatMTEngine
                 {
                     CollectionName = "new collection",
                     CollectionGuid = Guid.NewGuid().ToString(),
-                    CollectionType = "postedit"
+                    CollectionType = "postedit",
+                    GlobalCollection = false
                 };
 
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);

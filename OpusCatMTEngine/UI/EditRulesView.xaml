@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpusCatMTEngine"
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
-        Height="450" Width="800">
+        Height="650" Width="800">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
@@ -58,7 +58,11 @@
 
                     <ListView.View>
                                 <GridView AllowsColumnReorder="true">
-                                    <GridViewColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                    <GridViewColumn Width="350" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                        <GridViewColumn.Header>
+                                            <GridViewColumnHeader Content="Collection name" HorizontalContentAlignment="Center"/>
+                                        </GridViewColumn.Header>
+                                    </GridViewColumn>
                                     <GridViewColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
                                 </GridView>
                             </ListView.View>

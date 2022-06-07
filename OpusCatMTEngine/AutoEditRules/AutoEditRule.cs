@@ -8,12 +8,20 @@ namespace OpusCatMTEngine
 
     public class AutoEditRule
     {
+        public enum CharacterCaseProcessing
+        {
+            PreserveCase,
+            ConvertToUpperCase,
+            ConvertToLowerCase
+            //ConvertToTitleCase - omitted this because it has limited use and clutters the UI
+        };
+
         [YamlMember(Alias = "output-pattern", ApplyNamingConventions = false)]
         public string OutputPattern { get; set; }
 
         [YamlMember(Alias = "replacement", ApplyNamingConventions = false)]
         public string Replacement { get; set; }
-
+        
         [YamlMember(Alias = "source-pattern", ApplyNamingConventions = false)]
         public string SourcePattern { get; set; }
 

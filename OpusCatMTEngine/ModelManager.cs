@@ -464,8 +464,8 @@ namespace OpusCatMTEngine
             this.OnlineModelListFetched = false;
             var modelStorages =
                 new List<string> {
-                    OpusCatMTEngineSettings.Default.OpusModelStorageUrl,
-                    OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl
+                    OpusCatMTEngineSettings.Default.OpusModelStorageUrl//,
+                    //OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl
                 };
 
             foreach (var modelStorage in modelStorages)
@@ -479,6 +479,44 @@ namespace OpusCatMTEngine
                     var storageUri = new Uri(modelStorage);
                     client.DownloadStringCompleted += (x, y) => modelListDownloadComplete(storageUri, new List<string>(), x, y);
                     client.DownloadStringAsync(storageUri);
+                }
+            }
+
+            //Tatoeba model info can be fetched as a single file from Allas
+            using (var client = new WebClient())
+            {
+                var storageUrl = OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl;
+                var modelListUri = new Uri($"{storageUrl}released-model-languages.txt");
+                client.DownloadStringCompleted += TatoebaModelListDownloaded;
+                client.DownloadStringAsync(modelListUri);
+            }
+
+        }
+
+        private void TatoebaModelListDownloaded(object sender, DownloadStringCompletedEventArgs e)
+        {
+            var modelList = e.Result;
+            
+            //Model list uses \n as line break, it originates form linux
+            foreach (var line in modelList.Split('\n'))
+            {
+                var split = line.Split('\t');
+                if (split.Length >= 4)
+                {
+                    var modelPath = split[0];
+                    var modelUri = new Uri($"{OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl}{modelPath}");
+                    IEnumerable<string> sourceLangs = split[2].Split(',');
+                    IEnumerable<string> targetLangs = split[3].Split(',');
+
+                    //Some entries might have empty source and target languages
+                    if (!sourceLangs.Any() || !targetLangs.Any())
+                    {
+                        continue;
+                    }
+                    var model = new MTModel(modelPath.Replace(".zip", ""), modelUri);
+                    model.SourceLanguages = sourceLangs.Select(x => new IsoLanguage(x)).ToList();
+                    model.TargetLanguages = targetLangs.Select(x => new IsoLanguage(x)).ToList();
+                    this.onlineModels.Add(model);
                 }
             }
         }
@@ -582,6 +620,7 @@ namespace OpusCatMTEngine
             {
                 using (var client = new WebClient())
                 {
+                    Log.Information($"Fetching page {nextUri}");
                     client.DownloadStringCompleted += (x, y) => modelListDownloadComplete(nextUri, filePaths, x, y);
                     var uriBuilder = new UriBuilder(nextUri);
                     var query = HttpUtility.ParseQueryString(uriBuilder.Query);

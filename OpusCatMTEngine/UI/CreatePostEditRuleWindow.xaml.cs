@@ -13,17 +13,33 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static OpusCatMTEngine.AutoEditRule;
 
 namespace OpusCatMTEngine
 {
-    public partial class CreatePostEditRuleWindow : Window, ICreateRuleWindow
+    public partial class CreatePostEditRuleWindow : Window, ICreateRuleWindow, INotifyPropertyChanged
     {
-        private AutoEditRule rule;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+
+        
+        private AutoEditRule rule;
+        
         public AutoEditRule CreatedRule { get; set; }
+        
 
         public CreatePostEditRuleWindow()
         {
+            this.DataContext = this;
             InitializeComponent();
         }
 
@@ -35,7 +51,7 @@ namespace OpusCatMTEngine
             this.PostEditPattern.Text = rule.OutputPattern;
             this.RuleDescription.Text = rule.Description;
         }
-        
+
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -61,7 +77,7 @@ namespace OpusCatMTEngine
             }
 
 
-            
+
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -70,7 +86,7 @@ namespace OpusCatMTEngine
             this.Close();
         }
 
-        
-        
+
+
     }
 }

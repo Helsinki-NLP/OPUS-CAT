@@ -60,7 +60,7 @@
       <Value Profile="(Default)">models</Value>
     </Setting>
     <Setting Name="TatoebaModelStorageUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://object.pouta.csc.fi/Tatoeba-MT-models/</Value>
+      <Value Profile="(Default)">https://a3s.fi/Tatoeba-MT-models/</Value>
     </Setting>
     <Setting Name="DatabaseRemovalInterval" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">14</Value>

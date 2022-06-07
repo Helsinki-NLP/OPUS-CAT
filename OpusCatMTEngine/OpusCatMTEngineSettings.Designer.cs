@@ -253,7 +253,7 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/Tatoeba-MT-models/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://a3s.fi/Tatoeba-MT-models/")]
         public string TatoebaModelStorageUrl {
             get {
                 return ((string)(this["TatoebaModelStorageUrl"]));
