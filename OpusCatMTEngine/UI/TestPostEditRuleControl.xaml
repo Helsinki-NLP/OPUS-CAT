@@ -27,7 +27,7 @@
             <Button Visibility="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">Apply post-edit rule to MT output</Button>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label>Post-edited MT output</Label>
+                    <Label Name="OutputBoxTitle">Post-edited MT output</Label>
                     <RichTextBox IsReadOnly="True" Name="EditedOutputBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>

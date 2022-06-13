@@ -118,39 +118,68 @@ namespace OpusCatMTEngine
 
             this.InitializePythonEngine();
 
-            this.CheckForUpdates();
+            this.CheckForUpdatesAsync();
         }
 
-        private void CheckForUpdates()
+        private async void CheckForUpdatesAsync()
         {
             //Get info for all releases from Github
             var client = new GitHubClient(new ProductHeaderValue("OpusCatMTEngine"));
-            var releases = client.Repository.Release.GetAll("Helsinki-NLP", "OPUS-CAT");
-            var releases_with_notes = releases.Result.Where(x => x.Assets.Any(y => y.Name == "release_notes.txt"));
-            var latest_release = releases_with_notes.OrderByDescending(x => x.PublishedAt).First();
-            var download_url = latest_release.Assets.Single(x => x.Name == "release_notes.txt").BrowserDownloadUrl;
-            string release_notes;
-            using (var webClient = new WebClient())
+            try
             {
-                release_notes = webClient.DownloadString(new Uri(download_url));
-            }
-            //First line of release notes is the version
-            var latestVersion = new Version(release_notes.Split(new[] { '\r', '\n' }).First());
-            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-            
-            if (latestVersion > currentVersion)
-            {
-                string messageBoxText = "A new OPUS-CAT version is available. Click OK to download open the download page for new version.";
-                string caption = "New version";
-                MessageBoxButton button = MessageBoxButton.OKCancel;
-                MessageBoxImage icon = MessageBoxImage.Information;
-                MessageBoxResult result;
-                result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
-                if (result == MessageBoxResult.OK)
+                var releases = await client.Repository.Release.GetAll(
+                    OpusCatMTEngineSettings.Default.GithubOrg,
+                    OpusCatMTEngineSettings.Default.GithubRepo);
+
+                var releasesWithNotes = releases.Where(x => x.Assets.Any(y => y.Name == "release_notes.txt") && !x.Prerelease);
+                var latestRelease = releasesWithNotes.OrderByDescending(x => x.PublishedAt).FirstOrDefault();
+                if (latestRelease == null)
                 {
-                    System.Diagnostics.Process.Start(latest_release.HtmlUrl);
+                    Log.Information("No release with release notes found in Github repo");
+                    return;
+                }
+
+                var downloadUrl = latestRelease.Assets.Single(x => x.Name == "release_notes.txt").BrowserDownloadUrl;
+
+                
+
+                string release_notes;
+                using (var webClient = new WebClient())
+                {
+                    release_notes = webClient.DownloadString(new Uri(downloadUrl));
+                }
+
+                var latestVersion = new Version(release_notes.Split(new[] { '\r', '\n' }).First());
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                if (latestVersion > currentVersion)
+                {
+                    string messageBoxText = "A new OPUS-CAT version is available. Click OK to download open the download page for new version.";
+                    string caption = "New version";
+                    MessageBoxButton button = MessageBoxButton.OKCancel;
+                    MessageBoxImage icon = MessageBoxImage.Information;
+                    MessageBoxResult result;
+                    result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
+                    if (result == MessageBoxResult.OK)
+                    {
+                        System.Diagnostics.Process.Start(latestRelease.HtmlUrl);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Log.Error($"Exception during update check: {ex.Message}");
+            }
+
+        }
+
+        private void ReleaseNotesDownloadComplete(object sender, 
+            DownloadStringCompletedEventArgs e, 
+            Release latestRelease)
+        {
+            //First line of release notes is the version
+            var release_notes = e.Result;
+            
         }
 
         private void InitializePythonEngine()

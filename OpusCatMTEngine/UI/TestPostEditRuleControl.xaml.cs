@@ -336,6 +336,8 @@ namespace OpusCatMTEngine
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
 
+            this.OutputBoxTitle.Content = $"Post-edited MT output (rules applied: {result.AppliedReplacements.Count})";
+
             this.OutputBox.Document.Blocks.Clear();
             this.OutputBox.Document.Blocks.Add(matchHighlightSource);
         }
@@ -387,6 +389,8 @@ namespace OpusCatMTEngine
 
                 //Clear edited output
                 this.EditedOutputBox.Document.Blocks.Clear();
+
+                this.OutputBoxTitle.Content = $"Post-edited MT output";
 
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);

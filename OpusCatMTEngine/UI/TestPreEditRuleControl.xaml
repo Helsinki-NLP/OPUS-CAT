@@ -18,7 +18,7 @@
             <Button Visibility="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click" Content="{Binding ButtonText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label>Edited source text</Label>
+                    <TextBlock Name="EditedSourceBoxTitle"><Run FontWeight="Bold">Edited source text</Run></TextBlock>
                     <RichTextBox IsReadOnly="True" Name="EditedSourceBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>

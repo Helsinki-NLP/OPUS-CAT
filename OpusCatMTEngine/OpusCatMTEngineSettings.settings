@@ -92,5 +92,11 @@
     <Setting Name="EditRuleDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">editrules</Value>
     </Setting>
+    <Setting Name="GithubOrg" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Helsinki-NLP</Value>
+    </Setting>
+    <Setting Name="GithubRepo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OPUS-CAT</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -254,6 +254,13 @@ namespace OpusCatMTEngine
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
 
+            
+            this.EditedSourceBoxTitle.Inlines.Add(new Run
+            {
+                Text = $"(rules applied: {result.AppliedReplacements.Count})",
+                Name = "RulesApplied"
+            });
+
             this.EditedSourceBox.Document.Blocks.Clear();
             this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
         }
@@ -271,6 +278,12 @@ namespace OpusCatMTEngine
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
                 var sourceText = sourceTextRange.Text.Trim('\r', '\n');
+                var rulesAppliedRun = this.EditedSourceBoxTitle.Inlines.SingleOrDefault(y => y.Name == "RulesApplied");
+                if (rulesAppliedRun != null)
+                {
+                    this.EditedSourceBoxTitle.Inlines.Remove(rulesAppliedRun);
+                }
+                
                 this.SourceBox.Document.Blocks.Clear();
                 this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
             }

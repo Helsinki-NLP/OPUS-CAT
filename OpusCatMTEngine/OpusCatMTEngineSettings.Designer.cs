@@ -382,5 +382,29 @@ namespace OpusCatMTEngine {
                 this["EditRuleDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Helsinki-NLP")]
+        public string GithubOrg {
+            get {
+                return ((string)(this["GithubOrg"]));
+            }
+            set {
+                this["GithubOrg"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OPUS-CAT")]
+        public string GithubRepo {
+            get {
+                return ((string)(this["GithubRepo"]));
+            }
+            set {
+                this["GithubRepo"] = value;
+            }
+        }
     }
 }
