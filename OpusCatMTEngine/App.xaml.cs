@@ -1,4 +1,5 @@
-﻿using Python.Runtime;
+﻿using Octokit;
+using Python.Runtime;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,7 +20,7 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public static Overlay Overlay { get; private set; }
 
@@ -73,13 +75,13 @@ namespace OpusCatMTEngine
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            System.Windows.Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             if (!App.HasAvxSupport())
             {
                 MessageBox.Show(
                     "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.");
-                Application.Current.Shutdown(1);
+                System.Windows.Application.Current.Shutdown(1);
             }
 
             //Create data dir
@@ -115,6 +117,40 @@ namespace OpusCatMTEngine
             }
 
             this.InitializePythonEngine();
+
+            this.CheckForUpdates();
+        }
+
+        private void CheckForUpdates()
+        {
+            //Get info for all releases from Github
+            var client = new GitHubClient(new ProductHeaderValue("OpusCatMTEngine"));
+            var releases = client.Repository.Release.GetAll("Helsinki-NLP", "OPUS-CAT");
+            var releases_with_notes = releases.Result.Where(x => x.Assets.Any(y => y.Name == "release_notes.txt"));
+            var latest_release = releases_with_notes.OrderByDescending(x => x.PublishedAt).First();
+            var download_url = latest_release.Assets.Single(x => x.Name == "release_notes.txt").BrowserDownloadUrl;
+            string release_notes;
+            using (var webClient = new WebClient())
+            {
+                release_notes = webClient.DownloadString(new Uri(download_url));
+            }
+            //First line of release notes is the version
+            var latestVersion = new Version(release_notes.Split(new[] { '\r', '\n' }).First());
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            
+            if (latestVersion > currentVersion)
+            {
+                string messageBoxText = "A new OPUS-CAT version is available. Click OK to download open the download page for new version.";
+                string caption = "New version";
+                MessageBoxButton button = MessageBoxButton.OKCancel;
+                MessageBoxImage icon = MessageBoxImage.Information;
+                MessageBoxResult result;
+                result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
+                if (result == MessageBoxResult.OK)
+                {
+                    System.Diagnostics.Process.Start(latest_release.HtmlUrl);
+                }
+            }
         }
 
         private void InitializePythonEngine()

@@ -56,6 +56,8 @@ namespace OpusCatMTEngine
                 this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
                     y => y.CollectionGuid == x)).Where(y => y != null));
             InitializeComponent();
+            
+
             InitializeTester();
             this.AutoPreEditRuleCollectionList.ItemsSource = this.ModelAutoPreEditRuleCollections;
             this.AutoPostEditRuleCollectionList.ItemsSource = this.ModelAutoPostEditRuleCollections;
@@ -65,14 +67,17 @@ namespace OpusCatMTEngine
         //Add testing controls for each collection
         private void InitializeTester()
         {
+
+            this.RuleTester.Children.Clear();
             this.PreEditTesters = new List<TestPreEditRuleControl>();
             this.PostEditTesters = new List<TestPostEditRuleControl>();
+
             var inputBoxLabel = "Input to rule collection: Source text";
             
             foreach (var preEditRuleCollection in this.ModelAutoPreEditRuleCollections)
             {
                 
-                var title = $"Rule collection {preEditRuleCollection.CollectionName}";
+                var title = $"Pre-edit rule collection {preEditRuleCollection.CollectionName}";
                 var testControl =
                     new TestPreEditRuleControl()
                     {
@@ -92,7 +97,7 @@ namespace OpusCatMTEngine
             inputBoxLabel = "Input to rule collection: MT output";
             foreach (var postEditRuleCollection in this.ModelAutoPostEditRuleCollections)
             {
-                var title = $"Rule collection {postEditRuleCollection.CollectionName}";
+                var title = $"Post-edit rule collection {postEditRuleCollection.CollectionName}";
                 var testControl =
                     new TestPostEditRuleControl()
                     {
@@ -137,6 +142,7 @@ namespace OpusCatMTEngine
                 this.Model.SaveModelConfig();
                 this.AutoPreEditRuleCollections.Add(newRuleCollection);
                 this.ModelAutoPreEditRuleCollections.Add(newRuleCollection);
+                InitializeTester();
             }
         }
         
@@ -159,6 +165,7 @@ namespace OpusCatMTEngine
                     }
                 }
                 this.Model.SaveModelConfig();
+                InitializeTester();
             }
         }
 
@@ -168,6 +175,7 @@ namespace OpusCatMTEngine
             var editCollectionWindow = new EditPreEditRuleCollectionWindow(selectedCollection);
             var dialogResult = editCollectionWindow.ShowDialog();
             selectedCollection.Save();
+            InitializeTester();
         }
 
         private void RemovePreRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -176,6 +184,7 @@ namespace OpusCatMTEngine
             this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
             this.ModelAutoPreEditRuleCollections.Remove(selectedCollection);
             this.Model.SaveModelConfig();
+            InitializeTester();
         }
 
         private void DeletePreRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -186,6 +195,7 @@ namespace OpusCatMTEngine
             this.AutoPreEditRuleCollections.Remove(selectedCollection);
             this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
             this.Model.SaveModelConfig();
+            InitializeTester();
         }
 
         private void CreatePostRule_Click(object sender, RoutedEventArgs e)
@@ -210,6 +220,7 @@ namespace OpusCatMTEngine
                 this.Model.SaveModelConfig();
                 this.AutoPostEditRuleCollections.Add(newRuleCollection);
                 this.ModelAutoPostEditRuleCollections.Add(newRuleCollection);
+                InitializeTester();
             }
         }
 
@@ -232,6 +243,7 @@ namespace OpusCatMTEngine
                     }
                 }
                 this.Model.SaveModelConfig();
+                InitializeTester();
             }
         }
 
@@ -241,6 +253,7 @@ namespace OpusCatMTEngine
             var editCollectionWindow = new EditPostEditRuleCollectionWindow(selectedCollection);
             var dialogResult = editCollectionWindow.ShowDialog();
             selectedCollection.Save();
+            InitializeTester();
         }
 
         private void RemovePostRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -249,6 +262,7 @@ namespace OpusCatMTEngine
             this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
             this.ModelAutoPostEditRuleCollections.Remove(selectedCollection);
             this.Model.SaveModelConfig();
+            InitializeTester();
         }
 
         private void DeletePostRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -259,6 +273,7 @@ namespace OpusCatMTEngine
             this.AutoPostEditRuleCollections.Remove(selectedCollection);
             this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
             this.Model.SaveModelConfig();
+            InitializeTester();
         }
 
         private void TestRules_Click(object sender, RoutedEventArgs e)
@@ -297,6 +312,49 @@ namespace OpusCatMTEngine
                 previousTesterOutput = tester.EditedOutputText;
             }
 
+        }
+        
+        
+        private void MoveCollectionDown(ListView collectionList, ObservableCollection<AutoEditRuleCollection> ruleCollection)
+        {
+            var selectedItem = (AutoEditRuleCollection)collectionList.SelectedItem;
+            var selectedItemIndex = ruleCollection.IndexOf(selectedItem);
+            if (selectedItemIndex < ruleCollection.Count - 1)
+            {
+                ruleCollection.Move(selectedItemIndex, selectedItemIndex + 1);
+            }
+            this.InitializeTester();
+        }
+
+        private void MovePreRuleCollectionDown_Click(object sender, RoutedEventArgs e)
+        {
+            this.MoveCollectionDown(this.AutoPreEditRuleCollectionList, this.ModelAutoPreEditRuleCollections);
+        }
+
+        private void MovePostRuleCollectionDown_Click(object sender, RoutedEventArgs e)
+        {
+            this.MoveCollectionDown(this.AutoPostEditRuleCollectionList, this.ModelAutoPostEditRuleCollections);
+        }
+
+        private void MoveCollectionUp(ListView collectionList, ObservableCollection<AutoEditRuleCollection> ruleCollection)
+        {
+            var selectedItem = (AutoEditRuleCollection)collectionList.SelectedItem;
+            var selectedItemIndex = ruleCollection.IndexOf(selectedItem);
+            if (selectedItemIndex > 0)
+            {
+                ruleCollection.Move(selectedItemIndex, selectedItemIndex - 1);
+            }
+            this.InitializeTester();
+        }
+
+        private void MovePreRuleCollectionUp_Click(object sender, RoutedEventArgs e)
+        {
+            this.MoveCollectionUp(this.AutoPreEditRuleCollectionList, this.ModelAutoPreEditRuleCollections);
+        }
+
+        private void MovePostRuleCollectionUp_Click(object sender, RoutedEventArgs e)
+        {
+            this.MoveCollectionUp(this.AutoPostEditRuleCollectionList, this.ModelAutoPostEditRuleCollections);
         }
     }
 }

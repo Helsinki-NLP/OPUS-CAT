@@ -127,7 +127,8 @@ namespace OpusCatMTEngine
 
         private void DeleteRule_Click(object sender, RoutedEventArgs e)
         {
-
+            var selectedRule = (AutoEditRule)this.AutoEditRuleCollectionList.SelectedItem;
+            this.RuleCollection.EditRules.Remove(selectedRule);
         }
         
     }

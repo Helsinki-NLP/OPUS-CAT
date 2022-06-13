@@ -437,4 +437,10 @@
   <data name="Rules_DeleteRuleCollectionConfirmation" xml:space="preserve">
     <value>Are you sure want to permanently delete rule collection {0}?</value>
   </data>
+  <data name="EditRules_MoveDownButton" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="EditRules_MoveUpButton" xml:space="preserve">
+    <value>Move up</value>
+  </data>
 </root>

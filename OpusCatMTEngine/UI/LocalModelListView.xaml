@@ -142,7 +142,7 @@
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 
-                    Height="300" 
+                    Height="500" 
                     ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}" 
                     SelectionMode="Extended"
                     GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">

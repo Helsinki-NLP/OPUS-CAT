@@ -178,6 +178,24 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Move down.
+        /// </summary>
+        public static string EditRules_MoveDownButton {
+            get {
+                return ResourceManager.GetString("EditRules_MoveDownButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move up.
+        /// </summary>
+        public static string EditRules_MoveUpButton {
+            get {
+                return ResourceManager.GetString("EditRules_MoveUpButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remove rule collection.
         /// </summary>
         public static string EditRules_RemoveRuleCollectionButton {

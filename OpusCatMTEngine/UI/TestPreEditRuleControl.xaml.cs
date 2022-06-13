@@ -105,7 +105,7 @@ namespace OpusCatMTEngine
             get
             {
                 TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                var sourceText = textRange.Text.Trim('\r', '\n');
                 return sourceText;
             }
             set
@@ -122,7 +122,7 @@ namespace OpusCatMTEngine
             get
             {
                 TextRange textRange = new TextRange(this.EditedSourceBox.Document.ContentStart, this.EditedSourceBox.Document.ContentEnd);
-                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                var sourceText = textRange.Text.Trim('\r', '\n');
                 return sourceText;
             }
 
@@ -139,7 +139,7 @@ namespace OpusCatMTEngine
         public void ProcessRules()
         {
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.TrimEnd('\r', '\n');
+            var sourceText = textRange.Text.Trim('\r', '\n');
 
             try
             {
@@ -183,7 +183,7 @@ namespace OpusCatMTEngine
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.TrimEnd('\r', '\n'); ;
+            var sourceText = textRange.Text.Trim('\r', '\n'); ;
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
@@ -270,7 +270,7 @@ namespace OpusCatMTEngine
 
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-                var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
+                var sourceText = sourceTextRange.Text.Trim('\r', '\n');
                 this.SourceBox.Document.Blocks.Clear();
                 this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
             }

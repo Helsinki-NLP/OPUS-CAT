@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpusCatMTEngine"
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
-        Height="650" Width="800">
+        Height="550" Width="800">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
@@ -46,8 +46,18 @@
                         Name="deletePreRuleCollection" 
                         Click="DeletePreRuleCollection_Click"
                         Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
-                   
-                </StackPanel>
+                    <Button 
+                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                        Name="movePreRuleCollectionUp" 
+                        Click="MovePreRuleCollectionUp_Click"
+                        Content="{x:Static resx:Resources.EditRules_MoveUpButton}" />
+                    <Button 
+                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                        Name="movePreRuleCollectionDown" 
+                        Click="MovePreRuleCollectionDown_Click"
+                        Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
+
+                        </StackPanel>
                 <ListView Name="AutoPreEditRuleCollectionList">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
@@ -107,6 +117,17 @@
                         Name="deletePostRuleCollection" 
                         Click="DeletePostRuleCollection_Click"
                         Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
+
+                            <Button 
+                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                        Name="movePostRuleCollectionUp" 
+                        Click="MovePostRuleCollectionUp_Click"
+                        Content="{x:Static resx:Resources.EditRules_MoveUpButton}" />
+                            <Button 
+                        IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}" 
+                        Name="movePostRuleCollectionDown" 
+                        Click="MovePostRuleCollectionDown_Click"
+                        Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
 
                         </StackPanel>
                         <ListView Name="AutoPostEditRuleCollectionList">

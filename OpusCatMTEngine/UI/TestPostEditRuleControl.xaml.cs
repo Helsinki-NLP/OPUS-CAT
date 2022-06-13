@@ -66,7 +66,10 @@ namespace OpusCatMTEngine
         public AutoEditRuleCollection RuleCollection
         {
             get => (AutoEditRuleCollection)GetValue(RuleCollectionProperty);
-            set => SetValue(RuleCollectionProperty, value);
+            set
+            {
+                SetValue(RuleCollectionProperty, value);
+            }
         }
 
         public TextBox SourcePatternBox
@@ -116,7 +119,7 @@ namespace OpusCatMTEngine
             get
             {
                 TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-                var sourceText = textRange.Text.TrimEnd('\r', '\n');
+                var sourceText = textRange.Text.Trim('\r', '\n');
                 return sourceText;
             }
             set
@@ -133,15 +136,41 @@ namespace OpusCatMTEngine
             get
             {
                 TextRange textRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-                var outputText = textRange.Text.TrimEnd('\r', '\n');
+                var outputText = textRange.Text.Trim('\r', '\n');
                 return outputText;
             }
             set
             {
                 Paragraph outputPara = new Paragraph();
                 outputPara.Inlines.Add(new Run(value));
-                this.OutputBox.Document.Blocks.Clear();
+                foreach (var block in this.OutputBox.Document.Blocks.ToList())
+                {
+                    this.OutputBox.Document.Blocks.Remove(block);
+                }
+                
                 this.OutputBox.Document.Blocks.Add(outputPara);
+            }
+        }
+        
+        public Visibility SourceBoxVisibility
+        {
+            get
+            {
+                if (this.RuleCollection == null)
+                {
+                    return Visibility.Collapsed;
+                }
+                else
+                {
+                    if (this.RuleCollection.EditRules.Any(x => String.IsNullOrEmpty(x.SourcePattern)))
+                    {
+                        return Visibility.Visible;
+                    }
+                    else
+                    {
+                        return Visibility.Collapsed;
+                    }
+                }
             }
         }
 
@@ -150,8 +179,8 @@ namespace OpusCatMTEngine
             get
             {
                 TextRange textRange = new TextRange(this.EditedOutputBox.Document.ContentStart, this.EditedOutputBox.Document.ContentEnd);
-                var sourceText = textRange.Text.TrimEnd('\r', '\n');
-                return sourceText;
+                var editedOutputText = textRange.Text.Trim('\r', '\n');
+                return editedOutputText;
             }
 
         }
@@ -167,10 +196,10 @@ namespace OpusCatMTEngine
         public void ProcessRules()
         {
             TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
+            var sourceText = sourceTextRange.Text.Trim('\r', '\n');
 
             TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-            var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
+            var outputText = outputTextRange.Text.Trim('\r', '\n');
             try
             {
                 var result = this.RuleCollection.ProcessPostEditRules(sourceText, outputText);
@@ -217,51 +246,65 @@ namespace OpusCatMTEngine
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.TrimEnd('\r', '\n');
+            var sourceText = textRange.Text.Trim('\r', '\n');
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
-            foreach (var replacement in result.AppliedReplacements.Where(x => !x.RepeatedSourceMatch))
+
+            var nonRepeatedSourceMatches = result.AppliedReplacements.Where(x => !x.RepeatedSourceMatch);
+
+            if (nonRepeatedSourceMatches.Any())
             {
-                if (replacement.SourceMatch == null)
+                this.SourceBoxBorder.Visibility = Visibility.Visible;
+                foreach (var replacement in nonRepeatedSourceMatches)
                 {
-                    continue;
+                    if (replacement.SourceMatch == null)
+                    {
+                        continue;
+                    }
+
+                    if (nonMatchStartIndex < replacement.SourceMatch.Index)
+                    {
+                        var nonMatchText =
+                            sourceText.Substring(
+                                nonMatchStartIndex, replacement.SourceMatch.Index - nonMatchStartIndex);
+                        matchHighlightSource.Inlines.Add(nonMatchText);
+                    }
+
+                    var matchText = replacement.SourceMatch.Value;
+                    var matchRun = new Run(matchText)
+                    {
+                        Background = replacement.MatchColor,
+                        ToolTip = replacement.Rule.SourcePattern
+                    };
+
+                    matchHighlightSource.Inlines.Add(matchRun);
+
+                    nonMatchStartIndex = replacement.SourceMatch.Index + replacement.SourceMatch.Length;
                 }
 
-                if (nonMatchStartIndex < replacement.SourceMatch.Index)
+                if (nonMatchStartIndex < sourceText.Length)
                 {
                     var nonMatchText =
-                        sourceText.Substring(
-                            nonMatchStartIndex, replacement.SourceMatch.Index - nonMatchStartIndex);
+                            sourceText.Substring(
+                                nonMatchStartIndex);
                     matchHighlightSource.Inlines.Add(nonMatchText);
                 }
 
-                var matchText = replacement.SourceMatch.Value;
-                var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor, ToolTip = replacement.Rule.SourcePattern };
-
-                matchHighlightSource.Inlines.Add(matchRun);
-
-                nonMatchStartIndex = replacement.SourceMatch.Index + replacement.SourceMatch.Length;
+                this.SourceBox.Document.Blocks.Clear();
+                this.SourceBox.Document.Blocks.Add(matchHighlightSource);
             }
-
-            if (nonMatchStartIndex < sourceText.Length)
+            else
             {
-                var nonMatchText =
-                        sourceText.Substring(
-                            nonMatchStartIndex);
-                matchHighlightSource.Inlines.Add(nonMatchText);
+                this.SourceBoxBorder.Visibility = Visibility.Collapsed;
             }
-
-            this.SourceBox.Document.Blocks.Clear();
-            this.SourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 
         private void PopulateOutputBox(AutoEditResult result)
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-            var outputText = textRange.Text.TrimEnd('\r', '\n');
+            var outputText = textRange.Text.Trim('\r', '\n');
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
@@ -347,12 +390,12 @@ namespace OpusCatMTEngine
 
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-                var sourceText = sourceTextRange.Text.TrimEnd('\r', '\n');
+                var sourceText = sourceTextRange.Text.Trim('\r', '\n');
                 this.SourceBox.Document.Blocks.Clear();
                 this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
 
                 TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
-                var outputText = outputTextRange.Text.TrimEnd('\r', '\n');
+                var outputText = outputTextRange.Text.Trim('\r', '\n');
                 this.OutputBox.Document.Blocks.Clear();
                 this.OutputBox.Document.Blocks.Add(new Paragraph(new Run(outputText)));
 

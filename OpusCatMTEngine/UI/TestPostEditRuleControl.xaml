@@ -12,9 +12,9 @@
     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel>
             <Label Content="{Binding Title}" FontWeight="Bold" />
-            <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+            <Border Visibility="Collapsed" Name= "SourceBoxBorder" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label>Source text</Label>
+                    <Label>Source text matches</Label>
                     <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" />
                 </StackPanel>
             </Border>
