@@ -115,6 +115,17 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool ShowTransformerBigModels
+        {
+            get => _showTransformerBigModels;
+            set
+            {
+                _showTransformerBigModels = value;
+                NotifyPropertyChanged();
+                this.FilterOnlineModels();
+            }
+        }
+
         public bool ShowMultilingualModels
         {
             get => _showMultilingualModels;
@@ -228,6 +239,7 @@ namespace OpusCatMTEngine
 
         private bool onlineModelListFetched;
         private IsoLanguage _overrideModelTargetLanguage;
+        private bool _showTransformerBigModels;
 
         public string CheckModelStatus(IsoLanguage sourceLang, IsoLanguage targetLang, string modelTag)
         {
@@ -317,6 +329,11 @@ namespace OpusCatMTEngine
                                  select model;
 
 
+            if (!this.ShowTransformerBigModels)
+            {
+                filteredModels = filteredModels.Where(x => !x.ModelType.Contains("transformer-big"));
+            }
+
             if (!this.ShowBilingualModels)
             {
                 filteredModels = filteredModels.Where(x => (x.SourceLanguages.Count > 1 || x.TargetLanguages.Count > 1) || x.Faulted);
@@ -337,16 +354,17 @@ namespace OpusCatMTEngine
                 var onlyNew = new Dictionary<string, MTModel>();
                 foreach (var model in filteredModels)
                 {
-                    if (onlyNew.ContainsKey(model.ModelBaseName))
+                    var modelKey = model.ModelBaseName + model.SourceLanguageString + model.TargetLanguageString;
+                    if (onlyNew.ContainsKey(modelKey))
                     {
-                        if (onlyNew[model.ModelBaseName].ModelDate < model.ModelDate)
+                        if (onlyNew[modelKey].ModelDate < model.ModelDate)
                         {
-                            onlyNew[model.ModelBaseName] = model;
+                            onlyNew[modelKey] = model;
                         }
                     }
                     else
                     {
-                        onlyNew[model.ModelBaseName] = model;
+                        onlyNew[modelKey] = model;
                     }
                 }
 
@@ -497,14 +515,17 @@ namespace OpusCatMTEngine
         {
             var modelList = e.Result;
             
+
             //Model list uses \n as line break, it originates form linux
-            foreach (var line in modelList.Split('\n'))
+            //Use distinct to remove duplicate entries
+            foreach (var line in modelList.Split('\n').Distinct())
             {
                 var split = line.Split('\t');
                 if (split.Length >= 4)
                 {
                     var modelPath = split[0];
                     var modelUri = new Uri($"{OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl}{modelPath}");
+                    var modelType = split[1];
                     IEnumerable<string> sourceLangs = split[2].Split(',');
                     IEnumerable<string> targetLangs = split[3].Split(',');
 
@@ -514,6 +535,7 @@ namespace OpusCatMTEngine
                         continue;
                     }
                     var model = new MTModel(modelPath.Replace(".zip", ""), modelUri);
+                    model.ModelType = modelType;
                     model.SourceLanguages = sourceLangs.Select(x => new IsoLanguage(x)).ToList();
                     model.TargetLanguages = targetLangs.Select(x => new IsoLanguage(x)).ToList();
                     this.onlineModels.Add(model);
@@ -658,13 +680,13 @@ namespace OpusCatMTEngine
         private void AddOnlineStorageModels(List<string> filePaths, Uri storageUri)
         {
             //Get the model zips
-            var models = filePaths.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
+            var modelPaths = filePaths.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.zip"));
             var yamlHash = filePaths.Where(x => Regex.IsMatch(x, @"[^/-]+-[^/-]+/[^.]+\.yml")).ToHashSet();
 
-            foreach (var model in models)
+            foreach (var modelPath in modelPaths)
             {
-                var modelUri = new Uri(storageUri, model);
-                var yaml = Regex.Replace(model, @"\.zip$", ".yml");
+                var modelUri = new Uri(storageUri, modelPath);
+                var yaml = Regex.Replace(modelPath, @"\.zip$", ".yml");
 
                 if (yamlHash.Contains(yaml))
                 {
@@ -672,7 +694,7 @@ namespace OpusCatMTEngine
                     {
                         this.yamlDownloads.Add(modelUri);
                         client.DownloadStringCompleted +=
-                            (x, y) => modelYamlDownloadComplete(modelUri, model, x, y);
+                            (x, y) => modelYamlDownloadComplete(modelUri, modelPath, x, y);
                         var yamlUri = new Uri(storageUri, yaml);
                         client.DownloadStringAsync(yamlUri);
                     }
@@ -687,7 +709,12 @@ namespace OpusCatMTEngine
                     //OPUS-MT models have no yaml files, so add them as they are
                     else
                     {
-                        this.onlineModels.Add(new MTModel(model.Replace(".zip", ""), modelUri));
+                        var model = new MTModel(modelPath.Replace(".zip", ""), modelUri);
+                        //OPUS-MT models are all normal transformers (most are transformer-align, but
+                        //use just "transformer"). The model type is used to exclude transformer-big,
+                        //so it doesn't matter much whether the other types are 100% correct
+                        model.ModelType = "transformer";
+                        this.onlineModels.Add(model);
                     }
                 }
             }

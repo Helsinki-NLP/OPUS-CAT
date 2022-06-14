@@ -741,6 +741,11 @@ namespace OpusCatMTEngine
                 {
                     xamlSourceLangs = res["source-languages"];
                 }
+
+                if (res.ContainsKey("modeltype"))
+                {
+                    this.ModelType = res["modeltype"];
+                }
                 
                 if (xamlSourceLangs != null)
                 {
@@ -932,6 +937,12 @@ namespace OpusCatMTEngine
         }
         
         public ObservableCollection<AutoEditRule> AutoPreEditRuleCollections
+        {
+            get;
+            internal set;
+        }
+
+        public string ModelType
         {
             get;
             internal set;
