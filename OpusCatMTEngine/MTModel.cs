@@ -871,7 +871,19 @@ namespace OpusCatMTEngine
 
         public string SourceLanguageString
         {
-            get { return String.Join(", ", this.SourceLanguages.Select(x => x.IsoRefName)); }
+            get
+            {
+                string sourceLangString = String.Join(", ", this.SourceLanguages.Select(x => x.IsoRefName));
+                if (String.IsNullOrWhiteSpace(sourceLangString))
+                {
+                    this.Faulted = true;
+                    return "No source languages available";
+                }
+                else
+                {
+                    return sourceLangString;
+                }
+            }
         }
 
         public string SourceCodesString
@@ -881,7 +893,20 @@ namespace OpusCatMTEngine
 
         public string TargetLanguageString
         {
-            get { return String.Join(", ", this.TargetLanguages.Select(x => x.IsoRefName)); }
+            get
+            {
+                string targetLangString = String.Join(", ", this.TargetLanguages.Select(x => x.IsoRefName));
+                if (String.IsNullOrWhiteSpace(targetLangString))
+                {
+                    this.Faulted = true;
+                    return "No target languages available";
+                }
+                else
+                {
+                    return targetLangString;
+                }
+            }
+
         }
 
         public string TargetCodesString

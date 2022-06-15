@@ -96,6 +96,7 @@
                 <local:TestPostEditRuleControl 
                     RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
                     Title="Test rule collection (all rules will be processed sequentially)"
+                    InputBoxLabel="MT output"
                     ButtonText="Apply rules to source text sequentially" />
                 </Expander>
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="10">

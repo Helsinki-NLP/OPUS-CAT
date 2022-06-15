@@ -32,6 +32,12 @@ namespace OpusCatMTEngine
             typeof(TestPostEditRuleControl)
             );
 
+        public static readonly DependencyProperty InputOriginProperty = DependencyProperty.Register(
+           "InputOrigin", typeof(string),
+           typeof(TestPostEditRuleControl)
+           );
+
+
         public static readonly DependencyProperty ButtonTextProperty = DependencyProperty.Register(
             "ButtonText", typeof(string),
             typeof(TestPostEditRuleControl)
@@ -101,6 +107,14 @@ namespace OpusCatMTEngine
             get => (string)GetValue(TitleProperty);
             set => SetValue(TitleProperty, value);
         }
+
+        public string InputOrigin
+        {
+            get => (string)GetValue(InputOriginProperty);
+            set => SetValue(InputOriginProperty, value);
+        }
+
+
 
         public string InputBoxLabel
         {
@@ -336,7 +350,7 @@ namespace OpusCatMTEngine
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
 
-            this.OutputBoxTitle.Content = $"Post-edited MT output (rules applied: {result.AppliedReplacements.Count})";
+            this.RulesAppliedRun.Text = $"(rules applied: {result.AppliedReplacements.Count})";
 
             this.OutputBox.Document.Blocks.Clear();
             this.OutputBox.Document.Blocks.Add(matchHighlightSource);
@@ -389,8 +403,7 @@ namespace OpusCatMTEngine
 
                 //Clear edited output
                 this.EditedOutputBox.Document.Blocks.Clear();
-
-                this.OutputBoxTitle.Content = $"Post-edited MT output";
+                this.RulesAppliedRun.Text = "";
 
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);

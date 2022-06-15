@@ -11,7 +11,7 @@
     </UserControl.Resources>
     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel>
-            <Label Content="{Binding Title}" FontWeight="Bold" />
+            <TextBlock Margin="5"><Run FontWeight="Bold" Text="{Binding Title}" /> <Run FontStyle="Italic" Text="{Binding RuleCollection.CollectionName}" /></TextBlock>
             <Border Visibility="Collapsed" Name= "SourceBoxBorder" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
                     <Label>Source text matches</Label>
@@ -20,14 +20,16 @@
             </Border>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label Content="{Binding InputBoxLabel}" />
+                    <TextBlock>
+                        <Run Text="{Binding InputBoxLabel}"/> <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
+                    </TextBlock>
                     <RichTextBox Name="OutputBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>
             <Button Visibility="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">Apply post-edit rule to MT output</Button>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label Name="OutputBoxTitle">Post-edited MT output</Label>
+                    <TextBlock Name="OutputBoxTitle"><Run>Edited MT output</Run> <Run FontStyle="Italic" Name="RulesAppliedRun" /></TextBlock>
                     <RichTextBox IsReadOnly="True" Name="EditedOutputBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>

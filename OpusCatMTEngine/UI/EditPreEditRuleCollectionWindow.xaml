@@ -83,6 +83,7 @@
                 <Expander Margin="5" IsExpanded="False" Header="Rule collection tester">
                 <local:TestPreEditRuleControl 
                     RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
+                    InputBoxLabel="Source text"
                     Title="Test rule collection (all rules will be processed sequentially)"
                     ButtonText="Apply rules to source text sequentially" />
                 </Expander>

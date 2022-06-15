@@ -688,7 +688,11 @@ namespace OpusCatMTEngine
                 var modelUri = new Uri(storageUri, modelPath);
                 var yaml = Regex.Replace(modelPath, @"\.zip$", ".yml");
 
-                if (yamlHash.Contains(yaml))
+                //OPUS-MT-models yml files have a different format, and the necessary data
+                //is shown in the model path (source and language files), so only fetch yaml
+                //for Tatoeba models (although currently model info for Tatoeba is fetched from
+                //a single file, so this never fires now, but save in case). 
+                if (yamlHash.Contains(yaml) && storageUri.Segments[1].Contains("Tatoeba-MT"))
                 {
                     using (var client = new WebClient())
                     {

@@ -45,6 +45,7 @@
                             PostEditPatternBox="{Binding ElementName=PostEditPattern}"
                             PostEditReplacementBox="{Binding ElementName=PostEditReplacement}"
                             SourcePatternBox="{Binding ElementName=SourcePattern}"
+                            InputBoxLabel="Unedited MT output"
                             Title="Test post-edit rule"
                             ButtonText="Apply post-edit rule to MT output"/>
 

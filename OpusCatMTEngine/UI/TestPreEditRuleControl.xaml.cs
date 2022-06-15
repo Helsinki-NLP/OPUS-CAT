@@ -32,6 +32,11 @@ namespace OpusCatMTEngine
             typeof(TestPreEditRuleControl)
             );
 
+        public static readonly DependencyProperty InputOriginProperty = DependencyProperty.Register(
+          "InputOrigin", typeof(string),
+          typeof(TestPreEditRuleControl)
+          );
+
         public static readonly DependencyProperty ButtonTextProperty = DependencyProperty.Register(
             "ButtonText", typeof(string),
             typeof(TestPreEditRuleControl)
@@ -86,6 +91,12 @@ namespace OpusCatMTEngine
         {
             get => (string)GetValue(TitleProperty);
             set => SetValue(TitleProperty,value);
+        }
+
+        public string InputOrigin
+        {
+            get => (string)GetValue(InputOriginProperty);
+            set => SetValue(InputOriginProperty, value);
         }
 
         public string InputBoxLabel
@@ -254,12 +265,8 @@ namespace OpusCatMTEngine
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
 
-            
-            this.EditedSourceBoxTitle.Inlines.Add(new Run
-            {
-                Text = $"(rules applied: {result.AppliedReplacements.Count})",
-                Name = "RulesApplied"
-            });
+
+            this.RulesAppliedRun.Text = $"(rules applied: {result.AppliedReplacements.Count})";
 
             this.EditedSourceBox.Document.Blocks.Clear();
             this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
@@ -278,11 +285,7 @@ namespace OpusCatMTEngine
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
                 var sourceText = sourceTextRange.Text.Trim('\r', '\n');
-                var rulesAppliedRun = this.EditedSourceBoxTitle.Inlines.SingleOrDefault(y => y.Name == "RulesApplied");
-                if (rulesAppliedRun != null)
-                {
-                    this.EditedSourceBoxTitle.Inlines.Remove(rulesAppliedRun);
-                }
+                this.RulesAppliedRun.Text = "";
                 
                 this.SourceBox.Document.Blocks.Clear();
                 this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));

@@ -79,12 +79,11 @@ namespace OpusCatMTEngine
             }
         }
 
-            //this static constructor parses the iso table files that are embedded as resources
+        //this static constructor parses the iso table files that are embedded as resources
         static IsoLanguage()
         {
             IsoLanguage.ParseIso639_3();
             IsoLanguage.ParseIso639_5();
-            
         }
 
         private static Dictionary<string, string> Iso639_3To639_1 = new Dictionary<string, string>();

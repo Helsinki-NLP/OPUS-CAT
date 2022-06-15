@@ -34,6 +34,7 @@
                         PreEditPatternBox="{Binding ElementName=PreEditPattern}"
                         PreEditReplacementBox="{Binding ElementName=PreEditReplacement}"
                         Title="Test pre-edit rule"
+                        InputBoxLabel="Source text"
                         ButtonText="Apply pre-edit rule to source text" />
                     <!--<Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>

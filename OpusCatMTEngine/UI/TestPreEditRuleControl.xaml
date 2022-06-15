@@ -8,17 +8,19 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel>
-            <Label Content="{Binding Title}" FontWeight="Bold" />
+            <TextBlock Margin="5"><Run FontWeight="Bold" Text="{Binding Title}" /> <Run FontStyle="Italic" Text="{Binding RuleCollection.CollectionName}" /></TextBlock>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <Label Content="{Binding InputBoxLabel}" />
+                    <TextBlock>
+                        <Run Text="{Binding InputBoxLabel}"/> <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
+                    </TextBlock>
                     <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>
             <Button Visibility="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click" Content="{Binding ButtonText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
-                    <TextBlock Name="EditedSourceBoxTitle"><Run FontWeight="Bold">Edited source text</Run></TextBlock>
+                    <TextBlock Name="EditedSourceBoxTitle"><Run>Edited source text</Run> <Run FontStyle="Italic" Name="RulesAppliedRun" /></TextBlock>
                     <RichTextBox IsReadOnly="True" Name="EditedSourceBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
                 </StackPanel>
             </Border>

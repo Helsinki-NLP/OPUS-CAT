@@ -72,41 +72,45 @@ namespace OpusCatMTEngine
             this.PreEditTesters = new List<TestPreEditRuleControl>();
             this.PostEditTesters = new List<TestPostEditRuleControl>();
 
-            var inputBoxLabel = "Input to rule collection: Source text";
+            var inputBoxLabel = "Input to rule collection:";
+            var inputOrigin = "Source text";
             
             foreach (var preEditRuleCollection in this.ModelAutoPreEditRuleCollections)
             {
                 
-                var title = $"Pre-edit rule collection {preEditRuleCollection.CollectionName}";
+                var title = $"Pre-edit rule collection";
                 var testControl =
                     new TestPreEditRuleControl()
                     {
                         RuleCollection = preEditRuleCollection,
                         Title = title,
                         InputBoxLabel = inputBoxLabel,
+                        InputOrigin = inputOrigin,
                         TestButtonVisibility = Visibility.Collapsed,
                         ButtonText = "Test all pre- and postediting rules"
                     };
 
-                inputBoxLabel = $"Input to rule collection: Output from {preEditRuleCollection.CollectionName}";
+                inputOrigin = $"Output from {preEditRuleCollection.CollectionName}";
                 this.PreEditTesters.Add(testControl);
                 this.RuleTester.Children.Add(testControl);
             }
 
 
-            inputBoxLabel = "Input to rule collection: MT output";
+            inputBoxLabel = "Input to rule collection:";
+            inputOrigin = "MT output";
             foreach (var postEditRuleCollection in this.ModelAutoPostEditRuleCollections)
             {
-                var title = $"Post-edit rule collection {postEditRuleCollection.CollectionName}";
+                var title = $"Post-edit rule collection";
                 var testControl =
                     new TestPostEditRuleControl()
                     {
                         RuleCollection = postEditRuleCollection,
                         Title = title,
                         InputBoxLabel = inputBoxLabel,
+                        InputOrigin = inputOrigin,
                         TestButtonVisibility = Visibility.Collapsed
                     };
-                inputBoxLabel = $"Input to rule collection: Output from {postEditRuleCollection.CollectionName}";
+                inputOrigin = $"Output from {postEditRuleCollection.CollectionName}";
 
                 this.PostEditTesters.Add(testControl);
                 this.RuleTester.Children.Add(testControl);
@@ -356,5 +360,13 @@ namespace OpusCatMTEngine
         {
             this.MoveCollectionUp(this.AutoPostEditRuleCollectionList, this.ModelAutoPostEditRuleCollections);
         }
+
+        private void Tester_Expanded(object sender, RoutedEventArgs e)
+        {
+            //Scroll to tester when it is expanded
+            var tester = (Expander)sender;
+            tester.BringIntoView();
+        }
+        
     }
 }

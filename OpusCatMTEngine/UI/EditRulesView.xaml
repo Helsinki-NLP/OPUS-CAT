@@ -7,7 +7,7 @@
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         Height="550" Width="800">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
             <Border Margin="5" BorderBrush="Black" BorderThickness="1">
@@ -148,7 +148,7 @@
                     </DockPanel>
                 </StackPanel>
             </Border>
-            <Expander Margin="5" IsExpanded="False" Header="Rule collection tester">
+            <Expander Expanded="Tester_Expanded" Margin="5" IsExpanded="False" Header="Rule collection tester">
                 <StackPanel>
                 <Button Margin="5" Padding="5" Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
                 <StackPanel Name="RuleTester" />
