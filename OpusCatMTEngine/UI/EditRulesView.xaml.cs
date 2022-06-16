@@ -108,7 +108,8 @@ namespace OpusCatMTEngine
                         Title = title,
                         InputBoxLabel = inputBoxLabel,
                         InputOrigin = inputOrigin,
-                        TestButtonVisibility = Visibility.Collapsed
+                        TestButtonVisibility = Visibility.Collapsed,
+                        SourceBoxVisibility = Visibility.Collapsed
                     };
                 inputOrigin = $"Output from {postEditRuleCollection.CollectionName}";
 
@@ -154,7 +155,7 @@ namespace OpusCatMTEngine
         {
             var addCollectionWindow = 
                 new AddEditRuleCollectionWindow(
-                    AutoPreEditRuleCollections, 
+                    this.AutoPreEditRuleCollections, 
                     this.ModelAutoPreEditRuleCollections);
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
@@ -162,6 +163,11 @@ namespace OpusCatMTEngine
                 this.ModelAutoPreEditRuleCollections.Clear();
                 foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
                 {
+                    if (!this.AutoPreEditRuleCollections.Contains(collection.Item))
+                    {
+                        this.AutoPreEditRuleCollections.Add(collection.Item);
+                    }
+
                     if (collection.Checked)
                     {
                         this.ModelAutoPreEditRuleCollections.Add(collection.Item);
@@ -182,13 +188,28 @@ namespace OpusCatMTEngine
             InitializeTester();
         }
 
-        private void RemovePreRuleCollection_Click(object sender, RoutedEventArgs e)
+        private void RemoveRuleCollection(
+            List<AutoEditRuleCollection> selectedCollections,
+            ObservableCollection<string> guidList,
+            ObservableCollection<AutoEditRuleCollection> collectionList)
         {
-            var selectedCollection = (AutoEditRuleCollection)this.AutoPreEditRuleCollectionList.SelectedItem;
-            this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
-            this.ModelAutoPreEditRuleCollections.Remove(selectedCollection);
+            foreach (var selectedCollection in selectedCollections)
+            {
+                guidList.Remove(selectedCollection.CollectionGuid);
+                collectionList.Remove(selectedCollection);
+            }
             this.Model.SaveModelConfig();
             InitializeTester();
+        }
+
+        private void RemovePreRuleCollection_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedCollections = 
+                this.AutoPreEditRuleCollectionList.SelectedItems.Cast<AutoEditRuleCollection>().ToList();
+            this.RemoveRuleCollection(
+                selectedCollections,
+                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids,
+                this.ModelAutoPreEditRuleCollections);
         }
 
         private void DeletePreRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -240,6 +261,11 @@ namespace OpusCatMTEngine
                 this.ModelAutoPostEditRuleCollections.Clear();
                 foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
                 {
+                    if (!this.AutoPostEditRuleCollections.Contains(collection.Item))
+                    {
+                        this.AutoPostEditRuleCollections.Add(collection.Item);
+                    }
+
                     if (collection.Checked)
                     {
                         this.ModelAutoPostEditRuleCollections.Add(collection.Item);
@@ -262,11 +288,12 @@ namespace OpusCatMTEngine
 
         private void RemovePostRuleCollection_Click(object sender, RoutedEventArgs e)
         {
-            var selectedCollection = (AutoEditRuleCollection)this.AutoPostEditRuleCollectionList.SelectedItem;
-            this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
-            this.ModelAutoPostEditRuleCollections.Remove(selectedCollection);
-            this.Model.SaveModelConfig();
-            InitializeTester();
+            var selectedCollections =
+                this.AutoPostEditRuleCollectionList.SelectedItems.Cast<AutoEditRuleCollection>().ToList();
+            this.RemoveRuleCollection(
+                    selectedCollections,
+                    this.Model.ModelConfig.AutoPostEditRuleCollectionGuids,
+                    this.ModelAutoPostEditRuleCollections);
         }
 
         private void DeletePostRuleCollection_Click(object sender, RoutedEventArgs e)

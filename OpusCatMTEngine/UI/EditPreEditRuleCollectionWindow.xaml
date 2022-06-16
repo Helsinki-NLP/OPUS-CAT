@@ -84,8 +84,8 @@
                 <local:TestPreEditRuleControl 
                     RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
                     InputBoxLabel="Source text"
-                    Title="Test rule collection (all rules will be processed sequentially)"
-                    ButtonText="Apply rules to source text sequentially" />
+                    Title="Test rule collection:"
+                    ButtonText="Apply rules to source text" />
                 </Expander>
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="10">
                     <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>

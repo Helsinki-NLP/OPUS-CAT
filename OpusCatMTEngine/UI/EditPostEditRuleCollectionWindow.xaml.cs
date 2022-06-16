@@ -93,6 +93,7 @@ namespace OpusCatMTEngine
                 if (dialogResult != null && dialogResult.Value)
                 {
                     this.RuleCollection.AddRule(createRuleWindow.CreatedRule);
+                    this.Tester.Refresh();
                 }
             }
         }
@@ -121,6 +122,7 @@ namespace OpusCatMTEngine
                 if (dialogResult != null && dialogResult.Value)
                 {
                     this.RuleCollection.ReplaceRule(rule, createRuleWindow.CreatedRule);
+                    this.Tester.Refresh();
                 }
             }
         }
@@ -129,7 +131,8 @@ namespace OpusCatMTEngine
         {
             var selectedRule = (AutoEditRule)this.AutoEditRuleCollectionList.SelectedItem;
             this.RuleCollection.EditRules.Remove(selectedRule);
+            this.Tester.Refresh();
         }
-        
+
     }
 }

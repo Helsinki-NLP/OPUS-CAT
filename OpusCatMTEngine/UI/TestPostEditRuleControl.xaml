@@ -12,10 +12,10 @@
     <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel>
             <TextBlock Margin="5"><Run FontWeight="Bold" Text="{Binding Title}" /> <Run FontStyle="Italic" Text="{Binding RuleCollection.CollectionName}" /></TextBlock>
-            <Border Visibility="Collapsed" Name= "SourceBoxBorder" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+            <Border Visibility="{Binding SourceBoxVisibility}" Name= "SourceBoxBorder" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                 <StackPanel Margin="5">
                     <Label>Source text matches</Label>
-                    <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" />
+                    <RichTextBox AcceptsReturn="False" Name="SourceBox" Margin="5" IsDocumentEnabled="True" />
                 </StackPanel>
             </Border>
             <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">

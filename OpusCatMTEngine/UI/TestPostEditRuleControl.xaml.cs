@@ -68,6 +68,11 @@ namespace OpusCatMTEngine
             typeof(TestPostEditRuleControl), new UIPropertyMetadata(Visibility.Visible)
             );
 
+        public static readonly DependencyProperty SourceBoxVisibilityProperty = DependencyProperty.Register(
+            "SourceBoxVisibility", typeof(Visibility),
+            typeof(TestPostEditRuleControl), new UIPropertyMetadata(Visibility.Visible)
+            );
+
         public bool TestActive { get; private set; }
         public AutoEditRuleCollection RuleCollection
         {
@@ -78,10 +83,26 @@ namespace OpusCatMTEngine
             }
         }
 
+        internal void Refresh()
+        {
+            if (this.RuleCollection.EditRules.Any(x => !String.IsNullOrEmpty(x.SourcePattern)))
+            {
+                this.SourceBoxVisibility = Visibility.Visible;
+            }
+            else
+            {
+                this.SourceBoxVisibility = Visibility.Collapsed;
+            }
+        }
+
         public TextBox SourcePatternBox
         {
             get => (TextBox)GetValue(SourcePatternBoxProperty);
-            set => SetValue(SourcePatternBoxProperty, value);
+            set
+            {
+                SetValue(SourcePatternBoxProperty, value);
+            }
+            
         }
 
         public TextBox PostEditPatternBox
@@ -128,6 +149,16 @@ namespace OpusCatMTEngine
             set => SetValue(TestButtonVisibilityProperty, value);
         }
 
+        public Visibility SourceBoxVisibility
+        {
+            get => (Visibility)GetValue(SourceBoxVisibilityProperty);
+            set
+            {
+                this.sourceBoxDefaultVisibility = value;
+                SetValue(SourceBoxVisibilityProperty, value);
+            }
+        }
+
         public string SourceText
         {
             get
@@ -139,7 +170,7 @@ namespace OpusCatMTEngine
             set
             {
                 Paragraph sourcePara = new Paragraph();
-                sourcePara.Inlines.Add(new Run(value));
+                sourcePara.Inlines.Add(new Run(value.Trim('\r', '\n')));
                 this.SourceBox.Document.Blocks.Clear();
                 this.SourceBox.Document.Blocks.Add(sourcePara);
             }
@@ -166,28 +197,6 @@ namespace OpusCatMTEngine
             }
         }
         
-        public Visibility SourceBoxVisibility
-        {
-            get
-            {
-                if (this.RuleCollection == null)
-                {
-                    return Visibility.Collapsed;
-                }
-                else
-                {
-                    if (this.RuleCollection.EditRules.Any(x => String.IsNullOrEmpty(x.SourcePattern)))
-                    {
-                        return Visibility.Visible;
-                    }
-                    else
-                    {
-                        return Visibility.Collapsed;
-                    }
-                }
-            }
-        }
-
         public string EditedOutputText
         {
             get
@@ -200,15 +209,18 @@ namespace OpusCatMTEngine
         }
 
         public bool textBoxHandlersAssigned = false;
+        private Visibility sourceBoxDefaultVisibility;
 
         public TestPostEditRuleControl()
         {
             this.DataContext = this;
             InitializeComponent();
+
         }
 
         public void ProcessRules()
         {
+            this.TestActive = false;
             TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
             var sourceText = sourceTextRange.Text.Trim('\r', '\n');
 
@@ -269,7 +281,7 @@ namespace OpusCatMTEngine
 
             if (nonRepeatedSourceMatches.Any())
             {
-                this.SourceBoxBorder.Visibility = Visibility.Visible;
+                this.SourceBoxVisibility = Visibility.Visible;
                 foreach (var replacement in nonRepeatedSourceMatches)
                 {
                     if (replacement.SourceMatch == null)
@@ -310,7 +322,7 @@ namespace OpusCatMTEngine
             }
             else
             {
-                this.SourceBoxBorder.Visibility = Visibility.Collapsed;
+                this.SourceBoxVisibility = this.sourceBoxDefaultVisibility;
             }
         }
 
@@ -396,6 +408,19 @@ namespace OpusCatMTEngine
 
         private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
         {
+            //Changes to source pattern box may change visibility of source box in tester
+            if (sender == this.SourcePatternBox)
+            {
+                if (String.IsNullOrEmpty(this.SourcePatternBox.Text))
+                {
+                    this.SourceBoxVisibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.SourceBoxVisibility = Visibility.Visible;
+                }
+            }
+
             if (this.TestActive)
             {
                 //Keep this on top, otherwise endless loop

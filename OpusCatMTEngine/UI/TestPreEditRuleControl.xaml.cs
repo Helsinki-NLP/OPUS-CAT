@@ -122,7 +122,7 @@ namespace OpusCatMTEngine
             set
             {
                 Paragraph sourcePara = new Paragraph();
-                sourcePara.Inlines.Add(new Run(value));
+                sourcePara.Inlines.Add(new Run(value.Trim('\r', '\n')));
                 this.SourceBox.Document.Blocks.Clear();
                 this.SourceBox.Document.Blocks.Add(sourcePara);
             }
@@ -149,6 +149,7 @@ namespace OpusCatMTEngine
         
         public void ProcessRules()
         {
+            this.TestActive = false;
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
             var sourceText = textRange.Text.Trim('\r', '\n');
 
@@ -194,7 +195,7 @@ namespace OpusCatMTEngine
         {
             //Store the source text, use it as basis of the source text with match highlights
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.Trim('\r', '\n'); ;
+            var sourceText = textRange.Text.Trim('\r', '\n');
 
             int nonMatchStartIndex = 0;
             Paragraph matchHighlightSource = new Paragraph();
@@ -227,7 +228,8 @@ namespace OpusCatMTEngine
                 matchHighlightSource.Inlines.Add(nonMatchText);
             }
 
-            this.SourceBox.Document.Blocks.Clear();
+            this.SourceBox.Document = new FlowDocument();
+
             this.SourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 

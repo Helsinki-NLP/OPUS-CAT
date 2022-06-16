@@ -93,11 +93,12 @@
                 </DockPanel>
                 
                 <Expander Margin="5" IsExpanded="False" Header="Rule collection tester">
-                <local:TestPostEditRuleControl 
+                <local:TestPostEditRuleControl
+                    x:Name="Tester"
                     RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
-                    Title="Test rule collection (all rules will be processed sequentially)"
+                    Title="Test rule collection"
                     InputBoxLabel="MT output"
-                    ButtonText="Apply rules to source text sequentially" />
+                    ButtonText="Apply rules to MT output" />
                 </Expander>
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="10">
                     <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>

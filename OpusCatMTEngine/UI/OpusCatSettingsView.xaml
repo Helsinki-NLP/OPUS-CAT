@@ -48,12 +48,12 @@
                     <Border Margin="5" BorderThickness="1" BorderBrush="Black">
                         <StackPanel>
                             <CheckBox 
-                                IsChecked="{Binding ElementName=_this, Path=CacheMtInDatabase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Use MT database for caching MT</CheckBox>
+                                IsChecked="{Binding ElementName=_this, Path=CacheMtInDatabase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Use local MT database for caching MT</CheckBox>
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox 
                                     IsChecked="{Binding ElementName=_this, Path=UseDatabaseRemoval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                     VerticalAlignment="Center" />
-                                <Label>Remove MT from the database</Label>
+                                <Label>Remove MT from the local database</Label>
                                 <TextBox
                                     Name="RemovalIntervalBox"
                                     Text="{Binding ElementName=_this, Path=DatabaseRemovalInterval, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}"
@@ -70,6 +70,7 @@
                                 IsChecked="{Binding ElementName=_this, Path=DisplayOverlay, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">Show overlay displaying most recent translation</CheckBox>
                         </StackPanel>
                     </Border>
+
                     <StackPanel Orientation="Horizontal">
                         <Button 
                                 Margin="5" 

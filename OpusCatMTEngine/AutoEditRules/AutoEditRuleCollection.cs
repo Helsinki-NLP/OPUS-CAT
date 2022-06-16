@@ -32,13 +32,18 @@ namespace OpusCatMTEngine
         {
         }
 
-        public void Save()
+        public void Save(DirectoryInfo editRuleDir=null)
         {
-            var editRuleDir = new DirectoryInfo(
-                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.EditRuleDir));
-            if (!editRuleDir.Exists)
+            //If dir arg is null, save to opus-cat data directory. Dir arg is used with
+            //exporting rules.
+            if (editRuleDir == null)
             {
-                editRuleDir.Create();
+                editRuleDir = new DirectoryInfo(
+                    HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.EditRuleDir));
+                if (!editRuleDir.Exists)
+                {
+                    editRuleDir.Create();
+                }
             }
 
             var ruleCollectionTempPath = Path.Combine(
@@ -362,7 +367,7 @@ namespace OpusCatMTEngine
             return replacement;
         }
 
-        public static AutoEditRuleCollection CreateFromFile(FileInfo ruleFileInfo)
+        public static AutoEditRuleCollection CreateFromFile(FileInfo ruleFileInfo, bool assignNewId=false)
         {
             AutoEditRuleCollection editRuleCollection;
             var deserializer = new Deserializer();
@@ -371,6 +376,10 @@ namespace OpusCatMTEngine
                 editRuleCollection = deserializer.Deserialize<AutoEditRuleCollection>(reader);
             }
             editRuleCollection.ruleCollectionFile = ruleFileInfo;
+            if (assignNewId)
+            {
+                editRuleCollection.CollectionGuid = Guid.NewGuid().ToString();
+            }
             return editRuleCollection;
         }
     }
