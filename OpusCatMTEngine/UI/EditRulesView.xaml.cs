@@ -237,6 +237,7 @@ namespace OpusCatMTEngine
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);
                 newRuleCollection.Save();
                 this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
+                this.Model.SaveModelConfig();
                 this.AutoPostEditRuleCollections.Add(newRuleCollection);
                 this.Model.AutoPostEditRuleCollections.Add(newRuleCollection);
                 InitializeTester();

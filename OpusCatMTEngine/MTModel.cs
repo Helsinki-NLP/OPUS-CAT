@@ -224,10 +224,41 @@ namespace OpusCatMTEngine
                         modelOrigTargetCode,
                         $"{this.SourceCodesString}-{this.TargetCodesString}_{this.Name}",
                         this.targetLanguages.Count > 1,
-                        this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
+                        this.modelConfig.IncludePlaceholderTags, 
+                        this.modelConfig.IncludeTagPairs);
             };
 
-            return this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
+            var translationTask = this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
+            return this.ApplyAutoPostEditRules(translationTask, input);
+            
+        }
+
+        private async Task<TranslationPair> ApplyAutoPostEditRules(Task<TranslationPair> translationTask, string input)
+        {
+            await translationTask;
+            if (translationTask.IsCompleted)
+            {
+                var translationPair = translationTask.Result;
+                var output = translationPair.Translation;
+                //Postprocess output with post-edit rules
+                foreach (var postEditRuleCollection in this.AutoPostEditRuleCollections)
+                {
+                    output = postEditRuleCollection.ProcessPostEditRules(input, output).Result;
+                }
+
+                if (output != translationPair.Translation)
+                {
+                    translationPair.AutoEditedTranslation = true;
+                    translationPair.Translation = output;
+                    translationPair.SegmentedTranslation = new string[] { output };
+                }
+
+                return translationPair;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)

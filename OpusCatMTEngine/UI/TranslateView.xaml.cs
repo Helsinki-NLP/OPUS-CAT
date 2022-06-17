@@ -109,8 +109,21 @@ namespace OpusCatMTEngine
             }
         }
 
+        public bool AutoEditedTranslations
+        {
+            get => autoEditedTranslations;
+            set
+            {
+                autoEditedTranslations = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool autoEditedTranslations;
+
         private void translateButton_Click(object sender, RoutedEventArgs e)
         {
+            this.AutoEditedTranslations = false;
             this.TargetBox.Document.Blocks.Clear();
             TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
 
@@ -140,6 +153,10 @@ namespace OpusCatMTEngine
                     else
                     {
                         this.PopulateBoxes(x.Result);
+                        if (x.Result.Any(y => y.AutoEditedTranslation))
+                        {
+                            this.AutoEditedTranslations = true;
+                        }
                     }
                 }));
             translate.Start();
@@ -189,7 +206,8 @@ namespace OpusCatMTEngine
                     pair.SegmentedAlignmentSourceToTarget,
                     pair.Segmentation,
                     pairindex,
-                    this.targetRuns);
+                    this.targetRuns,
+                    pair.AutoEditedTranslation);
 
                 this.sourceRuns.Add(sourcerunlist);
                 sourcepara.Inlines.AddRange(sourcerunlist);
@@ -201,7 +219,8 @@ namespace OpusCatMTEngine
                     pair.SegmentedAlignmentTargetToSource,
                     pair.Segmentation,
                     pairindex,
-                    this.sourceRuns);
+                    this.sourceRuns,
+                    pair.AutoEditedTranslation);
 
                 this.targetRuns.Add(targetrunlist);
                 targetpara.Inlines.AddRange(targetrunlist);
@@ -214,7 +233,8 @@ namespace OpusCatMTEngine
             Dictionary<int, List<int>> alignment,
             SegmentationMethod segmentation,
             int translationIndex,
-            List<List<Run>> otherRuns)
+            List<List<Run>> otherRuns,
+            bool autoEditedTranslation)
         {
             var runlist = new List<Run>();
             //Change this to add each token as a run, and add empty runs for space and pipe runs for segmentation
@@ -281,7 +301,7 @@ namespace OpusCatMTEngine
                 }
                 
 
-                if (this.model.SupportsWordAlignment && alignment.ContainsKey(index))
+                if (this.model.SupportsWordAlignment && !autoEditedTranslation && alignment.ContainsKey(index))
                 {
                     var alignedTokens = alignment[index];
                     tokenrun.MouseEnter += (x, y) => Tokenrun_MouseEnter(alignedTokens, otherRuns, translationIndex, x, y);
@@ -290,7 +310,7 @@ namespace OpusCatMTEngine
                 
             }
 
-            //This shows segmentation if ShowSegmentation is true
+            //This shows segmentation if ShowSegmentation 
             NotifyPropertyChanged("ShowSegmentation");
             return runlist;
         }

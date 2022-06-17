@@ -32,7 +32,7 @@ namespace OpusCatMTEngine
         public string[] SegmentedSourceSentence { get; private set; }
 
         [DataMember]
-        public string[] SegmentedTranslation { get; private set; }
+        public string[] SegmentedTranslation { get; internal set; }
 
         [DataMember]
         public Dictionary<int, List<int>> SegmentedAlignmentSourceToTarget { get; private set; }
@@ -48,6 +48,7 @@ namespace OpusCatMTEngine
 
         [DataMember]
         public SegmentationMethod Segmentation { get; internal set; }
+        public bool AutoEditedTranslation { get; internal set; }
 
         public TranslationPair()
         {
