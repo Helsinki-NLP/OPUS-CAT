@@ -49,18 +49,12 @@ namespace OpusCatMTEngine
             
             this.AutoPreEditRuleCollections = autoPreEditRuleCollections;
             this.AutoPostEditRuleCollections = autoPostEditRuleCollections;
-            this.ModelAutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
-                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Select(x => autoPreEditRuleCollections.SingleOrDefault(
-                    y => y.CollectionGuid == x)).Where(y => y != null));
-            this.ModelAutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
-                this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
-                    y => y.CollectionGuid == x)).Where(y => y != null));
+            
             InitializeComponent();
             
-
             InitializeTester();
-            this.AutoPreEditRuleCollectionList.ItemsSource = this.ModelAutoPreEditRuleCollections;
-            this.AutoPostEditRuleCollectionList.ItemsSource = this.ModelAutoPostEditRuleCollections;
+            this.AutoPreEditRuleCollectionList.ItemsSource = this.Model.AutoPreEditRuleCollections;
+            this.AutoPostEditRuleCollectionList.ItemsSource = this.Model.AutoPostEditRuleCollections;
             
         }
 
@@ -75,7 +69,7 @@ namespace OpusCatMTEngine
             var inputBoxLabel = "Input to rule collection:";
             var inputOrigin = "Source text";
             
-            foreach (var preEditRuleCollection in this.ModelAutoPreEditRuleCollections)
+            foreach (var preEditRuleCollection in this.Model.AutoPreEditRuleCollections)
             {
                 
                 var title = $"Pre-edit rule collection";
@@ -98,7 +92,7 @@ namespace OpusCatMTEngine
 
             inputBoxLabel = "Input to rule collection:";
             inputOrigin = "MT output";
-            foreach (var postEditRuleCollection in this.ModelAutoPostEditRuleCollections)
+            foreach (var postEditRuleCollection in this.Model.AutoPostEditRuleCollections)
             {
                 var title = $"Post-edit rule collection";
                 var testControl =
@@ -122,8 +116,6 @@ namespace OpusCatMTEngine
         public string Title { get; private set; }
         public ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
         public ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
-        public ObservableCollection<AutoEditRuleCollection> ModelAutoPreEditRuleCollections { get; set; }
-        public ObservableCollection<AutoEditRuleCollection> ModelAutoPostEditRuleCollections { get; set; }
         public List<TestPreEditRuleControl> PreEditTesters { get; private set; }
         public List<TestPostEditRuleControl> PostEditTesters { get; private set; }
 
@@ -146,7 +138,7 @@ namespace OpusCatMTEngine
                 this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
                 this.Model.SaveModelConfig();
                 this.AutoPreEditRuleCollections.Add(newRuleCollection);
-                this.ModelAutoPreEditRuleCollections.Add(newRuleCollection);
+                this.Model.AutoPreEditRuleCollections.Add(newRuleCollection);
                 InitializeTester();
             }
         }
@@ -156,11 +148,11 @@ namespace OpusCatMTEngine
             var addCollectionWindow = 
                 new AddEditRuleCollectionWindow(
                     this.AutoPreEditRuleCollections, 
-                    this.ModelAutoPreEditRuleCollections);
+                    this.Model.AutoPreEditRuleCollections);
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
             {
-                this.ModelAutoPreEditRuleCollections.Clear();
+                this.Model.AutoPreEditRuleCollections.Clear();
                 foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
                 {
                     if (!this.AutoPreEditRuleCollections.Contains(collection.Item))
@@ -170,7 +162,7 @@ namespace OpusCatMTEngine
 
                     if (collection.Checked)
                     {
-                        this.ModelAutoPreEditRuleCollections.Add(collection.Item);
+                        this.Model.AutoPreEditRuleCollections.Add(collection.Item);
                         this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Add(collection.Item.CollectionGuid);
                     }
                 }
@@ -209,18 +201,21 @@ namespace OpusCatMTEngine
             this.RemoveRuleCollection(
                 selectedCollections,
                 this.Model.ModelConfig.AutoPreEditRuleCollectionGuids,
-                this.ModelAutoPreEditRuleCollections);
+                this.Model.AutoPreEditRuleCollections);
         }
 
         private void DeletePreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
             var selectedCollection = (AutoEditRuleCollection)this.AutoPreEditRuleCollectionList.SelectedItem;
-            selectedCollection.Delete();
-            this.ModelAutoPreEditRuleCollections.Remove(selectedCollection);
-            this.AutoPreEditRuleCollections.Remove(selectedCollection);
-            this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
-            this.Model.SaveModelConfig();
-            InitializeTester();
+            var messageBoxResult = selectedCollection.Delete();
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                this.Model.AutoPreEditRuleCollections.Remove(selectedCollection);
+                this.AutoPreEditRuleCollections.Remove(selectedCollection);
+                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
+                this.Model.SaveModelConfig();
+                InitializeTester();
+            }
         }
 
         private void CreatePostRule_Click(object sender, RoutedEventArgs e)
@@ -242,9 +237,8 @@ namespace OpusCatMTEngine
                 newRuleCollection.AddRule(createRuleWindow.CreatedRule);
                 newRuleCollection.Save();
                 this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(newRuleCollection.CollectionGuid);
-                this.Model.SaveModelConfig();
                 this.AutoPostEditRuleCollections.Add(newRuleCollection);
-                this.ModelAutoPostEditRuleCollections.Add(newRuleCollection);
+                this.Model.AutoPostEditRuleCollections.Add(newRuleCollection);
                 InitializeTester();
             }
         }
@@ -254,11 +248,11 @@ namespace OpusCatMTEngine
             var addCollectionWindow =
                 new AddEditRuleCollectionWindow(
                     AutoPostEditRuleCollections,
-                    this.ModelAutoPostEditRuleCollections);
+                    this.Model.AutoPostEditRuleCollections);
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
             {
-                this.ModelAutoPostEditRuleCollections.Clear();
+                this.Model.AutoPostEditRuleCollections.Clear();
                 foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
                 {
                     if (!this.AutoPostEditRuleCollections.Contains(collection.Item))
@@ -268,7 +262,7 @@ namespace OpusCatMTEngine
 
                     if (collection.Checked)
                     {
-                        this.ModelAutoPostEditRuleCollections.Add(collection.Item);
+                        this.Model.AutoPostEditRuleCollections.Add(collection.Item);
                         this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(collection.Item.CollectionGuid);
                     }
                 }
@@ -293,14 +287,14 @@ namespace OpusCatMTEngine
             this.RemoveRuleCollection(
                     selectedCollections,
                     this.Model.ModelConfig.AutoPostEditRuleCollectionGuids,
-                    this.ModelAutoPostEditRuleCollections);
+                    this.Model.AutoPostEditRuleCollections);
         }
 
         private void DeletePostRuleCollection_Click(object sender, RoutedEventArgs e)
         {
             var selectedCollection = (AutoEditRuleCollection)this.AutoPostEditRuleCollectionList.SelectedItem;
             selectedCollection.Delete();
-            this.ModelAutoPostEditRuleCollections.Remove(selectedCollection);
+            this.Model.AutoPostEditRuleCollections.Remove(selectedCollection);
             this.AutoPostEditRuleCollections.Remove(selectedCollection);
             this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Remove(selectedCollection.CollectionGuid);
             this.Model.SaveModelConfig();
@@ -346,46 +340,72 @@ namespace OpusCatMTEngine
         }
         
         
-        private void MoveCollectionDown(ListView collectionList, ObservableCollection<AutoEditRuleCollection> ruleCollection)
+        private void MoveCollectionDown(
+            ListView collectionList, 
+            ObservableCollection<AutoEditRuleCollection> ruleCollection,
+            ObservableCollection<string> collectionGuids
+            )
         {
             var selectedItem = (AutoEditRuleCollection)collectionList.SelectedItem;
+            
             var selectedItemIndex = ruleCollection.IndexOf(selectedItem);
+            var guidIndex = collectionGuids.IndexOf(selectedItem.CollectionGuid);
             if (selectedItemIndex < ruleCollection.Count - 1)
             {
                 ruleCollection.Move(selectedItemIndex, selectedItemIndex + 1);
+                collectionGuids.Move(guidIndex, guidIndex + 1);
             }
             this.InitializeTester();
+            this.Model.SaveModelConfig();
         }
 
         private void MovePreRuleCollectionDown_Click(object sender, RoutedEventArgs e)
         {
-            this.MoveCollectionDown(this.AutoPreEditRuleCollectionList, this.ModelAutoPreEditRuleCollections);
+            this.MoveCollectionDown(
+                this.AutoPreEditRuleCollectionList, 
+                this.Model.AutoPreEditRuleCollections,
+                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids);
         }
 
         private void MovePostRuleCollectionDown_Click(object sender, RoutedEventArgs e)
         {
-            this.MoveCollectionDown(this.AutoPostEditRuleCollectionList, this.ModelAutoPostEditRuleCollections);
+            this.MoveCollectionDown(
+                this.AutoPostEditRuleCollectionList, 
+                this.Model.AutoPostEditRuleCollections,
+                this.Model.ModelConfig.AutoPostEditRuleCollectionGuids);
         }
 
-        private void MoveCollectionUp(ListView collectionList, ObservableCollection<AutoEditRuleCollection> ruleCollection)
+        private void MoveCollectionUp(
+            ListView collectionList, 
+            ObservableCollection<AutoEditRuleCollection> ruleCollection,
+            ObservableCollection<string> collectionGuids)
         {
             var selectedItem = (AutoEditRuleCollection)collectionList.SelectedItem;
             var selectedItemIndex = ruleCollection.IndexOf(selectedItem);
+            var guidIndex = collectionGuids.IndexOf(selectedItem.CollectionGuid);
             if (selectedItemIndex > 0)
             {
                 ruleCollection.Move(selectedItemIndex, selectedItemIndex - 1);
+                collectionGuids.Move(guidIndex, guidIndex - 1);
             }
             this.InitializeTester();
+            this.Model.SaveModelConfig();
         }
 
         private void MovePreRuleCollectionUp_Click(object sender, RoutedEventArgs e)
         {
-            this.MoveCollectionUp(this.AutoPreEditRuleCollectionList, this.ModelAutoPreEditRuleCollections);
+            this.MoveCollectionUp(
+                this.AutoPreEditRuleCollectionList, 
+                this.Model.AutoPreEditRuleCollections,
+                this.Model.ModelConfig.AutoPreEditRuleCollectionGuids);
         }
 
         private void MovePostRuleCollectionUp_Click(object sender, RoutedEventArgs e)
         {
-            this.MoveCollectionUp(this.AutoPostEditRuleCollectionList, this.ModelAutoPostEditRuleCollections);
+            this.MoveCollectionUp(
+                this.AutoPostEditRuleCollectionList, 
+                this.Model.AutoPostEditRuleCollections,
+                this.Model.ModelConfig.AutoPostEditRuleCollectionGuids);
         }
 
         private void Tester_Expanded(object sender, RoutedEventArgs e)

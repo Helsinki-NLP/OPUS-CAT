@@ -194,7 +194,7 @@ namespace OpusCatMTEngine
             return regexMatches;
         }
 
-        internal void Delete(Boolean requireConfirmation = true)
+        internal MessageBoxResult Delete(Boolean requireConfirmation = true)
         {
             MessageBoxResult messageBoxResult =
                 System.Windows.MessageBox.Show(
@@ -207,6 +207,7 @@ namespace OpusCatMTEngine
                     this.ruleCollectionFile.Delete();
                 }
             }
+            return messageBoxResult;
         }
 
         internal void ReplaceRule(AutoEditRule rule, AutoEditRule replacement)

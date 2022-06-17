@@ -854,7 +854,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Are you sure want to permanently delete rule collection {0}?.
+        ///   Looks up a localized string similar to Are you sure want to permanently delete rule collection {0}? This collection may be in use with other models, and it will also be deleted from those models..
         /// </summary>
         public static string Rules_DeleteRuleCollectionConfirmation {
             get {

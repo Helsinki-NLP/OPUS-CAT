@@ -435,7 +435,7 @@
     <value>Edit rules in collection {0}</value>
   </data>
   <data name="Rules_DeleteRuleCollectionConfirmation" xml:space="preserve">
-    <value>Are you sure want to permanently delete rule collection {0}?</value>
+    <value>Are you sure want to permanently delete rule collection {0}? This collection may be in use with other models, and it will also be deleted from those models.</value>
   </data>
   <data name="EditRules_MoveDownButton" xml:space="preserve">
     <value>Move down</value>
