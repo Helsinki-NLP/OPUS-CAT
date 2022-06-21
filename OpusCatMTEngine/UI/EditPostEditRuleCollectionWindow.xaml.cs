@@ -56,6 +56,7 @@ namespace OpusCatMTEngine
             InitializeComponent();
             this.Title = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
             this.WindowHeader.Content = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
+            this.Tester.Refresh();
         }
             
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -88,8 +89,8 @@ namespace OpusCatMTEngine
 
             if (createRuleWindow != null)
             {
+                ((Window)createRuleWindow).Owner = this;
                 var dialogResult = ((Window)createRuleWindow).ShowDialog();
-
                 if (dialogResult != null && dialogResult.Value)
                 {
                     this.RuleCollection.AddRule(createRuleWindow.CreatedRule);
@@ -117,6 +118,7 @@ namespace OpusCatMTEngine
 
             if (createRuleWindow != null)
             {
+                ((Window)createRuleWindow).Owner = this;
                 var dialogResult = ((Window)createRuleWindow).ShowDialog();
 
                 if (dialogResult != null && dialogResult.Value)

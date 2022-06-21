@@ -56,7 +56,7 @@ namespace OpusCatMTEngine
         /// <param name="tokenCode">The token code.</param>
         /// <returns>The supported languages.</returns>
         [HttpGet]
-        public List<string> ListSupportedLanguagePairs(string tokenCode)
+        public List<string> ListSupportedLanguagePairs(string tokenCode=null)
         {
 
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))

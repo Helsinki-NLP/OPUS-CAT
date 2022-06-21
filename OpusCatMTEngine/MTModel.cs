@@ -166,7 +166,11 @@ namespace OpusCatMTEngine
             this.marianProcesses = null;
         }
 
-        public Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
+        public Task<TranslationPair> Translate(
+            string input, 
+            IsoLanguage sourceLang, 
+            IsoLanguage targetLang,
+            bool applyEditRules=true)
         {
             if (String.IsNullOrWhiteSpace(input))
             {
@@ -175,9 +179,12 @@ namespace OpusCatMTEngine
             }
 
             //Preprocess input with pre-edit rules
-            foreach (var preEditRuleCollection in this.AutoPreEditRuleCollections)
+            if (applyEditRules)
             {
-                input = preEditRuleCollection.ProcessPreEditRules(input).Result;
+                foreach (var preEditRuleCollection in this.AutoPreEditRuleCollections)
+                {
+                    input = preEditRuleCollection.ProcessPreEditRules(input).Result;
+                }
             }
 
             //Need to get the original codes, since those are the ones the marian model uses
@@ -229,7 +236,14 @@ namespace OpusCatMTEngine
             };
 
             var translationTask = this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
-            return this.ApplyAutoPostEditRules(translationTask, input);
+            if (applyEditRules)
+            {
+                return this.ApplyAutoPostEditRules(translationTask, input);
+            }
+            else
+            {
+                return translationTask;
+            }
             
         }
 

@@ -46,7 +46,6 @@ namespace OpusCatMTEngine
         {
             this.Model = selectedModel;
             this.Title = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRulesTitle,Model.Name);
-            
             this.AutoPreEditRuleCollections = autoPreEditRuleCollections;
             this.AutoPostEditRuleCollections = autoPostEditRuleCollections;
             
@@ -55,7 +54,6 @@ namespace OpusCatMTEngine
             InitializeTester();
             this.AutoPreEditRuleCollectionList.ItemsSource = this.Model.AutoPreEditRuleCollections;
             this.AutoPostEditRuleCollectionList.ItemsSource = this.Model.AutoPostEditRuleCollections;
-            
         }
 
         //Add testing controls for each collection
@@ -122,14 +120,15 @@ namespace OpusCatMTEngine
         private void CreatePreRule_Click(object sender, RoutedEventArgs e)
         {
             var createRuleWindow = new CreatePreEditRuleWindow();
-            
+            ((Window)createRuleWindow).Owner = Application.Current.MainWindow;
             var dialogResult = createRuleWindow.ShowDialog();
+
 
             if (dialogResult != null && dialogResult.Value)
             {
                 var newRuleCollection = new AutoEditRuleCollection()
                 {
-                    CollectionName = "new collection",
+                    CollectionName = createRuleWindow.CreatedRule.Description,
                     CollectionGuid = Guid.NewGuid().ToString(),
                     CollectionType = "preedit"
                 };
@@ -149,6 +148,7 @@ namespace OpusCatMTEngine
                 new AddEditRuleCollectionWindow(
                     this.AutoPreEditRuleCollections, 
                     this.Model.AutoPreEditRuleCollections);
+            addCollectionWindow.Owner = Application.Current.MainWindow;
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
             {
@@ -174,10 +174,18 @@ namespace OpusCatMTEngine
         private void EditPreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
             var selectedCollection = (AutoEditRuleCollection)this.AutoPreEditRuleCollectionList.SelectedItem;
-            var editCollectionWindow = new EditPreEditRuleCollectionWindow(selectedCollection);
+            
+            //Edit a clone of the collection, so that the changes can be canceled in the edit window
+            var editCollectionWindow = new EditPostEditRuleCollectionWindow(selectedCollection.Clone());
+            editCollectionWindow.Owner = Application.Current.MainWindow;
             var dialogResult = editCollectionWindow.ShowDialog();
-            selectedCollection.Save();
-            InitializeTester();
+            if (dialogResult.Value)
+            {
+                selectedCollection.CopyValuesFromOtherCollection(editCollectionWindow.RuleCollection);
+                selectedCollection.Save();
+                this.AutoPreEditRuleCollectionList.Items.Refresh();
+                InitializeTester();
+            }
         }
 
         private void RemoveRuleCollection(
@@ -221,14 +229,14 @@ namespace OpusCatMTEngine
         private void CreatePostRule_Click(object sender, RoutedEventArgs e)
         {
             var createRuleWindow = new CreatePostEditRuleWindow();
-
+            createRuleWindow.Owner = Application.Current.MainWindow;
             var dialogResult = createRuleWindow.ShowDialog();
 
             if (dialogResult != null && dialogResult.Value)
             {
                 var newRuleCollection = new AutoEditRuleCollection()
                 {
-                    CollectionName = "new collection",
+                    CollectionName = createRuleWindow.CreatedRule.Description,
                     CollectionGuid = Guid.NewGuid().ToString(),
                     CollectionType = "postedit",
                     GlobalCollection = false
@@ -250,6 +258,7 @@ namespace OpusCatMTEngine
                 new AddEditRuleCollectionWindow(
                     AutoPostEditRuleCollections,
                     this.Model.AutoPostEditRuleCollections);
+            addCollectionWindow.Owner = Application.Current.MainWindow;
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
             {
@@ -275,10 +284,19 @@ namespace OpusCatMTEngine
         private void EditPostRuleCollection_Click(object sender, RoutedEventArgs e)
         {
             var selectedCollection = (AutoEditRuleCollection)this.AutoPostEditRuleCollectionList.SelectedItem;
-            var editCollectionWindow = new EditPostEditRuleCollectionWindow(selectedCollection);
+            
+            //Edit a clone of the collection, so that the changes can be canceled in the edit window
+            var editCollectionWindow = new EditPostEditRuleCollectionWindow(selectedCollection.Clone());
+            editCollectionWindow.Owner = Application.Current.MainWindow;
             var dialogResult = editCollectionWindow.ShowDialog();
-            selectedCollection.Save();
-            InitializeTester();
+            if (dialogResult.Value)
+            {
+                selectedCollection.CopyValuesFromOtherCollection(editCollectionWindow.RuleCollection);
+                selectedCollection.Save();
+                this.AutoPostEditRuleCollectionList.Items.Refresh();
+                InitializeTester();
+            }
+
         }
 
         private void RemovePostRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -321,11 +339,13 @@ namespace OpusCatMTEngine
             }
 
             //previousTesterOutput will now contain the pre-edited source for machine translation,
-            //change it to MT output
+            //change it to MT output.
+            //Do not apply edit rules here, since they will be visually applied in the tester
             var mtResult = this.Model.Translate(
                 previousTesterOutput,
                 this.Model.SourceLanguages.First(),
-                this.Model.SourceLanguages.First()).Result;
+                this.Model.SourceLanguages.First(),
+                applyEditRules:false).Result;
 
             previousTesterOutput = mtResult.Translation;
 

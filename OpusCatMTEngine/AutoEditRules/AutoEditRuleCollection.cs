@@ -335,6 +335,22 @@ namespace OpusCatMTEngine
             return new AutoEditResult(edited, appliedReplacements);
         }
 
+        internal void CopyValuesFromOtherCollection(AutoEditRuleCollection otherRuleCollection)
+        {
+            this.CollectionName = otherRuleCollection.CollectionName;
+            this.EditRules = otherRuleCollection.EditRules;
+            this.GlobalCollection = otherRuleCollection.GlobalCollection;
+        }
+
+        internal AutoEditRuleCollection Clone()
+        {
+            if (this.ruleCollectionFile == null || !this.ruleCollectionFile.Exists)
+            {
+                this.Save();
+            }
+            return AutoEditRuleCollection.CreateFromFile(this.ruleCollectionFile);
+        }
+
         private string ReplaceCasingGroups(AutoEditRuleMatch longestMatch, string replacement)
         {
             var casingGroupMatches =

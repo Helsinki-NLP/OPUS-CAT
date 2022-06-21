@@ -9,7 +9,7 @@
         Height="550" Width="800">
     <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
         <StackPanel>
-            <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesTitle}"/>
+            <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesHeading}"/>
             <Border Margin="5" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <Label FontWeight="Bold" FontSize="15">Pre-edit rule collections</Label>

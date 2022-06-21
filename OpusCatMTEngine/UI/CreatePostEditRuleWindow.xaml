@@ -47,7 +47,8 @@
                             SourcePatternBox="{Binding ElementName=SourcePattern}"
                             InputBoxLabel="Unedited MT output"
                             Title="Test post-edit rule"
-                            ButtonText="Apply post-edit rule to MT output"/>
+                            ButtonText="Apply post-edit rule to MT output"
+                            SourceBoxVisibility="Collapsed"/>
 
                         <DockPanel LastChildFill="False" Margin="5">
                             <Button DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save rule</Button>

@@ -98,7 +98,8 @@
                     RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
                     Title="Test rule collection"
                     InputBoxLabel="MT output"
-                    ButtonText="Apply rules to MT output" />
+                    ButtonText="Apply rules to MT output"
+                    SourceBoxVisibility="Collapsed"/>
                 </Expander>
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="10">
                     <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>

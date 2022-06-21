@@ -14,7 +14,10 @@
                 <Label Name="WindowHeader" Margin="10,0,0,0" FontSize="20"></Label>
                 <DockPanel Margin="5" LastChildFill="True">
                     <Label>Rule collection name</Label>
-                    <TextBox Text="{Binding ElementName=_this, Path=RuleCollection.CollectionName, Mode=TwoWay}" />
+                    <TextBox Width="500" Text="{Binding ElementName=_this, Path=RuleCollection.CollectionName, Mode=TwoWay}" />
+                    <CheckBox DockPanel.Dock="Right" VerticalContentAlignment="Center" IsChecked="{Binding ElementName=_this, Path=RuleCollection.GlobalCollection, Mode=TwoWay}">
+                        Global collection
+                    </CheckBox>
                 </DockPanel>
                 <DockPanel Margin="10">
                     <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">

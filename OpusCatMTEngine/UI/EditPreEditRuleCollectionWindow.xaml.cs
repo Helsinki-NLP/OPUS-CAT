@@ -88,6 +88,7 @@ namespace OpusCatMTEngine
 
             if (createRuleWindow != null)
             {
+                ((Window)createRuleWindow).Owner = this;
                 var dialogResult = ((Window)createRuleWindow).ShowDialog();
 
                 if (dialogResult != null && dialogResult.Value)
@@ -115,6 +116,7 @@ namespace OpusCatMTEngine
 
             if (createRuleWindow != null)
             {
+                ((Window)createRuleWindow).Owner = this;
                 var dialogResult = ((Window)createRuleWindow).ShowDialog();
 
                 if (dialogResult != null && dialogResult.Value)

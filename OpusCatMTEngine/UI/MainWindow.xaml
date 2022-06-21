@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle, RelativeSource={RelativeSource Mode=Self}}" Height="650" Width="1000" Icon="opus.bmp"
+        Title="{Binding WindowTitle, RelativeSource={RelativeSource Mode=Self}}" Height="650" Width="1000" 
+        Icon="opus.bmp"
         Name="OpusCatWindow"
         Closing="Window_Closing">
     <Window.Resources>

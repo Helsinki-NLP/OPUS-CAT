@@ -408,7 +408,7 @@
     <value>Edit rule collection</value>
   </data>
   <data name="EditRules_EditRulesTitle" xml:space="preserve">
-    <value>Edit rules</value>
+    <value>Edit rules for model {0}</value>
   </data>
   <data name="EditRules_RemoveRuleCollectionButton" xml:space="preserve">
     <value>Remove rule collection</value>
@@ -442,5 +442,8 @@
   </data>
   <data name="EditRules_MoveUpButton" xml:space="preserve">
     <value>Move up</value>
+  </data>
+  <data name="EditRules_EditRulesHeading" xml:space="preserve">
+    <value>Edit rules</value>
   </data>
 </root>

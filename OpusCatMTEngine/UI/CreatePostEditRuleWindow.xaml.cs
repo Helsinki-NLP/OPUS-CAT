@@ -29,8 +29,6 @@ namespace OpusCatMTEngine
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
-
         
         private AutoEditRule rule;
         
@@ -85,8 +83,6 @@ namespace OpusCatMTEngine
             this.DialogResult = false;
             this.Close();
         }
-
-
-
+        
     }
 }

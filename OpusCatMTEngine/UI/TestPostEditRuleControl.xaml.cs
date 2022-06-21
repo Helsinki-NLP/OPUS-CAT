@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace OpusCatMTEngine
 {
@@ -47,6 +48,7 @@ namespace OpusCatMTEngine
             "SourcePatternBox", typeof(TextBox),
             typeof(TestPostEditRuleControl)
             );
+
 
         public static readonly DependencyProperty PostEditReplacementBoxProperty = DependencyProperty.Register(
             "PostEditReplacementBox", typeof(TextBox),
@@ -216,6 +218,17 @@ namespace OpusCatMTEngine
             this.DataContext = this;
             InitializeComponent();
 
+            //Need to add a handler to source pattern box after the dependency property has been set,
+            //this will do it after all other rendering is complete
+            Dispatcher.BeginInvoke(new Action(() => SetHandlers()), DispatcherPriority.ContextIdle, null);
+        }
+
+        private void SetHandlers()
+        {
+            if (this.SourcePatternBox != null)
+            {
+                this.SourcePatternBox.TextChanged += AnyControl_TextChanged;
+            }
         }
 
         public void ProcessRules()
@@ -258,7 +271,6 @@ namespace OpusCatMTEngine
                     });
                 if (!this.textBoxHandlersAssigned)
                 {
-                    this.SourcePatternBox.TextChanged += this.AnyControl_TextChanged;
                     this.PostEditPatternBox.TextChanged += this.AnyControl_TextChanged;
                     this.PostEditReplacementBox.TextChanged += this.AnyControl_TextChanged;
                     this.textBoxHandlersAssigned = true;

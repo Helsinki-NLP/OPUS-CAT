@@ -171,6 +171,15 @@ namespace OpusCatMTEngine.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Edit rules.
         /// </summary>
+        public static string EditRules_EditRulesHeading {
+            get {
+                return ResourceManager.GetString("EditRules_EditRulesHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rules for model {0}.
+        /// </summary>
         public static string EditRules_EditRulesTitle {
             get {
                 return ResourceManager.GetString("EditRules_EditRulesTitle", resourceCulture);
