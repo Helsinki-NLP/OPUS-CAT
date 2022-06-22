@@ -44,7 +44,14 @@ namespace OpusCatMTEngine
         public CreatePostEditRuleWindow(AutoEditRule rule)
         {
             InitializeComponent();
-            this.SourcePattern.Text = rule.SourcePattern;
+            
+            if (!String.IsNullOrWhiteSpace(rule.SourcePattern))
+            {
+                //TODO: this does not trigger the tester source box visibility, maybe the handler has not
+                //been attached yet
+                this.SourcePatternCheckbox.IsChecked = true;
+                this.SourcePattern.Text = rule.SourcePattern;
+            }
             this.PostEditReplacement.Text = rule.Replacement;
             this.PostEditPattern.Text = rule.OutputPattern;
             this.RuleDescription.Text = rule.Description;
@@ -56,7 +63,7 @@ namespace OpusCatMTEngine
             this.CreatedRule =
                 new AutoEditRule()
                 {
-                    SourcePattern = this.SourcePattern.Text,
+                    SourcePattern = this.SourcePatternCheckbox.IsChecked.Value ? this.SourcePattern.Text : "",
                     OutputPattern = this.PostEditPattern.Text,
                     Replacement = this.PostEditReplacement.Text,
                     Description = this.RuleDescription.Text
@@ -66,6 +73,7 @@ namespace OpusCatMTEngine
             try
             {
                 var sourcePatternRegex = this.CreatedRule.SourcePatternRegex;
+                var outputPatternRegex = this.CreatedRule.OutputPatternRegex;
                 this.DialogResult = true;
                 this.Close();
             }
