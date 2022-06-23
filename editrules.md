@@ -6,7 +6,7 @@ permalink: /editrules
 
 Automatic edit rules can be used to edit the source text before translating it with MT models (_pre-edit rules_), or to edit the machine translation (_post-edit rules_). Regular expressions ([.NET regex flavor](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference)) can be used in the rules. Rules are organized into _rule collections_, which can contain any number of rules. 
 
-### Quickstart: Adding a simple pre-edit rule
+### <a name="Quickstart"></a>Quickstart: Adding a simple pre-edit rule
 
 1. Select a model from the **Models** tab and click **Edit Rules**.
 
@@ -35,7 +35,7 @@ Automatic edit rules can be used to edit the source text before translating it w
 
     <img src="./images/editrules5.png?raw=true" alt="drawing" width="100%"/>
 
-6. The tester displays the result of the rule application. Parts of the source sentence that match the rule are highlighted, as are the replacements performed in the edited source sentence:
+6. <a name="pre_edit_tester"></a>The tester displays the result of the rule application. Parts of the source sentence that match the rule are highlighted, as are the replacements performed in the edited source sentence:
 
     <img src="./images/editrules6.png?raw=true" alt="drawing" width="100%"/>
     
@@ -57,7 +57,7 @@ The **Edit rules in collection** window contains a field for the name of the col
   - **Edit rule**: When you select a rule from the list and click this, the rule opens in the **Create edit rule** window, and the rule can be modified.
   - **Delete rule**: Deletes the rule from the collection. **Note**: If you have deleted a rule with this button, the rule may still be recovered by clicking **Cancel** in the lower right corner of the **Edit rules in collection** window. If you click **Save** in the lower left corner of the window, the rule will be permanently deleted.
 
-The **Edit rules in collection** window also contains a field for modifying the name of the collection, and a checkbox labeled **Global collection**. If the **Global collection** checkbox is checked, the collection can be added to other models by using the **Add rule collection** button in the **Edit rules** tab. The checkbox is unchecked by default for newly created models, to avoid cluttering the list of global models.
+<a name="global"></a>The **Edit rules in collection** window also contains a field for modifying the name of the collection, and a checkbox labeled **Global collection**. If the **Global collection** checkbox is checked, the collection can be added to other models by using the **Add rule collection** button in the **Edit rules** tab. The checkbox is unchecked by default for newly created models, to avoid cluttering the list of global models.
 
 After you have edited the collection by adding, deleting, or modifying rules or by changing the collection name or its global status, you can either save the modifications by clicking the **Save** button, or reject them by clicking the **Cancel** button. 
 
@@ -85,12 +85,53 @@ Here's a simple example rule, where all three fields are used:
 
 This rule replaces the word _vika_ in the MT output with the word _virhe_, but only if the original source text contained the word _fault_. So in this rule, the source pattern is used as a condition for the replacement.
 
-As in the **Create pre-edit rule** window, the lower section contains a tester, which can be used to verify that the rule works as intended. If a source pattern has been defined, the tester will contain an additional field for entering the test source text, against which the source pattern will be matched:
+<a name="post_edit_tester"></a>As in the **Create pre-edit rule** window, the lower section contains a tester, which can be used to verify that the rule works as intended. If a source pattern has been defined, the tester will contain an additional field for entering the test source text, against which the source pattern will be matched:
 
   <img src="./images/editrules12.png?raw=true" alt="drawing" width="100%"/>
 
 Once the post-edit rule has been defined, it can be saved by clicking the **Save** button in the lower left corner. The rule will appear in a new rule collection in the **Post-edit rule collections** section of the **Edit rules** tab:
 
   <img src="./images/editrules13.png?raw=true" alt="drawing" width="100%"/>
+
+### Rule testers
+
+Rule testers can be used to verify that the edit rules work correctly both individually and in combination with other rules. Testers are available in the following contexts:
+  1. **Create pre-edit rule** and **Create post-edit rule**
+  2. **Edit rules in collection** window
+  3. **Edit rules** tab
+  
+Each rule tester is similar, but there are some differences. The testers in the **Create pre-edit rule** and **Create post-edit rule** windows are always visible, and they are always used to test a single rule at a time. See [Pre-edit rule tester](#pre_edit_tester) and [Post-edit rule tester](#post_edit_tester) for more information on these testers.
+
+The tester in the **Edit rules in collection** window is hidden by default, and it is used to test all the rules in a collection simultaneously. In this example the pre-edit rule collection from the quickstart with just a single rule has been expanded to handle other common misspellings. The tester can be opened by clicking the expander button under the rule list:
+
+  <img src="./images/editrules15.png?raw=true" alt="drawing" width="100%"/>
+
+When you click the button, the tester expands. The following screenshot shows the results of testing the rules against a source sentence containing all of the misspellings:
+
+  <img src="./images/editrules16.png?raw=true" alt="drawing" width="100%"/>
+
+As you can see from the image above, matches for all of the listed rules are highlighted in the tester.
+
+#### Testing the entire translation pipeline in **Edit rules** tab
+
+The tester in the **Edit rules in collection** window is the most comprehensive tester, since it tests both the pre-edit and post-edit rule collections: the tester edits the source text with each of the pre-edit rule collections, then produces a machine translation from the edited source text, and finally edits the MT output with all the post-edit rule collections. This tester is also hidden by default, and it can be opened by clicking the expander button at the bottom of the tab:
+
+  <img src="./images/editrules17.png?raw=true" alt="drawing" width="100%"/>
+
+In the **Edit rules** tab tester, only the topmost field, containing the original source sentence needs to be filled. In the following screenshot, a test sentence containing a match for both pre-edit and post-edit rule collections has been entered into the topmost field. All the rules can be applied to the test sentence by clicking the **Test all pre- and post-edit rule collections** button:
+
+  <img src="./images/editrules18.png?raw=true" alt="drawing" width="100%"/>
+  
+If the **Edit rules** tab tester is being used for the first time, there will be a slight delay before the results are displayed, since the machine translation model needs to be initialized. The results will appear as follows:
+
+  <img src="./images/editrules19.png?raw=true" alt="drawing" width="100%"/>
+
+The parts of the text, which match some rule, are highlighted. The image above shows that the original source text is first edited to correct two misspellings (_calender_ and _experiance_), the edited source text is then used as MT input, and the MT output is then edited to replace _vika_ with _virhe_. 
+
+### <a name="management"></a>Adding, removing, and deleting rule collections
+
+Rule collections can be added, removed or deleted in the **Edit rules** tab. Rule collections that have been defined as [global](#global), can be used in multiple projects, and they can be removed and added by using the **Add rule collection** and **Remove rule collection** buttons. Local and global rule collections can be permanently deleted by clicking the **Delete rule collection** button (deletion needs to be confirmed, as the same rule collection may be in use in other MT models):
+
+  <img src="./images/editrules20.png?raw=true" alt="drawing" width="100%"/>
 
 ### <a name="advanced"></a>Advanced rule usage
