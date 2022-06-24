@@ -29,14 +29,14 @@
 
                     <ListView.View>
                         <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
-                            <GridViewColumn>
+                            <GridViewColumn Width="350" Header="Collection name">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Width="400" Text="{Binding Path=Item.CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBlock Width="350" Text="{Binding Path=Item.CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn>
+                                <GridViewColumn Header="Use with model">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding Path=Checked, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />

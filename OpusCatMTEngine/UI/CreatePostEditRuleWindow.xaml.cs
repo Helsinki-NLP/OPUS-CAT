@@ -30,7 +30,6 @@ namespace OpusCatMTEngine
             }
         }
         
-        private AutoEditRule rule;
         
         public AutoEditRule CreatedRule { get; set; }
         
@@ -47,13 +46,13 @@ namespace OpusCatMTEngine
             
             if (!String.IsNullOrWhiteSpace(rule.SourcePattern))
             {
-                //TODO: this does not trigger the tester source box visibility, maybe the handler has not
-                //been attached yet
                 this.SourcePatternCheckbox.IsChecked = true;
                 this.SourcePattern.Text = rule.SourcePattern;
+                this.UseRegexInSourcePattern.IsChecked = rule.SourcePatternIsRegex;
             }
             this.PostEditReplacement.Text = rule.Replacement;
             this.PostEditPattern.Text = rule.OutputPattern;
+            this.UseRegexInPostEditPattern.IsChecked = rule.OutputPatternIsRegex;
             this.RuleDescription.Text = rule.Description;
         }
 
@@ -64,7 +63,9 @@ namespace OpusCatMTEngine
                 new AutoEditRule()
                 {
                     SourcePattern = this.SourcePatternCheckbox.IsChecked.Value ? this.SourcePattern.Text : "",
+                    SourcePatternIsRegex = this.UseRegexInSourcePattern.IsChecked.Value,
                     OutputPattern = this.PostEditPattern.Text,
+                    OutputPatternIsRegex = this.UseRegexInPostEditPattern.IsChecked.Value,
                     Replacement = this.PostEditReplacement.Text,
                     Description = this.RuleDescription.Text
                 };

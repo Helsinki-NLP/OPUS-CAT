@@ -142,6 +142,8 @@ namespace OpusCatMTEngine
             }
         }
         
+
+        
         private void AddPreRuleCollection_Click(object sender, RoutedEventArgs e)
         {
             var addCollectionWindow = 
@@ -152,23 +154,49 @@ namespace OpusCatMTEngine
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
             {
-                this.Model.AutoPreEditRuleCollections.Clear();
-                foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
-                {
-                    if (!this.AutoPreEditRuleCollections.Contains(collection.Item))
-                    {
-                        this.AutoPreEditRuleCollections.Add(collection.Item);
-                    }
+                this.AddRuleCollection(
+                    addCollectionWindow.RuleCollectionCheckBoxList,
+                    this.AutoPreEditRuleCollections,
+                    this.Model.AutoPreEditRuleCollections,
+                    this.Model.ModelConfig.AutoPreEditRuleCollectionGuids);
+            }
+        }
 
-                    if (collection.Checked)
+        private void AddRuleCollection(
+            ObservableCollection<CheckBoxListItem<AutoEditRuleCollection>> ruleCollectionCheckBoxList,
+            ObservableCollection<AutoEditRuleCollection> allCollections, 
+            ObservableCollection<AutoEditRuleCollection> modelCollections, 
+            ObservableCollection<string> modelGuids)
+        {
+            foreach (var collection in ruleCollectionCheckBoxList)
+            {
+                if (!allCollections.Contains(collection.Item))
+                {
+                    allCollections.Add(collection.Item);
+                }
+
+                if (collection.Checked)
+                {
+                    //Don't read the collection if it was already selected for the model
+                    if (!modelCollections.Any(x => x.CollectionGuid == collection.Item.CollectionGuid))
                     {
-                        this.Model.AutoPreEditRuleCollections.Add(collection.Item);
-                        this.Model.ModelConfig.AutoPreEditRuleCollectionGuids.Add(collection.Item.CollectionGuid);
+                        modelCollections.Add(collection.Item);
+                        modelGuids.Add(collection.Item.CollectionGuid);
                     }
                 }
-                this.Model.SaveModelConfig();
-                InitializeTester();
+                else
+                {
+                    //If a collection was selected for the model and is now unchecked, remove it
+                    var collectionPresent = modelCollections.SingleOrDefault(x => x.CollectionGuid == collection.Item.CollectionGuid);
+                    if (collectionPresent != null)
+                    {
+                        modelCollections.Remove(collectionPresent);
+                        modelGuids.Remove(collectionPresent.CollectionGuid);
+                    }
+                }
             }
+            this.Model.SaveModelConfig();
+            InitializeTester(); ;
         }
 
         private void EditPreRuleCollection_Click(object sender, RoutedEventArgs e)
@@ -176,7 +204,7 @@ namespace OpusCatMTEngine
             var selectedCollection = (AutoEditRuleCollection)this.AutoPreEditRuleCollectionList.SelectedItem;
             
             //Edit a clone of the collection, so that the changes can be canceled in the edit window
-            var editCollectionWindow = new EditPostEditRuleCollectionWindow(selectedCollection.Clone());
+            var editCollectionWindow = new EditPreEditRuleCollectionWindow(selectedCollection.Clone());
             editCollectionWindow.Owner = Application.Current.MainWindow;
             var dialogResult = editCollectionWindow.ShowDialog();
             if (dialogResult.Value)
@@ -262,22 +290,11 @@ namespace OpusCatMTEngine
             var dialogResult = addCollectionWindow.ShowDialog();
             if (dialogResult.Value)
             {
-                this.Model.AutoPostEditRuleCollections.Clear();
-                foreach (var collection in addCollectionWindow.RuleCollectionCheckBoxList)
-                {
-                    if (!this.AutoPostEditRuleCollections.Contains(collection.Item))
-                    {
-                        this.AutoPostEditRuleCollections.Add(collection.Item);
-                    }
-
-                    if (collection.Checked)
-                    {
-                        this.Model.AutoPostEditRuleCollections.Add(collection.Item);
-                        this.Model.ModelConfig.AutoPostEditRuleCollectionGuids.Add(collection.Item.CollectionGuid);
-                    }
-                }
-                this.Model.SaveModelConfig();
-                InitializeTester();
+                this.AddRuleCollection(
+                    addCollectionWindow.RuleCollectionCheckBoxList,
+                    this.AutoPostEditRuleCollections,
+                    this.Model.AutoPostEditRuleCollections,
+                    this.Model.ModelConfig.AutoPostEditRuleCollectionGuids);
             }
         }
 

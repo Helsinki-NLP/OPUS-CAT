@@ -17,10 +17,13 @@
                     <StackPanel Margin="5">
                         <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                             <StackPanel>
-                                <Label FontWeight="Bold">Define post-edit rule</Label>
-                                <DockPanel Margin="5,0">
+
+                                <Label DockPanel.Dock="Left" FontWeight="Bold">Define post-edit rule</Label>
+
+                                <DockPanel LastChildFill="False" Margin="5,0">
                                     <CheckBox Name="SourcePatternCheckbox" Margin="0,0,5,0" VerticalAlignment="Center">Use source pattern</CheckBox>
-                                    <TextBox Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" />
+                                    <TextBox Width="520" Name="SourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" />
+                                    <CheckBox Name="UseRegexInSourcePattern" IsEnabled="{Binding ElementName=SourcePatternCheckbox, Path=IsChecked}" Width="80" VerticalAlignment="Center" DockPanel.Dock="Right">Use regex</CheckBox>
                                 </DockPanel>
                                 <Separator Margin="5"></Separator>
                                 <DockPanel Margin="5,0">
@@ -28,9 +31,10 @@
                                     <TextBox Name="RuleDescription" />
                                 </DockPanel>
                                 <Separator Margin="5"></Separator>
-                                <DockPanel Margin="5,0">
+                                <DockPanel LastChildFill="False" Margin="5,0">
                                     <Label>Post-edit pattern</Label>
-                                    <TextBox Name="PostEditPattern" />
+                                    <TextBox Width="550" Name="PostEditPattern" />
+                                    <CheckBox Name="UseRegexInPostEditPattern" Width="80" VerticalAlignment="Center" DockPanel.Dock="Right">Use regex</CheckBox>
                                 </DockPanel>
                                 <Separator Margin="5"></Separator>
                                 <DockPanel Margin="5,0,5,5">
@@ -43,8 +47,10 @@
                         </Border>
                         <local:TestPostEditRuleControl
                             PostEditPatternBox="{Binding ElementName=PostEditPattern}"
+                            PostEditPatternIsRegex="{Binding ElementName=UseRegexInPostEditPattern}"
                             PostEditReplacementBox="{Binding ElementName=PostEditReplacement}"
                             SourcePatternBox="{Binding ElementName=SourcePattern}"
+                            SourcePatternIsRegex="{Binding ElementName=UseRegexInSourcePattern}"
                             InputBoxLabel="Unedited MT output"
                             Title="Test post-edit rule"
                             ButtonText="Apply post-edit rule to MT output"

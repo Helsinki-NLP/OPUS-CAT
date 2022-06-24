@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -49,6 +50,11 @@ namespace OpusCatMTEngine
             typeof(TestPostEditRuleControl)
             );
 
+        public static readonly DependencyProperty SourcePatternIsRegexProperty = DependencyProperty.Register(
+            "SourcePatternIsRegex", typeof(CheckBox),
+            typeof(TestPostEditRuleControl)
+            );
+
 
         public static readonly DependencyProperty PostEditReplacementBoxProperty = DependencyProperty.Register(
             "PostEditReplacementBox", typeof(TextBox),
@@ -57,6 +63,11 @@ namespace OpusCatMTEngine
 
         public static readonly DependencyProperty PostEditPatternBoxProperty = DependencyProperty.Register(
             "PostEditPatternBox", typeof(TextBox),
+            typeof(TestPostEditRuleControl)
+            );
+
+        public static readonly DependencyProperty PostEditPatternIsRegexProperty = DependencyProperty.Register(
+            "PostEditPatternIsRegex", typeof(CheckBox),
             typeof(TestPostEditRuleControl)
             );
 
@@ -107,10 +118,30 @@ namespace OpusCatMTEngine
             
         }
 
+        public CheckBox SourcePatternIsRegex
+        {
+            get => (CheckBox)GetValue(SourcePatternIsRegexProperty);
+            set
+            {
+                SetValue(SourcePatternIsRegexProperty, value);
+            }
+
+        }
+
         public TextBox PostEditPatternBox
         {
             get => (TextBox)GetValue(PostEditPatternBoxProperty);
             set => SetValue(PostEditPatternBoxProperty, value);
+        }
+
+        public CheckBox PostEditPatternIsRegex
+        {
+            get => (CheckBox)GetValue(PostEditPatternIsRegexProperty);
+            set
+            {
+                SetValue(PostEditPatternIsRegexProperty, value);
+            }
+
         }
 
         public TextBox PostEditReplacementBox
@@ -210,7 +241,7 @@ namespace OpusCatMTEngine
 
         }
 
-        public bool textBoxHandlersAssigned = false;
+        public bool handlersAssigned = false;
         private Visibility sourceBoxDefaultVisibility;
 
         public TestPostEditRuleControl()
@@ -228,6 +259,9 @@ namespace OpusCatMTEngine
             if (this.SourcePatternBox != null)
             {
                 this.SourcePatternBox.TextChanged += AnyControl_TextChanged;
+                this.SourcePatternIsRegex.Checked += AnyControl_TextChanged;
+                //TODO: do the same regex chekcbox changes to pre edit rule creation
+                this.SourcePatternIsRegex.Unchecked += AnyControl_TextChanged;
             }
         }
 
@@ -262,18 +296,23 @@ namespace OpusCatMTEngine
             if (this.PostEditPatternBox != null && this.PostEditReplacementBox != null)
             {
                 this.RuleCollection = new AutoEditRuleCollection();
+
                 this.RuleCollection.AddRule(
                     new AutoEditRule()
                     {
                         SourcePattern = this.SourcePatternBox.Text,
+                        SourcePatternIsRegex = this.SourcePatternIsRegex.IsChecked.Value,
                         OutputPattern = this.PostEditPatternBox.Text,
+                        OutputPatternIsRegex = this.PostEditPatternIsRegex.IsChecked.Value,
                         Replacement = this.PostEditReplacementBox.Text
                     });
-                if (!this.textBoxHandlersAssigned)
+                if (!this.handlersAssigned)
                 {
                     this.PostEditPatternBox.TextChanged += this.AnyControl_TextChanged;
                     this.PostEditReplacementBox.TextChanged += this.AnyControl_TextChanged;
-                    this.textBoxHandlersAssigned = true;
+                    this.PostEditPatternIsRegex.Checked += this.AnyControl_TextChanged;
+                    this.PostEditPatternIsRegex.Unchecked += this.AnyControl_TextChanged;
+                    this.handlersAssigned = true;
                 }
             }
 
@@ -418,7 +457,7 @@ namespace OpusCatMTEngine
             this.EditedOutputBox.Document.Blocks.Add(matchHighlightSource);
         }
 
-        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
+        private void AnyControl_TextChanged(object sender, EventArgs e)
         {
             //Changes to source pattern box may change visibility of source box in tester
             if (sender == this.SourcePatternBox)
