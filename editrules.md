@@ -130,8 +130,33 @@ The parts of the text, which match some rule, are highlighted. The image above s
 
 ### <a name="management"></a>Adding, removing, and deleting rule collections
 
-Rule collections can be added, removed or deleted in the **Edit rules** tab. Rule collections that have been defined as [global](#global), can be used in multiple projects, and they can be removed and added by using the **Add rule collection** and **Remove rule collection** buttons. Local and global rule collections can be permanently deleted by clicking the **Delete rule collection** button (deletion needs to be confirmed, as the same rule collection may be in use in other MT models):
+Rule collections can be added, removed or deleted in the **Edit rules** tab. Rule collections that have been defined as [global](#global), can be used in multiple MT models, and they can be removed and added by using the **Add rule collection** and **Remove rule collection** buttons. Local and global rule collections can be permanently deleted by clicking the **Delete rule collection** button (deletion needs to be confirmed, as the same rule collection may be in use in other MT models):
 
   <img src="./images/editrules20.png?raw=true" alt="drawing" width="100%"/>
 
-### <a name="advanced"></a>Advanced rule usage
+When you click the **Add rule collection** button, the **Add edit rule collection** window opens. The window contains a list of all global rule collections. Checkboxes next to the rule collection names indicate, whether a collection has already been included in the model, and you can add or remove collections by checking and unchecking the checkboxes:
+
+  <img src="./images/editrules21.png?raw=true" alt="drawing" width="100%"/>
+
+If we check the checkbox for the _Expand contractions_ rule collection and click the **Save** button, the _Expand contractions_ collection will be added to the rule collection list on the **Edit rules** tab:
+
+  <img src="./images/editrules22.png?raw=true" alt="drawing" width="100%"/>
+  
+The addition of the collection is also reflected in the tester of the **Edit rules** tab. Two pre-edit rule collections are now displayed in the tester, and the rules of both collections are applied to the source sentence before it is machine translated:
+
+  <img src="./images/editrules23.png?raw=true" alt="drawing" width="100%"/>
+  
+
+#### <a name="import_export"></a>Importing and exporting rule collections
+
+The **Add edit rule collection** window can also be used to import and export rule collections. There are two buttons in the top section of the window:
+
+  <img src="./images/editrules24.png?raw=true" alt="drawing" width="100%"/>
+
+  1. **Export checked**: With this button you can export the rule collections, which have a checked checkbox next to them in the list. When you click the button, a folder selection dialog opens, and you can browse to the folder to which you want to export the rule collections.
+  2. **Import rule collections**: With this button you can import rule collections and add them to the model. Imported rule collections become global, so they can also be used with other models after importing them. Next to this button is the **Replace existing rules** checkbox. If this checkbox is checked, the rule collections will overwrite existing rule collections that have same ID number. If the checkbox is not checked, the imported rule collection will receive a new ID number, and the old collection will not be overwritten.
+  
+## <a name="advanced"></a>Advanced rule usage
+
+
+### <a name="regex"></a>Using regular expressions in rules
