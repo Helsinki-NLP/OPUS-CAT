@@ -33,6 +33,7 @@ namespace OpusCatMTEngine
             this.PreEditPattern.Text = rule.SourcePattern;
             this.PreEditReplacement.Text = rule.Replacement;
             this.RuleDescription.Text = rule.Description;
+            this.UseRegexInSourcePattern.IsChecked = rule.OutputPatternIsRegex;
         }
 
         
@@ -43,6 +44,7 @@ namespace OpusCatMTEngine
                 new AutoEditRule()
                 {
                     SourcePattern = this.PreEditPattern.Text,
+                    SourcePatternIsRegex = this.UseRegexInSourcePattern.IsChecked.Value,
                     Replacement = this.PreEditReplacement.Text,
                     Description = this.RuleDescription.Text
                 };

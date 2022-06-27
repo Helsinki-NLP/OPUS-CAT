@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 
 namespace OpusCatMTEngine
 {
@@ -120,6 +121,20 @@ namespace OpusCatMTEngine
         {
             throw new NotSupportedException();
         }
+
     }
     
+    public class RichTextBoxHelper
+    {
+        public static void UpdateRichTextBoxWithCaretInSamePosition(RichTextBox rtBox, Paragraph newContent)
+        {
+            var caretIndex = new TextRange(rtBox.Document.ContentStart, rtBox.CaretPosition).Text.Length;
+            rtBox.Document.Blocks.Clear();
+            rtBox.Document.Blocks.Add(newContent);
+            rtBox.CaretPosition = rtBox.Document.ContentStart;
+            rtBox.CaretPosition = rtBox.CaretPosition.GetPositionAtOffset(caretIndex, LogicalDirection.Forward);
+        }
+    }
+    
+
 }

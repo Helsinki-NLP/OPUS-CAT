@@ -52,6 +52,11 @@ namespace OpusCatMTEngine
             typeof(TestPreEditRuleControl)
             );
 
+        public static readonly DependencyProperty SourcePatternIsRegexProperty = DependencyProperty.Register(
+            "SourcePatternIsRegex", typeof(CheckBox),
+            typeof(TestPreEditRuleControl)
+            );
+
         public static readonly DependencyProperty InputBoxLabelProperty = DependencyProperty.Register(
             "InputBoxLabel", typeof(string),
             typeof(TestPreEditRuleControl)
@@ -73,6 +78,15 @@ namespace OpusCatMTEngine
         {
             get => (TextBox)GetValue(PreEditPatternBoxProperty);
             set => SetValue(PreEditPatternBoxProperty, value);
+        }
+
+        public CheckBox SourcePatternIsRegex
+        {
+            get => (CheckBox)GetValue(SourcePatternIsRegexProperty);
+            set
+            {
+                SetValue(SourcePatternIsRegexProperty, value);
+            }
         }
 
         public TextBox PreEditReplacementBox
@@ -177,12 +191,15 @@ namespace OpusCatMTEngine
                     new AutoEditRule()
                     {
                         SourcePattern = this.PreEditPatternBox.Text,
+                        SourcePatternIsRegex = this.SourcePatternIsRegex.IsChecked.Value,
                         Replacement = this.PreEditReplacementBox.Text
                     });
                 if (!this.textBoxHandlersAssigned)
                 {
                     this.PreEditPatternBox.TextChanged += this.AnyControl_TextChanged;
                     this.PreEditReplacementBox.TextChanged += this.AnyControl_TextChanged;
+                    this.SourcePatternIsRegex.Checked += this.AnyControl_TextChanged;
+                    this.SourcePatternIsRegex.Unchecked += this.AnyControl_TextChanged;
                     this.textBoxHandlersAssigned = true;
                 }
             }
@@ -274,7 +291,7 @@ namespace OpusCatMTEngine
             this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 
-        public void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
+        public void AnyControl_TextChanged(object sender, EventArgs e)
         {
             if (this.TestActive)
             {
@@ -289,8 +306,9 @@ namespace OpusCatMTEngine
                 var sourceText = sourceTextRange.Text.Trim('\r', '\n');
                 this.RulesAppliedRun.Text = "";
                 
-                this.SourceBox.Document.Blocks.Clear();
-                this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
+                var cleanSource = new Paragraph(new Run(sourceText));
+                RichTextBoxHelper.UpdateRichTextBoxWithCaretInSamePosition(this.SourceBox, cleanSource);
+                
             }
         }
     }

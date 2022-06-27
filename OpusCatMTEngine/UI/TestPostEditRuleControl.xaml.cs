@@ -260,8 +260,8 @@ namespace OpusCatMTEngine
             {
                 this.SourcePatternBox.TextChanged += AnyControl_TextChanged;
                 this.SourcePatternIsRegex.Checked += AnyControl_TextChanged;
-                //TODO: do the same regex chekcbox changes to pre edit rule creation
                 this.SourcePatternIsRegex.Unchecked += AnyControl_TextChanged;
+                AnyControl_TextChanged(this.SourcePatternBox, null);
             }
         }
 
@@ -484,13 +484,13 @@ namespace OpusCatMTEngine
                 //Remove highlights from source and unedited output
                 TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
                 var sourceText = sourceTextRange.Text.Trim('\r', '\n');
-                this.SourceBox.Document.Blocks.Clear();
-                this.SourceBox.Document.Blocks.Add(new Paragraph(new Run(sourceText)));
+                var cleanSource = new Paragraph(new Run(sourceText));
+                RichTextBoxHelper.UpdateRichTextBoxWithCaretInSamePosition(this.SourceBox, cleanSource);
 
                 TextRange outputTextRange = new TextRange(this.OutputBox.Document.ContentStart, this.OutputBox.Document.ContentEnd);
                 var outputText = outputTextRange.Text.Trim('\r', '\n');
-                this.OutputBox.Document.Blocks.Clear();
-                this.OutputBox.Document.Blocks.Add(new Paragraph(new Run(outputText)));
+                var cleanOutput = new Paragraph(new Run(outputText));
+                RichTextBoxHelper.UpdateRichTextBoxWithCaretInSamePosition(this.OutputBox, cleanOutput);
 
             }
         }

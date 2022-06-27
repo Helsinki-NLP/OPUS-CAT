@@ -19,9 +19,10 @@
                                 <TextBox Name="RuleDescription" />
                             </DockPanel>
                             <Separator Margin="5"></Separator>
-                            <DockPanel Margin="5,0">
+                            <DockPanel LastChildFill="False" Margin="5,0">
                                 <Label>Pre-edit pattern</Label>
-                                <TextBox Name="PreEditPattern" />
+                                <TextBox Width="570" Name="PreEditPattern" />
+                                <CheckBox Name="UseRegexInSourcePattern" Width="80" VerticalAlignment="Center" DockPanel.Dock="Right">Use regex</CheckBox>
                             </DockPanel>
                             <Separator Margin="5"></Separator>
                             <DockPanel Margin="5,0,5,5">
@@ -32,6 +33,7 @@
                     </Border>
                     <local:TestPreEditRuleControl x:Name="TestControl"
                         PreEditPatternBox="{Binding ElementName=PreEditPattern}"
+                        SourcePatternIsRegex="{Binding ElementName=UseRegexInSourcePattern}"
                         PreEditReplacementBox="{Binding ElementName=PreEditReplacement}"
                         Title="Test pre-edit rule"
                         InputBoxLabel="Source text"
