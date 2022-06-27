@@ -33,7 +33,7 @@ namespace OpusCatMTEngine
             this.PreEditPattern.Text = rule.SourcePattern;
             this.PreEditReplacement.Text = rule.Replacement;
             this.RuleDescription.Text = rule.Description;
-            this.UseRegexInSourcePattern.IsChecked = rule.OutputPatternIsRegex;
+            this.UseRegexInSourcePattern.IsChecked = rule.SourcePatternIsRegex;
         }
 
         

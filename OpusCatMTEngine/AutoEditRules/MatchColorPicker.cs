@@ -14,12 +14,12 @@ namespace OpusCatMTEngine
         {
             Brushes.Chartreuse,
             Brushes.CadetBlue,
-            Brushes.ForestGreen,
-            Brushes.DeepPink,
+            Brushes.HotPink,
+            Brushes.LightGreen,
             Brushes.DodgerBlue,
             Brushes.Fuchsia,
             Brushes.Orange,
-            Brushes.Indigo
+            Brushes.Aquamarine
         };
 
         public static void ResetIndex()

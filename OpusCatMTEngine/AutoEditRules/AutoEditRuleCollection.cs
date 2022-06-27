@@ -256,7 +256,18 @@ namespace OpusCatMTEngine
 
             return new AutoEditResult(edited, appliedReplacements);
         }
-        
+
+        private string FirstLetterToUpper(string str)
+        {
+            if (str == null)
+                return null;
+
+            if (str.Length > 1)
+                return char.ToUpper(str[0]) + str.Substring(1);
+
+            return str.ToUpper();
+        }
+
         public AutoEditResult ProcessPostEditRules(string source, string unedited)
         {
             string edited = unedited;
@@ -284,7 +295,7 @@ namespace OpusCatMTEngine
                 var sourceGroupMatches = 
                     Regex.Matches(
                         replacement,
-                        @"(^(\$\$)*\$|[^$](\$\$)*\$)<(?<casingOperator>[LU])?(?<sourceGroup>\d+)>");
+                        @"(^(\$\$)*\$|[^$](\$\$)*\$)<(?<casingOperator>[LUC])?(?<sourceGroup>\d+)>");
 
                 if (sourceGroupMatches.Count > 0)
                 {
@@ -307,6 +318,10 @@ namespace OpusCatMTEngine
                                 else if (casingOperator.Value == "U")
                                 {
                                     replacement = replacement.Replace($"$<U{sourceGroupIndex}>", sourceGroup.Value.ToUpper());
+                                }
+                                else if (casingOperator.Value == "C")
+                                {
+                                    replacement = replacement.Replace($"$<C{sourceGroupIndex}>", this.FirstLetterToUpper(sourceGroup.Value));
                                 }
                             }
                             else
@@ -356,7 +371,7 @@ namespace OpusCatMTEngine
             var casingGroupMatches =
                     Regex.Matches(
                         replacement,
-                        @"(^(\$\$)*\$|[^$](\$\$)*\$)(?<casingOperator>[LU])(?<outputGroup>\d+)");
+                        @"(^(\$\$)*\$|[^$](\$\$)*\$)(?<casingOperator>[LUC])(?<outputGroup>\d+)");
 
             if (casingGroupMatches.Count > 0)
             {
@@ -376,7 +391,12 @@ namespace OpusCatMTEngine
                     {
                         replacement = replacement.Replace($"$U{outputGroupIndex}", outputGroup.Value.ToUpper());
                     }
-                    
+
+                    else if (casingOperator.Value == "C")
+                    {
+                        replacement = replacement.Replace($"$C{outputGroupIndex}", this.FirstLetterToUpper(outputGroup.Value));
+                    }
+
                     longestMatch.Output = replacement;
                 }
             }
