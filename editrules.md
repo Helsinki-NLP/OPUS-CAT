@@ -6,6 +6,15 @@ permalink: /editrules
 
 Automatic edit rules can be used to edit the source text before translating it with MT models (_pre-edit rules_), or to edit the machine translation (_post-edit rules_). Regular expressions ([.NET regex flavor](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference)) can be used in the rules. Rules are organized into _rule collections_, which can contain any number of rules. 
 
+## Contents
+1. [Quickstart (pre-edit rules)](#Quickstart)
+2. [Rule collections](#rule_collections) 
+3. [Post-edit rules](#post_edit_rules)
+4. [Rule testers](#rule_testers)
+5. [Managing rule collections](#management)
+6. [Using regular expressions in rules](#regex)
+7. [Using rule collections sequentially](#sequential_use)
+
 ### <a name="Quickstart"></a>Quickstart: Adding a simple pre-edit rule
 
 1. Select a model from the **Models** tab and click **Edit Rules**.
@@ -43,7 +52,7 @@ Automatic edit rules can be used to edit the source text before translating it w
 
     <img src="./images/editrules7.png?raw=true" alt="drawing" width="100%"/>
 
-### Rule collections
+### <a name="rule_collections"></a>Rule collections
 
 As mentioned, automatic edit rules are organized into _rule collections_, which may contain any amount of rules. Every rule must be part of a rule collection, so when you create a rule using the **Create rule** button (as in the quickstart section above), a rule collection is also created to contain the rule. The default name of the created rule collection is the same as the description of the rule that it contains (_fix "acheive" misspelling_ in the example above). You can edit a rule collection by selecting it from the list and clicking **Edit rule collection**:
 
@@ -61,7 +70,7 @@ The **Edit rules in collection** window contains a field for the name of the col
 
 After you have edited the collection by adding, deleting, or modifying rules or by changing the collection name or its global status, you can either save the modifications by clicking the **Save** button, or reject them by clicking the **Cancel** button. 
 
-### Post-edit rules
+### <a name="post_edit_rules"></a>Post-edit rules
 
 Post-edit rules are used to edit the output of the machine translation produced by the model. You can create a post-edit rule by clicking on the **Create rule** button in the **Post-edit rule collections** section of the **Edit rules** tab:
 
@@ -93,7 +102,7 @@ Once the post-edit rule has been defined, it can be saved by clicking the **Save
 
   <img src="./images/editrules13.png?raw=true" alt="drawing" width="100%"/>
 
-### Rule testers
+### <a name="rule_testers"></a>Rule testers
 
 Rule testers can be used to verify that the edit rules work correctly both individually and in combination with other rules. Testers are available in the following contexts:
   1. **Create pre-edit rule** and **Create post-edit rule** windows
@@ -196,6 +205,18 @@ Capturing groups capture the part of the source text that they match. For instan
 
 The capturing groups of the rule pattern capture the letter sequences in the incorrectly hyphenated word, and the replacement _$1$2_ reconstructs the word without the hyphen.
 
+#### Changing the character case of text matched by capturing groups
+
+The regular expressions in the OPUS-MT Engine contain some extensions to the .NET regular expression language. One of these is the possibility to convert the text matched by capturing group into lower or upper case. The case of the letters in a capturing group can be converted by adding _L_ (for lower case), _U_ (for upper case), or _C_ (for upper-case first letter) after the dollar sign but before the index. Let's say for instance that the source text contains sentences that are written in ALL CAPS, i.e. just using upper case letters. This may degrade the quality of the machine translation, so it makes sense to convert the source sentence to lower case before machine translating it. This can be done with the following rule:
+
+  <img src="./images/editrules35.png?raw=true" alt="drawing" width="100%"/>
+  
+In this rule, the source pattern contains two capturing groups, one for the initial character in the sentence, and the second for matching the rest of the sentence. The pattern only matches whole sentences where all letter characters are upper case (_[^\p{Ll}]_ matches everything except lower-case characters). In the replacement field, $L2 converts the contents of the second group to lower case. Since the first character in a sentence should be upper case, it is copied from the source without case conversion by just using _$1_. We can verify that the rule works by using the tester:
+
+  <img src="./images/editrules36.png?raw=true" alt="drawing" width="100%"/>
+  
+Note that the match covers the whole sentence. This is intended, since the rule should be used only with sentences that contain no lower-case letters.
+
 #### Referencing source pattern capturing groups in post-edit rules
 
 As mentioned before, post-edit rules have a source pattern field, which can be used as a condition for rule application: if a source pattern is defined, the source text must match the pattern, otherwise the rule will not be applied. It is also possible to use capturing groups in the source pattern field of post-edit rules. This makes it possible to copy parts of text from the source sentence when applying a post-edit rule. The following example shows one scenario, in which this functionality can be useful:
@@ -215,4 +236,43 @@ The initial _ERROR_ part of these sentences should not be translated, but usuall
 The _$<1>_ in the replacement field is a reference to a capturing group in the source pattern. The capturing group will contain the _ERROR-XXXXX_ part of the source sentence, so it can be used to transfer the text from source to the translation. We can see this rule in action by using the tester:
 
   <img src="./images/editrules34.png?raw=true" alt="drawing" width="100%"/>
+
+Note that this rule assumes that the translation will preserve the format of the source sentence, i.e. that there will be a colon in the translation to demarcate the point up to which the translation should be replaced with the source text. This might not be the case, since the colon may well be omitted in the machine translation. We can avoid this problem by combining this rule with a pre-edit rule that removes the error code portion of the source text before the source sentence is machine translated:
+
+  <img src="./images/editrules37.png?raw=true" alt="drawing" width="100%"/>
+
+With this rule, the problematic _ERROR-XXXXX:_ part of the sentence is removed before machine translation, so it does not have be replaced by a post-edit rule. Instead, we can use a simpler post-edit rule, which simply adds the _ERROR-XXXXX_ part directly from the original source to the translation, bypassing machine translation entirely:
+
+  <img src="./images/editrules38.png?raw=true" alt="drawing" width="100%"/>
+
+We can verify that these rules work correctly together by using the tester for the whole translation pipeline in the **Edit rules** tab:
+
+  <img src="./images/editrules39.png?raw=true" alt="drawing" width="100%"/>
+  <img src="./images/editrules40.png?raw=true" alt="drawing" width="100%"/>
+
+As you can see from the images above, the two rules transfer the text from the original source (top field of the tester) to the final translation (bottom field in the tester), without ever machine translating the problematic part of the source sentence.
+
+### <a name="sequential_use"></a>Using rule collections sequentially
+
+As was demonstrated in the previous section, using rules in combination can be more powerful than just using a single rule. It is also possible to use several pre-edit or post-edit rules together to make more complex replacements than single rules allow for. Each rule collection is processed sequentially, which means that the output of the previous rule collection is used as the input of the next rule collection. To see how rule collections can be combined sequentially to perform complex replacements, let's return to the case conversion example from the previous section. In the case conversion example we created a rule, which converted ALL CAPS source sentences to lower case (except for the first letter):
+
+  <img src="./images/editrules35.png?raw=true" alt="drawing" width="100%"/>
   
+There is a big problem with this rule: it converts all upper-case letters to lower case except for the initial letter, but there may well be other letters in the sentence that should be capitalized (e.g. proper nouns, such as _Paris_ or _John_) or written in upper case (e.g. many abbreviations, such as _EU_ and _UN_). These upper case words can be handled by adding another pre-edit rule collection, which takes the case conversion output as its input and restores the proper casing. The rule collection contains two rules, the first of which restores proper nouns:
+
+  <img src="./images/editrules41.png?raw=true" alt="drawing" width="100%"/>
+
+The capitalization operator _$C1_ is used in the rule to just upper case the first letter of the capturing group match. The regular expression special characters _\b_ at the start and end of the pattern mean that the pattern will only match complete words (otherwise _mary_ would match with _summary_ etc.)  Note that even though the source pattern here contains only four proper nouns, it would be fairly easy to create a regular expression covering a much larger selection of proper nouns by using e.g. a text editor and a list of proper nouns. To verify that the two rule collections work together, we can again use the tester for the whole translation pipeline:
+
+  <img src="./images/editrules42.png?raw=true" alt="drawing" width="100%"/>
+  <img src="./images/editrules43.png?raw=true" alt="drawing" width="100%"/>
+
+The tester shows that the ALL CAPS sentence is first converted to lower case by the first rule collection, and then the second rule collection restores the correct casing for _Paris_. If we want to also restore the correct casing for abbreviations, we can add a second rule to the case restoration rule collection:
+
+  <img src="./images/editrules44.png?raw=true" alt="drawing" width="100%"/>
+  
+This time we use the upper casing operator _$U1_ to upper case the abbreviation. Again, we verify that the rules are working correctly with the complete pipeline tester:
+
+  <img src="./images/editrules45.png?raw=true" alt="drawing" width="100%"/>
+  
+By combining sequential rule collections in this way, very complex replacement operations can be performed.
