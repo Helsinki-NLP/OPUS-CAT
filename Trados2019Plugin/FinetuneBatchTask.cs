@@ -12,6 +12,7 @@ using Sdl.Core.Globalization;
 using System.Windows.Forms;
 using Sdl.Core.Settings;
 using Sdl.LanguagePlatform.TranslationMemory;
+using OpusCatMTEngine;
 
 namespace OpusCatTranslationProvider
 {
@@ -29,7 +30,7 @@ namespace OpusCatTranslationProvider
         private FinetuneBatchTaskSettings settings;
         private OpusCatOptions opusCatOptions;
         private Dictionary<Language, List<ITranslationMemoryLanguageDirection>> tms;
-        internal Dictionary<Language,List<Tuple<string, string>>> ProjectTranslations;
+        internal Dictionary<Language,List<ParallelSentence>> ProjectTranslations;
 
         public Dictionary<Language, List<string>> ProjectNewSegments { get; private set; }
 
@@ -68,7 +69,7 @@ namespace OpusCatTranslationProvider
             //Get instances of the translation memories included in the project.
             this.tms = this.InstantiateProjectTms();
 
-            this.ProjectTranslations = new Dictionary<Language, List<Tuple<string, string>>>();
+            this.ProjectTranslations = new Dictionary<Language, List<ParallelSentence>>();
             this.ProjectNewSegments = new Dictionary<Language, List<string>>();
             this.ProjectFuzzies = new Dictionary<Language, List<TranslationUnit>>();
             this.sourceVisitor = new OpusCatProviderElementVisitor();
@@ -172,11 +173,11 @@ namespace OpusCatTranslationProvider
                 var targetCode = targetLang.CultureInfo.TwoLetterISOLanguageName;
                 var uniqueNewSegments = this.ProjectNewSegments[targetLang].Distinct().ToList();
                 //Send the new segments to MT service
-                var result = OpusCatMTServiceHelper.PreOrderBatch(opusCatOptions.mtServiceAddress, opusCatOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, opusCatOptions.modelTag);
+                var result = OpusCatProvider.OpusCatMtEngineConnection.PreOrderBatch(opusCatOptions.mtServiceAddress, opusCatOptions.mtServicePort, uniqueNewSegments, sourceCode, targetCode, opusCatOptions.modelTag);
 
                 switch (result)
                 {
-                    case "batch translation or customization already in process":
+                    case HttpStatusCode.ServiceUnavailable:
                         throw new Exception("MT engine is currently batch translating or fine-tuning, wait for previous job to finish (or cancel it by restarting MT engine).");
                     default:
                         break;
@@ -184,10 +185,10 @@ namespace OpusCatTranslationProvider
             }
         }
 
-        private List<Tuple<string, string>> ExtractFromTm(
+        private List<ParallelSentence> ExtractFromTm(
             List<ITranslationMemoryLanguageDirection> tms,
             List<string> uniqueNewSegments,
-            List<Tuple<string, string>> uniqueProjectTranslations)
+            List<ParallelSentence> uniqueProjectTranslations)
         {
 
             //assign fuzzy min and all above percentage divisible by ten as fuzzybands
@@ -247,7 +248,7 @@ namespace OpusCatTranslationProvider
             var uniqueProjectTranslations = this.ProjectTranslations[primaryTargetLanguage].Distinct().ToList();
             List<string> uniqueNewSegments = this.ProjectNewSegments[primaryTargetLanguage].Distinct().ToList();
 
-            List<Tuple<string, string>> finetuneSet;
+            List<ParallelSentence> finetuneSet;
             if (this.tms[primaryTargetLanguage].Any())
             {
                 var tmExtracts = this.ExtractFromTm(this.tms[primaryTargetLanguage], uniqueNewSegments, uniqueProjectTranslations);
@@ -267,7 +268,7 @@ namespace OpusCatTranslationProvider
             }
 
             //Send the tuning set to MT service
-            var result = OpusCatMTServiceHelper.Customize(
+            var result = OpusCatProvider.OpusCatMtEngineConnection.Customize(
                 this.opusCatOptions.mtServiceAddress,
                 this.opusCatOptions.mtServicePort,
                 finetuneSet,

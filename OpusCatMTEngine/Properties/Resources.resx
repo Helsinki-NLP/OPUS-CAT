@@ -284,8 +284,8 @@
   <data name="opus" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\UI\opus.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Progress_BleuAxis" xml:space="preserve">
-    <value>BLEU score</value>
+  <data name="Progress_MetricAxis" xml:space="preserve">
+    <value>Metric score</value>
   </data>
   <data name="Progress_InDomainSeriesName" xml:space="preserve">
     <value>In-domain validation set</value>
@@ -297,10 +297,10 @@
     <value>Validation step</value>
   </data>
   <data name="Settings_HttpPortLabel" xml:space="preserve">
-    <value>MT service HTTP port (used with other integrations, 1024-65535):</value>
+    <value>MT service HTTP port (used with current plugins and integrations, 1024-65535):</value>
   </data>
   <data name="Settings_NetTcpPortLabel" xml:space="preserve">
-    <value>MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):</value>
+    <value>MT service net.tcp port (used with older Trados and memoQ plugins, 1024-65535):</value>
   </data>
   <data name="Settings_NoteHeading" xml:space="preserve">
     <value>Note:</value>
@@ -361,5 +361,92 @@
   </data>
   <data name="Main_CancelOverrideButton" xml:space="preserve">
     <value>Cancel override</value>
+  </data>
+  <data name="Finetune_NotEnoughSegmentsInTmx" xml:space="preserve">
+    <value>Not enough parallel segments in the TMX.</value>
+  </data>
+  <data name="Main_NonAsciiPathCaption" xml:space="preserve">
+    <value>Illegal characters in path</value>
+  </data>
+  <data name="Main_NonAsciiPathMessage" xml:space="preserve">
+    <value>The path where OPUS-CAT MT Engine stores MT models ({0}) contains the following illegal characters: {1}. Install OPUS-CAT MT Engine to a path with no illegal characters in it (for instance, in a folder in the root of the C: drive, such as C:\opuscat).</value>
+  </data>
+  <data name="SelectTmxLangPair_Instructions" xml:space="preserve">
+    <value>The TMX file does not contain languages compatible with the language codes of the MT model, or there are not enough segments for the compatible language pair. Language pairs included in the TMX file and the amount of segments per language pair are listed below. You can either select one of the language pairs to extract as fine-tuning material, or cancel fine-tuning.</value>
+  </data>
+  <data name="SelectTmxLangPair_Title" xml:space="preserve">
+    <value>Select language pair</value>
+  </data>
+  <data name="Main_EvaluateModelsButton" xml:space="preserve">
+    <value>Evaluate models</value>
+  </data>
+  <data name="Evaluation_LanguagePair" xml:space="preserve">
+    <value>Language pair to evaluate</value>
+  </data>
+  <data name="Evaluation_TermbaseLabel" xml:space="preserve">
+    <value>Termbase file (.tbx)</value>
+  </data>
+  <data name="Evaluation_TermTranslationsLabel" xml:space="preserve">
+    <value>Termbase</value>
+  </data>
+  <data name="Evaluation_TestSetLabel" xml:space="preserve">
+    <value>Source text and reference translation</value>
+  </data>
+  <data name="Evaluation_EvaluateButton" xml:space="preserve">
+    <value>Evaluate</value>
+  </data>
+  <data name="EditRules_AddRuleCollectionButton" xml:space="preserve">
+    <value>Add rule collection</value>
+  </data>
+  <data name="EditRules_CreateRuleButton" xml:space="preserve">
+    <value>Create rule</value>
+  </data>
+  <data name="EditRules_DeleteRuleCollectionButton" xml:space="preserve">
+    <value>Delete rule collection</value>
+  </data>
+  <data name="EditRules_EditRuleCollectionButton" xml:space="preserve">
+    <value>Edit rule collection</value>
+  </data>
+  <data name="EditRules_EditRulesTitle" xml:space="preserve">
+    <value>Edit rules for model {0}</value>
+  </data>
+  <data name="EditRules_RemoveRuleCollectionButton" xml:space="preserve">
+    <value>Remove rule collection</value>
+  </data>
+  <data name="Main_EditRulesButton" xml:space="preserve">
+    <value>Edit rules</value>
+  </data>
+  <data name="EditRules_AddEditRuleCollectionTitle" xml:space="preserve">
+    <value>Add edit rule collection</value>
+  </data>
+  <data name="EditRules_CreatePreEditRuleTitle" xml:space="preserve">
+    <value>Create edit rule</value>
+  </data>
+  <data name="EditRules_CreatePostEditRuleTitle" xml:space="preserve">
+    <value>Create post-edit rule</value>
+  </data>
+  <data name="EditRules_DeleteRuleButton" xml:space="preserve">
+    <value>Delete rule</value>
+  </data>
+  <data name="EditRules_EditRuleButton" xml:space="preserve">
+    <value>Edit rule</value>
+  </data>
+  <data name="EditRules_EditRuleCollectionTitle" xml:space="preserve">
+    <value>Edit rules in collection {0}</value>
+  </data>
+  <data name="Rules_DeleteRuleCollectionConfirmation" xml:space="preserve">
+    <value>Are you sure want to permanently delete rule collection {0}? This collection may be in use with other models, and it will also be deleted from those models.</value>
+  </data>
+  <data name="EditRules_MoveDownButton" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="EditRules_MoveUpButton" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="EditRules_EditRulesHeading" xml:space="preserve">
+    <value>Edit rules</value>
+  </data>
+  <data name="Online_FailedStatus" xml:space="preserve">
+    <value>Installation failed</value>
   </data>
 </root>

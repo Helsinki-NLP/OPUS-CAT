@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using Octokit;
+using Python.Runtime;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,6 +9,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.ServiceModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,7 +20,7 @@ namespace OpusCatMTEngine
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public static Overlay Overlay { get; private set; }
 
@@ -72,13 +75,13 @@ namespace OpusCatMTEngine
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            System.Windows.Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
             if (!App.HasAvxSupport())
             {
                 MessageBox.Show(
                     "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.");
-                Application.Current.Shutdown(1);
+                System.Windows.Application.Current.Shutdown(1);
             }
 
             //Create data dir
@@ -99,6 +102,7 @@ namespace OpusCatMTEngine
             Log.Information("Opening OPUS-CAT MT Engine window");
 
             // Create the startup window
+            //TODO: make it possible to start the engine without launching UI
             MainWindow wnd = new MainWindow();
             // Show the window
             wnd.Show();
@@ -111,6 +115,72 @@ namespace OpusCatMTEngine
             {
                 App.CloseOverlay();
             }
+
+            this.InitializePythonEngine();
+
+            this.CheckForUpdatesAsync();
+        }
+
+        private async void CheckForUpdatesAsync()
+        {
+            //Get info for all releases from Github
+            try
+            {
+                var client = new GitHubClient(new ProductHeaderValue("OpusCatMTEngine"));
+                var releases = await client.Repository.Release.GetAll(
+                    OpusCatMTEngineSettings.Default.GithubOrg,
+                    OpusCatMTEngineSettings.Default.GithubRepo);
+
+                var releasesWithNotes = releases.Where(x => x.Assets.Any(y => y.Name == "release_notes.txt") && !x.Prerelease);
+                var latestRelease = releasesWithNotes.OrderByDescending(x => x.PublishedAt).FirstOrDefault();
+                if (latestRelease == null)
+                {
+                    Log.Information("No release with release notes found in Github repo");
+                    return;
+                }
+
+                var downloadUrl = latestRelease.Assets.Single(x => x.Name == "release_notes.txt").BrowserDownloadUrl;
+
+                
+
+                string release_notes;
+                using (var webClient = new WebClient())
+                {
+                    release_notes = webClient.DownloadString(new Uri(downloadUrl));
+                }
+
+                var latestVersion = new Version(release_notes.Split(new[] { '\r', '\n' }).First());
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                if (latestVersion > currentVersion)
+                {
+                    string messageBoxText = "A new OPUS-CAT version is available. Click OK to download open the download page for new version.";
+                    string caption = "New version";
+                    MessageBoxButton button = MessageBoxButton.OKCancel;
+                    MessageBoxImage icon = MessageBoxImage.Information;
+                    MessageBoxResult result;
+                    result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
+                    if (result == MessageBoxResult.OK)
+                    {
+                        System.Diagnostics.Process.Start(latestRelease.HtmlUrl);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Exception during update check: {ex.Message}");
+            }
+
+        }
+        
+
+        private void InitializePythonEngine()
+        {
+            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll");
+            Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64");
+            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64");
+            PythonEngine.Initialize();
+            PythonEngine.BeginAllowThreads();
         }
 
         /// <summary>

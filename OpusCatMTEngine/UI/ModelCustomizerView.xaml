@@ -7,7 +7,7 @@
         xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
         mc:Ignorable="d"
         x:Name="_this"
-        Height="500" Width="700">
+        Height="400" Width="700">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <local:ValidationErrorConverter x:Key="ValidationErrorConverter" />
@@ -46,7 +46,8 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <DockPanel Margin="5">
+    <ScrollViewer>
+    <StackPanel Margin="5">
         <StackPanel DockPanel.Dock="Top">
             <Border Style="{StaticResource BorderStyle}" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
@@ -171,7 +172,7 @@
                 <TextBox IsEnabled="{Binding ElementName=_this,Path=CustomizationNotStarted, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ValidatedTextBoxStyle}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=true, ValidatesOnDataErrors=True, Mode=TwoWay}" Width="200"></TextBox>
             </StackPanel>
         </StackPanel>
-        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
+        <DockPanel DockPanel.Dock="Right" LastChildFill="False" Height="50">
             <!--<Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>-->
             <Button 
                 Name="CustomizeButton" 
@@ -196,5 +197,6 @@
                 </Button.IsEnabled>
             </Button>
         </DockPanel>
-    </DockPanel>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

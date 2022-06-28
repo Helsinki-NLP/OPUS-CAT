@@ -53,7 +53,11 @@ namespace OpusCatTranslationProvider
             StringBuilder connectionResult = new StringBuilder();
             try
             {
-                ConnectionControl.MtServiceLanguagePairs = OpusCatMTServiceHelper.ListSupportedLanguages(host,port);
+                if (OpusCatProvider.OpusCatMtEngineConnection == null)
+                {
+                    OpusCatProvider.OpusCatMtEngineConnection = new OpusCatMtServiceConnection();
+                }
+                ConnectionControl.MtServiceLanguagePairs = OpusCatProvider.OpusCatMtEngineConnection.ListSupportedLanguages(host,port);
                 IEnumerable<string> modelTagLanguagePairs;
                 if (this.LanguagePairs != null)
                 {
@@ -77,7 +81,7 @@ namespace OpusCatTranslationProvider
                     {
                         connectionResult.Append(Environment.NewLine);
                         var sourceTarget = pair.Split('-');
-                        connectionResult.Append(OpusCatMTServiceHelper.CheckModelStatus(host, port, sourceTarget[0], sourceTarget[1], modeltag));
+                        connectionResult.Append(OpusCatProvider.OpusCatMtEngineConnection.CheckModelStatus(host, port, sourceTarget[0], sourceTarget[1], modeltag));
                     }
                 }
                 else
@@ -93,7 +97,7 @@ namespace OpusCatTranslationProvider
                 foreach (var languagePair in modelTagLanguagePairs)
                 {
                     var pairSplit = languagePair.Split('-');
-                    modelTags.AddRange(OpusCatMTServiceHelper.GetLanguagePairModelTags(host, port, pairSplit[0],pairSplit[1]));
+                    modelTags.AddRange(OpusCatProvider.OpusCatMtEngineConnection.GetLanguagePairModelTags(host, port, pairSplit[0],pairSplit[1]));
                 }
 
                 this.NoConnection = false;

@@ -85,6 +85,7 @@ namespace OpusCatMTEngine
             }
             
             ((ModelManager)this.DataContext).OverrideModel = selectedModel;
+            ((ModelManager)this.DataContext).OverrideModelTargetLanguage = selectedModel.TargetLanguages.First();
             ((ModelManager)this.DataContext).MoveOverrideToTop();
         }
 
@@ -151,17 +152,7 @@ namespace OpusCatMTEngine
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.AddTab(new ActionTabItem() { Content = translateView, Header = translateView.Title, Closable = true });
         }
-
-        //TODO: Open a window where the test file is translated with the model.
-        //Show the BLEU score and translation time etc.
-        private void btnTestModel_Click(object sender, RoutedEventArgs e)
-        {
-            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            TestView testView = new TestView(selectedModel);
-
-            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.AddTab(new ActionTabItem() { Content = testView, Header = testView.Title, Closable = true });
-        }
+        
 
         private void btnEditModelTags_Click(object sender, RoutedEventArgs e)
         {
@@ -180,6 +171,17 @@ namespace OpusCatMTEngine
 
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.AddTab(new ActionTabItem() { Content = customizeModel, Header = customizeModel.Title, Closable = true });
+        }
+
+        private void btnEvaluateModels_Click(object sender, RoutedEventArgs e)
+        {
+            IEnumerable<MTModel> selectedModels = this.LocalModelList.SelectedItems.OfType<MTModel>().ToList();
+            ModelEvaluatorView evaluateModels = new ModelEvaluatorView(selectedModels);
+
+            customizeModel.DataContext = this.DataContext;
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = evaluateModels, Header = evaluateModels.Title, Closable = true });
         }
 
         private void GridViewColumnHeaderClickedHandler(object sender, RoutedEventArgs e)
@@ -243,6 +245,20 @@ namespace OpusCatMTEngine
         private void btnOpenModelInOverlay_Click(object sender, RoutedEventArgs e)
         {
             //TODO: open an overlay that is always on top and displays translation
+        }
+
+        private void EditRulesTag_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            EditRulesView editRules = 
+                new EditRulesView(
+                    selectedModel, 
+                    ((ModelManager)this.DataContext).AutoPreEditRuleCollections,
+                    ((ModelManager)this.DataContext).AutoPostEditRuleCollections);
+            editRules.DataContext = this.DataContext;
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = editRules, Header = editRules.Title, Closable = true });
         }
     }
 

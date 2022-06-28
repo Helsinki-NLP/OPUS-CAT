@@ -77,7 +77,7 @@ EXIT /B %ERRORLEVEL%
 	REM the findstr command appends a number to each line, the string replacement on the last line
 	REM strips it. this ensures that blank lines aren't discarded (if they are, parallel files go out of sync)
     for /f "usebackq delims=" %%a in (`findstr /N "^" "%~1"`) do (
-        set /a file=!line!/%nLines%
+        if %~2==0 (set /a file=1) else (set /a file=!line!/%nLines%)
 		if !line! LEQ !nLines! (set /a line+=1)
 		set "linecontent=%%a"
 		REM Remove spaces between bpe tokens

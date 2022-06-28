@@ -179,7 +179,7 @@ namespace OpusCatTranslationProvider
                 NotifyPropertyChanged();
             }
         }
-
+        
         public int pregenerateSegmentCount
         {
             get
@@ -206,6 +206,15 @@ namespace OpusCatTranslationProvider
                 }
                 NotifyPropertyChanged();
             }
+        }
+
+        public Boolean restoreTags
+        {
+            get
+            {
+                return GetBooleanParameter("restoreTags", defaultValue: OpusCatTpSettings.Default.RestoreTags);
+            }
+            set { SetBooleanParameter("restoreTags", value); NotifyPropertyChanged(); }
         }
 
         public Boolean showMtAsOrigin

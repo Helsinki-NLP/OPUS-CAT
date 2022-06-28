@@ -5,12 +5,12 @@ using MemoQ.Addins.Common.Framework;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FiskmoMTPlugin")]
+[assembly: AssemblyTitle("OpusCatMTPlugin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tommi Nieminen")]
-[assembly: AssemblyProduct("FiskmoMTPlugin")]
-[assembly: AssemblyCopyright("Copyright © Tommi Nieminen 2020")]
+[assembly: AssemblyProduct("OpusCatMTPlugin")]
+[assembly: AssemblyCopyright("Copyright © Tommi Nieminen 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using MemoQ.Addins.Common.Framework;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("A72C466D-67B0-46B4-A4E9-39B30DFC4FC5")]
+[assembly: Guid("2972C5BD-115D-46C6-97E0-2F779151F501")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -35,4 +35,4 @@ using MemoQ.Addins.Common.Framework;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Module(ModuleName = "Fiskmo MT", ClassName = "FiskmoMTPlugin.FiskmoMTPluginDirector")]
+[assembly: Module(ModuleName = "OPUS-CAT MT Plugin", ClassName = "OpusCatMTPlugin.OpusCatMTPluginDirector")]

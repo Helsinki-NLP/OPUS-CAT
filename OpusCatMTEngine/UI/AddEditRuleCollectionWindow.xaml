@@ -1,0 +1,57 @@
+﻿<Window x:Class="OpusCatMTEngine.AddEditRuleCollectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
+        mc:Ignorable="d"
+        x:Name="_this"
+        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="400" Width="500">
+    <Grid>
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+            <StackPanel Height="360">
+                <Label Margin="10,0,0,0" FontSize="20" Content="Check rule collections to use with model"/>
+                <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="5">
+                    <Button  DockPanel.Dock="Left" Padding="5" Click="ImportRules_Click">Import rule collections</Button>
+                    <CheckBox Name="ReplaceCheckBox" VerticalAlignment="Center" IsChecked="False">Replace existing rules</CheckBox>
+                    <Button DockPanel.Dock="Right" Padding="5" Click="ExportRules_Click">Export checked</Button>
+                </DockPanel>
+                <ScrollViewer Height="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ListView Margin="5" Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollectionCheckBoxList, Mode=TwoWay}">
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="BorderBrush" Value="LightGray" />
+                            <Setter Property="BorderThickness" Value="1,1,1,1" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Model Information">
+                            <GridViewColumn Width="350" Header="Collection name">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Width="350" Text="{Binding Path=Item.CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                                <GridViewColumn Header="Use with model">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=Checked, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                </ScrollViewer>
+                <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="5">
+                    <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>
+                    <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>
+                </DockPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

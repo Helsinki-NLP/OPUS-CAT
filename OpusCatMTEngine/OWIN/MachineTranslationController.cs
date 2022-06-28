@@ -10,6 +10,8 @@ using System.Web.Http;
 using System.ServiceModel;
 using System.Web;
 using System.Net.Http;
+using SentenceSplitterNet;
+using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
@@ -54,7 +56,7 @@ namespace OpusCatMTEngine
         /// <param name="tokenCode">The token code.</param>
         /// <returns>The supported languages.</returns>
         [HttpGet]
-        public List<string> ListSupportedLanguagePairs(string tokenCode)
+        public List<string> ListSupportedLanguagePairs(string tokenCode=null)
         {
 
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
@@ -64,13 +66,13 @@ namespace OpusCatMTEngine
         }
 
         [HttpGet]
-        public string CheckModelStatus(string tokenCode, string sourceCode, string targetCode, string modelTag)
+        public string CheckModelStatus(string tokenCode, string srcLangCode, string trgLangCode, string modelTag)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 
-            var sourceLang = new IsoLanguage(sourceCode);
-            var targetLang = new IsoLanguage(targetCode);
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
 
             return this.mtProvider.CheckModelStatus(sourceLang, targetLang, modelTag);
         }
@@ -102,22 +104,82 @@ namespace OpusCatMTEngine
             var translation = this.Translate(tokenCode, input, srcLangCode, trgLangCode, modelTag);
             return new Translation(translation);
         }
+        
 
         [HttpGet]
-        public HttpResponseMessage TranslateJson(string tokenCode="", string input="", string srcLangCode="", string trgLangCode="", string modelTag="")
+        public HttpResponseMessage TranslateJson(
+            string tokenCode="", 
+            string input="", 
+            string srcLangCode="", 
+            string trgLangCode="", 
+            string modelTag="",
+            Boolean inputIsSingleSentence=true)
         {
+            if (input == null)
+            {
+                input = "";
+            }
             //HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
-            var translation = this.mtProvider.Translate(input, sourceLang, targetLang, modelTag);
-
-            var response = Request.CreateResponse<Translation>(HttpStatusCode.OK, new Translation(translation.Result.Translation));
+            List<string> sentencesToTranslate;
+            if (inputIsSingleSentence)
+            {
+                sentencesToTranslate = new List<string>() { input };
+            }
+            else
+            {
+                var splitter = new SentenceSplitter(sourceLang.ShortestIsoCode);
+                sentencesToTranslate = splitter.Split(input);
+            }
+            
+            
+            TranslationPair finalTranslation = null;
+            foreach (var sentence in sentencesToTranslate)
+            {
+                var translationPart = this.mtProvider.Translate(sentence, sourceLang, targetLang, modelTag);
+                if (finalTranslation == null)
+                {
+                    finalTranslation = translationPart.Result;
+                }
+                else
+                {
+                    finalTranslation.AppendTranslationPair(translationPart.Result);
+                }
+            }
+            
+            var response = Request.CreateResponse<TranslationPair>(HttpStatusCode.OK, finalTranslation);
             response.Headers.Add("Access-Control-Allow-Origin", "*");
-
 
             return response;
             //return new Translation(translation.Result.Translation);
+        }
+
+        [HttpGet]
+        public string TranslateParagraphJson(string tokenCode = "", string input = "", string srcLangCode = "", string trgLangCode = "", string modelTag = "", Boolean segmentedInput = true)
+        {
+            if (input == null)
+            {
+                input = "";
+            }
+            //HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
+            var splitter = new SentenceSplitter(sourceLang.ShortestIsoCode);
+            var sentencesToTranslate = splitter.Split(input);
+
+            StringBuilder translationBuilder = new StringBuilder();
+
+            foreach (var sentence in sentencesToTranslate)
+            {
+                var translation = this.mtProvider.Translate(sentence, sourceLang, targetLang, modelTag);
+                translationBuilder.Append(translation.Result.Translation + " ");
+            }
+
+            return translationBuilder.ToString().Trim();
+            
         }
 
 
@@ -185,25 +247,25 @@ namespace OpusCatMTEngine
         /// <param name="trgLangCode"></param>
         /// 
         [HttpPost]
-        public string PreOrderBatch(string tokenCode, List<string> input, string srcLangCode, string trgLangCode, string modelTag)
+        public HttpResponseMessage PreOrderBatch([FromBody] List<string> input, string tokenCode="", string srcLangCode="", string trgLangCode="", string modelTag="")
         {
-
+           
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
-                return "";
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
 
             var sourceLang = new IsoLanguage(srcLangCode);
             var targetLang = new IsoLanguage(trgLangCode);
 
             if (input.Count == 0)
             {
-                return "input was empty";
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
             foreach (var inputString in input)
             {
                 this.mtProvider.Translate(inputString, sourceLang, targetLang, modelTag);
             }
-
+            
             /* Batch preordering was done earlier with batch translation, but it doesn't seem
              * to be much quicker than normal translation, and it has the problem of providing all
              * the translations at once in the end. Using normal translation means the MT is ready
@@ -221,20 +283,16 @@ namespace OpusCatMTEngine
                 return "batch translation or customization already in process";
             }*/
 
-            return "preorder received";
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpPost]
-        public string Customize(
+        public HttpResponseMessage Customize(
+            [FromBody] FinetuningJob finetuningJob,
             string tokenCode,
-            List<Tuple<string, string>> input,
-            List<Tuple<string, string>> validation,
-            List<string> uniqueNewSegments,
             string srcLangCode,
             string trgLangCode,
-            string modelTag,
-            bool includePlaceholderTags,
-            bool includeTagPairs)
+            string modelTag)
         {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
@@ -245,13 +303,18 @@ namespace OpusCatMTEngine
             if (!this.mtProvider.FinetuningOngoing && !this.mtProvider.BatchTranslationOngoing)
             {
                 this.mtProvider.StartCustomization(
-                    input, validation, uniqueNewSegments, sourceLang, targetLang, modelTag, includePlaceholderTags, includeTagPairs,null);
-                return "fine-tuning started";
+                    finetuningJob.Input,
+                    finetuningJob.Validation,
+                    finetuningJob.UniqueNewSegments, 
+                    sourceLang, targetLang, modelTag,
+                    finetuningJob.IncludePlaceholderTags,
+                    finetuningJob.IncludeTagPairs,null);
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             else
             {
                 //TODO: need to queue up customization, i.e. save data for starting later
-                throw new FaultException($"Batch translation or customization already in process in the MT engine");
+                return Request.CreateResponse(HttpStatusCode.ServiceUnavailable);
             }
         }
 

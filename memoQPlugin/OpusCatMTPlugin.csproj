@@ -7,8 +7,8 @@
     <ProjectGuid>{29FA4881-4CFC-4A4E-AF21-17DB1669C05F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FiskmoMTPlugin</RootNamespace>
-    <AssemblyName>FiskmoMTPlugin</AssemblyName>
+    <RootNamespace>OpusCatMTPlugin</RootNamespace>
+    <AssemblyName>OpusCatMTPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -55,11 +55,11 @@
   <ItemGroup>
     <Reference Include="MemoQ.Addins.Common, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References9710\MemoQ.Addins.Common.dll</HintPath>
+      <HintPath>..\References987\MemoQ.Addins.Common.dll</HintPath>
     </Reference>
     <Reference Include="MemoQ.MTInterfaces, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References9710\MemoQ.MTInterfaces.dll</HintPath>
+      <HintPath>..\References987\MemoQ.MTInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,16 +82,16 @@
     <Compile Include="..\OpusMTInterface\Translation.cs">
       <Link>Translation.cs</Link>
     </Compile>
-    <Compile Include="FiskmoMTEngine.cs" />
-    <Compile Include="FiskmoMTOptions.cs" />
-    <Compile Include="FiskmoMTOptionsForm.cs">
+    <Compile Include="OpusMTEngine.cs" />
+    <Compile Include="OpusCatMTOptions.cs" />
+    <Compile Include="OpusCatMTOptionsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FiskmoMTOptionsForm.Designer.cs">
-      <DependentUpon>FiskmoMTOptionsForm.cs</DependentUpon>
+    <Compile Include="OpusCatMTOptionsForm.Designer.cs">
+      <DependentUpon>OpusCatMTOptionsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="FiskmoMTPluginDirector.cs" />
-    <Compile Include="FiskmoMTServiceHelper.cs" />
+    <Compile Include="OpusCatMTPluginDirector.cs" />
+    <Compile Include="OpusCatMTServiceHelper.cs" />
     <Compile Include="LocalizationHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -99,25 +99,22 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="FiskmoMTSession.cs" />
+    <Compile Include="OpusCatMTSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="INSTALL.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FiskmoMTOptionsForm.resx">
-      <DependentUpon>FiskmoMTOptionsForm.cs</DependentUpon>
+    <EmbeddedResource Include="OpusCatMTOptionsForm.resx">
+      <DependentUpon>OpusCatMTOptionsForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="fiskmo-help.html" />
-    <EmbeddedResource Include="fiskmo_small.png" />
-    <EmbeddedResource Include="fiskmo_medium.png" />
-    <Content Include="fiskmo_zIQ_icon.ico" />
+    <EmbeddedResource Include="opus.ico" />
+    <Content Include="opuscat_help.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

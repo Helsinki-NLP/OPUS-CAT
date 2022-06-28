@@ -38,10 +38,13 @@ namespace OpusCatMTEngine
         public ParallelFilePair(string sourcePath, string targetPath)
         {
             this.Source = new FileInfo(sourcePath);
-            this.Target = new FileInfo(targetPath);
+            if (targetPath != null)
+            {
+                this.Target = new FileInfo(targetPath);
+            }
         }
 
-        public ParallelFilePair(List<Tuple<string, string>> biText, string srcPath, string trgPath)
+        public ParallelFilePair(List<ParallelSentence> biText, string srcPath, string trgPath)
         {
             Regex linebreakRegex = new Regex(@"\r\n?|\n");
             FileInfo srcFile = new FileInfo(srcPath);
@@ -53,8 +56,8 @@ namespace OpusCatMTEngine
                 {
                     //Make sure to remove line breaks from the items before writing them, otherwise the line
                     //breaks can mess marian processing up
-                    srcStream.WriteLine(linebreakRegex.Replace(pair.Item1, " "));
-                    trgStream.WriteLine(linebreakRegex.Replace(pair.Item2, " "));
+                    srcStream.WriteLine(linebreakRegex.Replace(pair.Source, " "));
+                    trgStream.WriteLine(linebreakRegex.Replace(pair.Target, " "));
                 }
             }
 
@@ -64,5 +67,6 @@ namespace OpusCatMTEngine
 
         public FileInfo Source { get; private set; }
         public FileInfo Target { get; private set; }
+        public int SentenceCount { get; set; }
     }
 }

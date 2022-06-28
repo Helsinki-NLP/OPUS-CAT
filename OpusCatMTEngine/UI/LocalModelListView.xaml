@@ -24,6 +24,21 @@
                             <Setter Property="Margin" Value="0,0,0,5" />
                         </Style>
                     </StackPanel.Resources>
+                    <Border
+                        BorderBrush="Black" BorderThickness="1"
+                        Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}">
+                        <StackPanel Margin="5">
+                            <Label>Override model target language</Label>
+                        <ComboBox ItemsSource="{Binding Path=OverrideModel.TargetLanguages, Mode=TwoWay}"
+                            DisplayMemberPath="IsoRefName"
+                            SelectedValue="{Binding OverrideModelTargetLanguage, Mode=TwoWay}"
+                            Width="200"/>
+                            <Button 
+                        Name="cancelOverride"
+                        Click="btnCancelOverride_Click"
+                        Content="{x:Static resx:Resources.Main_CancelOverrideButton}"/>
+                        </StackPanel>
+                    </Border>
                     <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click" Content="{x:Static resx:Resources.Main_InstallFromWebButton}" />
                     <Button Name="addZipModel" Click="btnAddZipModel_Click" Content="{x:Static resx:Resources.Main_InstallFromZipButton}" />
                     <Button Name="customizeModel" Click="btnCustomizeModel_Click" Content="{x:Static resx:Resources.Main_FinetuneButton}">
@@ -98,11 +113,22 @@
                     <!-- This is disabled until the testing functionalities can be polished a bit more
                         <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
                     -->
-                    <Button 
+                    <Button
+                        Visibility="Collapsed"
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
-                        Name="addModelTag" 
-                        Click="btnEditModelTags_Click"
-                        Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
+                        Name="evaluateModels" 
+                        Click="btnEvaluateModels_Click"
+                        Content="{x:Static resx:Resources.Main_EvaluateModelsButton}" />
+                    <Button 
+                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                            Name="addModelTag" 
+                            Click="btnEditModelTags_Click"
+                            Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
+                    <Button 
+                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                            Name="editRulesTag" 
+                            Click="EditRulesTag_Click"
+                            Content="{x:Static resx:Resources.Main_EditRulesButton}" />
                     <Button 
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
                         Name="openModelDir"
@@ -113,17 +139,12 @@
                         Name="setAsOverride"
                         Click="btnSetOverride_Click"
                         Content="{x:Static resx:Resources.Main_SetAsOverrideModelButton}"/>
-                    <Button 
-                        Visibility="{Binding OverrideModelSet, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}"
-                        Name="cancelOverride"
-                        Click="btnCancelOverride_Click"
-                        Content="{x:Static resx:Resources.Main_CancelOverrideButton}"/>
                 </StackPanel>
                 <ListView 
                     Name="LocalModelList" 
-                    Height="300" 
+                    Height="500" 
                     ItemsSource="{Binding Path=LocalModels, Mode=TwoWay}" 
-                    SelectionMode="Single"
+                    SelectionMode="Extended"
                     GridViewColumnHeader.Click="GridViewColumnHeaderClickedHandler">
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">

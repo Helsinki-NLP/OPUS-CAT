@@ -239,6 +239,23 @@ namespace OpusCatMTEngine
             bool includePlaceholderTags,
             bool includeTagPairs)
         {
+            List<ParallelSentence> input2 = input.Select(x => new ParallelSentence(x.Item1, x.Item2)).ToList();
+            List<ParallelSentence> validation2 = validation.Select(x => new ParallelSentence(x.Item1, x.Item2)).ToList();
+
+            return this.Customize(tokenCode, input2, validation2, uniqueNewSegments, srcLangCode, trgLangCode, modelTag, includePlaceholderTags, includeTagPairs);
+        }
+
+            public string Customize(
+            string tokenCode,
+            List<ParallelSentence> input,
+            List<ParallelSentence> validation,
+            List<string> uniqueNewSegments,
+            string srcLangCode,
+            string trgLangCode,
+            string modelTag,
+            bool includePlaceholderTags,
+            bool includeTagPairs)
+        {
             if (!TokenCodeGenerator.Instance.TokenCodeIsValid(tokenCode))
                 return null;
 

@@ -28,14 +28,14 @@ namespace OpusCatMTEngine
     {
 
         private MTModel model;
-
-        private LineSeries ScoresToSeries(IEnumerable<FileInfo> scoreFiles, string title)
+        
+        private IEnumerable<LineSeries> ScoresToSeries(
+            IEnumerable<FileInfo> scoreFiles,
+            string title,
+            Geometry geometry)
         {
-            var series = new LineSeries
-            {
-                Title = title,
-                Values = new ChartValues<double>()
-            };
+
+            Dictionary<string, LineSeries> scoresSeries = new Dictionary<string, LineSeries>();
 
             foreach (FileInfo file in scoreFiles)
             {
@@ -43,10 +43,27 @@ namespace OpusCatMTEngine
                 {
                     using (var reader = new StreamReader(file.Open(FileMode.Open, FileAccess.Read, FileShare.None)))
                     {
-                        var allText = reader.ReadToEnd();
-                        var trimmed = allText.TrimEnd('\r', '\n');
-                        var score = double.Parse(trimmed, CultureInfo.InvariantCulture);
-                        series.Values.Add(score);
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            var lineSplit = line.Split(':');
+                            var metricName = lineSplit[0].Trim();
+                            var metricScore = double.Parse(lineSplit[1].Trim(), CultureInfo.InvariantCulture);
+                            if (scoresSeries.ContainsKey(metricName))
+                            {
+                                scoresSeries[metricName].Values.Add(metricScore);
+                            }
+                            else
+                            {
+                                scoresSeries[metricName] = new LineSeries
+                                {
+                                    Title = $"{title} - {metricName}",
+                                    Values = new ChartValues<double>() { metricScore},
+                                    PointGeometry = geometry
+                                };
+                            }
+                        }
+                        
                     }
                 }
                 catch (IOException ex)
@@ -66,7 +83,7 @@ namespace OpusCatMTEngine
             }
 
 
-            return series;
+            return scoresSeries.Values;
         }
 
         public CustomizationProgressView(MTModel selectedModel)
@@ -80,15 +97,23 @@ namespace OpusCatMTEngine
             this.SeriesCollection = new SeriesCollection();
 
             var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
-            var inDomainSeries = this.ScoresToSeries(inDomainFiles,OpusCatMTEngine.Properties.Resources.Progress_InDomainSeriesName);
+            var inDomainSeries = 
+                this.ScoresToSeries(
+                    inDomainFiles,
+                    OpusCatMTEngine.Properties.Resources.Progress_InDomainSeriesName,
+                    DefaultGeometries.Diamond);
             
-            this.SeriesCollection.Add(inDomainSeries);
+            this.SeriesCollection.AddRange(inDomainSeries);
 
             if (this.model.HasOODValidSet)
             {
                 var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
-                var outOfDomainSeries = this.ScoresToSeries(outOfDomainFiles, OpusCatMTEngine.Properties.Resources.Progress_OutOfDomainSeriesName);
-                this.SeriesCollection.Add(outOfDomainSeries);
+                var outOfDomainSeries = 
+                    this.ScoresToSeries(
+                        outOfDomainFiles, 
+                        OpusCatMTEngine.Properties.Resources.Progress_OutOfDomainSeriesName,
+                        DefaultGeometries.Square);
+                this.SeriesCollection.AddRange(outOfDomainSeries);
             }
 
             InitializeComponent();

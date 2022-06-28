@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpusCatMTEngine"
         mc:Ignorable="d"
-        Title="{Binding WindowTitle, RelativeSource={RelativeSource Mode=Self}}" Height="500" Width="1000" Icon="opus.bmp"
+        Title="{Binding WindowTitle, RelativeSource={RelativeSource Mode=Self}}" Height="650" Width="1000" 
+        Icon="opus.bmp"
         Name="OpusCatWindow"
         Closing="Window_Closing">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Window.Resources>
     <StackPanel>
-        <TabControl Name="Tabs" ItemsSource="{Binding UiTabs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,2,0.333,-2.333">
+        <TabControl Name="Tabs" ItemsSource="{Binding UiTabs, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

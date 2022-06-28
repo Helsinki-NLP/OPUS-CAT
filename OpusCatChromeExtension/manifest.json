@@ -3,15 +3,22 @@
   "manifest_version": 3,
   "name": "OPUS-CAT extension",
   "description": "Sends source text from supported websites for translation in local OPUS-CAT MT engine.",
-  "version": "1.0",
+  "version": "1.0.0",
   "action": {
     "default_icon": {              
       "16": "icons/opus16.png",
       "24": "icons/opus24.png",
-      "32": "icons/opus32.png"
+      "32": "icons/opus32.png",
+      "128": "icons/opus128.png"
     },
     "default_title": "OPUS-CAT",
     "default_popup": "popup.html"
+  },
+  "icons": {
+      "16": "icons/opus16.png",
+      "24": "icons/opus24.png",
+      "32": "icons/opus32.png",
+      "128": "icons/opus128.png"
   },
   "background": {
     "service_worker": "connector.js"
@@ -19,7 +26,7 @@
   "permissions": ["notifications","tabs","storage","commands","clipboardRead","clipboardWrite"],
   "content_scripts": [
     {
-      "matches": ["https://*.memsource.com/*","*://*.xtm.cloud/*"],
+      "matches": ["https://*.memsource.com/*","*://*.xtm.cloud/*","*://*.xtm-intl.com/*"],
       "js": ["extractsource.js"],
       "all_frames": true
     }
@@ -27,10 +34,10 @@
   "commands": {
     "copy-opuscat-mt": {
       "suggested_key": {
-        "windows": "Ctrl+Shift+5",
-        "mac": "Command+Shift+5"
+        "windows": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
       },
-      "description": "Toggle feature foo"
+      "description": "Paste OPUS-CAT translation to the active text element"
     }
   }
 }

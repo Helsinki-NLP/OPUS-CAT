@@ -6,7 +6,7 @@
       <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT-models/</Value>
     </Setting>
     <Setting Name="LocalOpusCatDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">opuscat/</Value>
+      <Value Profile="(Default)">opuscat\</Value>
     </Setting>
     <Setting Name="MtServicePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">8477</Value>
@@ -60,7 +60,7 @@
       <Value Profile="(Default)">models</Value>
     </Setting>
     <Setting Name="TatoebaModelStorageUrl" Type="System.String" Scope="User">
-      <Value Profile="(Default)">https://object.pouta.csc.fi/Tatoeba-MT-models/</Value>
+      <Value Profile="(Default)">https://a3s.fi/Tatoeba-MT-models/</Value>
     </Setting>
     <Setting Name="DatabaseRemovalInterval" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">14</Value>
@@ -78,7 +78,25 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="OverlayFontsize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">8</Value>
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="FinetuningSetMinSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="EvaluationDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">evaluations</Value>
+    </Setting>
+    <Setting Name="PythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python-3.8.10-embed-amd64</Value>
+    </Setting>
+    <Setting Name="EditRuleDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">editrules</Value>
+    </Setting>
+    <Setting Name="GithubOrg" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Helsinki-NLP</Value>
+    </Setting>
+    <Setting Name="GithubRepo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OPUS-CAT</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -34,7 +34,6 @@ namespace OpusCatTranslationProvider
                     .PropertiesFactory
                     .CreateTextProperties(OpusCatProviderLanguageDirection.CurrentTranslation.ToPlain());
                 IText firstText = documentItemFactory.CreateText(firstTextProp);
-                
                 activeSegmentPair.Target.Add(firstText);
                 Controller.ActiveDocument.UpdateSegmentPair(activeSegmentPair);
             }

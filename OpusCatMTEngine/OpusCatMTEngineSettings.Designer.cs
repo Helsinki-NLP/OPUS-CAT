@@ -37,7 +37,7 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("opuscat/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("opuscat\\")]
         public string LocalOpusCatDir {
             get {
                 return ((string)(this["LocalOpusCatDir"]));
@@ -253,7 +253,7 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://object.pouta.csc.fi/Tatoeba-MT-models/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://a3s.fi/Tatoeba-MT-models/")]
         public string TatoebaModelStorageUrl {
             get {
                 return ((string)(this["TatoebaModelStorageUrl"]));
@@ -325,13 +325,85 @@ namespace OpusCatMTEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
         public int OverlayFontsize {
             get {
                 return ((int)(this["OverlayFontsize"]));
             }
             set {
                 this["OverlayFontsize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int FinetuningSetMinSize {
+            get {
+                return ((int)(this["FinetuningSetMinSize"]));
+            }
+            set {
+                this["FinetuningSetMinSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("evaluations")]
+        public string EvaluationDir {
+            get {
+                return ((string)(this["EvaluationDir"]));
+            }
+            set {
+                this["EvaluationDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("python-3.8.10-embed-amd64")]
+        public string PythonDir {
+            get {
+                return ((string)(this["PythonDir"]));
+            }
+            set {
+                this["PythonDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("editrules")]
+        public string EditRuleDir {
+            get {
+                return ((string)(this["EditRuleDir"]));
+            }
+            set {
+                this["EditRuleDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Helsinki-NLP")]
+        public string GithubOrg {
+            get {
+                return ((string)(this["GithubOrg"]));
+            }
+            set {
+                this["GithubOrg"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OPUS-CAT")]
+        public string GithubRepo {
+            get {
+                return ((string)(this["GithubRepo"]));
+            }
+            set {
+                this["GithubRepo"] = value;
             }
         }
     }

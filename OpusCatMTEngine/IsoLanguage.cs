@@ -15,7 +15,7 @@ namespace OpusCatMTEngine
     /// in Opus and Tatoeba Challenge. Some of the language codes are two-letter, some three-letter, and
     /// most don't have CultureInfos available.
     /// </summary>
-    public class IsoLanguage
+    public class IsoLanguage : IEquatable<IsoLanguage>
     {
 
         private static void ParseIso639_3()
@@ -79,12 +79,11 @@ namespace OpusCatMTEngine
             }
         }
 
-            //this static constructor parses the iso table files that are embedded as resources
+        //this static constructor parses the iso table files that are embedded as resources
         static IsoLanguage()
         {
             IsoLanguage.ParseIso639_3();
             IsoLanguage.ParseIso639_5();
-            
         }
 
         private static Dictionary<string, string> Iso639_3To639_1 = new Dictionary<string, string>();
@@ -150,7 +149,7 @@ namespace OpusCatMTEngine
 
             //Format checking
             Match opusMatch = IsoLanguage.OpusMtCode.Match(languageCode);
-            if (opusMatch != null)
+            if (opusMatch.Success)
             {
                 this.Iso639_1Code = opusMatch.Groups["iso639_1"].Value;
 
@@ -176,7 +175,7 @@ namespace OpusCatMTEngine
             else
             {
                 Match cultureInfoMatch = IsoLanguage.CultureInfoCode.Match(languageCode);
-                if (cultureInfoMatch != null)
+                if (cultureInfoMatch.Success)
                 {
                     this.Iso639_1Code = cultureInfoMatch.Groups["iso639_1"].Value;
                     this.Iso639_3Code = cultureInfoMatch.Groups["iso639_3"].Value;
@@ -251,7 +250,23 @@ namespace OpusCatMTEngine
             //code might contain locale after hyphen
             var languagePart = xmlLangCode.Split('-')[0];
 
-            return (languagePart == this.Iso639_1Code || languagePart == this.Iso639_3Code);
+            return (
+                languagePart == this.Iso639_1Code || 
+                languagePart == this.Iso639_3Code || 
+                languagePart == this.OriginalCode || 
+                xmlLangCode == this.OriginalCode);
+        }
+        
+
+        public bool Equals(IsoLanguage lang)
+        {
+            return this.Iso639_3Code == lang.Iso639_3Code;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Iso639_3Code.GetHashCode();
         }
     }
+    
 }

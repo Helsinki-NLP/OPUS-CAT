@@ -56,6 +56,8 @@ namespace OpusCatMTEngine
             {
                 //No spaces in model tags, keeps things simple
                 modelTag = value.Replace(' ','_');
+                //Remove non-ascii characters (issue with paths)
+                modelTag = String.Join("",modelTag.Where(x => x < 127));
                 NotifyPropertyChanged();
             }
         }
@@ -207,7 +209,8 @@ namespace OpusCatMTEngine
                     filePair = new ParallelFilePair(this.SourceFile, this.TargetFile);
                     break;
                 case InputFileType.TmxFile:
-                    filePair = TmxToTxtParser.ParseTmxToParallelFiles(
+                    var tmxParser = new TmxToTxtParser();
+                    filePair = tmxParser.ParseTmxToParallelFiles(
                             this.TmxFile,
                             this.SourceLanguage,
                             this.TargetLanguage,
@@ -221,10 +224,39 @@ namespace OpusCatMTEngine
                                 OpusCatMTEngine.Properties.Resources.Finetune_TmxFileNotValidMessage,this.TmxFile));
                         return;
                     }
+
+                    if (filePair.SentenceCount < OpusCatMTEngineSettings.Default.FinetuningSetMinSize)
+                    {
+                        var eligibleLangPairs = 
+                            tmxParser.TmxLangCounts.Where(x => x.Value > OpusCatMTEngineSettings.Default.FinetuningSetMinSize);
+                        if (eligibleLangPairs.Count() > 0)
+                        {
+                            var selectionWindow = new SelectTmxLangPairWindow(eligibleLangPairs);
+                            var dialogResult = selectionWindow.ShowDialog();
+                            if (dialogResult.HasValue && dialogResult.Value)
+                            {
+                                filePair = tmxParser.ParseTmxToParallelFiles(
+                                    this.TmxFile,
+                                    new IsoLanguage(selectionWindow.SelectedPair.Key.Item1),
+                                    new IsoLanguage(selectionWindow.SelectedPair.Key.Item2),
+                                    this.IncludePlaceholderTagsBox.IsChecked.Value,
+                                    this.IncludeTagPairBox.IsChecked.Value
+                                );
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                String.Format(
+                                    OpusCatMTEngine.Properties.Resources.Finetune_NotEnoughSegmentsInTmx));
+                            return;
+                        }
+                    }
                     break;
-                    
-                    
-                    
                 default:
                     break;
             }

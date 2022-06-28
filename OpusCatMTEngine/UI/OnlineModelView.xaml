@@ -11,6 +11,17 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
         <local:BooleanToVisibilityInverseConverter x:Key="VisibleIfFalseConverter" />
+        <Style TargetType="ToolTip">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding}"  MaxWidth="400" TextWrapping='Wrap' />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Border BorderBrush="Black" BorderThickness="1" Margin="5">
         <Grid>
@@ -65,6 +76,7 @@
                     <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" Name="txtFilter" Text="{Binding ElementName=_this, Path=ModelManager.SourceFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Name="txtFilter1" Text="{Binding ElementName=_this, Path=ModelManager.TargetFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                     <TextBox VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Name="txtFilter2" Text="{Binding ElementName=_this, Path=ModelManager.NameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTransformerBigModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="6">Transformer-big/tiny models</CheckBox>
                     <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowBilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="5">Bilingual models</CheckBox>
                     <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowMultilingualModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3">Multilingual models (usually lower quality than bilingual models, use with caution)</CheckBox>
                     <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowOpusModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="4">OPUS-MT models</CheckBox>
@@ -113,14 +125,24 @@
                             <GridViewColumn Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}" Width="100">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>
+                                        <TextBlock 
+                                            ToolTip="{Binding Path=SourceLanguageString, Mode=OneWay}"
+                                            TextWrapping="NoWrap" 
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center" 
+                                            Text="{Binding Path=SourceLanguageString, Mode=OneWay}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}" Width="100">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
+                                        <TextBlock 
+                                            ToolTip="{Binding Path=TargetLanguageString, Mode=OneWay}"
+                                            TextWrapping="NoWrap" 
+                                            HorizontalAlignment="Left" 
+                                            VerticalAlignment="Center" 
+                                            Text="{Binding Path=TargetLanguageString, Mode=OneWay}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>

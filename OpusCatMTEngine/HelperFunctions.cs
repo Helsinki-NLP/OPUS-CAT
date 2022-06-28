@@ -10,7 +10,7 @@ using System.Windows.Controls;
 
 namespace OpusCatMTEngine
 {
-    class HelperFunctions
+    public class HelperFunctions
     {
         public static string EnumToString(object value)
         {

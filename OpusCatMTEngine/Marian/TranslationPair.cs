@@ -1,23 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace OpusCatMTEngine
 {
+    public enum SegmentationMethod
+    {
+        Bpe,
+        SentencePiece
+    }
+
+    [DataContract]
     public class TranslationPair
     {
-        
-        public string Translation { get; set; }
-            
+
+        //For compatibility with the previous API
+        [DataMember]
+        public string translation {get; set;}
+
+        [DataMember]
+        public string Translation
+        {
+            get { return translation; }
+            set { translation = value; }
+        }
+
+        [DataMember]
         public string[] SegmentedSourceSentence { get; private set; }
-        public string[] SegmentedTranslation { get; private set; }
+
+        [DataMember]
+        public string[] SegmentedTranslation { get; internal set; }
+
+        [DataMember]
         public Dictionary<int, List<int>> SegmentedAlignmentSourceToTarget { get; private set; }
+
+        [DataMember]
         public Dictionary<int, List<int>> SegmentedAlignmentTargetToSource { get; private set; }
+
+        [DataMember]
         public string AlignmentString { get; private set; }
+
+        [DataMember]
         public string RawTranslation { get; private set; }
+
+        [DataMember]
         public SegmentationMethod Segmentation { get; internal set; }
+        public bool AutoEditedTranslation { get; internal set; }
+
+        public TranslationPair()
+        {
+
+        }
 
         public TranslationPair(
             string segmentedSource, 
@@ -58,8 +94,8 @@ namespace OpusCatMTEngine
             this.SegmentedTranslation = segmentedTarget.Split(' ');
             this.SegmentedAlignmentSourceToTarget = TranslationPair.ParseAlignmentString(
                 alignment,
-                SegmentedSourceSentence.Length-1,
-                SegmentedTranslation.Length-1,
+                SegmentedSourceSentence.Length - 1,
+                SegmentedTranslation.Length - 1,
                 false);
 
             this.SegmentedAlignmentTargetToSource = TranslationPair.ParseAlignmentString(
@@ -188,5 +224,39 @@ namespace OpusCatMTEngine
 
         }
 
+        //This joins up two translation pairs, used to produce single output when input 
+        // has been segmented into separate sentences
+        internal void AppendTranslationPair(TranslationPair translationPart)
+        {
+            this.translation = $"{this.translation} {translationPart.translation}";
+            
+            this.SegmentedAlignmentSourceToTarget = this.JoinAlignments(
+                this.SegmentedAlignmentSourceToTarget, translationPart.SegmentedAlignmentSourceToTarget,
+                this.SegmentedSourceSentence.Length, this.SegmentedTranslation.Length);
+
+            this.SegmentedAlignmentTargetToSource = this.JoinAlignments(
+                this.SegmentedAlignmentTargetToSource, translationPart.SegmentedAlignmentTargetToSource,
+                this.SegmentedTranslation.Length,this.SegmentedSourceSentence.Length);
+
+            this.SegmentedTranslation = 
+                this.SegmentedTranslation.Concat(translationPart.SegmentedTranslation).ToArray();
+            this.SegmentedSourceSentence = 
+                this.SegmentedSourceSentence.Concat(translationPart.SegmentedSourceSentence).ToArray();
+        }
+
+        private Dictionary<int, List<int>> JoinAlignments(
+            Dictionary<int,List<int>> firstAlignment,
+            Dictionary<int, List<int>> secondAlignment,
+            int keySequenceLength,
+            int valueSequenceLength)
+        {
+            var offsetAlignment =
+                secondAlignment.ToDictionary(
+                    x => x.Key + keySequenceLength,
+                    x => x.Value.Select(z => z + valueSequenceLength).ToList());
+
+            return firstAlignment.Concat(
+                offsetAlignment).ToDictionary(x => x.Key, y => y.Value);
+        }
     }
 }

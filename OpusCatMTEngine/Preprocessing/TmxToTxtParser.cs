@@ -11,11 +11,17 @@ using System.Xml.Linq;
 
 namespace OpusCatMTEngine
 {
-    public static class TmxToTxtParser
+    public class TmxToTxtParser
     {
+        public Dictionary<Tuple<string,string>, int> TmxLangCounts { get; private set; }
+
+        public TmxToTxtParser()
+        {
+            this.TmxLangCounts = new Dictionary<Tuple<string, string>, int>();
+        }
 
         //Tmx may contain tags. They can be converted to tag tokens for use in training or omitted.
-        private static string FilterTextAndTags(
+        private string FilterTextAndTags(
             XElement seg,
             bool includePlaceholderTags,
             bool includeTagPairs)
@@ -73,6 +79,7 @@ namespace OpusCatMTEngine
                         }
                     }
                     //This handles elements with inner structure that should be included in the training corpus
+                    //(such as img tags with captions to translate)
                     else
                     {
                         foreach (var node in topElement.Nodes().Reverse())
@@ -101,7 +108,7 @@ namespace OpusCatMTEngine
             return unescaped;
         }
         
-        public static ParallelFilePair ParseTmxToParallelFiles(
+        public ParallelFilePair ParseTmxToParallelFiles(
             string tmxFile, 
             IsoLanguage sourceLang,
             IsoLanguage targetLang,
@@ -112,6 +119,8 @@ namespace OpusCatMTEngine
             var sourceFile = new FileInfo($"{tmxFile}.{sourceLang.ShortestIsoCode}.txt");
             var targetFile = new FileInfo($"{tmxFile}.{targetLang.ShortestIsoCode}.txt");
             
+            //TODO: update this to use XMLReader, this might cause ouf of memory errors with
+            //very large files
             XDocument tmx;
             try
             {
@@ -119,34 +128,100 @@ namespace OpusCatMTEngine
             }
             catch (System.Xml.XmlException ex)
             {
-                Log.Error($"{tmxFile} is not a valid tmx file");
+                Log.Error($"{tmxFile} is not a valid tmx file: {ex.Message}");
                 return null;
             }
             
             var tus = tmx.Descendants("tu");
+
+            if (tus == null)
+            {
+                return null;
+            }
+
+            int extractedPairCount = 0;
 
             using (var sourceWriter = sourceFile.CreateText())
             using (var targetWriter = targetFile.CreateText())
             {
                 foreach (var tu in tus)
                 {
-                    var sourceSeg =
-                        tu.Descendants("seg").FirstOrDefault(
-                            x => sourceLang.IsCompatibleTmxLang(x.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower()));
-                    var targetSeg =
-                        tu.Descendants("seg").FirstOrDefault(
-                            x => targetLang.IsCompatibleTmxLang(x.Parent.Attribute(XNamespace.Xml + "lang").Value.ToLower()));
+                    var segs = tu.Descendants("seg");
+
+                    
+                    XElement sourceSeg = null;
+                    XElement targetSeg = null;
+                    List<string> segLangs = new List<string>();
+
+                    //tmx format specifies that there should be seg elements
+                    //under tu elements, but if not (in case of e.g. incorrect tmx), you will get null, so
+                    //guard against it
+                    if (segs != null)
+                    {
+                        foreach (var seg in segs)
+                        {
+                            XAttribute segLangAttribute = seg.Parent.Attribute(XNamespace.Xml + "lang");
+                            //Old tmx versions have lang attribute instead of xml:lang
+                            if (segLangAttribute == null)
+                            {
+                                segLangAttribute = seg.Parent.Attribute("lang");
+                            }
+                            if (segLangAttribute != null)
+                            {
+                                var segLang = segLangAttribute.Value.ToLower();
+                                segLangs.Add(segLang);
+
+                                if (sourceLang.IsCompatibleTmxLang(segLang))
+                                {
+                                    sourceSeg = seg;
+                                }
+
+                                if (targetLang.IsCompatibleTmxLang(segLang))
+                                {
+                                    targetSeg = seg;
+                                }
+                            }
+                            
+                        }
+                    }
+                    
                     if (sourceSeg != null && targetSeg != null)
                     {
-                        var sourceText = TmxToTxtParser.FilterTextAndTags(sourceSeg, includePlaceholderTags, includeTagPairs);
+                        var sourceText = this.FilterTextAndTags(sourceSeg, includePlaceholderTags, includeTagPairs);
                         sourceWriter.WriteLine(sourceText);
-                        var targetText = TmxToTxtParser.FilterTextAndTags(targetSeg, includePlaceholderTags, includeTagPairs);
+                        var targetText = this.FilterTextAndTags(targetSeg, includePlaceholderTags, includeTagPairs);
                         targetWriter.WriteLine(targetText);
+                        extractedPairCount++;
                     }
+
+                    foreach (var lang1 in segLangs)
+                    {
+                        foreach (var lang2 in segLangs)
+                        {
+                            if (lang1 == lang2)
+                            {
+                                continue;
+                            }
+
+                            var langTuple = new Tuple<string, string>(lang1, lang2);
+                            if (this.TmxLangCounts.ContainsKey(langTuple))
+                            {
+                                this.TmxLangCounts[langTuple] = this.TmxLangCounts[langTuple] + 1;
+                            }
+                            else
+                            {
+                                this.TmxLangCounts[langTuple] = 1;
+                            }
+                        }
+                    }
+                    
                 }
             }
 
-            return new ParallelFilePair(sourceFile, targetFile);
+            var filePair = new ParallelFilePair(sourceFile, targetFile);
+            filePair.SentenceCount = extractedPairCount;
+
+            return filePair;
         }
 
     }

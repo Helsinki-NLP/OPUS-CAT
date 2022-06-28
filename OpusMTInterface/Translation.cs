@@ -11,7 +11,10 @@ namespace OpusMTInterface
     public class Translation
     {
         [DataMember]
-        string translation;
+        public string translation;
+
+        [DataMember]
+        public string alignment;
 
         public Translation(string translation)
         {

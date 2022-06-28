@@ -79,6 +79,186 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add edit rule collection.
+        /// </summary>
+        public static string EditRules_AddEditRuleCollectionTitle {
+            get {
+                return ResourceManager.GetString("EditRules_AddEditRuleCollectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add rule collection.
+        /// </summary>
+        public static string EditRules_AddRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_AddRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create post-edit rule.
+        /// </summary>
+        public static string EditRules_CreatePostEditRuleTitle {
+            get {
+                return ResourceManager.GetString("EditRules_CreatePostEditRuleTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create edit rule.
+        /// </summary>
+        public static string EditRules_CreatePreEditRuleTitle {
+            get {
+                return ResourceManager.GetString("EditRules_CreatePreEditRuleTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create rule.
+        /// </summary>
+        public static string EditRules_CreateRuleButton {
+            get {
+                return ResourceManager.GetString("EditRules_CreateRuleButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete rule.
+        /// </summary>
+        public static string EditRules_DeleteRuleButton {
+            get {
+                return ResourceManager.GetString("EditRules_DeleteRuleButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete rule collection.
+        /// </summary>
+        public static string EditRules_DeleteRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_DeleteRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rule.
+        /// </summary>
+        public static string EditRules_EditRuleButton {
+            get {
+                return ResourceManager.GetString("EditRules_EditRuleButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rule collection.
+        /// </summary>
+        public static string EditRules_EditRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_EditRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rules in collection {0}.
+        /// </summary>
+        public static string EditRules_EditRuleCollectionTitle {
+            get {
+                return ResourceManager.GetString("EditRules_EditRuleCollectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rules.
+        /// </summary>
+        public static string EditRules_EditRulesHeading {
+            get {
+                return ResourceManager.GetString("EditRules_EditRulesHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit rules for model {0}.
+        /// </summary>
+        public static string EditRules_EditRulesTitle {
+            get {
+                return ResourceManager.GetString("EditRules_EditRulesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move down.
+        /// </summary>
+        public static string EditRules_MoveDownButton {
+            get {
+                return ResourceManager.GetString("EditRules_MoveDownButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move up.
+        /// </summary>
+        public static string EditRules_MoveUpButton {
+            get {
+                return ResourceManager.GetString("EditRules_MoveUpButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove rule collection.
+        /// </summary>
+        public static string EditRules_RemoveRuleCollectionButton {
+            get {
+                return ResourceManager.GetString("EditRules_RemoveRuleCollectionButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Evaluate.
+        /// </summary>
+        public static string Evaluation_EvaluateButton {
+            get {
+                return ResourceManager.GetString("Evaluation_EvaluateButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language pair to evaluate.
+        /// </summary>
+        public static string Evaluation_LanguagePair {
+            get {
+                return ResourceManager.GetString("Evaluation_LanguagePair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Termbase file (.tbx).
+        /// </summary>
+        public static string Evaluation_TermbaseLabel {
+            get {
+                return ResourceManager.GetString("Evaluation_TermbaseLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Termbase.
+        /// </summary>
+        public static string Evaluation_TermTranslationsLabel {
+            get {
+                return ResourceManager.GetString("Evaluation_TermTranslationsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source text and reference translation.
+        /// </summary>
+        public static string Evaluation_TestSetLabel {
+            get {
+                return ResourceManager.GetString("Evaluation_TestSetLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Browse.
         /// </summary>
         public static string Finetune_BrowseButton {
@@ -165,6 +345,15 @@ namespace OpusCatMTEngine.Properties {
         public static string Finetune_ModelTagTooLongMessage {
             get {
                 return ResourceManager.GetString("Finetune_ModelTagTooLongMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough parallel segments in the TMX..
+        /// </summary>
+        public static string Finetune_NotEnoughSegmentsInTmx {
+            get {
+                return ResourceManager.GetString("Finetune_NotEnoughSegmentsInTmx", resourceCulture);
             }
         }
         
@@ -376,6 +565,24 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Edit rules.
+        /// </summary>
+        public static string Main_EditRulesButton {
+            get {
+                return ResourceManager.GetString("Main_EditRulesButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Evaluate models.
+        /// </summary>
+        public static string Main_EvaluateModelsButton {
+            get {
+                return ResourceManager.GetString("Main_EvaluateModelsButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Fine-tune selected model.
         /// </summary>
         public static string Main_FinetuneButton {
@@ -408,6 +615,24 @@ namespace OpusCatMTEngine.Properties {
         public static string Main_ModelsTabTitle {
             get {
                 return ResourceManager.GetString("Main_ModelsTabTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Illegal characters in path.
+        /// </summary>
+        public static string Main_NonAsciiPathCaption {
+            get {
+                return ResourceManager.GetString("Main_NonAsciiPathCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path where OPUS-CAT MT Engine stores MT models ({0}) contains the following illegal characters: {1}. Install OPUS-CAT MT Engine to a path with no illegal characters in it (for instance, in a folder in the root of the C: drive, such as C:\opuscat)..
+        /// </summary>
+        public static string Main_NonAsciiPathMessage {
+            get {
+                return ResourceManager.GetString("Main_NonAsciiPathMessage", resourceCulture);
             }
         }
         
@@ -489,6 +714,15 @@ namespace OpusCatMTEngine.Properties {
         public static string Online_ExtractingStatus {
             get {
                 return ResourceManager.GetString("Online_ExtractingStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installation failed.
+        /// </summary>
+        public static string Online_FailedStatus {
+            get {
+                return ResourceManager.GetString("Online_FailedStatus", resourceCulture);
             }
         }
         
@@ -602,20 +836,20 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BLEU score.
-        /// </summary>
-        public static string Progress_BleuAxis {
-            get {
-                return ResourceManager.GetString("Progress_BleuAxis", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to In-domain validation set.
         /// </summary>
         public static string Progress_InDomainSeriesName {
             get {
                 return ResourceManager.GetString("Progress_InDomainSeriesName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metric score.
+        /// </summary>
+        public static string Progress_MetricAxis {
+            get {
+                return ResourceManager.GetString("Progress_MetricAxis", resourceCulture);
             }
         }
         
@@ -638,6 +872,33 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Are you sure want to permanently delete rule collection {0}? This collection may be in use with other models, and it will also be deleted from those models..
+        /// </summary>
+        public static string Rules_DeleteRuleCollectionConfirmation {
+            get {
+                return ResourceManager.GetString("Rules_DeleteRuleCollectionConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The TMX file does not contain languages compatible with the language codes of the MT model, or there are not enough segments for the compatible language pair. Language pairs included in the TMX file and the amount of segments per language pair are listed below. You can either select one of the language pairs to extract as fine-tuning material, or cancel fine-tuning..
+        /// </summary>
+        public static string SelectTmxLangPair_Instructions {
+            get {
+                return ResourceManager.GetString("SelectTmxLangPair_Instructions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select language pair.
+        /// </summary>
+        public static string SelectTmxLangPair_Title {
+            get {
+                return ResourceManager.GetString("SelectTmxLangPair_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The port that OPUS-CAT MT Engine uses ({0}) is not available. Another instance of OPUS-CAT MT Engine may be active and using the port..
         /// </summary>
         public static string Service_PortNotAvailable {
@@ -647,7 +908,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MT service HTTP port (used with other integrations, 1024-65535):.
+        ///   Looks up a localized string similar to MT service HTTP port (used with current plugins and integrations, 1024-65535):.
         /// </summary>
         public static string Settings_HttpPortLabel {
             get {
@@ -656,7 +917,7 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MT service net.tcp port (used with Trados and memoQ plugins, 1024-65535):.
+        ///   Looks up a localized string similar to MT service net.tcp port (used with older Trados and memoQ plugins, 1024-65535):.
         /// </summary>
         public static string Settings_NetTcpPortLabel {
             get {

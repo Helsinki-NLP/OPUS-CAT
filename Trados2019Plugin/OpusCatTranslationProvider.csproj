@@ -157,6 +157,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\OpusCatMTEngine\Marian\TranslationPair.cs">
+      <Link>TranslationPair.cs</Link>
+    </Compile>
+    <Compile Include="..\OpusCatMTEngine\OWIN\FinetuningJob.cs">
+      <Link>FinetuningJob.cs</Link>
+    </Compile>
+    <Compile Include="..\OpusCatMTEngine\OWIN\ParallelSentence.cs">
+      <Link>ParallelSentence.cs</Link>
+    </Compile>
     <Compile Include="..\OpusMTInterface\IMTService.cs">
       <Link>IMTService.cs</Link>
     </Compile>
@@ -172,6 +181,7 @@
     <Compile Include="ConnectionControl.xaml.cs">
       <DependentUpon>ConnectionControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OpusCatMtServiceConnection.cs" />
     <Compile Include="ElgServiceConnection.cs" />
     <Compile Include="ElgTokenResponse.cs" />
     <Compile Include="FileReader.cs" />
@@ -207,7 +217,6 @@
     <Compile Include="OpusCatProviderFactory.cs" />
     <Compile Include="OpusCatProviderLanguageDirection.cs" />
     <Compile Include="OpusCatProviderWinFormsUI.cs" />
-    <Compile Include="OpusCatMTServiceHelper.cs" />
     <Compile Include="IHasOpusCatOptions.cs" />
     <Compile Include="FinetuneBatchTask.cs" />
     <Compile Include="FinetuneBatchTaskSettings.cs" />
@@ -227,6 +236,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RestSharp\Deserializers\JsonDeserializer.cs" />
+    <Compile Include="TagRestorer.cs" />
     <Compile Include="TestsetExtractor.cs" />
     <Compile Include="TradosElgCredentialWrapper.cs" />
     <Compile Include="TranslationResponse.cs" />

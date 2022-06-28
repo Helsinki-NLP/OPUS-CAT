@@ -13,7 +13,7 @@ Copy the plugin file ([omegat-plugin-opus-mt-1.0.0.jar](https://github.com/Helsi
 
 **Usage**
 
-Once the plugin has been installed, it should show up in the **Options** -> **Machine Translate** menu when a project is open in OmegaT. Make sure that the OPUS MT engine is running on the same machine and that a MT model has been installed for the language pair of the project. If the MT engine is not running, you will see a **Connection refused** error. If the MT engine is running but a model for the language pair has not been installed, you will see a **400: Bad Request** error.
+Once the plugin has been installed, it should show up in the **Options** -> **Machine Translate** menu when a project is open in OmegaT. Make sure that the OPUS MT engine is running on the same machine and that a MT model has been installed for the language pair of the project (see instructions here: https://helsinki-nlp.github.io/OPUS-CAT/install). If the MT engine is not running, you will see a **Connection refused** error. If the MT engine is running but a model for the language pair has not been installed, you will see a **400: Bad Request** error.
 
 **Licensing**
 

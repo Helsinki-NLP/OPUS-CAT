@@ -30,11 +30,9 @@ namespace OpusCatMTEngine
         public string TargetCode { get; set; }
         public bool Faulted { get; private set; }
         public Process MtProcess { get => mtPipe; set => mtPipe = value; }
-        private Process preprocessPipe;
 
         private ConcurrentStack<Task<TranslationPair>> taskStack = new ConcurrentStack<Task<TranslationPair>>();
 
-        private StreamWriter utf8PreprocessWriter;
         private StreamWriter utf8MtWriter;
         private string modelDir;
         private readonly bool includePlaceholderTags;
@@ -42,9 +40,7 @@ namespace OpusCatMTEngine
 
         public string SystemName { get; }
         public bool TargetLanguageCodeRequired { get; private set; }
-        public Process PreprocessProcess { get => preprocessPipe; set => preprocessPipe = value; }
-        public Process PostprocessProcess { get; private set; }
-        private StreamWriter utf8PostprocessWriter;
+        public IPreprocessor preprocessor;
         
         private SegmentationMethod segmentation;
         private static readonly Object lockObj = new Object();
@@ -99,34 +95,40 @@ namespace OpusCatMTEngine
             //Both moses+BPE and sentencepiece preprocessing are supported, check which one model is using
             //There are scripts for monolingual and multilingual models
 
-            string preprocessCommand, mtCommand;
+            string preprocessCommand, mtCommand, preprocessArgs, mtArgs;
 
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
-                preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
+                this.preprocessor = new SentencePiecePreprocessor($"{this.modelDir}\\source.spm");
+                //preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
+
+                preprocessCommand = "Preprocessing\\spm_encode.exe";
+                preprocessArgs = $"--model \"{this.modelDir}\\source.spm\"";
                 this.segmentation = SegmentationMethod.SentencePiece;
             }
             else
             {
-                preprocessCommand = $"Preprocessing\\mosesprocessor.exe --stage preprocess --sourcelang {this.SourceCode} --tcmodel \"{this.modelDir}\\source.tcmodel\" | Preprocessing\\apply_bpe.exe -c  \"{this.modelDir}\\source.bpe\"";
+                this.preprocessor = 
+                    new MosesBpePreprocessor(
+                        $"{this.modelDir}\\source.tcmodel",
+                        $"{this.modelDir}\\source.bpe",
+                        this.SourceCode, this.TargetCode);
+
                 this.segmentation = SegmentationMethod.Bpe;
-                var postprocessCommand =
-                    $@"Preprocessing\mosesprocessor.exe --stage postprocess --targetlang {this.TargetCode}";
-                this.PostprocessProcess = MarianHelper.StartProcessInBackgroundWithRedirects(postprocessCommand);
-                this.utf8PostprocessWriter =
-                    new StreamWriter(this.PostprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             }
 
-            mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
+            //mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
+
+            mtCommand = "Marian\\marian.exe";
+            mtArgs = $"decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
+
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
-            this.PreprocessProcess = 
-                MarianHelper.StartProcessInBackgroundWithRedirects(preprocessCommand);
+            /*this.PreprocessProcess = 
+                MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(preprocessCommand,preprocessArgs);*/
             this.MtProcess = 
-                MarianHelper.StartProcessInBackgroundWithRedirects(mtCommand);
+                MarianHelper.StartProcessDirectlyInBackgroundWithRedirects(mtCommand,mtArgs);
             
-            this.utf8PreprocessWriter =
-                new StreamWriter(this.PreprocessProcess.StandardInput.BaseStream, new UTF8Encoding(false));
             this.utf8MtWriter =
                 new StreamWriter(this.MtProcess.StandardInput.BaseStream, new UTF8Encoding(false));
 
@@ -164,10 +166,11 @@ namespace OpusCatMTEngine
 
             //Add preprocessing in here, capture preprocessed source for getting aligned tokens.
 
-            this.utf8PreprocessWriter.WriteLine(sourceSentence);
-            this.utf8PreprocessWriter.Flush();
+            //this.utf8PreprocessWriter.WriteLine(sourceSentence);
+            //this.utf8PreprocessWriter.Flush();
 
-            string preprocessedLine = this.PreprocessProcess.StandardOutput.ReadLine();
+            //string preprocessedLine = this.PreprocessProcess.StandardOutput.ReadLine();
+            string preprocessedLine = this.preprocessor.PreprocessSentence(sourceSentence);
 
             var lineToTranslate = preprocessedLine;
             if (this.TargetLanguageCodeRequired)
@@ -184,7 +187,7 @@ namespace OpusCatMTEngine
 
             TranslationPair alignedTranslationPair = new TranslationPair(preprocessedLine, translationAndAlignment, this.segmentation, this.TargetCode);
 
-            switch (this.segmentation)
+            /*switch (this.segmentation)
             {
                 case SegmentationMethod.SentencePiece:
                     alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace(" ", "").Replace("▁", " ").Trim();
@@ -197,7 +200,9 @@ namespace OpusCatMTEngine
                     break;
                 default:
                     throw new Exception("Unknown segmentation method specified for model");
-            }
+            }*/
+
+            alignedTranslationPair.Translation = this.preprocessor.PostprocessSentence(alignedTranslationPair.RawTranslation);
 
             return alignedTranslationPair;
             

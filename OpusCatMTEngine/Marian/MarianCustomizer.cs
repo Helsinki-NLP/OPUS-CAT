@@ -107,6 +107,12 @@ namespace OpusCatMTEngine
             //Data will be null in when the process exits
             if (e.Data != null)
             {
+                //If there is no marian log file yet, log the output to opuscat log
+                var marianLog = new FileInfo(Path.Combine(this.customDir.FullName, "train.log"));
+                if (!marianLog.Exists)
+                {
+                    Log.Information(e.Data);
+                }
                 this.trainingLog.ParseTrainLogLine(e.Data);
                 //Check here for Marian error, if it happens trigger ui to show customization as suspended.
                 if (this.trainingLog.EncounteredError)
@@ -128,6 +134,7 @@ namespace OpusCatMTEngine
                 }
                 this.OnProgressChanged(new ProgressChangedEventArgs(newProgress, new MarianCustomizationStatus(CustomizationStep.Finetuning, this.trainingLog.EstimatedRemainingTotalTime)));
             }
+            
         }
 
         public enum CustomizationStep {
@@ -182,16 +189,21 @@ namespace OpusCatMTEngine
 
             var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
 
+            // TODO: this is meant for generating alignments for fine-tuning models with guided alignment.
+            // However, it seems that it's not necessary to provide alignments for fine-tuning 
+            // (at least the effects are not huge), so this has not been implemented yet. Also, this 
+            // uses eflomal, which is GPL and so difficult to integrate. I'll leave this code here,
+            // but I'll remove the actual eflomal components, they can be reintroduced if needed.
             if (this.guidedAlignment)
             {
                 //Generate alignments for fine-tuning corpus
-                this.alignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "custom.alignments"));
-                MarianHelper.GenerateAlignments(this.spSource, this.spTarget, this.alignmentFile, this.model.AlignmentPriorsFile);
+                //this.alignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "custom.alignments"));
+                //MarianHelper.GenerateAlignments(this.spSource, this.spTarget, this.alignmentFile, this.model.AlignmentPriorsFile);
 
                 //
                 //Generate alignments for validation set (for evaluating fine-tuning effect on alignment)
-                this.validAlignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "combined.alignments"));
-                MarianHelper.GenerateAlignments(this.spValidSource, this.spValidTarget, this.validAlignmentFile, this.model.AlignmentPriorsFile);
+                //this.validAlignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "combined.alignments"));
+                //MarianHelper.GenerateAlignments(this.spValidSource, this.spValidTarget, this.validAlignmentFile, this.model.AlignmentPriorsFile);
             }
 
             this.OnProgressChanged(new ProgressChangedEventArgs(4, new MarianCustomizationStatus(CustomizationStep.Initial_evaluation, null)));
@@ -257,8 +269,10 @@ namespace OpusCatMTEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            switch (this.segmentationMethod)
+            /* This is the old method, using a batch file, now uses python script
+             * switch (this.segmentationMethod)
             {
+
                 case ".bpe":
                     string validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
                     trainingConfig.validScriptPath = 
@@ -275,12 +289,16 @@ namespace OpusCatMTEngine
                     break;
                 default:
                     break;
-            }
+            }*/
+
+            trainingConfig.validScriptPath =
+                Path.Combine(Path.Combine(processDir, OpusCatMTEngineSettings.Default.PythonDir), "python.exe .\\Marian\\validate.py");
 
             trainingConfig.validScriptArgs = 
                 new List<string> {
                     $"{spValidTarget.FullName}",
-                    $"OOD{OpusCatMTEngineSettings.Default.OODValidSetSize.ToString()}" };
+                    OpusCatMTEngineSettings.Default.OODValidSetSize.ToString(),
+                    this.segmentationMethod};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             if (this.guidedAlignment)
@@ -326,8 +344,23 @@ namespace OpusCatMTEngine
             //var trainingArgs = $"--config {configPath} --log-level=warn";
             var trainingArgs = $"--config \"{configPath}\" --log-level=info"; // --quiet";
 
+            /*byte[] bytes = Encoding.Default.GetBytes(trainingArgs);
+            trainingArgs = Encoding.UTF8.GetString(bytes);*/
+
+            // Fine-tuning tends to cause IO lockup when the model is written, so assign low priority
+            // by changing main process priority to 
+            var parent = Process.GetCurrentProcess();
+            var original = parent.PriorityClass;
+
+            parent.PriorityClass = ProcessPriorityClass.BelowNormal;
+
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMTEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
+
+            //Restore normal process priority
+            parent.PriorityClass = original;
+
+
             return trainProcess;
         }
 

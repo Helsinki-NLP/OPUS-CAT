@@ -21,11 +21,66 @@ namespace OpusCatMTEngine
             EventHandler exitCallback = null,
             DataReceivedEventHandler errorDataHandler = null)
         {
+            var fileName = command.Split()[0];
+            var args = command.Substring(fileName.Length);
             var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process ExternalProcess = new Process();
 
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {command}";
+            ExternalProcess.StartInfo.FileName = fileName;
+            ExternalProcess.StartInfo.Arguments = args;
+            ExternalProcess.StartInfo.UseShellExecute = false;
+            //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+            ExternalProcess.StartInfo.WorkingDirectory = pluginDir;
+            ExternalProcess.StartInfo.RedirectStandardInput = true;
+            ExternalProcess.StartInfo.RedirectStandardOutput = true;
+            ExternalProcess.StartInfo.RedirectStandardError = true;
+            ExternalProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+
+            //Async error data handler is used for tracking progress
+            if (errorDataHandler != null)
+            {
+                ExternalProcess.ErrorDataReceived += errorDataHandler;
+            }
+            else
+            {
+                ExternalProcess.ErrorDataReceived += defaultErrorDataHandler;
+            }
+
+            ExternalProcess.StartInfo.CreateNoWindow = true;
+
+            if (exitCallback != null)
+            {
+                ExternalProcess.Exited += exitCallback;
+            }
+
+            ExternalProcess.Start();
+
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+            ChildProcessTracker.AddProcess(ExternalProcess);
+
+            ExternalProcess.EnableRaisingEvents = true;
+            ExternalProcess.BeginErrorReadLine();
+
+            ExternalProcess.StandardInput.AutoFlush = true;
+
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+
+            return ExternalProcess;
+        }
+
+        internal static Process StartProcessDirectlyInBackgroundWithRedirects(
+            string command,
+            string args,
+            EventHandler exitCallback = null,
+            DataReceivedEventHandler errorDataHandler = null)
+        {
+            var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            Process ExternalProcess = new Process();
+
+            ExternalProcess.StartInfo.FileName = command;
+            ExternalProcess.StartInfo.Arguments = args;
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
@@ -77,8 +132,8 @@ namespace OpusCatMTEngine
             var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             Process ExternalProcess = new Process();
 
-            ExternalProcess.StartInfo.FileName = "cmd";
-            ExternalProcess.StartInfo.Arguments = $"/c {fileName} {args}";
+            ExternalProcess.StartInfo.FileName = fileName;
+            ExternalProcess.StartInfo.Arguments = args;
             ExternalProcess.StartInfo.UseShellExecute = false;
             //ExternalProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
@@ -206,12 +261,14 @@ namespace OpusCatMTEngine
         {
             if (!includePlaceholderTags)
             {
+                line = Regex.Replace(line, @" PLACEHOLDER\d* ([.,!?:;])", "$1");
                 line = Regex.Replace(line, @"PLACEHOLDER\d*", "");
             }
 
             if (!includeTagPairs)
             {
                 line = Regex.Replace(line, @"TAGPAIRSTART\d*", "");
+                line = Regex.Replace(line, @" TAGPAIREND\d* ([.,!?:;])", "$1");
                 line = Regex.Replace(line, @"TAGPAIREND\d*", "");
             }
 
@@ -248,26 +305,42 @@ namespace OpusCatMTEngine
             //Marian doesn't like spaces in names
             var segmentedFile = new FileInfo(Path.Combine(directory.FullName, $"seg_{languageFile.Name.Replace(" ", "_")}"));
 
+            IPreprocessor preprocessor;
             switch (segmentationModel.Extension)
             {
                 case ".spm":
-                    var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{segmentationModel.FullName}\" --output \"{segmentedFile.FullName}\"";
+                    preprocessor = new SentencePiecePreprocessor(segmentationModel.FullName);
+                    /*var spArgs = $"\"{preprocessedFile.FullName}\" --model \"{segmentationModel.FullName}\" --output \"{segmentedFile.FullName}\"";
                     var segmentationProcess = MarianHelper.StartProcessInBackgroundWithRedirects("Preprocessing\\spm_encode.exe", spArgs);
-                    segmentationProcess.WaitForExit();
+                    segmentationProcess.WaitForExit();*/
                     break;
                 case ".bpe":
+                    preprocessor = new MosesBpePreprocessor("", segmentationModel.FullName, languageCode, null);
+                    /*
                     //Truecasing is not used in any models, so this is a dummy tc model (empty). So it does not
                     //matter is source.tcmodel is used for target language.
                     var tcModelPath = $@"{directory.FullName}\source.tcmodel";
 
+                    //TODO: this would not work, since pipes no longer work (cmd.exe was removed from start process).
+                    //Combine the py scripts and use those directly (add input file parameter).
                     var mosesProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                         $"type {preprocessedFile.FullName} | Preprocessing\\StartMosesBpePreprocessPipe.bat {languageCode} \"{tcModelPath}\" \"{segmentationModel.FullName}\" > {segmentedFile.FullName}");
-                    mosesProcess.WaitForExit();
+                    mosesProcess.WaitForExit();*/
                     break;
                 default:
-                    segmentationProcess = null;
                     throw new Exception("No segmentation model found");
                     break;
+            }
+
+            using (var preprocessedFileReader = preprocessedFile.OpenText())
+            using (var segmentedFileWriter = new StreamWriter(segmentedFile.FullName))
+            {
+                String line;
+                while ((line = preprocessedFileReader.ReadLine()) != null)
+                {
+                    var segmentedLine = preprocessor.PreprocessSentence(line);
+                    segmentedFileWriter.WriteLine(segmentedLine);
+                }
             }
          
             if (targetLanguageToPrefix != null)

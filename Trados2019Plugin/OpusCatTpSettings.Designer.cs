@@ -178,5 +178,17 @@ namespace OpusCatTranslationProvider {
                 this["PregenerateSegmentCountMax"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RestoreTags {
+            get {
+                return ((bool)(this["RestoreTags"]));
+            }
+            set {
+                this["RestoreTags"] = value;
+            }
+        }
     }
 }

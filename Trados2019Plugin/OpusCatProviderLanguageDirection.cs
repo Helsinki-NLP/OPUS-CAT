@@ -111,93 +111,67 @@ namespace OpusCatTranslationProvider
             #endregion
         }
 
-        private List<SearchResult> GenerateSystemResult(string sourceText, SearchMode mode, Segment segment, string sourceCode, string targetCode)
+        private List<SearchResult> GenerateSystemResult(
+            string sourceText, 
+            SearchMode mode, 
+            Segment segment, string sourceCode, string targetCode)
         {
             List<SearchResult> systemResults = new List<SearchResult>();
 
-            string translatedSentence;
+            Segment translationSegment = new Segment(_languageDirection.TargetCulture);
             if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.OpusCatMtEngine)
             {
-                translatedSentence = OpusCatMTServiceHelper.Translate(this._options, sourceText, sourceCode, targetCode, this._options.modelTag);
-            }
-            else if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
-            {
-                translatedSentence = OpusCatProvider.ElgConnection.Translate(sourceText,
+                var translation = OpusCatProvider.OpusCatMtEngineConnection.Translate(
+                    this._options.mtServiceAddress, 
+                    this._options.mtServicePort, 
+                    sourceText, 
                     sourceCode, 
-                    targetCode);
-            }
-            else
-            {
-                translatedSentence = null;
-            }
+                    targetCode, 
+                    this._options.modelTag);
 
-            if (String.IsNullOrEmpty(translatedSentence))
-                return systemResults;
-
-            // Look up the currently selected segment in the collection (normal segment lookup).
-            if (mode == SearchMode.FullSearch || mode == SearchMode.NormalSearch)
-            {
-                Segment translation = new Segment(_languageDirection.TargetCulture);
-                if (_visitor.Placeholders.Any() || _visitor.TagStarts.Any() || _visitor.TagEnds.Any())
+                if (this._options.restoreTags &&
+                    (_visitor.Placeholders.Any() || 
+                    _visitor.TagStarts.Any() || 
+                    _visitor.TagEnds.Any()))
                 {
-
-                    var split = Regex.Split(translatedSentence, @"\b(PLACEHOLDER|TAGPAIRSTART ?| ?TAGPAIREND)\b");
-                
-                    //Tag starts and ends must match, so need a stack to keep track of what tags
-                    //have been applied
-                    var tagStack = new Stack<Tag>();
-
-                    foreach (var part in split)
-                    {
-                        //Remove potential spaces from after TAGPAIRSTARTS and before TAGPAIREND
-                        var normalpart = part.Replace("TAGPAIRSTART ", "TAGPAIRSTART");
-                        normalpart = normalpart.Replace(" TAGPAIREND", "TAGPAIREND");
-
-                        switch (normalpart)
-                        {
-                            case "PLACEHOLDER":
-                                if (_visitor.Placeholders.Count != 0)
-                                {
-                                    translation.Add(_visitor.Placeholders.Dequeue());
-                                }
-                                break;
-                            case "TAGPAIRSTART":
-                                if (_visitor.TagStarts.Count != 0)
-                                {
-                                    var startTag = _visitor.TagStarts.Dequeue();
-                                    tagStack.Push(startTag);
-                                    translation.Add(startTag);
-                                }
-                                break;
-                            case "TAGPAIREND":
-                                if (tagStack.Count != 0)
-                                {
-                                    var correspondingStartTag = tagStack.Pop();
-                                    var endTag = _visitor.TagEnds[correspondingStartTag.TagID];
-                                    translation.Add(endTag);
-                                }
-                                break;
-                            default:
-                                translation.Add(part);
-                                break;
-                        }
-                    }
-
-                    //Insert missing end tags
-                    foreach (var excessStartTag in tagStack)
-                    {
-                        var nonEndedTagIndex = translation.Elements.IndexOf(excessStartTag);
-                        var endTag = _visitor.TagEnds[excessStartTag.TagID];
-                        translation.Elements.Insert(nonEndedTagIndex+1, endTag);
-                    }
+                    var tagRestorer = new TagRestorer(segment, translation, _visitor, translationSegment);
+                    tagRestorer.ProcessTags();
                 }
                 else
                 {
-                    translation.Add(translatedSentence);
+                    translationSegment.Add(translation.Translation);
                 }
 
+                //Fix potential tag problems
+                translationSegment.FillUnmatchedStartAndEndTags();
+                if (!translationSegment.IsValid())
+                {
+                    translationSegment.Clear();
+                    translationSegment.Add(translation.Translation);
+                }
+            }
+            else if (this._options.opusCatSource == OpusCatOptions.OpusCatSource.Elg)
+            {
+                var taglessSourceText = Regex.Replace(sourceText, " (PLACEHOLDER|TAGPAIRSTART|TAGPAIREND) ", "");
+                var translatedSentence = OpusCatProvider.ElgConnection.Translate(taglessSourceText,
+                    sourceCode, 
+                    targetCode);
+                translationSegment.Add(translatedSentence);
+            }
+            else
+            {
+                translationSegment = null;
+            }
+
+            if (translationSegment == null)
+                return systemResults;
+
+            
+            // Look up the currently selected segment in the collection (normal segment lookup).
+            if (mode == SearchMode.FullSearch || mode == SearchMode.NormalSearch)
+            {
                 
-                systemResults.Add(CreateSearchResult(segment, translation, segment.HasTags,"opus-cat"));
+                systemResults.Add(CreateSearchResult(segment, translationSegment, segment.HasTags,"opus-cat"));
             }
             return systemResults;
         }

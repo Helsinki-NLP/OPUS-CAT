@@ -61,13 +61,7 @@ namespace OpusCatMTEngine
         Remove,
         IncludePlaceholders
     }
-
-    public enum SegmentationMethod
-    {
-        Bpe,
-        SentencePiece
-    }
-
+    
     public class MTModel : INotifyPropertyChanged
     {
         public object this[string propertyName]
@@ -172,8 +166,27 @@ namespace OpusCatMTEngine
             this.marianProcesses = null;
         }
 
-        internal Task<TranslationPair> Translate(string input, IsoLanguage sourceLang, IsoLanguage targetLang)
+        public Task<TranslationPair> Translate(
+            string input, 
+            IsoLanguage sourceLang, 
+            IsoLanguage targetLang,
+            bool applyEditRules=true)
         {
+            if (String.IsNullOrWhiteSpace(input))
+            {
+                var translationPair = new TranslationPair(input, input, input, "0-0", this.ModelSegmentationMethod, targetLang.OriginalCode);
+                return Task.FromResult<TranslationPair>(translationPair);
+            }
+
+            //Preprocess input with pre-edit rules
+            if (applyEditRules)
+            {
+                foreach (var preEditRuleCollection in this.AutoPreEditRuleCollections)
+                {
+                    input = preEditRuleCollection.ProcessPreEditRules(input).Result;
+                }
+            }
+
             //Need to get the original codes, since those are the ones the marian model uses
             var modelSourceLang =
                 this.SourceLanguages.SingleOrDefault(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode);
@@ -218,10 +231,48 @@ namespace OpusCatMTEngine
                         modelOrigTargetCode,
                         $"{this.SourceCodesString}-{this.TargetCodesString}_{this.Name}",
                         this.targetLanguages.Count > 1,
-                        this.modelConfig.IncludePlaceholderTags, this.modelConfig.IncludeTagPairs);
+                        this.modelConfig.IncludePlaceholderTags, 
+                        this.modelConfig.IncludeTagPairs);
             };
 
-            return this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
+            var translationTask = this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
+            if (applyEditRules)
+            {
+                return this.ApplyAutoPostEditRules(translationTask, input);
+            }
+            else
+            {
+                return translationTask;
+            }
+            
+        }
+
+        private async Task<TranslationPair> ApplyAutoPostEditRules(Task<TranslationPair> translationTask, string input)
+        {
+            await translationTask;
+            if (translationTask.IsCompleted)
+            {
+                var translationPair = translationTask.Result;
+                var output = translationPair.Translation;
+                //Postprocess output with post-edit rules
+                foreach (var postEditRuleCollection in this.AutoPostEditRuleCollections)
+                {
+                    output = postEditRuleCollection.ProcessPostEditRules(input, output).Result;
+                }
+
+                if (output != translationPair.Translation)
+                {
+                    translationPair.AutoEditedTranslation = true;
+                    translationPair.Translation = output;
+                    translationPair.SegmentedTranslation = new string[] { output };
+                }
+
+                return translationPair;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         internal void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -261,12 +312,28 @@ namespace OpusCatMTEngine
                 foreach (var modelNpzName in this.decoderSettings.models)
                 {
                     //No point in compressing npz, it's already compressed
-                    packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, modelNpzName), modelNpzName, CompressionLevel.NoCompression);
+                    packageZip.CreateEntryFromFile(
+                        Path.Combine(this.InstallDir, modelNpzName),
+                        modelNpzName,
+                        CompressionLevel.NoCompression);
+    
                 }
+
+
 
                 foreach (var vocabName in decoderSettings.vocabs.Distinct())
                 {
                     packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, vocabName), vocabName);
+                }
+
+                //Tatoeba models have yml configs, which may be needed for extracting info about the model
+                //(especially for multilingual models).
+                
+                if (File.Exists(this.modelYamlFilePath))
+                {
+                    packageZip.CreateEntryFromFile(
+                        this.modelYamlFilePath,
+                        Path.GetFileName(this.modelYamlFilePath));
                 }
 
                 var otherModelFiles =
@@ -280,7 +347,8 @@ namespace OpusCatMTEngine
                         "preprocess.sh",
                         "postprocess.sh",
                         "modelconfig.yml",
-                        "LICENSE"
+                        "LICENSE",
+                        "train.log"
                     };
 
                 foreach (var fileName in otherModelFiles)
@@ -288,7 +356,9 @@ namespace OpusCatMTEngine
                     packageZip.CreateEntryFromFile(Path.Combine(this.InstallDir, fileName), fileName);
                 }
             }
-            
+
+            MessageBox.Show($"Model has been packaged and saved to {zipPath}. Click OK to go to folder.","Model packaged",MessageBoxButton.OK);
+            System.Diagnostics.Process.Start("explorer.exe", Path.GetDirectoryName(zipPath));
         }
 
         public string StatusAndEstimateString
@@ -521,7 +591,11 @@ namespace OpusCatMTEngine
             this.modelYamlFilePath = Path.ChangeExtension(modelFilePath, "yml");
         }
 
-        public MTModel(string modelPath, string installDir)
+        public MTModel(
+            string modelPath, 
+            string installDir,
+            ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
+            ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
         {
             this.InstallDir = installDir;
 
@@ -541,7 +615,15 @@ namespace OpusCatMTEngine
             this.ParseModelPath(modelPath);
 
             this.ParseModelConfig();
-            
+
+            //
+            this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
+                this.ModelConfig.AutoPreEditRuleCollectionGuids.Select(x => autoPreEditRuleCollections.SingleOrDefault(
+                    y => y.CollectionGuid == x)).Where(y => y != null));
+            this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
+                this.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
+                    y => y.CollectionGuid == x)).Where(y => y != null));
+
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
@@ -590,24 +672,25 @@ namespace OpusCatMTEngine
             FileInfo spOutput)
         {
 
-            string validateScript;
-
+            string segmethodArg;
+            
             switch (this.ModelSegmentationMethod)
             {
                 case SegmentationMethod.Bpe:
-                    validateScript = "ValidateBpe.bat";
+                    segmethodArg = ".bpe";
                     break;
                 case SegmentationMethod.SentencePiece:
-                    validateScript = "ValidateSp.bat";
+                    segmethodArg = ".spm";
                     break;
                 default:
                     return;
             }
 
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                validateScript,
-                $"{refFile.FullName} OOD{outOfDomainSize} {spOutput.FullName}");
+                Path.Combine(OpusCatMTEngineSettings.Default.PythonDir, "python.exe"),
+                $".\\Marian\\validate.py {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
         }
+        
 
         private void ModelTags_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -633,10 +716,15 @@ namespace OpusCatMTEngine
             //languages have to be fetched the metadata yml file
             if (this.modelYaml == null)
             {
-                this.SourceLanguages =
-                    pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-                this.TargetLanguages =
-                    pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                //There may be weird paths with no hyphen separating source from target languages, e.g.
+                //just "westgermanic" (presumably both source and target languages are westgermanic).
+                if (pathSplit[0].Contains("-"))
+                {
+                    this.SourceLanguages =
+                        pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                    this.TargetLanguages =
+                        pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                }
             }
             else
             {
@@ -663,6 +751,8 @@ namespace OpusCatMTEngine
             this.Name = name;
             this.SourceLanguages = sourceLangs;
             this.TargetLanguages = targetLangs;
+            this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
@@ -708,6 +798,11 @@ namespace OpusCatMTEngine
                 if (res.ContainsKey("source-languages"))
                 {
                     xamlSourceLangs = res["source-languages"];
+                }
+
+                if (res.ContainsKey("modeltype"))
+                {
+                    this.ModelType = res["modeltype"];
                 }
                 
                 if (xamlSourceLangs != null)
@@ -834,7 +929,19 @@ namespace OpusCatMTEngine
 
         public string SourceLanguageString
         {
-            get { return String.Join(", ", this.SourceLanguages.Select(x => x.IsoRefName)); }
+            get
+            {
+                string sourceLangString = String.Join(", ", this.SourceLanguages.Select(x => x.IsoRefName));
+                if (String.IsNullOrWhiteSpace(sourceLangString))
+                {
+                    this.Faulted = true;
+                    return "No source languages available";
+                }
+                else
+                {
+                    return sourceLangString;
+                }
+            }
         }
 
         public string SourceCodesString
@@ -844,7 +951,20 @@ namespace OpusCatMTEngine
 
         public string TargetLanguageString
         {
-            get { return String.Join(", ", this.TargetLanguages.Select(x => x.IsoRefName)); }
+            get
+            {
+                string targetLangString = String.Join(", ", this.TargetLanguages.Select(x => x.IsoRefName));
+                if (String.IsNullOrWhiteSpace(targetLangString))
+                {
+                    this.Faulted = true;
+                    return "No target languages available";
+                }
+                else
+                {
+                    return targetLangString;
+                }
+            }
+
         }
 
         public string TargetCodesString
@@ -897,6 +1017,24 @@ namespace OpusCatMTEngine
                 }
                 return hasOODValidSet.Value;
             }
+        }
+        
+        public ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections
+        {
+            get;
+            internal set;
+        }
+
+        public ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections
+        {
+            get;
+            internal set;
+        }
+
+        public string ModelType
+        {
+            get;
+            internal set;
         }
 
         private MTModelStatus status;

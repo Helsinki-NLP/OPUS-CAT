@@ -20,7 +20,7 @@ function notifyEngine(e) {
             chrome.runtime.sendMessage({opusCatSourceText: sourceSegment.textContent});
         }
     }
-    if (locationUrl.hostname.endsWith("xtm.cloud")) {
+    if (locationUrl.hostname.endsWith("xtm.cloud") || locationUrl.hostname.endsWith("xtm-intl.com")) {
         var activesegs = document.getElementsByClassName("trans-unit--active");
         if (activesegs.length > 0) {
             const activeSegmentPair = activesegs[0];
