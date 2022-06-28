@@ -718,6 +718,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installation failed.
+        /// </summary>
+        public static string Online_FailedStatus {
+            get {
+                return ResourceManager.GetString("Online_FailedStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installation progress.
         /// </summary>
         public static string Online_InstallationProgressHeader {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -113,28 +114,39 @@ namespace OpusCatMTEngine
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
             model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_ExtractingStatus;
-            var installPath = this.ModelManager.ExtractModel(model.ModelPath,true);
-            
-            //If model has yaml config, check whether it was included in the zip package (Tatoeba models)
-            if (!String.IsNullOrEmpty(model.TatoebaConfigString))
-            {
-                var decoderYaml = 
-                    new DirectoryInfo(installPath).GetFiles("decoder.yml").Single();
-                var deserializer = new Deserializer();
-                var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-                var modelPath = Path.Combine(installPath, decoderSettings.models[0]);
-                var yamlPath = Path.ChangeExtension(modelPath, "yml");
 
-                //The yamls inside the model zips may be corrupt, so always write the config string as yaml,
-                //as that is more current.
-                using (var writer = File.CreateText(yamlPath))
+            try
+            {
+                var installPath = this.ModelManager.ExtractModel(model.ModelPath,true);
+            
+                //If model has yaml config, check whether it was included in the zip package (Tatoeba models)
+                if (!String.IsNullOrEmpty(model.TatoebaConfigString))
                 {
-                    writer.Write(model.TatoebaConfigString);
+                    var decoderYaml =
+                        new DirectoryInfo(installPath).GetFiles("decoder.yml").Single();
+                    var deserializer = new Deserializer();
+                    var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
+                    var modelPath = Path.Combine(installPath, decoderSettings.models[0]);
+                    var yamlPath = Path.ChangeExtension(modelPath, "yml");
+
+                    //The yamls inside the model zips may be corrupt, so always write the config string as yaml,
+                    //as that is more current.
+                    using (var writer = File.CreateText(yamlPath))
+                    {
+                        writer.Write(model.TatoebaConfigString);
+                    }
                 }
+
+                model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_InstalledStatus;
+                this.ModelManager.GetLocalModels();
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Online model installation failed: {ex.Message}");
+                model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_FailedStatus;
             }
 
-            model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_InstalledStatus;
-            this.ModelManager.GetLocalModels();
+            
         }
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
@@ -149,10 +161,10 @@ namespace OpusCatMTEngine
 
                 selectedModel.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_DownloadingStatus;
                 this.ModelManager.DownloadModel(
-                    selectedModel.ModelUri,
-                    selectedModel.ModelPath,
-                    selectedModel.DownloadProgressChanged,
-                    (x, y) => DownloadCompleted(selectedModel, x, y));
+                        selectedModel.ModelUri,
+                        selectedModel.ModelPath,
+                        selectedModel.DownloadProgressChanged,
+                        (x, y) => DownloadCompleted(selectedModel, x, y));
             }
 
         }

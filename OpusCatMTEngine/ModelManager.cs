@@ -331,7 +331,7 @@ namespace OpusCatMTEngine
 
             if (!this.ShowTransformerBigModels)
             {
-                filteredModels = filteredModels.Where(x => !x.ModelType.Contains("transformer-big"));
+                filteredModels = filteredModels.Where(x => !x.ModelType.Contains("transformer-big") && !x.ModelType.Contains("transformer-tiny"));
             }
 
             if (!this.ShowBilingualModels)
@@ -1113,15 +1113,22 @@ namespace OpusCatMTEngine
             AsyncCompletedEventHandler wc_DownloadComplete)
         {
             var downloadPath = Path.Combine(this.OpusModelDir.FullName, modelName + ".zip");
-
-            using (var client = new WebClient())
+            try
             {
-                client.DownloadProgressChanged += wc_DownloadProgressChanged;
-                client.DownloadFileCompleted += wc_DownloadComplete;
-                Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
-                client.DownloadFileAsync(modelUri, downloadPath);
+                using (var client = new WebClient())
+                {
+                    client.DownloadProgressChanged += wc_DownloadProgressChanged;
+                    client.DownloadFileCompleted += wc_DownloadComplete;
+                    Directory.CreateDirectory(Path.GetDirectoryName(downloadPath));
+                    client.DownloadFileAsync(modelUri, downloadPath);
+                }
+
             }
-        }
+            catch (Exception ex)
+            {
+                Log.Error($"Model download failed: {ex.Message}");
+            }
+}
 
         //This is used with automatic downloads from the object storage, where the
         //language pair is contained in the object storage path

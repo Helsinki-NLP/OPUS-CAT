@@ -751,6 +751,8 @@ namespace OpusCatMTEngine
             this.Name = name;
             this.SourceLanguages = sourceLangs;
             this.TargetLanguages = targetLangs;
+            this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();

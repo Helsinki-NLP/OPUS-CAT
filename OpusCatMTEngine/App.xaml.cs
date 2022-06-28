@@ -124,9 +124,9 @@ namespace OpusCatMTEngine
         private async void CheckForUpdatesAsync()
         {
             //Get info for all releases from Github
-            var client = new GitHubClient(new ProductHeaderValue("OpusCatMTEngine"));
             try
             {
+                var client = new GitHubClient(new ProductHeaderValue("OpusCatMTEngine"));
                 var releases = await client.Repository.Release.GetAll(
                     OpusCatMTEngineSettings.Default.GithubOrg,
                     OpusCatMTEngineSettings.Default.GithubRepo);
@@ -172,15 +172,7 @@ namespace OpusCatMTEngine
             }
 
         }
-
-        private void ReleaseNotesDownloadComplete(object sender, 
-            DownloadStringCompletedEventArgs e, 
-            Release latestRelease)
-        {
-            //First line of release notes is the version
-            var release_notes = e.Result;
-            
-        }
+        
 
         private void InitializePythonEngine()
         {
