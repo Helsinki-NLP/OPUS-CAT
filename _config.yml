@@ -31,6 +31,7 @@ header_pages:
  - about.md
  - contact.md
  - install.md
+ - editrules.md
 #plugins:
 #i  - jekyll-feed
 
