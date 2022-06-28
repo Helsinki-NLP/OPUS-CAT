@@ -1,21 +1,28 @@
 ---
 layout: page
-title: Using automatic edit rules OPUS-CAT MT Engine
+title: Using edit rules OPUS-CAT MT Engine
 permalink: /editrules
 ---
 
-Automatic edit rules can be used to edit the source text before translating it with MT models (_pre-edit rules_), or to edit the machine translation (_post-edit rules_). Regular expressions ([.NET regex flavor](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference)) can be used in the rules. Rules are organized into _rule collections_, which can contain any number of rules. 
+Edit rules can be used to edit the source text before translating it with MT models (_pre-edit rules_), or to edit the machine translation (_post-edit rules_). Pre-edit rules can be used to compensate for errors and deviations from normal text that exist in source texts (misspellings, text processing artifacts etc.), which may otherwise degrade the MT quality. Post-edit rules can be used to modify machine translations to correct incorrect terminology or punctuation mistakes.
+
+Edit rules can be defined in the **Edit rules** tab of OPUS-CAT MT Engine. Regular expressions ([.NET regex flavor](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference)) can be used in the rules. Rules are organized into _rule collections_, which can contain any number of rules. 
 
 ## Contents
 1. [Quickstart (pre-edit rules)](#Quickstart)
 2. [Rule collections](#rule_collections) 
 3. [Post-edit rules](#post_edit_rules)
-4. [Rule testers](#rule_testers)
-5. [Managing rule collections](#management)
-6. [Using regular expressions in rules](#regex)
+4. [Rule testers](#rule_testers)  
+  4.1 [Testing the entire translation pipeline](#pipeline_tester)
+5. [Managing rule collections](#management)  
+  5.1 [Importing and exporting rule collections](#import_export)
+6. [Using regular expressions in rules](#regex)  
+  6.1 [Capturing groups](#cap_groups)  
+  6.2 [Changing the character case of text matched by capturing groups](#case_conversion)  
+  6.3 [Referencing source pattern capturing groups in post-edit rules](#source_ref)
 7. [Using rule collections sequentially](#sequential_use)
 
-### <a name="Quickstart"></a>Quickstart: Adding a simple pre-edit rule
+### <a name="Quickstart"></a>1. Quickstart: Adding a simple pre-edit rule
 
 1. Select a model from the **Models** tab and click **Edit Rules**.
 
@@ -52,9 +59,9 @@ Automatic edit rules can be used to edit the source text before translating it w
 
     <img src="./images/editrules7.png?raw=true" alt="drawing" width="100%"/>
 
-### <a name="rule_collections"></a>Rule collections
+### <a name="rule_collections"></a>2. Rule collections
 
-As mentioned, automatic edit rules are organized into _rule collections_, which may contain any amount of rules. Every rule must be part of a rule collection, so when you create a rule using the **Create rule** button (as in the quickstart section above), a rule collection is also created to contain the rule. The default name of the created rule collection is the same as the description of the rule that it contains (_fix "acheive" misspelling_ in the example above). You can edit a rule collection by selecting it from the list and clicking **Edit rule collection**:
+As mentioned, edit rules are organized into _rule collections_, which may contain any amount of rules. Every rule must be part of a rule collection, so when you create a rule using the **Create rule** button (as in the quickstart section above), a rule collection is also created to contain the rule. The default name of the created rule collection is the same as the description of the rule that it contains (_fix "acheive" misspelling_ in the example above). You can edit a rule collection by selecting it from the list and clicking **Edit rule collection**:
 
   <img src="./images/editrules8.png?raw=true" alt="drawing" width="100%"/>
 
@@ -70,7 +77,7 @@ The **Edit rules in collection** window contains a field for the name of the col
 
 After you have edited the collection by adding, deleting, or modifying rules or by changing the collection name or its global status, you can either save the modifications by clicking the **Save** button, or reject them by clicking the **Cancel** button. 
 
-### <a name="post_edit_rules"></a>Post-edit rules
+### <a name="post_edit_rules"></a>3. Post-edit rules
 
 Post-edit rules are used to edit the output of the machine translation produced by the model. You can create a post-edit rule by clicking on the **Create rule** button in the **Post-edit rule collections** section of the **Edit rules** tab:
 
@@ -80,15 +87,16 @@ When you click on the button, the **Create post-edit rule** window opens:
 
   <img src="./images/editrules10.png?raw=true" alt="drawing" width="100%"/>
 
-As you can see from the image above, the **Create post-edit rule** window is also divided into two sections, the upper **Define post-edit rule** section and the lower tester section. Post-edit rules are very similar to the pre-edit rules described in the Quickstart section, the only difference is that a post-edit rule contains three fields instead of the two for the pre-edit rule:
+As you can see from the image above, the **Create post-edit rule** window is also divided into two sections, the upper **Define post-edit rule** section and the lower tester section. Post-edit rules are very similar to the pre-edit rules described in the Quickstart section, the only difference is that a post-edit rule contains four fields instead of the three for the pre-edit rule:
 
   1. **Use source pattern**: This is a pattern that is searched for in the original source text of the machine translation (i.e. the source text as it is before the application of pre-edit rules, if any). This field is optional, and it has two use cases:
      - The source pattern acts a trigger for the application of the rule (the rule is applied only if the pattern is found in the original source text).
      - The source pattern is used to copy text from the original source text directly into the MT output. 
-  2. **Post-edit pattern**: This is the pattern that the rule will search for in the source text.
-  3. **Post-edit replacement**: This is the text that will replace the part of the MT output that has been matched by the **Post-edit pattern**.
+  2. **Rule description**: Freeform description of the rule, preferably as informative as possible.
+  3. **Post-edit pattern**: This is the pattern that the rule will search for in the source text.
+  4. **Post-edit replacement**: This is the text that will replace the part of the MT output that has been matched by the **Post-edit pattern**.
 
-Here's a simple example rule, where all three fields are used:
+Here's a simple example rule, where all four fields are used:
 
   <img src="./images/editrules14.png?raw=true" alt="drawing" width="100%"/>
 
@@ -102,7 +110,7 @@ Once the post-edit rule has been defined, it can be saved by clicking the **Save
 
   <img src="./images/editrules13.png?raw=true" alt="drawing" width="100%"/>
 
-### <a name="rule_testers"></a>Rule testers
+### <a name="rule_testers"></a>4. Rule testers
 
 Rule testers can be used to verify that the edit rules work correctly both individually and in combination with other rules. Testers are available in the following contexts:
   1. **Create pre-edit rule** and **Create post-edit rule** windows
@@ -121,7 +129,7 @@ When you click the button, the tester expands. The following screenshot shows th
 
 As you can see from the image above, matches for all of the listed rules are highlighted in the tester.
 
-#### Testing the entire translation pipeline in the **Edit rules** tab
+#### <a name="pipeline_tester">4.1 Testing the entire translation pipeline in the **Edit rules** tab
 
 The tester in the **Edit rules in collection** window is the most comprehensive tester, since it tests both the pre-edit and post-edit rule collections: the tester edits the source text with each of the pre-edit rule collections, then produces a machine translation from the edited source text, and finally edits the MT output with all the post-edit rule collections. This tester is also hidden by default, and it can be opened by clicking the expander button at the bottom of the tab:
 
@@ -137,7 +145,7 @@ If the **Edit rules** tab tester is being used for the first time, there will be
 
 The parts of the text, which match some rule, are highlighted. The image above shows that the original source text is first edited to correct two misspellings (_calender_ and _experiance_), the edited source text is then used as MT input, and the MT output is then edited to replace _vika_ with _virhe_ (as the source text fulfills the condition of having the word _fault_ in it). 
 
-### <a name="management"></a>Adding, removing, and deleting rule collections
+### <a name="management"></a>5. Adding, removing, and deleting rule collections
 
 Rule collections can be added, removed or deleted in the **Edit rules** tab. Rule collections that have been defined as [global](#global), can be used in multiple MT models, and they can be removed and added by using the **Add rule collection** and **Remove rule collection** buttons. Local and global rule collections can be permanently deleted by clicking the **Delete rule collection** button (deletion needs to be confirmed, as the same rule collection may be in use in other MT models):
 
@@ -156,7 +164,7 @@ The addition of the collection is also reflected in the tester of the **Edit rul
   <img src="./images/editrules23.png?raw=true" alt="drawing" width="100%"/>
   
 
-#### <a name="import_export"></a>Importing and exporting rule collections
+#### <a name="import_export"></a>5.1 Importing and exporting rule collections
 
 The **Add edit rule collection** window can also be used to import and export rule collections. There are two buttons in the top section of the window:
 
@@ -166,7 +174,7 @@ The **Add edit rule collection** window can also be used to import and export ru
   2. **Import rule collections**: With this button you can import rule collections and add them to the model. Imported rule collections become global, so they can also be used with other models after importing them. Next to this button is the **Replace existing rules** checkbox. If this checkbox is checked, the rule collections will overwrite existing rule collections that have same ID number. If the checkbox is not checked, the imported rule collection will receive a new ID number, and the old collection will not be overwritten.
   
 
-### <a name="regex"></a>Using regular expressions in rules
+### <a name="regex"></a>6. Using regular expressions in rules
 
 Both pre-edit and post-edit rules can contain regular expressions ([.NET regex flavor](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference)). Regular expressions enhance the capability of the rules significantly. Providing a comprehensive tutorial on regular expression usage is beyond the scope of this documentation, so this section will only cover the usage of regular expressions in the OPUS-CAT MT Engine. However, there are many introductory articles aimed at translators available, e.g. [this article by Riccardo Schiaffino from the ATA Chronicle](https://www.ata-chronicle.online/highlights/regular-expressions-an-introduction-for-translators/).
 
@@ -183,7 +191,7 @@ When the **Use regex** checkbox next to a rule pattern field has been checked, t
  
   <img src="./images/editrules30.png?raw=true" alt="drawing" width="100%"/>
 
-#### Capturing groups
+#### <a name="cap_groups"></a>6.1 Capturing groups
 
 If **Use regex** checkbox has been checked, it's also possible to use regular expression capturing groups in the replacement fields of the rule. Capturing groups make it possible to copy text from the match to the replacement string. Here's an example of how capturing groups can be used:
 
@@ -199,13 +207,13 @@ The rule above has an empty replacement field, so it will simply remove the matc
 
   <img src="./images/editrules31.png?raw=true" alt="drawing" width="100%"/>
   
-Capturing groups capture the part of the source text that they match. For instance, since the first capturing group matches the letter sequence _mal_ in the test sentence above, the capturing will capture _mal_. The captured text can be accessed during the replacement phase by using a capturing group reference in the replacement field. Capturing groups can always be referred to by their index: the text captured by the first capturing group can be accessed by adding _$1_ in the replacement field, and the text captured by the second capturing group by adding _$2_. Here's how we can use these capturing group references in the hyphen removal rule:
+Capturing groups capture the part of the source text that they match. For instance, since the first capturing group matches the letter sequence _mal_ in the test sentence above, the capturing group will capture _mal_. The captured text can be accessed during the replacement phase by using a capturing group reference in the replacement field. Capturing groups can always be referred to by their index: the text captured by the first capturing group can be accessed by adding _$1_ in the replacement field, and the text captured by the second capturing group by adding _$2_. Here's how we can use these capturing group references in the hyphen removal rule:
 
   <img src="./images/editrules32.png?raw=true" alt="drawing" width="100%"/>
 
 The capturing groups of the rule pattern capture the letter sequences in the incorrectly hyphenated word, and the replacement _$1$2_ reconstructs the word without the hyphen.
 
-#### Changing the character case of text matched by capturing groups
+#### <a name="case_conversion"></a>6.2 Changing the character case of text matched by capturing groups
 
 The regular expressions in the OPUS-MT Engine contain some extensions to the .NET regular expression language. One of these is the possibility to convert the text matched by capturing group into lower or upper case. The case of the letters in a capturing group can be converted by adding _L_ (for lower case), _U_ (for upper case), or _C_ (for upper-case first letter) after the dollar sign but before the index. Let's say for instance that the source text contains sentences that are written in ALL CAPS, i.e. just using upper case letters. This may degrade the quality of the machine translation, so it makes sense to convert the source sentence to lower case before machine translating it. This can be done with the following rule:
 
@@ -217,7 +225,7 @@ In this rule, the source pattern contains two capturing groups, one for the init
   
 Note that the match covers the whole sentence. This is intended, since the rule should be used only with sentences that contain no lower-case letters.
 
-#### Referencing source pattern capturing groups in post-edit rules
+#### <a name="source_ref"></a>6.3 Referencing source pattern capturing groups in post-edit rules
 
 As mentioned before, post-edit rules have a source pattern field, which can be used as a condition for rule application: if a source pattern is defined, the source text must match the pattern, otherwise the rule will not be applied. It is also possible to use capturing groups in the source pattern field of post-edit rules. This makes it possible to copy parts of text from the source sentence when applying a post-edit rule. The following example shows one scenario, in which this functionality can be useful:
 
@@ -229,7 +237,7 @@ ERROR-12313: Remove Y to reset X.
 ERROR-54121: Check that X has been correctly Y'd.
 ```
 
-The initial _ERROR_ part of these sentences should not be translated, but usually it is, and it is possible that the translations may even change the number part of the error code. With these kinds of sentences with recurring non-translateable sections, edit rules can be used to make sure that the non-translateable section of the sentence is not translated. We can use the following rule to achieve this:
+The initial _ERROR_ part of these sentences should not be translated, but the MT models usually do translate it, and it is possible that the machine translation may even change the number part of the error code. With these kinds of sentences with recurring non-translateable sections, edit rules can be used to make sure that the non-translateable section of the sentence is not translated. We can use the following rule to achieve this:
 
   <img src="./images/editrules33.png?raw=true" alt="drawing" width="100%"/>
   
@@ -252,7 +260,7 @@ We can verify that these rules work correctly together by using the tester for t
 
 As you can see from the images above, the two rules transfer the text from the original source (top field of the tester) to the final translation (bottom field in the tester), without ever machine translating the problematic part of the source sentence.
 
-### <a name="sequential_use"></a>Using rule collections sequentially
+### <a name="sequential_use"></a>7. Using rule collections sequentially
 
 As was demonstrated in the previous section, using rules in combination can be more powerful than just using a single rule. It is also possible to use several pre-edit or post-edit rules together to make more complex replacements than single rules allow for. Each rule collection is processed sequentially, which means that the output of the previous rule collection is used as the input of the next rule collection. To see how rule collections can be combined sequentially to perform complex replacements, let's return to the case conversion example from the previous section. In the case conversion example we created a rule, which converted ALL CAPS source sentences to lower case (except for the first letter):
 
