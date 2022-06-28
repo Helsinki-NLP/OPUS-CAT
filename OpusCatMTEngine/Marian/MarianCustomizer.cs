@@ -197,13 +197,13 @@ namespace OpusCatMTEngine
             if (this.guidedAlignment)
             {
                 //Generate alignments for fine-tuning corpus
-                this.alignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "custom.alignments"));
-                MarianHelper.GenerateAlignments(this.spSource, this.spTarget, this.alignmentFile, this.model.AlignmentPriorsFile);
+                //this.alignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "custom.alignments"));
+                //MarianHelper.GenerateAlignments(this.spSource, this.spTarget, this.alignmentFile, this.model.AlignmentPriorsFile);
 
                 //
                 //Generate alignments for validation set (for evaluating fine-tuning effect on alignment)
-                this.validAlignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "combined.alignments"));
-                MarianHelper.GenerateAlignments(this.spValidSource, this.spValidTarget, this.validAlignmentFile, this.model.AlignmentPriorsFile);
+                //this.validAlignmentFile = new FileInfo(Path.Combine(this.customDir.FullName, "combined.alignments"));
+                //MarianHelper.GenerateAlignments(this.spValidSource, this.spValidTarget, this.validAlignmentFile, this.model.AlignmentPriorsFile);
             }
 
             this.OnProgressChanged(new ProgressChangedEventArgs(4, new MarianCustomizationStatus(CustomizationStep.Initial_evaluation, null)));
