@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Using edit rules OPUS-CAT MT Engine
+title: Edit rules
 permalink: /editrules
 ---
 
