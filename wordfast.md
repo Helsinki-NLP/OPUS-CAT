@@ -10,7 +10,7 @@ OPUS-CAT can be used in different Wordfast CAT tools by using the **Custom MT** 
 
 ### Installing the OPUS-CAT MT Engine
 
-1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.1.0.7/OpusCatMtEngine_v1.1.0.7.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
+1. Download the [OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/download/engine_v1.2.0/OpusCatMtEngine_v1.2.0.zip) and install it to your computer by extracting it in a folder on your computer. **IMPORTANT**: OPUS-CAT MT Engine generates the machine translation, and all OPUS-CAT plugins require that the OPUS-CAT MT Engine is installed on the same computer and running when the plugins are used. 
 2. Start the OPUS-CAT MT Engine application by clicking OpusCatMTEngine.exe in the extraction folder (note that the file extension .exe may be hidden in Windows Explorer, in that case the file is shown as OpusCatMTEngine).
 3. Install models from the OPUS model repository for the language pairs that you require.
    - Click **Install OPUS model from Web**.
@@ -59,15 +59,32 @@ Make sure to set **Custom MT** as the primary MT in the preferences before using
 
 ### Using OPUS-CAT in Wordfast Classic
 
+**Note**: These instructions are for the current version of Wordfast Classic (8.85), courtesy of Jamie Lucero. Instructions for older versions of Wordfast Classic are available [here](./wordfast_classic_old).
+
 1. Make sure that OPUS-CAT MT Engine is running.
-2. Open Wordfast Classic user interface by pressing Ctlr+Alt+W in Word and select the **MT** tab: 
-<img src="./images/WordfastClassicMt.png?raw=true" alt="drawing" width="75%"/>
-3. Enter the following text into the empty field next to the topmost **No MT** entry in the **Web-based machine translation** section (also select the checkbox if it is not selected):
+2. Open Wordfast Classic user interface by pressing Ctlr+Alt+W in Word and select the **Machine translation** tab and the **Customize MT** subtab, and then select the **MT name** dropdown and choose **Custom (add)**: 
+<img src="./images/WordfastClassicJL.png?raw=true" alt="drawing" width="75%"/>
+3. Provide a preferred name, add the JSON key and URL (use the URL value below), and click **Remote MT** tab (or another tab) to initiate the save changes dialog:
 ```
-[id=FI:OPUS-CAT][url=http://localhost:8500/MTRestService/TranslateJson?tokenCode=&input={ss}&srcLangCode={sl}&trgLangCode={tl}][json=translation][type=A1]
+http://localhost:8500/MTRestService/TranslateJson?tokenCode=&input={ss}&srcLangCode={sl}&trgLangCode={tl}
 ```
-<img src="./images/WordfastClassicMtDef.png?raw=true" alt="drawing" width="75%"/>
-4. Click **Test**, and click **OK** in the testing window that opens:
-<img src="./images/WordfastClassicMtTest.png?raw=true" alt="drawing" width="75%"/>
-5. If the test produced a translation, close the Wordfast Classic user interface and open some source file. When you now open a segment, Wordfast Classic should display a machine translation from OPUS-CAT (unless a TM match is available):
+<img src="./images/WordfastClassicJL2.png?raw=true" alt="drawing" width="75%"/>
+
+4. After saving, select the new connection from the **MT provider** dropdown:
+<img src="./images/WordfastClassicJL3.png?raw=true" alt="drawing" width="75%"/>
+5. You can now test OPUS-CAT by clicking the **Test** button. If the test produced a translation, close the Wordfast Classic user interface and open some source file. When you now open a segment, Wordfast Classic should display a machine translation from OPUS-CAT (unless a TM match is available):
  <img src="./images/WordfastClassicMtSegment.png?raw=true" alt="drawing" width="75%"/>
+
+### Using OPUS-CAT with Wordfast Server
+
+These instructions are also courtesy of Jamie Lucero. With Wordfast Server and Opus-CAT running on the same machine, Opus-CAT can be used from outside the LAN with a connection to Wordfast Server.
+
+1. Go to **Setup** and click **MT Engines** to add the **MT Name** and configure the rest:
+```
+URL: http://localhost:8500/MTRestService/TranslateJson
+Request data: tokenCode=&input={ss}&srcLangCode={sl}&trgLangCode={tl}&modelTag=
+```
+<img src="./images/WordfastServerJL1.png?raw=true" alt="drawing" width="75%"/>
+
+2. Under **Accounts**, set up a new account or choose an existing one, then click the **MT engine** button to open the dialog and choose the desired engine:
+<img src="./images/WordfastServerJL2.png?raw=true" alt="drawing" width="75%"/>
