@@ -13,7 +13,7 @@ using Sdl.Desktop.IntegrationApi.Interfaces;
 namespace OpusCatTranslationProvider
 {
     public partial class FinetuneBatchTaskControl : UserControl, ISettingsAware<FinetuneBatchTaskSettings>
-    #if TRADOS21
+    #if (TRADOS21 || TRADOS22)
     , IUISettingsControl
     #endif
     {

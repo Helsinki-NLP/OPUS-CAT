@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
@@ -117,8 +118,8 @@ namespace OpusCatTranslationProvider
                 if (parameter == "" || parameter == null)
                 {
                     //Add default to URI
-                    SetStringParameter("mtServicePort", OpusCatTpSettings.Default.MtServicePort);
-                    return OpusCatTpSettings.Default.MtServicePort;
+                    SetStringParameter("mtServicePort", OpusCatTpSettings.Default.MtServicePortHttp);
+                    return OpusCatTpSettings.Default.MtServicePortHttp;
                 }
                 else
                 {
@@ -127,6 +128,8 @@ namespace OpusCatTranslationProvider
             }
             set { SetStringParameter("mtServicePort", value); NotifyPropertyChanged(); }
         }
+
+        
 
         public string mtServiceAddress
         {

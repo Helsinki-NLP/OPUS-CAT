@@ -269,7 +269,7 @@ namespace OpusCatTranslationProvider
             //If connection details are custom, check the custom checkbox, this is for start-up
             this.UseCustomConnection.IsChecked =
                 host != OpusCatTpSettings.Default.MtServiceAddress ||
-                port != OpusCatTpSettings.Default.MtServicePort;
+                port != OpusCatTpSettings.Default.MtServicePortHttp;
 
             var modeltag = this.options.modelTag;
             Task.Run(() => this.FetchServiceData(host, port, modeltag));
@@ -284,7 +284,7 @@ namespace OpusCatTranslationProvider
 
         private void SaveAsDefault_Click(object sender, RoutedEventArgs e)
         {
-            OpusCatTpSettings.Default.MtServicePort = this.ServicePortBoxElement.Text;
+            OpusCatTpSettings.Default.MtServicePortHttp = this.ServicePortBoxElement.Text;
             OpusCatTpSettings.Default.MtServiceAddress = this.ServiceAddressBoxElement.Text;
             OpusCatTpSettings.Default.Save();
         }
@@ -297,7 +297,7 @@ namespace OpusCatTranslationProvider
 
         private void UseCustomConnection_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.ServicePortBoxElement.Text = OpusCatTpSettings.Default.MtServicePort;
+            this.ServicePortBoxElement.Text = OpusCatTpSettings.Default.MtServicePortHttp;
             this.ServiceAddressBoxElement.Text = OpusCatTpSettings.Default.MtServiceAddress;
         }
     }

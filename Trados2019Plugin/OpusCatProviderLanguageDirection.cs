@@ -217,7 +217,7 @@ namespace OpusCatTranslationProvider
             
             if (this._options.showMtAsOrigin)
             {
-#if TRADOS21
+#if (TRADOS21 || TRADOS22)
                 tu.Origin = TranslationUnitOrigin.Nmt;
 #else
                 tu.Origin = TranslationUnitOrigin.MachineTranslation;

@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OpusCatTranslationProvider" GeneratedClassName="OpusCatTpSettings">
   <Profiles />
   <Settings>
-    <Setting Name="MtServicePort" Type="System.String" Scope="User">
-      <Value Profile="(Default)">8477</Value>
-    </Setting>
     <Setting Name="SupportAllLanguagePairs" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -43,6 +40,9 @@
     </Setting>
     <Setting Name="RestoreTags" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="MtServicePortHttp" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8500</Value>
     </Setting>
   </Settings>
 </SettingsFile>
