@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "OPUS-CAT MT Engine v1.2.0 available"
+date:   2022-06-28 16:00:00 +0200
+categories: opus-cat update
+---
+A [new version OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/tag/engine_v1.2.0) has been released.
+
+The new version introduces edit rules, which can be used to pre-edit MT input and post-edit MT output.

@@ -6,6 +6,8 @@ permalink: /editrules
 
 Edit rules can be used to edit the source text before translating it with MT models (_pre-edit rules_), or to edit the machine translation (_post-edit rules_). Pre-edit rules can be used to compensate for errors and deviations from normal text that exist in source texts (misspellings, text processing artifacts etc.), which may otherwise degrade the MT quality. Post-edit rules can be used to modify machine translations to correct incorrect terminology or punctuation mistakes.
 
+**Note:** Edit rules are available in OPUS-CAT MT Engine version 1.2.0 and later. See [the installation page](./install.md) for instructions on how to download the latest version of OPUS-CAT MT Engine.
+
 Edit rules can be defined in the **Edit rules** tab of OPUS-CAT MT Engine. Regular expressions ([.NET regex flavor](https://docs.microsoft.com/en-us/dotnet/standard/base-types/regular-expression-language-quick-reference)) can be used in the rules. Rules are organized into _rule collections_, which can contain any number of rules. 
 
 ## Contents
