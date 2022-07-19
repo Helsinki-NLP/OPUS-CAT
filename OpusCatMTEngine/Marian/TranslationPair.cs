@@ -242,6 +242,8 @@ namespace OpusCatMTEngine
                 this.SegmentedTranslation.Concat(translationPart.SegmentedTranslation).ToArray();
             this.SegmentedSourceSentence = 
                 this.SegmentedSourceSentence.Concat(translationPart.SegmentedSourceSentence).ToArray();
+
+            this.Translation = $"{this.Translation} {translationPart.Translation}";
         }
 
         private Dictionary<int, List<int>> JoinAlignments(

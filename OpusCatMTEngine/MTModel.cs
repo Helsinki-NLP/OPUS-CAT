@@ -555,9 +555,8 @@ namespace OpusCatMTEngine
         private void ParseDecoderConfig()
         {
             var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
-            var deserializer = new Deserializer();
-            this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-            
+            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+            this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText()); 
         }
 
         private void ParseModelConfig()

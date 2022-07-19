@@ -120,8 +120,7 @@ namespace OpusCatMTEngine
             //mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
 
             mtCommand = "Marian\\marian.exe";
-            mtArgs = $"decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
-
+            mtArgs = $"decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length={OpusCatMTEngineSettings.Default.MaxLength} --max-length-crop --alignment=hard";
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
             /*this.PreprocessProcess = 
@@ -187,28 +186,67 @@ namespace OpusCatMTEngine
 
             TranslationPair alignedTranslationPair = new TranslationPair(preprocessedLine, translationAndAlignment, this.segmentation, this.TargetCode);
 
-            /*switch (this.segmentation)
+            //If the source sentence is long (over 150 units) and the translation is much shorter, it's likely
+            //that the translation is a fragment or otherwise corrupted. Split the source sentence in two, translate
+            //the separate bits, and join the translations to generate a non-fragment translation. This works
+            //recursively, so the two halfs may be further split.
+            if (OpusCatMTEngineSettings.Default.FixUnbalancedLongTranslations)
             {
-                case SegmentationMethod.SentencePiece:
-                    alignedTranslationPair.Translation = alignedTranslationPair.RawTranslation.Replace(" ", "").Replace("▁", " ").Trim();
-                    break;
-                case SegmentationMethod.Bpe:
-                    this.utf8PostprocessWriter.WriteLine(alignedTranslationPair.RawTranslation);
-                    this.utf8PostprocessWriter.Flush();
-                    string postprocessedTranslation = this.PostprocessProcess.StandardOutput.ReadLine();
-                    alignedTranslationPair.Translation = postprocessedTranslation;
-                    break;
-                default:
-                    throw new Exception("Unknown segmentation method specified for model");
-            }*/
+                if (alignedTranslationPair.SegmentedSourceSentence.Length > OpusCatMTEngineSettings.Default.UnbalancedSplitMinLength &&
+                    (alignedTranslationPair.SegmentedTranslation.Length * OpusCatMTEngineSettings.Default.UnbalancedSplitLengthRatio <
+                    alignedTranslationPair.SegmentedSourceSentence.Length))
+                {
+                    List<string> sourceSplit = this.SplitSentence(rawSourceSentence);
 
-            alignedTranslationPair.Translation = this.preprocessor.PostprocessSentence(alignedTranslationPair.RawTranslation);
+                    if (sourceSplit != null && sourceSplit.Count == 2)
+                    {
+                        var splitTranslations = sourceSplit.Select(TranslateSentence).ToList();
+                        splitTranslations.First().AppendTranslationPair(splitTranslations.Last());
+                        alignedTranslationPair = splitTranslations.First();
+                    }
+                }
+            }
+
+            //If the translation pair is merged from split source, it will already have a translation
+            if (String.IsNullOrWhiteSpace(alignedTranslationPair.Translation))
+            {
+                alignedTranslationPair.Translation = this.preprocessor.PostprocessSentence(alignedTranslationPair.RawTranslation);
+            }
 
             return alignedTranslationPair;
-            
         }
 
-        
+        private List<string> SplitOnMiddle(string preprocessedLine, string splitPattern)
+        {
+            var lineLength = preprocessedLine.Length;
+            var splitterMatches = Regex.Matches(preprocessedLine, Regex.Escape(splitPattern)).Cast<Match>().ToList();
+            if (splitterMatches.Any())
+            {
+                var splitPoint = 
+                    splitterMatches.OrderBy(x => Math.Abs((lineLength / 2) - x.Index)).First();
+                return new List<string>()
+                {
+                    preprocessedLine.Substring(0,splitPoint.Index),
+                    preprocessedLine.Substring(splitPoint.Index)
+                };
+            }
+
+            return null;
+        }
+
+        private List<string> SplitSentence(string preprocessedLine)
+        {
+            foreach (var splitPattern in OpusCatMTEngineSettings.Default.UnbalancedSplitPatterns)
+            {
+                var splitResults = this.SplitOnMiddle(preprocessedLine, splitPattern);
+                if (splitResults != null)
+                {
+                    return splitResults;
+                }
+            }
+
+            return null;
+        }
 
         public Task<TranslationPair> AddToTranslationQueue(string sourceText)
         {

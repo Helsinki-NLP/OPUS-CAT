@@ -406,5 +406,73 @@ namespace OpusCatMTEngine {
                 this["GithubRepo"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        public int MaxLength {
+            get {
+                return ((int)(this["MaxLength"]));
+            }
+            set {
+                this["MaxLength"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FixUnbalancedLongTranslations {
+            get {
+                return ((bool)(this["FixUnbalancedLongTranslations"]));
+            }
+            set {
+                this["FixUnbalancedLongTranslations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>;</string>
+  <string>(</string>
+  <string>)</string>
+  <string>:</string>
+  <string>,</string>
+  <string />
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection UnbalancedSplitPatterns {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["UnbalancedSplitPatterns"]));
+            }
+            set {
+                this["UnbalancedSplitPatterns"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int UnbalancedSplitMinLength {
+            get {
+                return ((int)(this["UnbalancedSplitMinLength"]));
+            }
+            set {
+                this["UnbalancedSplitMinLength"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.5")]
+        public float UnbalancedSplitLengthRatio {
+            get {
+                return ((float)(this["UnbalancedSplitLengthRatio"]));
+            }
+            set {
+                this["UnbalancedSplitLengthRatio"] = value;
+            }
+        }
     }
 }

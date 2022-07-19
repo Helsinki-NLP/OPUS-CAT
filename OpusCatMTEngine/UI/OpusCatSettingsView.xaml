@@ -11,6 +11,7 @@
     <Border Margin="5" BorderThickness="1" BorderBrush="Black">
         <StackPanel>
             <Border Margin="5" BorderThickness="1" BorderBrush="Black">
+                <StackPanel Orientation="Horizontal">
                 <Button 
                     HorizontalAlignment="Left" 
                     VerticalAlignment="Center" 
@@ -18,6 +19,12 @@
                     Padding="5" 
                     Click="OpenCustomSettingsInEditor_Click"
                     Content="{x:Static resx:Resources.Settings_OpenSettingsFileButton}"/>
+
+                <DockPanel Visibility="Collapsed">
+                        <Label DockPanel.Dock="Left" VerticalContentAlignment="Center">Maximum source sentence length (longer sentences will be cropped)</Label>
+                        <TextBox Name="MaxLengthBoxElement" Text="{Binding ElementName=_this, Path=MaxLength, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, Mode=TwoWay}" PreviewTextInput="PreviewNumberInput" VerticalAlignment="Center"></TextBox>
+                </DockPanel>
+                </StackPanel>
             </Border>
             <Border Margin="5" BorderThickness="1" BorderBrush="Black">
                 <StackPanel>

@@ -30,7 +30,8 @@ namespace OpusCatMTEngine
                     "alignment",
                     "additiondate",
                     "segmentationmethod",
-                    "targetlanguage"
+                    "targetlanguage",
+                    "maxlength"
                 };
 
             var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TranslationDBName));
@@ -61,6 +62,12 @@ namespace OpusCatMTEngine
                         while (r.Read())
                         {
                             var columnName = Convert.ToString(r["name"]);
+                            if (tableColumnStrikeoutList.Count == 0)
+                            {
+                                //this means there are more columns in the table than expected,
+                                //so probably the table has been created with newer version
+                                tableValid = false;
+                            }
                             if (tableColumnStrikeoutList[0] == columnName)
                             {
                                 tableColumnStrikeoutList.RemoveAt(0);
@@ -139,7 +146,7 @@ namespace OpusCatMTEngine
             {
                 m_dbConnection.Open();
 
-                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, segmentationmethod TEXT, targetlanguage TEXT, PRIMARY KEY (model,sourcetext,targetlanguage))";
+                string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, segmentationmethod TEXT, targetlanguage TEXT, maxlength INTEGER, PRIMARY KEY (model,sourcetext,targetlanguage,maxlength))";
 
                 using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
                 {
@@ -174,7 +181,7 @@ namespace OpusCatMTEngine
 
                 using (SQLiteCommand insert =
                     new SQLiteCommand(
-                        "INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model, additiondate, segmentationmethod, targetlanguage) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model,CURRENT_TIMESTAMP,@segmentationmethod,@targetlanguage)", m_dbConnection))
+                        "INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model, additiondate, segmentationmethod, targetlanguage, maxlength) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model,CURRENT_TIMESTAMP,@segmentationmethod,@targetlanguage,@maxlength)", m_dbConnection))
                 {
                     insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
                     insert.Parameters.Add(new SQLiteParameter("@translation", translation.Translation));
@@ -184,6 +191,7 @@ namespace OpusCatMTEngine
                     insert.Parameters.Add(new SQLiteParameter("@model", model));
                     insert.Parameters.Add(new SQLiteParameter("@segmentationmethod", segmentationMethod.ToString()));
                     insert.Parameters.Add(new SQLiteParameter("@targetlanguage", targetLanguage));
+                    insert.Parameters.Add(new SQLiteParameter("@maxlength", OpusCatMTEngineSettings.Default.MaxLength));
                     insert.ExecuteNonQuery();
                 }
             }
