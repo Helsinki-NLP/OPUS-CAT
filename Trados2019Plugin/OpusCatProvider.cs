@@ -28,7 +28,7 @@ namespace OpusCatTranslationProvider
             set;
         }
 
-#if TRADOS21
+#if (TRADOS21 || TRADOS22)
         private static IStudioDocument activeDocument;
 #else
         private static Document activeDocument;
@@ -93,7 +93,7 @@ namespace OpusCatTranslationProvider
             }
         }
 
-#if TRADOS21
+#if (TRADOS21 || TRADOS22)
         private static void UpdateSegmentHandler(IStudioDocument doc)
 #else
         private static void UpdateSegmentHandler(Document doc)

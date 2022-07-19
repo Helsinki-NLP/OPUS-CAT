@@ -3,9 +3,13 @@ Opus MT plugin for OmegaT
 
 Opus MT can be used in OmegaT with this plugin.
 
+**Preparations**
+
+The plugin communicates with Opus MT engine via the HTTP API. Make sure you use the [latest version of OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/tag/engine_v1.1.0.3) (earlier versions of the engine require some extra setup steps to work with OmegaT).
+
 **Installation**
 
-Install the plugin in the *plugins* subfolder of the OmegaT installation folder.
+Copy the plugin file ([omegat-plugin-opus-mt-1.0.0.jar](https://github.com/Helsinki-NLP/OPUS-CAT/raw/master/OmegaTPlugin/omegat-plugin-opus-mt-1.0.0.jar)) to the *plugins* subfolder of the OmegaT installation folder (usually _C:\Program Files (x86)\OmegaT_).
 
 **Usage**
 

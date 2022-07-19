@@ -25,18 +25,6 @@ namespace OpusCatTranslationProvider {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8477")]
-        public string MtServicePort {
-            get {
-                return ((string)(this["MtServicePort"]));
-            }
-            set {
-                this["MtServicePort"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool SupportAllLanguagePairs {
             get {
@@ -188,6 +176,18 @@ namespace OpusCatTranslationProvider {
             }
             set {
                 this["RestoreTags"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8500")]
+        public string MtServicePortHttp {
+            get {
+                return ((string)(this["MtServicePortHttp"]));
+            }
+            set {
+                this["MtServicePortHttp"] = value;
             }
         }
     }

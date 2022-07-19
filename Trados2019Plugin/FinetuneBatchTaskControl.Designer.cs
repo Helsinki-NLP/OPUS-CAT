@@ -1,6 +1,6 @@
 ﻿namespace OpusCatTranslationProvider
 {
-    partial class FinetuneBatchTaskControl
+    partial class FinetuneBatchTaskControl 
     {
         /// <summary> 
         /// Required designer variable.
