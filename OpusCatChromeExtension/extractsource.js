@@ -4,6 +4,8 @@ chrome.runtime.onMessage.addListener(
         var blob = new Blob([request.opusCatTranslationToPaste], {type: 'text/plain'});
         var item = new ClipboardItem({'text/plain': blob});
         navigator.clipboard.write([item]).then(() => document.execCommand('paste'));
+        //If clipboard paste does not work, use insertText
+        //document.execCommand('insertText',false,request.opusCatTranslationToPaste);
     }
   }
 );

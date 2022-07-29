@@ -227,9 +227,7 @@ namespace OpusCatMTEngine
         //This joins up two translation pairs, used to produce single output when input 
         // has been segmented into separate sentences
         internal void AppendTranslationPair(TranslationPair translationPart)
-        {
-            this.translation = $"{this.translation} {translationPart.translation}";
-            
+        {   
             this.SegmentedAlignmentSourceToTarget = this.JoinAlignments(
                 this.SegmentedAlignmentSourceToTarget, translationPart.SegmentedAlignmentSourceToTarget,
                 this.SegmentedSourceSentence.Length, this.SegmentedTranslation.Length);

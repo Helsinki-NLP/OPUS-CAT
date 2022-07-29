@@ -220,6 +220,11 @@ namespace OpusCatMTEngine
         {
             var lineLength = preprocessedLine.Length;
             var splitterMatches = Regex.Matches(preprocessedLine, Regex.Escape(splitPattern)).Cast<Match>().ToList();
+
+            //Filter out very uneven splits (where one split is less than third of line length), since those won't solve the problem
+            var midpoint = lineLength / 2;
+            splitterMatches = splitterMatches.Where(x => Math.Abs(midpoint - x.Index) < (lineLength / 3)).ToList();
+
             if (splitterMatches.Any())
             {
                 var splitPoint = 
