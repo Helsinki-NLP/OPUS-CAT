@@ -527,7 +527,20 @@ namespace OpusCatMTEngine
                     var modelUri = new Uri($"{OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl}{modelPath}");
                     var modelType = split[1];
                     IEnumerable<string> sourceLangs = split[2].Split(',');
-                    IEnumerable<string> targetLangs = split[3].Split(',');
+                    IEnumerable<string> targetLangs;
+
+                    //Multilingual models have a use-target-labels field, which contains the target
+                    //labels of the model, use that instead of target languages, as it will include
+                    //script info (e.g. Latn or Cyrl).
+                    if (split.Length > 4)
+                    {
+                        //Remove the target code delimiters >>code<< -> code
+                        targetLangs = split[4].Replace("<","").Replace(">","").Split(',');
+                    }
+                    else
+                    {
+                        targetLangs = split[3].Split(',');
+                    }
 
                     //Some entries might have empty source and target languages
                     if (!sourceLangs.Any() || !targetLangs.Any())
@@ -729,22 +742,8 @@ namespace OpusCatMTEngine
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
         {
             var yamlString = e.Result;
-            yamlString = Regex.Replace(yamlString, "- (>>[^<]+<<)", "- \"$1\"");
-            yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
-            if (Regex.Match(yamlString, @"(?<!- )devset = top").Success)
-            {
-                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
-                yamlString = Regex.Replace(yamlString, @"(?<!- )devset = top", "devset: top");
-
-            }
-            if (yamlString.Contains("unused dev/test data is added to training data"))
-            {
-                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
-                yamlString = Regex.Replace(
-                        yamlString,
-                        @"unused dev/test data is added to training data",
-                        "other: unused dev/test data is added to training data");
-            }
+            yamlString = HelperFunctions.FixOpusYaml(yamlString, model);
+            
             var onlineModel = new MTModel(model.Replace(".zip", ""), modelUri, yamlString);
             this.CheckIfOnlineModelInstalled(onlineModel);
             this.onlineModels.Add(onlineModel);

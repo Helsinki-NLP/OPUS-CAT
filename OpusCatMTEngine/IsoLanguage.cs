@@ -221,6 +221,11 @@ namespace OpusCatMTEngine
                 }
                 
             }
+
+            if (!String.IsNullOrWhiteSpace(this.Iso15924Script))
+            {
+                this.IsoRefName = $"{this.IsoRefName} ({this.Iso15924Script})";
+            }
         }
 
 
@@ -237,7 +242,8 @@ namespace OpusCatMTEngine
 
         //Trados returns CultureInfo strings. They could be parsed just by using the CultureInfo constructor, but
         //unfortunately CultureInfo has no explicit property for writing system, so might as well parse them with this.
-        private static Regex CultureInfoCode = new Regex(@"(^(?<iso639_1>\w{2})|(?<iso639_3>\w{3}))(-(?<script>\w{4}))?(-(?<locale>\w{2}))?$");
+        private static Regex CultureInfoCode = 
+            new Regex(@"^((?<iso639_1>\w{2})|(?<iso639_3>\w{3}))[-_]((?<script>\w{4}))?[-_]?((?<locale>\w{2}))?$");
 
 
         //This is used with tmx's to filter relevant segments
@@ -260,12 +266,26 @@ namespace OpusCatMTEngine
 
         public bool Equals(IsoLanguage lang)
         {
-            return this.Iso639_3Code == lang.Iso639_3Code;
+            if (this.Iso639_3Code == null && lang.Iso639_3Code == null)
+            {
+                return this.OriginalCode == this.OriginalCode;
+            }
+            else
+            {
+                return this.Iso639_3Code == lang.Iso639_3Code;
+            }
         }
 
         public override int GetHashCode()
         {
-            return this.Iso639_3Code.GetHashCode();
+            if (this.Iso639_3Code != null)
+            {
+                return this.Iso639_3Code.GetHashCode();
+            }
+            else
+            {
+                return this.OriginalCode.GetHashCode();
+            }
         }
     }
     

@@ -200,8 +200,14 @@ namespace OpusCatMTEngine
                 modelOrigSourceCode = modelSourceLang.OriginalCode;
             }
 
+            //Try to get an exact match first, then try for shortest code match, this is for
+            //matching correct script variants of same languages
             var modelTargetLang =
-                this.TargetLanguages.SingleOrDefault(x => x.ShortestIsoCode == targetLang.ShortestIsoCode);
+                this.TargetLanguages.SingleOrDefault(x => x.OriginalCode == targetLang.OriginalCode);
+            if (modelTargetLang == null)
+            {
+                modelTargetLang = this.TargetLanguages.Where(x => x.ShortestIsoCode == targetLang.ShortestIsoCode).First();
+            }
             string modelOrigTargetCode;
             if (modelTargetLang == null)
             {
@@ -585,9 +591,32 @@ namespace OpusCatMTEngine
 
         private void UpdateModelYamlPath()
         {
-            //Recent models have yaml files containing metadata, they have the same name as the model npz file
-            var modelFilePath = Path.Combine(this.InstallDir, this.decoderSettings.models[0]);
-            this.modelYamlFilePath = Path.ChangeExtension(modelFilePath, "yml");
+            //Recent models have yaml files containing metadata, their naming conventions may change, so
+            //need to find the correct yml file. Three yml files can be excluded based on their name.
+            var modelYamlCandidates = Directory.GetFiles(this.InstallDir, "*.yml").Where(
+                x => !x.EndsWith("decoder.yml") && !x.EndsWith("modelconfig.yml") && !x.EndsWith("vocab.yml"));
+
+            foreach (var candidate in modelYamlCandidates)
+            {
+                using (var reader = File.OpenText(candidate))
+                {
+                    var candidateString = reader.ReadToEnd();
+                    
+                    if (ParseModelYaml(candidateString))
+                    {
+                        this.Faulted = false;
+                        this.modelYaml = candidateString;
+                        this.modelYamlFilePath = candidate;
+                        this.Name = Path.GetFileName(this.InstallDir);
+                        break;
+                    }
+                    else
+                    {
+                        this.Faulted = true;
+                    }
+                }
+            }
+           
         }
 
         public MTModel(
@@ -596,22 +625,19 @@ namespace OpusCatMTEngine
             ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
             ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
         {
+
+            this.ModelPath = modelPath;
             this.InstallDir = installDir;
 
             this.ParseDecoderConfig();
             this.UpdateModelYamlPath();
 
             this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
-
-            if (File.Exists(this.modelYamlFilePath))
+            
+            if (this.modelYaml == null)
             {
-                using (var reader = File.OpenText(this.modelYamlFilePath))
-                {
-                    this.modelYaml = reader.ReadToEnd();
-                } 
+                this.ParseModelPathForLanguages(modelPath);
             }
-
-            this.ParseModelPath(modelPath);
 
             this.ParseModelConfig();
 
@@ -696,7 +722,7 @@ namespace OpusCatMTEngine
             this.SaveModelConfig();
         }
         
-        private void ParseModelPath(string modelPath)
+        private void ParseModelPathForLanguages(string modelPath)
         {
             char separator;
             if (modelPath.Contains('/'))
@@ -713,25 +739,19 @@ namespace OpusCatMTEngine
             //For OPUS-MT models and monolingual Tatoeba models, 
             //languages are included in path. For multilingual Tatoeba models,
             //languages have to be fetched the metadata yml file
-            if (this.modelYaml == null)
+            
+            //There may be weird paths with no hyphen separating source from target languages, e.g.
+            //just "westgermanic" (presumably both source and target languages are westgermanic).
+            if (pathSplit[0].Contains("-"))
             {
-                //There may be weird paths with no hyphen separating source from target languages, e.g.
-                //just "westgermanic" (presumably both source and target languages are westgermanic).
-                if (pathSplit[0].Contains("-"))
-                {
-                    this.SourceLanguages =
-                        pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-                    this.TargetLanguages =
-                        pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
-                }
-            }
-            else
-            {
-                this.ParseModelYaml(this.modelYaml);
+                this.SourceLanguages =
+                    pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                this.TargetLanguages =
+                    pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
             }
             
+            
             this.Name = pathSplit[1];
-            this.ModelPath = modelPath;
         }
 
         //This is mainly for creating finetuned models, hence the process argument (which holds the fine tuning process)
@@ -775,16 +795,26 @@ namespace OpusCatMTEngine
         }
 
         //This is used for online models, model uri is included for later download of models
-        public MTModel(string modelPath, Uri modelUri, string yamlString=null)
+        public MTModel(string modelPath, Uri modelUri, string yamlString = null)
         {
+
+            this.ModelPath = modelPath;
             this.modelYaml = yamlString;
+            if (yamlString != null)
+            {
+                this.ParseModelYaml(this.modelYaml);
+            }
+            else
+            {
+                this.ParseModelPathForLanguages(modelPath);
+            }
             this.ModelUri = modelUri;
-            this.ParseModelPath(modelPath);
+            
         }
 
-        private void ParseModelYaml(string yamlString)
+        private Boolean ParseModelYaml(string yamlString)
         {
-
+            yamlString = HelperFunctions.FixOpusYaml(yamlString, this.Name);
             try
             {
                 this.SourceLanguages = new List<IsoLanguage>();
@@ -814,11 +844,17 @@ namespace OpusCatMTEngine
                 else
                 {
                     Log.Error($"No source langs in {this.ModelUri} yaml file.");
-                    this.Faulted = true;
                     this.SourceLanguages.Add(new IsoLanguage("NO SOURCE LANGUAGES"));
+                    return false;
                 }
                 List<object> xamlTargetLangs = null;
-                if (res.ContainsKey("target-languages"))
+                //There may be more target labels than target language, in case you have different
+                //writing systems etc., so use target labels as target languages whenever they exist
+                if (res.ContainsKey("use-target-labels"))
+                {
+                    xamlTargetLangs = res["use-target-labels"];
+                }
+                else if (res.ContainsKey("target-languages"))
                 {
                     xamlTargetLangs = res["target-languages"];
                 }
@@ -827,14 +863,14 @@ namespace OpusCatMTEngine
                 {
                     foreach (var lang in xamlTargetLangs)
                     {
-                        this.TargetLanguages.Add(new IsoLanguage(lang.ToString()));
+                        this.TargetLanguages.Add(new IsoLanguage(lang.ToString().Trim(new char[] { '>', '<' })));
                     }
                 }
                 else
                 {
                     Log.Error($"No target langs in {this.ModelUri} yaml file.");
-                    this.Faulted = true;
                     this.TargetLanguages.Add(new IsoLanguage("NO TARGET LANGUAGES"));
+                    return false;
                 }
             }
             catch (YamlDotNet.Core.SyntaxErrorException ex)
@@ -842,12 +878,10 @@ namespace OpusCatMTEngine
                 Log.Error($"Error in the yaml syntax of model {this.ModelUri}. Error: {ex.Message}.");
                 this.SourceLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
                 this.TargetLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
+                return false;
             }
-            catch (Exception ex)
-            {
-                Log.Error($"source-langs or target-langs key missing from {this.ModelUri} yaml file.");
-            }
-            
+
+            return true;
         }
 
         //This indicates whether the model is ready for translation
