@@ -118,7 +118,7 @@ namespace OpusCatMTEngine
             try
             {
                 var installPath = this.ModelManager.ExtractModel(model.ModelPath,true);
-            
+                model.InstallDir = installPath;
                 //If model has yaml config, check whether it was included in the zip package (Tatoeba models)
                 if (!String.IsNullOrEmpty(model.TatoebaConfigString))
                 {
@@ -135,7 +135,11 @@ namespace OpusCatMTEngine
                     {
                         writer.Write(model.TatoebaConfigString);
                     }
+
+                    
                 }
+
+                model.SaveModelConfig();
 
                 model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_InstalledStatus;
                 this.ModelManager.GetLocalModels();

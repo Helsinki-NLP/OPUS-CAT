@@ -361,7 +361,7 @@ namespace OpusCatMTEngine
             var mtResult = this.Model.Translate(
                 previousTesterOutput,
                 this.Model.SourceLanguages.First(),
-                this.Model.SourceLanguages.First(),
+                this.Model.TargetLanguages.First(),
                 applyEditRules:false).Result;
 
             previousTesterOutput = mtResult.Translation;

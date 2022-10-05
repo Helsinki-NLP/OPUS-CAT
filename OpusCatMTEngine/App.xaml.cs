@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.ServiceModel;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -119,6 +120,7 @@ namespace OpusCatMTEngine
             this.InitializePythonEngine();
 
             this.CheckForUpdatesAsync();
+            
         }
 
         private async void CheckForUpdatesAsync()

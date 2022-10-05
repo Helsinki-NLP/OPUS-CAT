@@ -52,6 +52,12 @@ namespace OpusCatMTEngine
         [YamlMember(Alias = "auto-post-edit-rule-collection-guids", ApplyNamingConventions = false)]
         public ObservableCollection<string> AutoPostEditRuleCollectionGuids { get; internal set; }
 
+        [YamlMember(Alias = "source-languages", ApplyNamingConventions = false)]
+        public ObservableCollection<string> SourceLanguageCodes { get; internal set; }
+
+        [YamlMember(Alias = "target-languages", ApplyNamingConventions = false)]
+        public ObservableCollection<string> TargetLanguageCodes { get; internal set; }
+
         private bool finetuningComplete;
 
         public MTModelConfig()

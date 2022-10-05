@@ -520,7 +520,7 @@ namespace OpusCatMTEngine
             //Use distinct to remove duplicate entries
             foreach (var line in modelList.Split('\n').Distinct())
             {
-                var split = line.Split('\t');
+                var split = line.Split(new char[] { '\t' });
                 if (split.Length >= 4)
                 {
                     var modelPath = split[0];
@@ -529,17 +529,17 @@ namespace OpusCatMTEngine
                     IEnumerable<string> sourceLangs = split[2].Split(',');
                     IEnumerable<string> targetLangs;
 
-                    //Multilingual models have a use-target-labels field, which contains the target
+                    //Multilingual models have a use-target-labels field (fifth column in tsv), which contains the target
                     //labels of the model, use that instead of target languages, as it will include
                     //script info (e.g. Latn or Cyrl).
-                    if (split.Length > 4)
+                    if (String.IsNullOrWhiteSpace(split[4]))
                     {
-                        //Remove the target code delimiters >>code<< -> code
-                        targetLangs = split[4].Replace("<","").Replace(">","").Split(',');
+                        targetLangs = split[3].Split(',');
                     }
                     else
                     {
-                        targetLangs = split[3].Split(',');
+                        //Remove the target code delimiters >>code<< -> code
+                        targetLangs = split[4].Replace("<", "").Replace(">", "").Split(',');
                     }
 
                     //Some entries might have empty source and target languages
@@ -549,8 +549,10 @@ namespace OpusCatMTEngine
                     }
                     var model = new MTModel(modelPath.Replace(".zip", ""), modelUri);
                     model.ModelType = modelType;
-                    model.SourceLanguages = sourceLangs.Select(x => new IsoLanguage(x)).ToList();
+                    
                     model.TargetLanguages = targetLangs.Select(x => new IsoLanguage(x)).ToList();
+                    model.SourceLanguages = sourceLangs.Select(x => new IsoLanguage(x)).ToList();
+
                     this.onlineModels.Add(model);
                 }
             }

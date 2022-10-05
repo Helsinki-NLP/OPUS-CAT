@@ -160,7 +160,7 @@ namespace OpusCatMTEngine
                 foreach (var langpair in this.marianProcesses.Keys)
                 {
                     this.marianProcesses[langpair].ShutdownMtPipe();
-                    this.marianProcesses[langpair] = null;
+                    //this.marianProcesses[langpair] = null;
                 }
             }
             this.marianProcesses = null;
@@ -285,13 +285,7 @@ namespace OpusCatMTEngine
         {
             this.InstallProgress = e.ProgressPercentage;
         }
-
-        public List<IsoLanguage> TargetLanguages
-        {
-            get => targetLanguages;
-            set => targetLanguages = value;
-        }
-
+        
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
         
         //This creates a zip package of the model that can be moved to another computer
@@ -460,7 +454,25 @@ namespace OpusCatMTEngine
             }
         }
 
-        public List<IsoLanguage> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
+        public List<IsoLanguage> SourceLanguages
+        {
+            get => sourceLanguages;
+            set
+            {
+                sourceLanguages = value;
+                NotifyPropertyChanged("SourceLanguageString");
+            }
+        }
+
+        public List<IsoLanguage> TargetLanguages
+        {
+            get => targetLanguages;
+            set
+            {
+                targetLanguages = value;
+                NotifyPropertyChanged("TargetLanguageString");
+            }
+        }
 
         public string Name { get => name; set => name = value; }
 
@@ -633,14 +645,23 @@ namespace OpusCatMTEngine
             this.UpdateModelYamlPath();
 
             this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
-            
-            if (this.modelYaml == null)
-            {
-                this.ParseModelPathForLanguages(modelPath);
-            }
 
             this.ParseModelConfig();
 
+            if (this.modelYaml == null)
+            {
+                if (this.modelConfig.SourceLanguageCodes == null ||
+                    this.modelConfig.TargetLanguageCodes == null)
+                {
+                    this.ParseModelPathForLanguages(modelPath);
+                }
+                else
+                {
+                    this.SourceLanguages = this.modelConfig.SourceLanguageCodes.Select(x => new IsoLanguage(x)).ToList();
+                    this.TargetLanguages = this.modelConfig.TargetLanguageCodes.Select(x => new IsoLanguage(x)).ToList();
+                }
+            }
+            
             //
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
                 this.ModelConfig.AutoPreEditRuleCollectionGuids.Select(x => autoPreEditRuleCollections.SingleOrDefault(
@@ -654,6 +675,17 @@ namespace OpusCatMTEngine
 
         internal void SaveModelConfig()
         {
+            if (this.ModelConfig == null)
+            {
+                this.ModelConfig = new MTModelConfig();
+            }
+
+            if (this.SourceLanguages != null && this.TargetLanguages != null)
+            {
+                this.ModelConfig.SourceLanguageCodes = new ObservableCollection<String>(this.SourceLanguages.Select(x => x.OriginalCode));
+                this.ModelConfig.TargetLanguageCodes = new ObservableCollection<String>(this.TargetLanguages.Select(x => x.OriginalCode));
+            }
+
             //The directory might not exists yet in case of customized models (i.e. copying of the base model
             //is not complete)
             if (Directory.Exists(this.InstallDir))
@@ -797,7 +829,6 @@ namespace OpusCatMTEngine
         //This is used for online models, model uri is included for later download of models
         public MTModel(string modelPath, Uri modelUri, string yamlString = null)
         {
-
             this.ModelPath = modelPath;
             this.modelYaml = yamlString;
             if (yamlString != null)
@@ -1006,7 +1037,7 @@ namespace OpusCatMTEngine
         }
 
         public string ModelPath { get; internal set; }
-        public string InstallDir { get; }
+        public string InstallDir { get; set; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
         
         private MarianLog TrainingLog;
