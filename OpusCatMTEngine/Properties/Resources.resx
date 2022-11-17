@@ -449,4 +449,22 @@
   <data name="Online_FailedStatus" xml:space="preserve">
     <value>Installation failed</value>
   </data>
+  <data name="Main_TermListButton" xml:space="preserve">
+    <value>Terminology</value>
+  </data>
+  <data name="Terminology_AddTermButton" xml:space="preserve">
+    <value>Add term</value>
+  </data>
+  <data name="Terminology_DeleteTermButton" xml:space="preserve">
+    <value>Delete term</value>
+  </data>
+  <data name="Terminology_EditTermButton" xml:space="preserve">
+    <value>Edit term</value>
+  </data>
+  <data name="Terminology_TerminologyHeading" xml:space="preserve">
+    <value>Terminology</value>
+  </data>
+  <data name="Terminology_TerminologyTitle" xml:space="preserve">
+    <value>Terminology</value>
+  </data>
 </root>

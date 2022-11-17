@@ -24,6 +24,23 @@ namespace OpusCatMTEngine
             return rawTranslation.Replace(" ", "").Replace("▁", " ").Trim();
         }
 
+        //Term symbols are added before segmentation, they need to be desegmented
+        private string FixTerminologySymbols(string segmentedSentence)
+        {
+            var termsSymbols = new List<string>() { "<term_start>", "<term_mask>", "<term_end>", "<trans_end>" };
+            var wordsInSegmented = segmentedSentence.Split('▁');
+            foreach (var word in wordsInSegmented)
+            {
+                var unsegmentedWord = word.Replace(" ", "");
+                if (termsSymbols.Contains(unsegmentedWord))
+                {
+                    segmentedSentence = segmentedSentence.Replace($"▁{word}", $"{unsegmentedWord} ");
+                }
+            }
+            
+            return segmentedSentence;
+        }
+
         public string PreprocessSentence(string sentence)
         {
             string preprocessedSentence;
@@ -32,6 +49,9 @@ namespace OpusCatMTEngine
                 var preprocessedSentenceArray = (string[])this.sentencePieceProcessor.encode(sentence, out_type: "str");
                 preprocessedSentence = String.Join(" ", preprocessedSentenceArray);
             }
+
+            preprocessedSentence = this.FixTerminologySymbols(preprocessedSentence);
+
             return preprocessedSentence;
         }
     }

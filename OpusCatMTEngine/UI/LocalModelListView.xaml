@@ -126,9 +126,14 @@
                             Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
                     <Button 
                             IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
-                            Name="editRulesTag" 
-                            Click="EditRulesTag_Click"
+                            Name="editRules" 
+                            Click="EditRules_Click"
                             Content="{x:Static resx:Resources.Main_EditRulesButton}" />
+                    <Button 
+                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                            Name="termList" 
+                            Click="TermList_Click"
+                            Content="{x:Static resx:Resources.Main_TermListButton}" />
                     <Button 
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
                         Name="openModelDir"

@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -170,7 +171,8 @@ namespace OpusCatMTEngine
             string input, 
             IsoLanguage sourceLang, 
             IsoLanguage targetLang,
-            bool applyEditRules=true)
+            bool applyEditRules=true,
+            bool applyTerminology=true)
         {
             if (String.IsNullOrWhiteSpace(input))
             {
@@ -187,6 +189,47 @@ namespace OpusCatMTEngine
                 }
             }
 
+            if (applyTerminology)
+            {
+                //Apply terminology
+                //Use a simple method of removing overlapping matches of different terms:
+                //For each position record only the longest term match, then when annotating term data,
+                //start from the term closest to edge and skip overlapping terms.
+                var termMatches = new Dictionary<int, List<Tuple<Term, Match>>>();
+                foreach (var term in this.Terminology.Terms)
+                {
+                    var thisTermMatches = term.SourcePatternRegex.Matches(input);
+                    foreach (Match termMatch in thisTermMatches)
+                    {
+                        if (termMatches.ContainsKey(termMatch.Index))
+                        {
+                            termMatches[termMatch.Index].Add(new Tuple<Term, Match>(term, termMatch));
+                        }
+                        else
+                        {
+                            termMatches[termMatch.Index] = new List<Tuple<Term, Match>>() {
+                            new Tuple<Term, Match>(term, termMatch)};
+                        }
+                    }
+                }
+
+                int lastEditStart = input.Length;
+                foreach (var index in termMatches.Keys.ToList().OrderByDescending(x => x))
+                {
+                    //Start from longest match
+                    var matchesDescending = termMatches[index].OrderByDescending(x => x.Item2.Length);
+                    foreach (var match in matchesDescending)
+                    {
+                        if (match.Item2.Length + index <= lastEditStart)
+                        {
+                            input = input.Remove(index, match.Item2.Length).Insert(index,
+                                $"<term_start> <term_mask> <term_end> {match.Item1.TargetLemma} <trans_end>");
+                            continue;
+                        }
+                    }
+                }
+            }
+            
             //Need to get the original codes, since those are the ones the marian model uses
             var modelSourceLang =
                 this.SourceLanguages.SingleOrDefault(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode);
@@ -238,7 +281,8 @@ namespace OpusCatMTEngine
                         $"{this.SourceCodesString}-{this.TargetCodesString}_{this.Name}",
                         this.targetLanguages.Count > 1,
                         this.modelConfig.IncludePlaceholderTags, 
-                        this.modelConfig.IncludeTagPairs);
+                        this.modelConfig.IncludeTagPairs,
+                        this.Terminology);
             };
 
             var translationTask = this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
@@ -650,25 +694,25 @@ namespace OpusCatMTEngine
 
             if (this.modelYaml == null)
             {
-                if (this.modelConfig.SourceLanguageCodes == null ||
-                    this.modelConfig.TargetLanguageCodes == null)
-                {
-                    this.ParseModelPathForLanguages(modelPath);
-                }
-                else
+                this.ParseModelPathForLanguages(modelPath);
+
+                if (this.modelConfig.SourceLanguageCodes != null &&
+                    this.modelConfig.TargetLanguageCodes != null)
                 {
                     this.SourceLanguages = this.modelConfig.SourceLanguageCodes.Select(x => new IsoLanguage(x)).ToList();
                     this.TargetLanguages = this.modelConfig.TargetLanguageCodes.Select(x => new IsoLanguage(x)).ToList();
                 }
             }
             
-            //
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
                 this.ModelConfig.AutoPreEditRuleCollectionGuids.Select(x => autoPreEditRuleCollections.SingleOrDefault(
                     y => y.CollectionGuid == x)).Where(y => y != null));
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
                 this.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
                     y => y.CollectionGuid == x)).Where(y => y != null));
+
+            this.Terminology = new Terminology()
+            { Terms = new ObservableCollection<Term>() { new Term() { SourcePattern = "test", TargetLemma = "test" } } };
 
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
@@ -804,6 +848,8 @@ namespace OpusCatMTEngine
             this.TargetLanguages = targetLangs;
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.Terminology = new Terminology()
+            { Terms = new ObservableCollection<Term>() { new Term() { SourcePattern = "test", TargetLemma = "test" } } };
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
@@ -1096,6 +1142,12 @@ namespace OpusCatMTEngine
         }
 
         public string ModelType
+        {
+            get;
+            internal set;
+        }
+
+        public Terminology Terminology
         {
             get;
             internal set;

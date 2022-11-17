@@ -236,6 +236,7 @@ namespace OpusCatMTEngine
 
         internal ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
         internal ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
+        internal ObservableCollection<Terminology> Terminologies { get; private set; }
 
         private bool onlineModelListFetched;
         private IsoLanguage _overrideModelTargetLanguage;

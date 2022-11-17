@@ -247,7 +247,7 @@ namespace OpusCatMTEngine
             //TODO: open an overlay that is always on top and displays translation
         }
 
-        private void EditRulesTag_Click(object sender, RoutedEventArgs e)
+        private void EditRules_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
             EditRulesView editRules = 
@@ -259,6 +259,19 @@ namespace OpusCatMTEngine
 
             MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
             mainWindow.AddTab(new ActionTabItem() { Content = editRules, Header = editRules.Title, Closable = true });
+        }
+
+        private void TermList_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
+            TerminologyView terminology =
+                new TerminologyView(
+                    selectedModel,
+                    ((ModelManager)this.DataContext).Terminologies);
+            terminology.DataContext = this.DataContext;
+
+            MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.AddTab(new ActionTabItem() { Content = terminology, Header = terminology.Title, Closable = true });
         }
     }
 

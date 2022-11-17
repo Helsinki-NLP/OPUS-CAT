@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="OpusCatMTEngine.TerminologyView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpusCatMTEngine"
+        xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
+        mc:Ignorable="d"
+        Height="550" Width="800">
+    <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.Terminology_TerminologyHeading}"/>
+            <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+                <StackPanel>
+                    <Label FontWeight="Bold" FontSize="15">Terms</Label>
+                    <DockPanel Margin="10">
+                        <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
+                            <StackPanel.Resources>
+                                <Style TargetType="Button">
+                                    <Setter Property="Margin" Value="0,0,0,5" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button 
+                        Name="addTerm" 
+                        Click="AddTerm_Click"
+                        Content="{x:Static resx:Resources.Terminology_AddTermButton}" />
+
+
+                            <Button 
+                        IsEnabled="{Binding ElementName=TermList, Path=SelectedItems.Count}" 
+                        Name="editTerm" 
+                        Click="EditTerm_Click"
+                        Content="{x:Static resx:Resources.Terminology_EditTermButton}" />
+
+                            <Button 
+                        IsEnabled="{Binding ElementName=TermList, Path=SelectedItems.Count}" 
+                        Name="deleteTerm" 
+                        Click="DeleteTerm_Click"
+                        Content="{x:Static resx:Resources.Terminology_DeleteTermButton}" />
+                        </StackPanel>
+                        <DataGrid Name="TermList" AutoGenerateColumns="False" CanUserAddRows="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Source pattern"  Binding="{Binding SourcePattern}"/>
+                                <DataGridTextColumn Header="Target lemma" Binding="{Binding TargetLemma}" />
+                                <DataGridCheckBoxColumn Header="Regex?" Binding="{Binding SourcePatternIsRegex}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

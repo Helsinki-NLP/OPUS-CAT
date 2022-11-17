@@ -691,6 +691,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Terminology.
+        /// </summary>
+        public static string Main_TermListButton {
+            get {
+                return ResourceManager.GetString("Main_TermListButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Translate with model.
         /// </summary>
         public static string Main_TranslateWithModelButton {
@@ -1012,6 +1021,51 @@ namespace OpusCatMTEngine.Properties {
         public static string Tags_ModelTagsLabel {
             get {
                 return ResourceManager.GetString("Tags_ModelTagsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add term.
+        /// </summary>
+        public static string Terminology_AddTermButton {
+            get {
+                return ResourceManager.GetString("Terminology_AddTermButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete term.
+        /// </summary>
+        public static string Terminology_DeleteTermButton {
+            get {
+                return ResourceManager.GetString("Terminology_DeleteTermButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit term.
+        /// </summary>
+        public static string Terminology_EditTermButton {
+            get {
+                return ResourceManager.GetString("Terminology_EditTermButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminology.
+        /// </summary>
+        public static string Terminology_TerminologyHeading {
+            get {
+                return ResourceManager.GetString("Terminology_TerminologyHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminology.
+        /// </summary>
+        public static string Terminology_TerminologyTitle {
+            get {
+                return ResourceManager.GetString("Terminology_TerminologyTitle", resourceCulture);
             }
         }
         
