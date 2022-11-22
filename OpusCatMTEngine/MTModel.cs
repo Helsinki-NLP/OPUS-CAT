@@ -224,6 +224,7 @@ namespace OpusCatMTEngine
                         {
                             input = input.Remove(index, match.Item2.Length).Insert(index,
                                 $"<term_start> <term_mask> <term_end> {match.Item1.TargetLemma} <trans_end>");
+                            lastEditStart = index;
                             continue;
                         }
                     }
