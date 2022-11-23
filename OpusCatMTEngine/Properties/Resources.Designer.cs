@@ -1052,6 +1052,24 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Import TBX.
+        /// </summary>
+        public static string Terminology_ImportTbxButton {
+            get {
+                return ResourceManager.GetString("Terminology_ImportTbxButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save terminology.
+        /// </summary>
+        public static string Terminology_SaveTerminologyButton {
+            get {
+                return ResourceManager.GetString("Terminology_SaveTerminologyButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Terminology.
         /// </summary>
         public static string Terminology_TerminologyHeading {

@@ -412,6 +412,36 @@ namespace OpusCatMTEngine
             }
         }
 
+        private void InitializeTerminologies()
+        {
+            this.Terminologies = new ObservableCollection<Terminology>();
+
+            var terminologyDir = new DirectoryInfo(
+                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TerminologyDir));
+            if (!terminologyDir.Exists)
+            {
+                terminologyDir.Create();
+            }
+
+            var deserializer = new Deserializer();
+            foreach (var file in terminologyDir.EnumerateFiles())
+            {
+                using (var reader = file.OpenText())
+                {
+                    try
+                    {
+                        var loadedTerminology = deserializer.Deserialize<Terminology>(reader);
+                        this.Terminologies.Add(loadedTerminology);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Terminology deserialization failed, file {file.Name}. Exception: {ex.Message}");
+                    }
+                }
+            }
+
+        }
+
         private void InitializeAutoEditRuleCollections()
         {
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
@@ -424,6 +454,9 @@ namespace OpusCatMTEngine
             {
                 editRuleDir.Create();
             }
+
+            //TODO: The rule collections should be loaded as needed, not all at once (in case there are massive
+            //rule collections)
             var deserializer = new Deserializer();
             foreach (var file in editRuleDir.EnumerateFiles())
             {
@@ -465,6 +498,7 @@ namespace OpusCatMTEngine
             this.ShowNewestOnly = true;
 
             this.InitializeAutoEditRuleCollections();
+            this.InitializeTerminologies();
 
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
             this.opusModelDir = new DirectoryInfo(modelDirPath);
@@ -945,7 +979,8 @@ namespace OpusCatMTEngine
                             Regex.Match(modelPath, @"[^\\]+\\[^\\]+$").Value,
                             modelPath,
                             this.AutoPreEditRuleCollections,
-                            this.AutoPostEditRuleCollections));
+                            this.AutoPostEditRuleCollections,
+                            this.Terminologies));
                 }
                 catch
                 {

@@ -121,5 +121,8 @@
     <Setting Name="UnbalancedSplitLengthRatio" Type="System.Single" Scope="User">
       <Value Profile="(Default)">1.5</Value>
     </Setting>
+    <Setting Name="TerminologyDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Terms</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

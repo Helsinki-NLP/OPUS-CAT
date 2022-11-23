@@ -130,6 +130,7 @@
                             Click="EditRules_Click"
                             Content="{x:Static resx:Resources.Main_EditRulesButton}" />
                     <Button 
+                            Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.SupportsTerminology, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}"
                             IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
                             Name="termList" 
                             Click="TermList_Click"

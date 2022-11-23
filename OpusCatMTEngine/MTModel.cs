@@ -189,7 +189,7 @@ namespace OpusCatMTEngine
                 }
             }
 
-            if (applyTerminology)
+            if (this.SupportsTerminology && applyTerminology)
             {
                 //Apply terminology
                 //Use a simple method of removing overlapping matches of different terms:
@@ -223,7 +223,7 @@ namespace OpusCatMTEngine
                         if (match.Item2.Length + index <= lastEditStart)
                         {
                             input = input.Remove(index, match.Item2.Length).Insert(index,
-                                $"<term_start> <term_mask> <term_end> {match.Item1.TargetLemma} <trans_end>");
+                                $" <term_start> <term_mask> <term_end> {match.Item1.TargetLemma} <trans_end>");
                             lastEditStart = index;
                             continue;
                         }
@@ -282,8 +282,7 @@ namespace OpusCatMTEngine
                         $"{this.SourceCodesString}-{this.TargetCodesString}_{this.Name}",
                         this.targetLanguages.Count > 1,
                         this.modelConfig.IncludePlaceholderTags, 
-                        this.modelConfig.IncludeTagPairs,
-                        this.Terminology);
+                        this.modelConfig.IncludeTagPairs);
             };
 
             var translationTask = this.marianProcesses[modelOrigTuple].AddToTranslationQueue(input);
@@ -680,7 +679,8 @@ namespace OpusCatMTEngine
             string modelPath, 
             string installDir,
             ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
-            ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
+            ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections,
+            ObservableCollection<Terminology> terminologies)
         {
 
             this.ModelPath = modelPath;
@@ -690,6 +690,7 @@ namespace OpusCatMTEngine
             this.UpdateModelYamlPath();
 
             this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
+            this.SupportsTerminology = this.decoderSettings.models[0].Contains("-terms");
 
             this.ParseModelConfig();
 
@@ -712,9 +713,19 @@ namespace OpusCatMTEngine
                 this.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
                     y => y.CollectionGuid == x)).Where(y => y != null));
 
-            this.Terminology = new Terminology()
-            { Terms = new ObservableCollection<Term>() { new Term() { SourcePattern = "test", TargetLemma = "test" } } };
-
+            if (this.SupportsTerminology)
+            {
+                this.Terminology = terminologies.SingleOrDefault(x => x.TerminologyGuid == this.ModelConfig.TerminologyGuid);
+                //If there is no terminology guid or the terminology does not exits, Terminology will be null,
+                //so use new Terminology
+                if (this.Terminology == null)
+                {
+                    this.Terminology = new Terminology() { TerminologyName = $"terms for {this.Name}" };
+                    this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
+                    this.SaveModelConfig();
+                }
+            }
+            
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
@@ -849,8 +860,9 @@ namespace OpusCatMTEngine
             this.TargetLanguages = targetLangs;
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
-            this.Terminology = new Terminology()
-            { Terms = new ObservableCollection<Term>() { new Term() { SourcePattern = "test", TargetLemma = "test" } } };
+            this.Terminology = new Terminology() { TerminologyName = $"terms for {this.Name}" };
+            this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
+            
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
@@ -1100,6 +1112,7 @@ namespace OpusCatMTEngine
         private MarianDecoderConfig decoderSettings;
 
         public bool SupportsWordAlignment { get => supportsWordAlignment; set => supportsWordAlignment = value; }
+        public bool SupportsTerminology { get; private set; }
         public bool DoesNotSupportWordAlignment { get => !supportsWordAlignment; }
         public SegmentationMethod ModelSegmentationMethod
         {

@@ -49,6 +49,7 @@ namespace OpusCatMTEngine
             
             InitializeComponent();
             this.TermList.ItemsSource = this.Model.Terminology.Terms;
+            
         }
 
         
@@ -66,7 +67,12 @@ namespace OpusCatMTEngine
 
         }
 
-        private void AddTerm_Click(object sender, RoutedEventArgs e)
+        private void SaveTerminology_Click(object sender, RoutedEventArgs e)
+        {
+            this.Model.Terminology.Save();
+        }
+
+        private void ImportTbx_Click(object sender, RoutedEventArgs e)
         {
 
         }

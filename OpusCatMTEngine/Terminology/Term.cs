@@ -35,17 +35,34 @@ namespace OpusCatMTEngine
             }
         }
 
+        [YamlMember(Alias = "source-pattern-is-case-sensitive", ApplyNamingConventions = false)]
+        public bool SourcePatternIsCaseSensitive
+        {
+            get => _sourcePatternIsCaseSensitive;
+            set
+            {
+                _sourcePatternIsCaseSensitive = value;
+                this.UpdateSourcePatternRegex();
+            }
+        }
+
         private void UpdateSourcePatternRegex()
         {
             if (this.SourcePattern != null)
             {
+                RegexOptions sourcePatternOptions = RegexOptions.None;
+                if (!this.SourcePatternIsCaseSensitive)
+                {
+                    sourcePatternOptions = RegexOptions.IgnoreCase;
+                }
+
                 if (this.SourcePatternIsRegex)
                 {
-                    this.sourcePatternRegex = new Regex(this.SourcePattern);
+                    this.sourcePatternRegex = new Regex($"\\b{this.SourcePattern}\\b",sourcePatternOptions);
                 }
                 else
                 {
-                    this.sourcePatternRegex = new Regex(Regex.Escape(this.SourcePattern));
+                    this.sourcePatternRegex = new Regex($"\\b{Regex.Escape(this.SourcePattern)}\\b", sourcePatternOptions);
                 }
             }
         }
@@ -72,6 +89,7 @@ namespace OpusCatMTEngine
 
         private bool _sourcePatternIsRegex;
         private string _sourcePattern;
+        private bool _sourcePatternIsCaseSensitive;
 
         [YamlIgnore]
         public Regex SourcePatternRegex

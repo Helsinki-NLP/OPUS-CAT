@@ -474,5 +474,17 @@ namespace OpusCatMTEngine {
                 this["UnbalancedSplitLengthRatio"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Terms")]
+        public string TerminologyDir {
+            get {
+                return ((string)(this["TerminologyDir"]));
+            }
+            set {
+                this["TerminologyDir"] = value;
+            }
+        }
     }
 }
