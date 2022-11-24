@@ -27,16 +27,10 @@
 
 
                             <Button 
-                        IsEnabled="{Binding ElementName=TermList, Path=SelectedItems.Count}" 
                         Name="editTerm" 
                         Click="ImportTbx_Click"
                         Content="{x:Static resx:Resources.Terminology_ImportTbxButton}" />
 
-                            <Button 
-                        IsEnabled="{Binding ElementName=TermList, Path=SelectedItems.Count}" 
-                        Name="deleteTerm" 
-                        Click="DeleteTerm_Click"
-                        Content="{x:Static resx:Resources.Terminology_DeleteTermButton}" />
                         </StackPanel>
                         <DataGrid Name="TermList" AutoGenerateColumns="False" CanUserAddRows="True">
                             <DataGrid.Columns>

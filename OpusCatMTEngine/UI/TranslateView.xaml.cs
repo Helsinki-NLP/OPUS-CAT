@@ -239,6 +239,7 @@ namespace OpusCatMTEngine
             var runlist = new List<Run>();
             //Change this to add each token as a run, and add empty runs for space and pipe runs for segmentation
             //visualization
+            bool insideTerm = false;
             foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
             {
                 string processedToken = token;
@@ -258,7 +259,30 @@ namespace OpusCatMTEngine
 
                             processedToken = processedToken.Substring(1);
                             tokenrun = new Run(processedToken);
+
+                            if (insideTerm)
+                            {
+                                tokenrun.TextDecorations.Add(TextDecorations.Underline);
+                            }
+
                             runlist.Add(tokenrun);
+                        }
+                        else if (token == "<term_start>" || token == "<term_mask>")
+                        {
+                            tokenrun = new Run("");
+                            runlist.Add(tokenrun);
+                        }
+                        else if (token == "<term_end>")
+                        {
+                            tokenrun = new Run("");
+                            runlist.Add(tokenrun);
+                            insideTerm = true;
+                        }
+                        else if (token == "<trans_end>")
+                        {
+                            tokenrun = new Run("");
+                            runlist.Add(tokenrun);
+                            insideTerm = false;
                         }
                         else
                         {
@@ -268,6 +292,10 @@ namespace OpusCatMTEngine
                             this.wordsplitList.Add(wordsplitRun);
 
                             tokenrun = new Run(processedToken);
+                            if (insideTerm)
+                            {
+                                tokenrun.TextDecorations.Add(TextDecorations.Underline);
+                            }
                             runlist.Add(tokenrun);
                         }
                         break;

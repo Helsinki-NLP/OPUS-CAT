@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Xml.Linq;
 
 namespace OpusCatMTEngine
 {
@@ -57,16 +58,6 @@ namespace OpusCatMTEngine
         public string Title { get; private set; }
         public ObservableCollection<Terminology> Terminologies { get; private set; }
 
-        private void DeleteTerm_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void EditTerm_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void SaveTerminology_Click(object sender, RoutedEventArgs e)
         {
             this.Model.Terminology.Save();
@@ -74,6 +65,48 @@ namespace OpusCatMTEngine
 
         private void ImportTbx_Click(object sender, RoutedEventArgs e)
         {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Filter = "TBX files (*.tbx)|*.tbx";
+            // Show open file dialog box
+            bool? result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                var tbxFileName = dlg.FileName;
+                XDocument tbxDoc = XDocument.Load(tbxFileName);
+                List<Term> importedTerms = new List<Term>();
+                var termCounter = 0;
+                foreach (XElement termEntry in tbxDoc.Descendants("termEntry"))
+                {
+                    if (termCounter > 1000)
+                    {
+                        break;
+                    }
+
+                    termCounter++;
+                    
+                    var sourceLangSet = termEntry.Descendants("langSet").FirstOrDefault(
+                        x => this.Model.SourceLanguages.First().IsCompatibleTmxLang(
+                            x.Attribute(XNamespace.Xml + "lang").Value));
+
+                    var targetLangSet = termEntry.Descendants("langSet").FirstOrDefault(
+                        x => this.Model.TargetLanguages.First().IsCompatibleTmxLang(
+                            x.Attribute(XNamespace.Xml + "lang").Value));
+
+                    if (sourceLangSet != null && targetLangSet != null)
+                    {
+                        var sourceTerm = sourceLangSet.Descendants("term").First().Value;
+                        var targetTerm = targetLangSet.Descendants("term").First().Value;
+
+                        importedTerms.Add(new Term(sourceTerm, targetTerm));
+                    }
+                }
+
+                var oldTerms = this.Model.Terminology.Terms.ToList();
+                var oldAndImported = oldTerms.Concat(importedTerms).ToList();
+                this.Model.Terminology.Terms = new ObservableCollection<Term>(oldAndImported);
+                this.TermList.ItemsSource = this.Model.Terminology.Terms;
+            }
 
         }
 

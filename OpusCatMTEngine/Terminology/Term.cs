@@ -10,6 +10,17 @@ namespace OpusCatMTEngine
     public class Term
     {
 
+        public Term()
+        {
+
+        }
+
+        public Term(string sourcePattern, string targetLemma)
+        {
+            this.SourcePattern = sourcePattern;
+            this.TargetLemma = targetLemma;
+        }
+
         [YamlMember(Alias = "source-pattern", ApplyNamingConventions = false)]
         public string SourcePattern
         {
