@@ -473,4 +473,21 @@
   <data name="Terminology_TerminologyTitle" xml:space="preserve">
     <value>Terminology</value>
   </data>
+  <data name="StanzaWrapperCode" xml:space="preserve">
+    <value>import stanza
+
+class StanzaWrapper:
+
+    def __init__(self,
+                 lang,
+                 processors):
+        self.stanza = stanza.Pipeline(lang, processors='tokenize,pos,lemma,depparse')
+        
+    def lemmatize(self,input):
+        doc = self.stanza(input)
+        lemma_string = ""
+        for sentence in doc.sentences:
+            lemma_string += " ".join([x.lemma for x in sentence.words])
+        return lemma_string</value>
+  </data>
 </root>

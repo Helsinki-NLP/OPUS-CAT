@@ -989,6 +989,29 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to import stanza
+        ///
+        ///class StanzaWrapper:
+        ///
+        ///    def __init__(self,
+        ///                 lang,
+        ///                 processors):
+        ///        self.stanza = stanza.Pipeline(lang, processors=&apos;tokenize,pos,lemma,depparse&apos;)
+        ///        
+        ///    def lemmatize(self,input):
+        ///        doc = self.stanza(input)
+        ///        lemma_string = &quot;&quot;
+        ///        for sentence in doc.sentences:
+        ///            lemma_string += &quot; &quot;.join([x.lemma for x in sentence.words])
+        ///        return lemma_string.
+        /// </summary>
+        public static string StanzaWrapperCode {
+            get {
+                return ResourceManager.GetString("StanzaWrapperCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add.
         /// </summary>
         public static string Tags_AddTagButton {

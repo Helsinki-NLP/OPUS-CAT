@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Python.Runtime;
+using Serilog;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -188,14 +189,18 @@ namespace OpusCatMTEngine
                     input = preEditRuleCollection.ProcessPreEditRules(input).Result;
                 }
             }
-
+            
             if (this.SupportsTerminology && applyTerminology)
             {
+
+                var lemmatizedInput = PythonNetHelper.Lemmatize(this.sourceLanguages.First(), input);
+
                 //Apply terminology
                 //Use a simple method of removing overlapping matches of different terms:
                 //For each position record only the longest term match, then when annotating term data,
                 //start from the term closest to edge and skip overlapping terms.
                 var termMatches = new Dictionary<int, List<Tuple<Term, Match>>>();
+
                 foreach (var term in this.Terminology.Terms)
                 {
                     var thisTermMatches = term.SourcePatternRegex.Matches(input);
@@ -1166,6 +1171,7 @@ namespace OpusCatMTEngine
             get;
             internal set;
         }
+        private dynamic SourceLemmatizer { get; set; }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;
