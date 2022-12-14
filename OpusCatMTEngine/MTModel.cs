@@ -192,29 +192,68 @@ namespace OpusCatMTEngine
             
             if (this.SupportsTerminology && applyTerminology)
             {
-
-                var lemmatizedInput = PythonNetHelper.Lemmatize(this.sourceLanguages.First(), input);
-
+                
                 //Apply terminology
                 //Use a simple method of removing overlapping matches of different terms:
                 //For each position record only the longest term match, then when annotating term data,
                 //start from the term closest to edge and skip overlapping terms.
-                var termMatches = new Dictionary<int, List<Tuple<Term, Match>>>();
+                var termMatches = new Dictionary<int, List<TermMatch>>();
+
+                //Get lemmatized input and find lemmatized term matches. Prioritize normal term matches
+                //in case of overlap
+                var lemmatizedInput = PythonNetHelper.Lemmatize(this.sourceLanguages.First().ShortestIsoCode, input);
+
+                //Make dicts out of 
+                var lemmaToPositionDict = new Dictionary<string, List<int>>();
+                int lemmaCounter = 0;
+                foreach (var lemma in lemmatizedInput.Select(x => x.Item3))
+                {
+                    if (lemmaToPositionDict.ContainsKey(lemma))
+                    {
+                        lemmaToPositionDict[lemma].Add(lemmaCounter);
+                    }
+                    else
+                    {
+                        lemmaToPositionDict[lemma] = new List<int>() { lemmaCounter };
+                    }
+                    lemmaCounter++;
+                }
 
                 foreach (var term in this.Terminology.Terms)
                 {
                     var thisTermMatches = term.SourcePatternRegex.Matches(input);
                     foreach (Match termMatch in thisTermMatches)
                     {
+                        
                         if (termMatches.ContainsKey(termMatch.Index))
                         {
-                            termMatches[termMatch.Index].Add(new Tuple<Term, Match>(term, termMatch));
+                            termMatches[termMatch.Index].Add(
+                                new TermMatch(term,termMatch));
                         }
                         else
                         {
-                            termMatches[termMatch.Index] = new List<Tuple<Term, Match>>() {
-                            new Tuple<Term, Match>(term, termMatch)};
+                            termMatches[termMatch.Index] = new List<TermMatch>() {
+                            new TermMatch(term,termMatch)};
                         }
+                    }
+
+                    //Match term at lemma level, if specified
+                    if (term.MatchSourceLemma)
+                    {
+                        var sourceLemma = term.SourceLemmas;
+
+                        //Check if first lemma in term found in sentence
+                        if (lemmaToPositionDict.ContainsKey(sourceLemma[0]))
+                        {
+                            var firstLemmaPositions = lemmaToPositionDict[sourceLemma[0]];
+
+                            //Then check if the other lemmas of the term follow in the source sentence
+                            foreach (var startPos in firstLemmaPositions)
+                            {
+
+                            }
+                        }
+
                     }
                 }
 
@@ -222,13 +261,13 @@ namespace OpusCatMTEngine
                 foreach (var index in termMatches.Keys.ToList().OrderByDescending(x => x))
                 {
                     //Start from longest match
-                    var matchesDescending = termMatches[index].OrderByDescending(x => x.Item2.Length);
+                    var matchesDescending = termMatches[index].OrderByDescending(x => x.Length);
                     foreach (var match in matchesDescending)
                     {
-                        if (match.Item2.Length + index <= lastEditStart)
+                        if (match.Length + index <= lastEditStart)
                         {
-                            input = input.Remove(index, match.Item2.Length).Insert(index,
-                                $" <term_start> <term_mask> <term_end> {match.Item1.TargetLemma} <trans_end>");
+                            input = input.Remove(index, match.Length).Insert(index,
+                                $" <term_start> <term_mask> <term_end> {match.Term.TargetLemma} <trans_end>");
                             lastEditStart = index;
                             continue;
                         }

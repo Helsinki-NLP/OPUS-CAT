@@ -98,7 +98,12 @@ namespace OpusCatMTEngine
                         var sourceTerm = sourceLangSet.Descendants("term").First().Value;
                         var targetTerm = targetLangSet.Descendants("term").First().Value;
 
-                        importedTerms.Add(new Term(sourceTerm, targetTerm));
+                        importedTerms.Add(
+                            new Term(
+                                sourceTerm, 
+                                targetTerm,
+                                this.model.SourceLanguages.First(),
+                                this.model.TargetLanguages.First()));
                     }
                 }
 

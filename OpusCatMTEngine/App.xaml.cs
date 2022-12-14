@@ -100,6 +100,8 @@ namespace OpusCatMTEngine
             Log.Information("Setting Tls12 as security protocol (required for accessing online model storage");
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
+            this.InitializePythonEngine();
+
             Log.Information("Opening OPUS-CAT MT Engine window");
 
             // Create the startup window
@@ -117,10 +119,11 @@ namespace OpusCatMTEngine
                 App.CloseOverlay();
             }
 
-            this.InitializePythonEngine();
-
+//The update check is used to keep track of use counts, so disable it in DEBUG mode to keep counts
+//more accurate
+#if !DEBUG
             this.CheckForUpdatesAsync();
-            
+#endif            
         }
 
         private async void CheckForUpdatesAsync()

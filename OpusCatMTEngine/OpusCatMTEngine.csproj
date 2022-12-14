@@ -273,6 +273,7 @@
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
     <Compile Include="PythonNetHelper.cs" />
+    <Compile Include="Terminology\TermMatch.cs" />
     <Compile Include="Terminology\Term.cs" />
     <Compile Include="Terminology\Terminology.cs" />
     <Compile Include="UI\ActionTabItem.cs" />

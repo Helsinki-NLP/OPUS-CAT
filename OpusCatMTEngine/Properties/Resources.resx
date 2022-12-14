@@ -485,9 +485,9 @@ class StanzaWrapper:
         
     def lemmatize(self,input):
         doc = self.stanza(input)
-        lemma_string = ""
+        lemma_tuples = []
         for sentence in doc.sentences:
-            lemma_string += " ".join([x.lemma for x in sentence.words])
-        return lemma_string</value>
+            lemma_tuples +=[(x.start_char,x.end_char,x.lemma) for x in sentence.words]
+        return lemma_tuples</value>
   </data>
 </root>

@@ -9,10 +9,11 @@ namespace OpusCatMTEngine
 {
     static class PythonNetHelper
     {
-        private static Dictionary<IsoLanguage, dynamic> LemmatizerScopes = new Dictionary<IsoLanguage, dynamic>();
+        private static Dictionary<string, dynamic> LemmatizerScopes = new Dictionary<string, dynamic>();
 
-        internal static string Lemmatize(IsoLanguage lang, string input)
+        internal static List<Tuple<int,int,string>> Lemmatize(string lang, string input)
         {
+            List<Tuple<int, int, string>> lemmaList = new List<Tuple<int, int, string>>();
             using (Py.GIL())
             {
                 if (!PythonNetHelper.LemmatizerScopes.ContainsKey(lang))
@@ -27,12 +28,18 @@ namespace OpusCatMTEngine
                             scope.Import(moduleScope, "stanza_wrapper");
 
                             PythonNetHelper.LemmatizerScopes[lang] = scope.Eval<dynamic>(
-                                $"stanza_wrapper.StanzaWrapper('{lang.ShortestIsoCode}', processors='tokenize, pos, lemma, depparse')");
+                                $"stanza_wrapper.StanzaWrapper('{lang}', processors='tokenize, pos, lemma, depparse')");
                         }
                     }
                 }
 
-                return PythonNetHelper.LemmatizerScopes[lang].lemmatize(input);
+                var lemmatized = PythonNetHelper.LemmatizerScopes[lang].lemmatize(input);
+                var output = new List<Tuple<int, int, string>>();
+                foreach (var lemma in lemmatized)
+                {
+                    output.Add(new Tuple<int,int,string>((int)lemma[0],(int)lemma[1],(string)lemma[2]));
+                }
+                return output;
             }
         }
     }

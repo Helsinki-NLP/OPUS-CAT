@@ -1000,10 +1000,10 @@ namespace OpusCatMTEngine.Properties {
         ///        
         ///    def lemmatize(self,input):
         ///        doc = self.stanza(input)
-        ///        lemma_string = &quot;&quot;
+        ///        lemma_tuples = []
         ///        for sentence in doc.sentences:
-        ///            lemma_string += &quot; &quot;.join([x.lemma for x in sentence.words])
-        ///        return lemma_string.
+        ///            lemma_tuples +=[(x.start_char,x.end_char,x.lemma) for x in sentence.words]
+        ///        return lemma_tuples.
         /// </summary>
         public static string StanzaWrapperCode {
             get {
