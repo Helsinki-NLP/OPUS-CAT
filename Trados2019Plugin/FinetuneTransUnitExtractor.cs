@@ -4,6 +4,7 @@ using Sdl.LanguagePlatform.TranslationMemory;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -143,7 +144,11 @@ namespace OpusCatTranslationProvider
             int maxConcordanceWindow)
         {
             this.tms = tms;
+#if (TRADOS22)
+            this.sourceLanguage = new CultureInfo(tms.First().SourceLanguage.Name).TwoLetterISOLanguageName;
+#else
             this.sourceLanguage = tms.First().SourceLanguage.TwoLetterISOLanguageName;
+#endif
             //Shuffle the source segment to prevent focusing on the initial part of the job (in case
             //units needed value is reached before whole source has been processed).
             this.sourceSegments = sourceSegments.ToList();

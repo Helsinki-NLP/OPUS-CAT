@@ -181,11 +181,19 @@ namespace OpusCatMTEngine
 
         private void InitializePythonEngine()
         {
-            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll");
-            Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64");
-            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64");
+            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
+            Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
+            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
+            Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
+
+            var home = PythonEngine.PythonHome;
+
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
+            using (Py.GIL())
+            {
+                PythonEngine.ImportModule("sacremoses");
+            }
         }
 
         /// <summary>

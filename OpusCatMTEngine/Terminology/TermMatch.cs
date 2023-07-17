@@ -11,6 +11,9 @@ namespace OpusCatMTEngine
         public TermMatch(Term term, Match termMatch)
         {
             this.Term = term;
+            this.Start = termMatch.Index;
+            this.Length = termMatch.Length;
+            this.LemmaMatch = false;
 
         }
 

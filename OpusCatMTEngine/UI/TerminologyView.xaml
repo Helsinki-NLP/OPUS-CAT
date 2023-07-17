@@ -38,6 +38,7 @@
                                 <DataGridTextColumn Header="Target lemma" Binding="{Binding TargetLemma}" />
                                 <DataGridCheckBoxColumn Header="Regex?" Binding="{Binding SourcePatternIsRegex}" />
                                 <DataGridCheckBoxColumn Header="Case sensitive?" Binding="{Binding SourcePatternIsCaseSensitive}" />
+                                <DataGridCheckBoxColumn Header="Match lemmas?" Binding="{Binding MatchSourceLemma}" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </DockPanel>

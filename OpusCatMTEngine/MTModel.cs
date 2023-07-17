@@ -24,7 +24,9 @@ using YamlDotNet.Serialization;
 
 namespace OpusCatMTEngine
 {
+
     
+
     public enum MTModelStatus
     {
         OK,
@@ -66,6 +68,30 @@ namespace OpusCatMTEngine
     
     public class MTModel : INotifyPropertyChanged
     {
+        private dynamic lemmatizer;
+
+        internal List<Tuple<int, int, string>> Lemmatize(string input)
+        {
+            List<Tuple<int, int, string>> lemmaList = new List<Tuple<int, int, string>>();
+            using (Py.GIL())
+            {
+                var output = new List<Tuple<int, int, string>>();
+
+                dynamic processed = this.lemmatizer(input);
+
+                foreach (var sentence in processed.sentences)
+                {
+                    foreach (var word in sentence.words)
+                    {
+                        output.Add(new Tuple<int, int, string>((int)word.start_char, (int)word.end_char, (string)word.lemma));
+                    }
+                }
+
+                return output;
+            }
+
+        }
+
         public object this[string propertyName]
         {
             get
@@ -168,6 +194,124 @@ namespace OpusCatMTEngine
             this.marianProcesses = null;
         }
 
+        private Dictionary<int, List<TermMatch>> GetTermMatches(string input)
+        {
+            var termMatches = new Dictionary<int, List<TermMatch>>();
+
+            foreach (var term in this.Terminology.Terms)
+            {
+                var thisTermMatches = term.SourcePatternRegex.Matches(input);
+                foreach (Match termMatch in thisTermMatches)
+                {
+                    if (termMatches.ContainsKey(termMatch.Index))
+                    {
+                        termMatches[termMatch.Index].Add(
+                            new TermMatch(term, termMatch));
+                    }
+                    else
+                    {
+                        termMatches[termMatch.Index] = new List<TermMatch>() {
+                            new TermMatch(term, termMatch)};
+                    }
+                }
+                
+            }
+
+            return termMatches;
+        }
+
+
+        private Dictionary<int,List<TermMatch>> GetLemmaMatches(string input, Dictionary<int, List<TermMatch>> termMatches = null)
+        {
+            if (termMatches == null)
+            {
+                termMatches = new Dictionary<int, List<TermMatch>>();
+            }
+            
+
+            //Get lemmatized input and find lemmatized term matches. Prioritize normal term matches
+            //in case of overlap
+            //var lemmatizedInput = PythonNetHelper.Lemmatize(this.sourceLanguages.First().ShortestIsoCode, input);
+            var lemmatizedInput = this.Lemmatize(input);
+
+            var lemmaToPositionDict = new Dictionary<string, List<int>>();
+            int lemmaCounter = 0;
+            foreach (var lemma in lemmatizedInput.Select(x => x.Item3))
+            {
+                if (lemmaToPositionDict.ContainsKey(lemma))
+                {
+                    lemmaToPositionDict[lemma].Add(lemmaCounter);
+                }
+                else
+                {
+                    lemmaToPositionDict[lemma] = new List<int>() { lemmaCounter };
+                }
+                lemmaCounter++;
+            }
+
+            foreach (var term in this.Terminology.Terms.Where(x => x.MatchSourceLemma))
+            {
+
+                if (term.SourceLemmas == null)
+                {
+                    term.SourceLemmas = this.Lemmatize(term.SourcePattern).Select(x => x.Item3).ToList();
+                }
+                var sourceLemmas = term.SourceLemmas;
+
+                //Check if first lemma in term found in sentence
+
+                bool termLemmaFound;
+
+                if (lemmaToPositionDict.ContainsKey(sourceLemmas[0]))
+                {
+                    var firstLemmaPositions = lemmaToPositionDict[sourceLemmas[0]];
+
+                    //Then check if the other lemmas of the term follow in the source sentence
+                    foreach (var startPos in firstLemmaPositions)
+                    {
+                        int sourceSentencePos = startPos;
+                        termLemmaFound = true;
+                        //start looking at second lemma
+                        for (var termLemmaIndex = 1; termLemmaIndex < sourceLemmas.Count; termLemmaIndex++)
+                        {
+                            sourceSentencePos = startPos + termLemmaIndex;
+                            if (sourceSentencePos < lemmatizedInput.Count)
+                            {
+                                if (lemmatizedInput[sourceSentencePos].Item3 != sourceLemmas[termLemmaIndex])
+                                {
+                                    termLemmaFound = false;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                termLemmaFound = false;
+                                break;
+                            }
+                        }
+
+                        if (termLemmaFound)
+                        {
+                            var startChar = lemmatizedInput[startPos].Item1;
+                            var endChar = lemmatizedInput[sourceSentencePos].Item2;
+                            if (termMatches.ContainsKey(startChar))
+                            {
+                                termMatches[startChar].Add(
+                                    new TermMatch(term, startChar, endChar - startChar, true));
+                            }
+                            else
+                            {
+                                termMatches[startChar] = new List<TermMatch>() {
+                                            new TermMatch(term, startChar, endChar-startChar, true)};
+                            }
+                        }
+                    }
+                }
+            }
+
+            return termMatches;
+        }
+
         public Task<TranslationPair> Translate(
             string input, 
             IsoLanguage sourceLang, 
@@ -197,64 +341,12 @@ namespace OpusCatMTEngine
                 //Use a simple method of removing overlapping matches of different terms:
                 //For each position record only the longest term match, then when annotating term data,
                 //start from the term closest to edge and skip overlapping terms.
-                var termMatches = new Dictionary<int, List<TermMatch>>();
+                var termMatches = this.GetTermMatches(input);
 
-                //Get lemmatized input and find lemmatized term matches. Prioritize normal term matches
-                //in case of overlap
-                var lemmatizedInput = PythonNetHelper.Lemmatize(this.sourceLanguages.First().ShortestIsoCode, input);
-
-                //Make dicts out of 
-                var lemmaToPositionDict = new Dictionary<string, List<int>>();
-                int lemmaCounter = 0;
-                foreach (var lemma in lemmatizedInput.Select(x => x.Item3))
+                //Match term at lemma level, if specified
+                if (this.Terminology.Terms.Any(x => x.MatchSourceLemma))
                 {
-                    if (lemmaToPositionDict.ContainsKey(lemma))
-                    {
-                        lemmaToPositionDict[lemma].Add(lemmaCounter);
-                    }
-                    else
-                    {
-                        lemmaToPositionDict[lemma] = new List<int>() { lemmaCounter };
-                    }
-                    lemmaCounter++;
-                }
-
-                foreach (var term in this.Terminology.Terms)
-                {
-                    var thisTermMatches = term.SourcePatternRegex.Matches(input);
-                    foreach (Match termMatch in thisTermMatches)
-                    {
-                        
-                        if (termMatches.ContainsKey(termMatch.Index))
-                        {
-                            termMatches[termMatch.Index].Add(
-                                new TermMatch(term,termMatch));
-                        }
-                        else
-                        {
-                            termMatches[termMatch.Index] = new List<TermMatch>() {
-                            new TermMatch(term,termMatch)};
-                        }
-                    }
-
-                    //Match term at lemma level, if specified
-                    if (term.MatchSourceLemma)
-                    {
-                        var sourceLemma = term.SourceLemmas;
-
-                        //Check if first lemma in term found in sentence
-                        if (lemmaToPositionDict.ContainsKey(sourceLemma[0]))
-                        {
-                            var firstLemmaPositions = lemmaToPositionDict[sourceLemma[0]];
-
-                            //Then check if the other lemmas of the term follow in the source sentence
-                            foreach (var startPos in firstLemmaPositions)
-                            {
-
-                            }
-                        }
-
-                    }
+                    termMatches = this.GetLemmaMatches(input, termMatches);
                 }
 
                 int lastEditStart = input.Length;
@@ -768,6 +860,14 @@ namespace OpusCatMTEngine
                     this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
                     this.SaveModelConfig();
                 }
+
+                using (Py.GIL())
+                {
+                    dynamic stanza = PythonEngine.ImportModule("stanza");
+                    this.lemmatizer = stanza.Pipeline(
+                            this.SourceLanguages[0].ShortestIsoCode, processors: "tokenize,mwt,pos,lemma");
+                }
+
             }
             
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;

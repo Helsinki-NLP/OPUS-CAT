@@ -49,11 +49,18 @@ namespace OpusCatMTEngine
             this.Terminologies = terminologies;
             
             InitializeComponent();
+            this.TermList.InitializingNewItem += InitializeNewTerm;
             this.TermList.ItemsSource = this.Model.Terminology.Terms;
             
         }
 
-        
+        private void InitializeNewTerm(object sender, InitializingNewItemEventArgs e)
+        {
+            var term = (Term)e.NewItem;
+            term.SourceLanguageCode = this.model.SourceLanguages.First().ShortestIsoCode;
+            term.TargetLanguageCode = this.model.TargetLanguages.First().ShortestIsoCode;
+        }
+
         public MTModel Model { get => model; set => model = value; }
         public string Title { get; private set; }
         public ObservableCollection<Terminology> Terminologies { get; private set; }

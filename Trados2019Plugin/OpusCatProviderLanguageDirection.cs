@@ -14,6 +14,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
+using System.Globalization;
+using Sdl.Core.Globalization;
 
 namespace OpusCatTranslationProvider
 {
@@ -48,11 +50,17 @@ namespace OpusCatTranslationProvider
 
             _visitor = new OpusCatProviderElementVisitor();
 
+#if (TRADOS22)
+            var sourceCode = new CultureInfo(this._languageDirection.SourceCulture.Name).TwoLetterISOLanguageName;
+            var targetCode = new CultureInfo(this._languageDirection.TargetCulture.Name).TwoLetterISOLanguageName;
+#else
             var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
+#endif
+
             this.langpair = $"{sourceCode}-{targetCode}";
 
-            #endregion
+#endregion
         }
 
 
@@ -79,7 +87,7 @@ namespace OpusCatTranslationProvider
         /// <param name="settings"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
-        #region "SearchSegment"
+#region "SearchSegment"
         public SearchResults SearchSegment(SearchSettings settings, Segment segment)
         {
            
@@ -90,15 +98,21 @@ namespace OpusCatTranslationProvider
             }
             
 
-            #region "SearchResultsObject"
+#region "SearchResultsObject"
             SearchResults results = new SearchResults();
             results.SourceSegment = segment.Duplicate();
 
-            #endregion
+#endregion
             string sourceText = _visitor.PlainText;
-           
+
+#if (TRADOS22)
+            var sourceCode = new CultureInfo(this._languageDirection.SourceCulture.Name).TwoLetterISOLanguageName;
+            var targetCode = new CultureInfo(this._languageDirection.TargetCulture.Name).TwoLetterISOLanguageName;
+#else
             var sourceCode = this._languageDirection.SourceCulture.TwoLetterISOLanguageName;
             var targetCode = this._languageDirection.TargetCulture.TwoLetterISOLanguageName;
+#endif
+
             var langpair = $"{sourceCode}-{targetCode}";
 
             List<SearchResult> systemResults = this.GenerateSystemResult(sourceText, settings.Mode,segment,sourceCode,targetCode);
@@ -108,7 +122,7 @@ namespace OpusCatTranslationProvider
             }
  
             return results;
-            #endregion
+#endregion
         }
 
         private List<SearchResult> GenerateSystemResult(
@@ -175,7 +189,7 @@ namespace OpusCatTranslationProvider
             }
             return systemResults;
         }
-        #endregion
+#endregion
 
 
 
@@ -188,7 +202,7 @@ namespace OpusCatTranslationProvider
         /// <param name="sourceSegment"></param>
         /// <param name="formattingPenalty"></param>
         /// <returns></returns>
-        #region "CreateSearchResult"
+#region "CreateSearchResult"
         private SearchResult CreateSearchResult(Segment searchSegment, Segment translation,
             bool formattingPenalty,string mtSystem)
         {
@@ -233,7 +247,7 @@ namespace OpusCatTranslationProvider
 
             return searchResult;
         }
-        #endregion
+#endregion
 
 
         public bool CanReverseLanguageDirection
@@ -242,6 +256,11 @@ namespace OpusCatTranslationProvider
         }
 
         public static Segment CurrentTranslation { get; private set; }
+
+#if (TRADOS22)
+        CultureCode ITranslationProviderLanguageDirection.SourceLanguage => new CultureCode(this.SourceLanguage);
+        CultureCode ITranslationProviderLanguageDirection.TargetLanguage => new CultureCode(this.TargetLanguage);
+#endif
 
         public SearchResults[] SearchSegments(SearchSettings settings, Segment[] segments)
         {
@@ -325,7 +344,7 @@ namespace OpusCatTranslationProvider
         }
 
 
-        #region "NotForThisImplementation"
+#region "NotForThisImplementation"
         /// <summary>
         /// Not required for this implementation.
         /// </summary>
@@ -403,6 +422,6 @@ namespace OpusCatTranslationProvider
         {
             throw new NotImplementedException();
         }
-        #endregion
+#endregion
     }
 }

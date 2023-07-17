@@ -53,18 +53,19 @@ namespace OpusCatMTEngine
             }
         }
 
+        [YamlIgnore]
         public List<string> SourceLemmas
         {
             get
             {
-                if (_sourceLemmas == null)
+                if (_sourceLemmas == null || _sourceLemmas.Count == 0)
                 {
-                    if (this.SourceLanguageCode != null)
+                    /*if (this.SourceLanguageCode != null)
                     {
                         _sourceLemmas = PythonNetHelper.Lemmatize(
                             this.SourceLanguageCode,
                             this.SourcePattern).Select(x => x.Item3).ToList();
-                    }
+                    }*/
                 }
                 return _sourceLemmas;
             }
