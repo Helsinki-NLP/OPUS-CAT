@@ -39,7 +39,7 @@
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
 
 
-                        <TextBox Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, Mode=TwoWay}" VerticalAlignment="Center"></TextBox>
+                        <MaskedTextBox Mask="00009" Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, Mode=TwoWay}" VerticalAlignment="Center"></MaskedTextBox>
 
                     </DockPanel>
                     <DockPanel Margin="0,0,0,0">
@@ -47,7 +47,7 @@
                             DockPanel.Dock="Left"
                             Content="{x:Static resx:Resources.Settings_HttpPortLabel}"/>
                         <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-                        <TextBox Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, Mode=TwoWay}" VerticalAlignment="Center"></TextBox>
+                        <MaskedTextBox Mask="00009" Name="HttpServicePortBoxElement" Text="{Binding ElementName=_this, Path=HttpServicePortBox, Mode=TwoWay}" VerticalAlignment="Center"></MaskedTextBox>
                     </DockPanel>
                     <DockPanel Margin="0,0,0,0">
                         <CheckBox IsChecked="{Binding ElementName=_this, Path=StoreDataInAppdata, Mode=TwoWay}" Content="{x:Static resx:Resources.Settings_StoreInAppdataCheckbox}" />

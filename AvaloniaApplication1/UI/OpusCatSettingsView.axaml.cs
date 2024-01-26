@@ -4,17 +4,23 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using OpusCatMtEngine;
+using OpusCatMtEngine.UI;
 using System;
+using System.Collections;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OpusCatMtEngine;
 
 public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
     private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
     {
@@ -98,16 +104,11 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
         e.Handled = regex.IsMatch(e.Text);
     }*/
 
-    public string this[string columnName]
-    {
-        get
-        {
-            return Validate(columnName);
-        }
-    }
-
 
     private string? httpServicePortBox;
+
+    [Required]
+    [StringRangeAttribute(1025, 65536, ErrorMessage="Port number should be 1025 - 65536")]
     public string HttpServicePortBox
     {
         get => httpServicePortBox;
@@ -120,6 +121,8 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
     }
 
     private string? databaseRemovalInterval;
+
+    [StringRangeAttribute(1,365,ErrorMessage = "Value must be 1-365")]
     public string DatabaseRemovalInterval
     {
         get => databaseRemovalInterval;
@@ -174,8 +177,10 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
             NotifyPropertyChanged("SaveButtonEnabled");
         }
     }
+    private string servicePortBox;
 
-    private string? servicePortBox;
+    [Required]
+    [StringRangeAttribute(1025,65536,ErrorMessage = "Port number should be 1025 - 65536")]
     public string ServicePortBox
     {
         get => servicePortBox;
@@ -186,6 +191,7 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
             NotifyPropertyChanged("SaveButtonEnabled");
         }
     }
+
 
     public string MaxLength
     {
@@ -226,95 +232,6 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
     private bool _displayOverlay;
     private string? maxLength;
 
-    public string Error
-    {
-        get { return "...."; }
-    }
-
-
-
-    private string Validate(string propertyName)
-    {
-        // Return error message if there is error on else return empty or null string
-        string validationMessage = string.Empty;
-        this.validationErrors = false;
-        switch (propertyName)
-        {
-            case "MaxLength":
-                if (!String.IsNullOrEmpty(this.MaxLength))
-                {
-                    var length = Int32.Parse(this.MaxLength);
-                    if (length == 0)
-                    {
-                        validationMessage = "Error";
-                        this.validationErrors = true;
-                    }
-                }
-                else
-                {
-                    validationMessage = "Error";
-                    this.validationErrors = true;
-                }
-                break;
-            case "DatabaseRemovalInterval":
-                if (!String.IsNullOrEmpty(this.DatabaseRemovalInterval))
-                {
-                    var interval = Int32.Parse(this.DatabaseRemovalInterval);
-                    if (interval == 0)
-                    {
-                        validationMessage = "Error";
-                        this.validationErrors = true;
-                    }
-                }
-                else
-                {
-                    validationMessage = "Error";
-                    this.validationErrors = true;
-                }
-                break;
-            case "ServicePortBox":
-                if (this.ServicePortBox != null && this.ServicePortBox != "")
-                {
-                    var portNumber = Int32.Parse(this.ServicePortBox);
-                    if (portNumber < 1024 || portNumber > 65535)
-                    {
-                        validationMessage = "Error";
-                        this.validationErrors = true;
-                    }
-                }
-                else
-                {
-                    validationMessage = "Error";
-                    this.validationErrors = true;
-                }
-
-                break;
-            case "HttpServicePortBox":
-                if (this.HttpServicePortBox != null && this.HttpServicePortBox != "")
-                {
-                    var portNumber = Int32.Parse(this.HttpServicePortBox);
-                    if (portNumber < 1024 || portNumber > 65535)
-                    {
-                        validationMessage = "Error";
-                        this.validationErrors = true;
-                    }
-                    else
-                    {
-                        this.httpServicePortBoxIsValid = true;
-                    }
-                }
-                else
-                {
-                    validationMessage = "Error";
-                    this.validationErrors = true;
-                }
-
-                break;
-        }
-
-        NotifyPropertyChanged("SaveButtonEnabled");
-        return validationMessage;
-    }
 
     private void revertToDefaultsButton_Click(object sender, RoutedEventArgs e)
     {
@@ -328,4 +245,6 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
         this.CacheMtInDatabase = OpusCatMtEngineSettings.Default.CacheMtInDatabase;
         this.MaxLength = OpusCatMtEngineSettings.Default.MaxLength.ToString();
     }
+
+    
 }
