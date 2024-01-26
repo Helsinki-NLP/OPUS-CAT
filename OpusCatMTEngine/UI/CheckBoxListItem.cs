@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class CheckBoxListItem<T> : INotifyPropertyChanged
     {

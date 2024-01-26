@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using OpusCatMTEngine;
+using OpusCatMtEngine;
 using Sdl.LanguagePlatform.TranslationMemory;
 using Sdl.LanguagePlatform.TranslationMemoryApi;
 using System;

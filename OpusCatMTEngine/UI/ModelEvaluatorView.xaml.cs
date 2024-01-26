@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Path = System.IO.Path;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public partial class ModelEvaluatorView : UserControl, IDataErrorInfo, INotifyPropertyChanged
     {
@@ -142,7 +142,7 @@ namespace OpusCatMTEngine
             string validationMessage = String.Empty;
             if (filePath == null || !File.Exists(filePath))
             {
-                validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_FileDoesNotExistMessage;
+                validationMessage = OpusCatMtEngine.Properties.Resources.Finetune_FileDoesNotExistMessage;
             }
             return validationMessage;
         }
@@ -154,7 +154,7 @@ namespace OpusCatMTEngine
             this.SourceLanguage = CommonSourceLanguages.First();
             this.TargetLanguage = CommonTargetLanguages.First();
             
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Finetune_FineTuneWindowTitle,
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.Finetune_FineTuneWindowTitle,
                 this.SelectedModels.Select(x => x.Name).Aggregate((x,y) => $"{x}, {y}"));
             InitializeComponent();
         }
@@ -191,7 +191,7 @@ namespace OpusCatMTEngine
                     {
                         MessageBox.Show(
                             String.Format(
-                                OpusCatMTEngine.Properties.Resources.Finetune_TmxFileNotValidMessage,this.TmxFile));
+                                OpusCatMtEngine.Properties.Resources.Finetune_TmxFileNotValidMessage,this.TmxFile));
                         return;
                     }
 
@@ -222,7 +222,7 @@ namespace OpusCatMTEngine
                         {
                             MessageBox.Show(
                                 String.Format(
-                                    OpusCatMTEngine.Properties.Resources.Finetune_NotEnoughSegmentsInTmx));
+                                    OpusCatMtEngine.Properties.Resources.Finetune_NotEnoughSegmentsInTmx));
                             return;
                         }
                     }

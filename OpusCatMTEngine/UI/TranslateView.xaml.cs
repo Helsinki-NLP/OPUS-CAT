@@ -19,7 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
@@ -54,7 +54,7 @@ namespace OpusCatMTEngine
             this.wordsplitList = new List<Run>();
             this.SourceLanguage = this.Model.SourceLanguages.First();
             this.TargetLanguage = this.Model.TargetLanguages.First();
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Translate_TranslateTitle, Model.Name);
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.Translate_TranslateTitle, Model.Name);
             InitializeComponent();
         }
 

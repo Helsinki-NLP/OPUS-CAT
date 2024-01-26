@@ -24,7 +24,7 @@ using System.Xml.Linq;
 using YamlDotNet.Serialization;
 using static System.Environment;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// This class contains methods for checking and downloading latest models from

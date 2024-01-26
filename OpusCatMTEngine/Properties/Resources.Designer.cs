@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpusCatMTEngine.Properties {
+namespace OpusCatMtEngine.Properties {
     using System;
     
     

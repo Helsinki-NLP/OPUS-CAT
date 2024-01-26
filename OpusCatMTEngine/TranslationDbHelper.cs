@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     class TranslationDbHelper
     {
@@ -89,8 +89,8 @@ namespace OpusCatMTEngine
 
             if (!tableValid)
             {
-                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.App_InvalidDbMessage,
-                                          OpusCatMTEngine.Properties.Resources.App_ConfirmDbCaption,
+                MessageBoxResult result = MessageBox.Show(OpusCatMtEngine.Properties.Resources.App_InvalidDbMessage,
+                                          OpusCatMtEngine.Properties.Resources.App_ConfirmDbCaption,
                                           MessageBoxButton.OKCancel,
                                           MessageBoxImage.Question);
                 if (result == MessageBoxResult.OK)

@@ -19,7 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
@@ -45,7 +45,7 @@ namespace OpusCatMTEngine
             ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
         {
             this.Model = selectedModel;
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRulesTitle,Model.Name);
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.EditRules_EditRulesTitle,Model.Name);
             this.AutoPreEditRuleCollections = autoPreEditRuleCollections;
             this.AutoPostEditRuleCollections = autoPostEditRuleCollections;
             

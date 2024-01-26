@@ -19,7 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
@@ -100,7 +100,7 @@ namespace OpusCatMTEngine
             var inDomainSeries = 
                 this.ScoresToSeries(
                     inDomainFiles,
-                    OpusCatMTEngine.Properties.Resources.Progress_InDomainSeriesName,
+                    OpusCatMtEngine.Properties.Resources.Progress_InDomainSeriesName,
                     DefaultGeometries.Diamond);
             
             this.SeriesCollection.AddRange(inDomainSeries);
@@ -111,7 +111,7 @@ namespace OpusCatMTEngine
                 var outOfDomainSeries = 
                     this.ScoresToSeries(
                         outOfDomainFiles, 
-                        OpusCatMTEngine.Properties.Resources.Progress_OutOfDomainSeriesName,
+                        OpusCatMtEngine.Properties.Resources.Progress_OutOfDomainSeriesName,
                         DefaultGeometries.Square);
                 this.SeriesCollection.AddRange(outOfDomainSeries);
             }

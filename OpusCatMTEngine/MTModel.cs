@@ -22,7 +22,7 @@ using System.Windows;
 using System.Windows.Data;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
 
     

@@ -13,7 +13,7 @@ using System.Net.Http;
 using SentenceSplitterNet;
 using System.Threading.Tasks;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class MtRestServiceController : ApiController
     {

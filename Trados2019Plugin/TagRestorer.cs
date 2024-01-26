@@ -1,4 +1,4 @@
-﻿using OpusCatMTEngine;
+﻿using OpusCatMtEngine;
 using OpusMTInterface;
 using Sdl.LanguagePlatform.Core;
 using System;

@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
 
     public class Terminology

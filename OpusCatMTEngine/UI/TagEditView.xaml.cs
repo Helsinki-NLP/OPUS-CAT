@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
@@ -29,7 +29,7 @@ namespace OpusCatMTEngine
         {
             this.Model = selectedModel;
             this.DataContext = selectedModel;
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Tags_EditTagsTitle,Model.Name);
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.Tags_EditTagsTitle,Model.Name);
             InitializeComponent();
             this.TagList.ItemsSource = selectedModel.ModelConfig.ModelTags;
         }

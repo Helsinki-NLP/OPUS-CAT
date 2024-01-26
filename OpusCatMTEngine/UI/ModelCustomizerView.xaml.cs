@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public partial class ModelCustomizerView : UserControl, IDataErrorInfo, INotifyPropertyChanged
     {
@@ -132,11 +132,11 @@ namespace OpusCatMTEngine
 
                     if (this.ModelTag == null || this.ModelTag == "")
                     {
-                        validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_ModelTagNotSpecifiedMessage;
+                        validationMessage = OpusCatMtEngine.Properties.Resources.Finetune_ModelTagNotSpecifiedMessage;
                     }
                     else if (this.ModelTag.Length > OpusCatMTEngineSettings.Default.ModelTagMaxLength)
                     {
-                        validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_ModelTagTooLongMessage;
+                        validationMessage = OpusCatMtEngine.Properties.Resources.Finetune_ModelTagTooLongMessage;
                     }
                     else
                     {
@@ -145,13 +145,13 @@ namespace OpusCatMTEngine
                             var customDir = new DirectoryInfo($"{this.SelectedModel.InstallDir}_{this.ModelTag}");
                             if (customDir.Exists)
                             {
-                                validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_ModelTagInUseMessage;
+                                validationMessage = OpusCatMtEngine.Properties.Resources.Finetune_ModelTagInUseMessage;
                             }
 
                         }
                         catch (Exception ex)
                         {
-                            validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_GenericValidationErrorMessage;
+                            validationMessage = OpusCatMtEngine.Properties.Resources.Finetune_GenericValidationErrorMessage;
                         }
                     }
 
@@ -181,7 +181,7 @@ namespace OpusCatMTEngine
             string validationMessage = String.Empty;
             if (filePath == null || !File.Exists(filePath))
             {
-                validationMessage = OpusCatMTEngine.Properties.Resources.Finetune_FileDoesNotExistMessage;
+                validationMessage = OpusCatMtEngine.Properties.Resources.Finetune_FileDoesNotExistMessage;
             }
             return validationMessage;
         }
@@ -193,7 +193,7 @@ namespace OpusCatMTEngine
             this.SourceLanguage = selectedModel.SourceLanguages.First();
             this.TargetLanguage = selectedModel.TargetLanguages.First();
             
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Finetune_FineTuneWindowTitle,this.SelectedModel.Name);
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.Finetune_FineTuneWindowTitle,this.SelectedModel.Name);
             InitializeComponent();
         }
 
@@ -221,7 +221,7 @@ namespace OpusCatMTEngine
                     {
                         MessageBox.Show(
                             String.Format(
-                                OpusCatMTEngine.Properties.Resources.Finetune_TmxFileNotValidMessage,this.TmxFile));
+                                OpusCatMtEngine.Properties.Resources.Finetune_TmxFileNotValidMessage,this.TmxFile));
                         return;
                     }
 
@@ -252,7 +252,7 @@ namespace OpusCatMTEngine
                         {
                             MessageBox.Show(
                                 String.Format(
-                                    OpusCatMTEngine.Properties.Resources.Finetune_NotEnoughSegmentsInTmx));
+                                    OpusCatMtEngine.Properties.Resources.Finetune_NotEnoughSegmentsInTmx));
                             return;
                         }
                     }

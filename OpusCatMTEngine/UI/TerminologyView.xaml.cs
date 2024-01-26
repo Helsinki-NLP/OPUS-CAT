@@ -20,7 +20,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for TranslateWindow.xaml
@@ -45,7 +45,7 @@ namespace OpusCatMTEngine
             ObservableCollection<Terminology> terminologies)
         {
             this.Model = selectedModel;
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.Terminology_TerminologyTitle,Model.Name);
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.Terminology_TerminologyTitle,Model.Name);
             this.Terminologies = terminologies;
             
             InitializeComponent();

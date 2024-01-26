@@ -21,7 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -33,7 +33,7 @@ namespace OpusCatMTEngine
             get
             {
                 Version version = Assembly.GetExecutingAssembly().GetName().Version;
-                return String.Format(OpusCatMTEngine.Properties.Resources.Main_OpusCatWindowTitle, version);
+                return String.Format(OpusCatMtEngine.Properties.Resources.Main_OpusCatWindowTitle, version);
             }
         }
 
@@ -43,8 +43,8 @@ namespace OpusCatMTEngine
         {
             if (this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
             {
-                MessageBoxResult result = MessageBox.Show(OpusCatMTEngine.Properties.Resources.Main_ConfirmExitMessage,
-                                          OpusCatMTEngine.Properties.Resources.Main_ConfirmExitCaption,
+                MessageBoxResult result = MessageBox.Show(OpusCatMtEngine.Properties.Resources.Main_ConfirmExitMessage,
+                                          OpusCatMtEngine.Properties.Resources.Main_ConfirmExitCaption,
                                           MessageBoxButton.YesNo,
                                           MessageBoxImage.Question);
                 if (result != MessageBoxResult.Yes)
@@ -103,10 +103,10 @@ namespace OpusCatMTEngine
                 MessageBoxResult result =
                     MessageBox.Show(
                         String.Format(
-                            OpusCatMTEngine.Properties.Resources.Main_NonAsciiPathMessage,
+                            OpusCatMtEngine.Properties.Resources.Main_NonAsciiPathMessage,
                             opuscatDataPath,
                             String.Join(",", illegalCharacters)),
-                        OpusCatMTEngine.Properties.Resources.Main_NonAsciiPathCaption,
+                        OpusCatMtEngine.Properties.Resources.Main_NonAsciiPathCaption,
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
                 System.Windows.Application.Current.Shutdown();
@@ -151,9 +151,9 @@ namespace OpusCatMTEngine
             var localModels = new LocalModelListView(this.ModelManager);
             var settings = new OpusCatSettingsView();
             this.UiTabs.Add(
-                new ActionTabItem { Content = localModels, Header = OpusCatMTEngine.Properties.Resources.Main_ModelsTabTitle, Closable = false });
+                new ActionTabItem { Content = localModels, Header = OpusCatMtEngine.Properties.Resources.Main_ModelsTabTitle, Closable = false });
             this.UiTabs.Add(
-                new ActionTabItem { Content = settings, Header = OpusCatMTEngine.Properties.Resources.Main_SettingsTabTitle, Closable = false });
+                new ActionTabItem { Content = settings, Header = OpusCatMtEngine.Properties.Resources.Main_SettingsTabTitle, Closable = false });
 
             this.DataContext = this;
             

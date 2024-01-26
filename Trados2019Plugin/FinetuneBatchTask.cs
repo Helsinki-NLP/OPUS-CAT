@@ -12,7 +12,7 @@ using Sdl.Core.Globalization;
 using System.Windows.Forms;
 using Sdl.Core.Settings;
 using Sdl.LanguagePlatform.TranslationMemory;
-using OpusCatMTEngine;
+using OpusCatMtEngine;
 
 namespace OpusCatTranslationProvider
 {

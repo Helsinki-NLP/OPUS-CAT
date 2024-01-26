@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for OnlineModelView.xaml
@@ -113,7 +113,7 @@ namespace OpusCatMTEngine
 
         internal void DownloadCompleted(MTModel model, object sender, AsyncCompletedEventArgs e)
         {
-            model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_ExtractingStatus;
+            model.InstallStatus = OpusCatMtEngine.Properties.Resources.Online_ExtractingStatus;
 
             try
             {
@@ -141,13 +141,13 @@ namespace OpusCatMTEngine
 
                 model.SaveModelConfig();
 
-                model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_InstalledStatus;
+                model.InstallStatus = OpusCatMtEngine.Properties.Resources.Online_InstalledStatus;
                 this.ModelManager.GetLocalModels();
             }
             catch (Exception ex)
             {
                 Log.Error($"Online model installation failed: {ex.Message}");
-                model.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_FailedStatus;
+                model.InstallStatus = OpusCatMtEngine.Properties.Resources.Online_FailedStatus;
             }
 
             
@@ -163,7 +163,7 @@ namespace OpusCatMTEngine
                     continue;
                 }
 
-                selectedModel.InstallStatus = OpusCatMTEngine.Properties.Resources.Online_DownloadingStatus;
+                selectedModel.InstallStatus = OpusCatMtEngine.Properties.Resources.Online_DownloadingStatus;
                 this.ModelManager.DownloadModel(
                         selectedModel.ModelUri,
                         selectedModel.ModelPath,

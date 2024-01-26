@@ -15,7 +15,7 @@ using System.Data;
 using System.Windows.Controls.Primitives;
 using System.ServiceModel.Description;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class MarianProcess
     {

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class AutoEditRuleCollection
     {
@@ -198,8 +198,8 @@ namespace OpusCatMTEngine
         {
             MessageBoxResult messageBoxResult =
                 System.Windows.MessageBox.Show(
-                    String.Format(OpusCatMTEngine.Properties.Resources.Rules_DeleteRuleCollectionConfirmation, this.CollectionName),
-                    OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
+                    String.Format(OpusCatMtEngine.Properties.Resources.Rules_DeleteRuleCollectionConfirmation, this.CollectionName),
+                    OpusCatMtEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
                 if (this.ruleCollectionFile != null && this.ruleCollectionFile.Exists)

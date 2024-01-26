@@ -1,4 +1,4 @@
-﻿using OpusCatMTEngine;
+﻿using OpusCatMtEngine;
 using Sdl.Core.Globalization;
 using Sdl.FileTypeSupport.Framework.BilingualApi;
 using Sdl.LanguagePlatform.TranslationMemory;

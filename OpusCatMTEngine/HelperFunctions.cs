@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class HelperFunctions
     {

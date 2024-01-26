@@ -15,11 +15,11 @@ namespace OpusCatMTEngineTests
         [TestMethod]
         public void TestFinetune()
         {
-            var modelInstallPath = OpusCatMTEngine.HelperFunctions.GetLocalAppDataPath("models\\eng-fin\\opus+bt-2021-03-09");
-            var model = new OpusCatMTEngine.MTModel("eng-fin\\opus+bt-2021-03-09", modelInstallPath);
+            var modelInstallPath = OpusCatMtEngine.HelperFunctions.GetLocalAppDataPath("models\\eng-fin\\opus+bt-2021-03-09");
+            var model = new OpusCatMtEngine.MTModel("eng-fin\\opus+bt-2021-03-09", modelInstallPath);
             var testTranslation = model.Translate("this is a test", model.SourceLanguages.First(), model.TargetLanguages.First());
             var result = testTranslation.Result;
-            var finetuneWindow = new OpusCatMTEngine.ModelCustomizerView(model);
+            var finetuneWindow = new OpusCatMtEngine.ModelCustomizerView(model);
 
         }
     }

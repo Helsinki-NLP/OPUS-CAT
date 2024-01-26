@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Python.Runtime;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     static class PythonNetHelper
     {

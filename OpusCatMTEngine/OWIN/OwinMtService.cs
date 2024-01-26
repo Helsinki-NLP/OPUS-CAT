@@ -11,7 +11,7 @@ using System.Web.Http;
 using Owin;
 using Serilog;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class OwinMtService
     {

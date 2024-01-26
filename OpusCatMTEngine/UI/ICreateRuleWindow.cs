@@ -1,4 +1,4 @@
-﻿namespace OpusCatMTEngine
+﻿namespace OpusCatMtEngine
 {
     internal interface ICreateRuleWindow
     {
