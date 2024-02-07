@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.FileProviders;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,10 +21,10 @@ namespace OpusCatMtEngine
 
         private static void ParseIso639_3()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-
-            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("OpusCatMtEngine.Resources.iso-639-3_20200515.tab")))
+            var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(),"");
+            using (var isoTable = new StreamReader(embeddedProvider.GetFileInfo("OpusCatMtEngine.iso-639-3_20200515.tab").CreateReadStream()))
             {
+                
                 //Skip header
                 isoTable.ReadLine();
 
@@ -61,8 +62,8 @@ namespace OpusCatMtEngine
 
         private static void ParseIso639_5()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            using (var isoTable = new StreamReader(assembly.GetManifestResourceStream("OpusCatMtEngine.Resources.iso639-5.tsv")))
+            var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(), "");
+            using (var isoTable = new StreamReader(embeddedProvider.GetFileInfo("OpusCatMtEngine.iso639-5.tsv").CreateReadStream()))
             {
                 //Skip header
                 isoTable.ReadLine();

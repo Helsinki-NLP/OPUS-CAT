@@ -11,6 +11,8 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="iso-639-3_20200515.tab" />
+    <None Remove="iso639-5.tsv" />
     <None Remove="Marian\marian.exe" />
     <None Remove="Marian\validate.py" />
   </ItemGroup>
@@ -29,15 +31,18 @@
     <PackageReference Include="Autofac.WebApi2" Version="6.1.1" />
     <PackageReference Include="Autofac.WebApi2.Owin" Version="6.2.1" />
     <PackageReference Include="Avalonia" Version="11.0.4" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.4" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.4" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.4" />
     <PackageReference Include="MessageBox.Avalonia" Version="3.1.4" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.1" />
     <PackageReference Include="Microsoft.Owin.Host.HttpListener" Version="4.2.2" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.2.2" />
     <PackageReference Include="Octokit" Version="9.1.0" />
@@ -63,6 +68,9 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="UI\OnlineModelView.axaml.cs">
+      <DependentUpon>OnlineModelView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -112,6 +120,11 @@
 
   <ItemGroup>
     <AvaloniaResource Remove="Images\cross.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="iso-639-3_20200515.tab" />
+    <EmbeddedResource Include="iso639-5.tsv" />
   </ItemGroup>
 
 </Project>

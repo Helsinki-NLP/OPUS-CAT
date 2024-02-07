@@ -237,6 +237,8 @@ namespace OpusCatMtEngine
         internal ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
         internal ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
         internal ObservableCollection<Terminology> Terminologies { get; private set; }
+        public bool OpusModelListDownloadComplete { get; private set; }
+        public bool TatoebaModelListDownloadComplete { get; private set; }
 
         private bool onlineModelListFetched;
         private IsoLanguage _overrideModelTargetLanguage;
@@ -596,6 +598,12 @@ namespace OpusCatMtEngine
                     this.onlineModels.Add(model);
                 }
             }
+
+            this.TatoebaModelListDownloadComplete = true;
+            if (this.OpusModelListDownloadComplete)
+            {
+                this.OnlineModelListFetched = true;
+            }
         }
 
         private MTModel SelectModel(IsoLanguage srcLang, IsoLanguage trgLang, string modelTag, bool includeIncomplete = false)
@@ -718,7 +726,15 @@ namespace OpusCatMtEngine
                 }
 
                 this.FilterOnlineModels();
+
+                this.OpusModelListDownloadComplete = true;
+                if (this.TatoebaModelListDownloadComplete)
+                {
+                    this.OnlineModelListFetched = true;
+                }
             }
+
+            
         }
 
         private void CheckIfOnlineModelInstalled(MTModel onlineModel)
@@ -987,7 +1003,7 @@ namespace OpusCatMtEngine
                             this.AutoPostEditRuleCollections,
                             this.Terminologies));
                 }
-                catch
+                catch (Exception ex)
                 {
                     Log.Error($"Model path invalid: {modelPath}.");
                 }

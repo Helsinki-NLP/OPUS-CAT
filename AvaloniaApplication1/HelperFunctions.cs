@@ -1,4 +1,5 @@
-﻿using OpusCatMtEngine;
+﻿using Avalonia.Platform.Storage;
+using OpusCatMtEngine;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,13 @@ namespace OpusCatMtEngine
                 return string.Empty;
             }
         }
-        
+
+        public static FilePickerFileType ZipFilePickerType { get; } = new("Zip files")
+        {
+            Patterns = new[] { "*.zip" },
+            MimeTypes = new[] { "application/x-zip" }
+            //AppleUniformTypeIdentifiers = new[] { "public.image" },
+        };
 
         public static string GetOpusCatDataPath(string restOfPath=null)
         {

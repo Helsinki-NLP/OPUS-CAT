@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OpusCatMtEngine.OnlineModelView"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             xmlns:local="clr-namespace:OpusCatMTEngine"
+             x:Name="_this"
+             x:CompileBindings="False">
+
+
+  <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+    <Grid>
+      <DockPanel Margin="10" >
+        <Grid DockPanel.Dock="Top">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="100" />
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="150" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+          </Grid.RowDefinitions>
+          <Label
+              Margin="0,-10,0,0"
+              FontSize="20"
+              Grid.ColumnSpan="3"
+              Grid.Column="0"
+              Grid.Row="0"
+              IsVisible="{Binding ElementName=_this, Path=ModelManager.OnlineModelListFetched}">
+            Downloadable online models
+            </Label>
+          <Label
+              Margin="0,-10,0,0"
+              FontSize="20"
+              Grid.ColumnSpan="3"
+              Grid.Column="0"
+              Grid.Row="0"
+              IsVisible="{Binding ElementName=_this, Path=!ModelManager.OnlineModelListFetched}">
+            Fetching list of online models, please wait...
+          </Label>
+                  
+
+          <Label Grid.Row="1" Grid.Column="0" Content="{x:Static resx:Resources.Online_SourceLangFilterLabel}"/>
+          <Label Grid.Row="1" Grid.Column="1" Content="{x:Static resx:Resources.Online_TargetLangFilterLabel}"/>
+          <Label Grid.Row="1" Grid.Column="2" Content="{x:Static resx:Resources.Online_ModelNameFilterLabel}"/>
+          <Border Margin="0,0,5,2" BorderThickness="1" BorderBrush="Black" Grid.Column="4" Grid.RowSpan="3" Grid.ColumnSpan="3"></Border>
+          <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" Name="txtFilter" Text="{Binding ElementName=_this, Path=ModelManager.SourceFilter, Mode=TwoWay}"></TextBox>
+          <TextBox VerticalAlignment="Center" Grid.Row="2" Grid.Column="1" Name="txtFilter1" Text="{Binding ElementName=_this, Path=ModelManager.TargetFilter, Mode=TwoWay}"></TextBox>
+          <TextBox VerticalAlignment="Center" Grid.Row="3" Grid.Column="2" Name="txtFilter2" Text="{Binding ElementName=_this, Path=ModelManager.NameFilter, Mode=TwoWay}"></TextBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTransformerBigModels, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="6">Transformer-big/tiny models</CheckBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowBilingualModels, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="5">Bilingual models</CheckBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowMultilingualModels, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="3">Multilingual models (usually lower quality than bilingual models, use with caution)</CheckBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowOpusModels, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="4">OPUS-MT models</CheckBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowTatoebaModels, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="4">Tatoeba models</CheckBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowNewestOnly, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="5">Newest only</CheckBox>
+          <CheckBox Margin="5" IsChecked="{Binding ElementName=_this, Path=ModelManager.ShowFaulted, Mode=TwoWay}" VerticalAlignment="Center" Grid.Row="0" Grid.Column="6">Models with errors</CheckBox>
+        </Grid>
+
+        <StackPanel DockPanel.Dock="Right" Margin="5,0">
+          <Button
+          Name="installModel"
+          Click="btnInstall_Click"
+          Content="{x:Static resx:Resources.Online_InstallModelLocallyButton}">
+            <Button.IsEnabled>
+              <Binding ElementName="ModelListView" Path="SelectedItem" Converter="{x:Static ObjectConverters.IsNotNull}"></Binding>
+            </Button.IsEnabled>
+          </Button>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+          <Label HorizontalAlignment="Center">Total amount of filtered models:</Label>
+          <Label HorizontalAlignment="Center" Name="ModelCount" Content="{Binding FilteredOnlineModels.Count, Mode=OneWay}"/>
+        </StackPanel>
+        <DataGrid
+          Name="ModelListView"
+          ItemsSource="{Binding FilteredOnlineModels, Mode=OneWay}"
+          DockPanel.Dock="Bottom" Height="300"
+          GridLinesVisibility="All">
+          <DataGrid.Columns>
+            <DataGridTemplateColumn Width="120" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock VerticalAlignment="Center" ToolTip.Tip="{Binding Path=SourceLanguageString, Mode=OneWay}" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"></TextBlock>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Width="120" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock VerticalAlignment="Center" ToolTip.Tip="{Binding Path=TargetLanguageString, Mode=OneWay}" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"></TextBlock>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTextColumn Binding="{Binding Path=Name, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelNameHeader}" Width="200"/>
+            <DataGridTextColumn Binding="{Binding Path=ModelOrigin, Mode=OneWay}" Header="{x:Static resx:Resources.Online_ModelOriginHeader}"/>
+            <DataGridTemplateColumn Width="220" Header="Status">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Grid>
+                    <ProgressBar Foreground="Green" Width="220" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
+                    <TextBlock HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
+                  </Grid>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+          
+        </DataGrid>
+
+      </DockPanel>
+    </Grid>
+  </Border>
+</UserControl>

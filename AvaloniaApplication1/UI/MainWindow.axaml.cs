@@ -164,10 +164,10 @@ namespace OpusCatMtEngine
 
         public ObservableCollection<ActionTabItem>? UiTabs { get; set; }
 
-        /*TODO: port to Avalonia
-         * private void Image_MouseUp(object sender, MouseButtonEventArgs e)
+        
+        private void Image_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
             this.UiTabs.RemoveAt(Tabs.SelectedIndex);
-        }*/
+        }
     }
 }

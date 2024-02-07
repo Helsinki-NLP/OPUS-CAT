@@ -8,8 +8,7 @@
         Title="{Binding WindowTitle, RelativeSource={RelativeSource Mode=Self}}" Height="650" Width="1000"
         Name="OpusCatWindow"
         x:CompileBindings="False">
-  <StackPanel>
-    <Button Content="TEST"></Button>
+  <DockPanel>
     <TabControl Name="Tabs" ItemsSource="{Binding UiTabs}">
       <TabControl.ItemTemplate>
         <DataTemplate>
@@ -21,6 +20,7 @@
             Source="D:\Users\niemi\source\repos\OPUS-CAT\AvaloniaApplication1\Images\cross.png"
             Width="10"
             Height="10"
+            PointerReleased="Image_PointerReleased"
             Margin="10,0,0,0"/>
           </StackPanel>
         </DataTemplate>
@@ -31,5 +31,5 @@
         </DataTemplate>
       </TabControl.ContentTemplate>
     </TabControl>
-  </StackPanel>
+  </DockPanel>
 </Window>
