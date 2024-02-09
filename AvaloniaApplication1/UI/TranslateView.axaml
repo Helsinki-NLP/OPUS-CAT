@@ -3,6 +3,63 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OpusCatMtEngine.TranslateView">
-  Welcome to Avalonia!
+             x:Class="OpusCatMtEngine.TranslateView"
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             x:Name="_this"
+             x:CompileBindings="False">
+  <Grid>
+    <StackPanel Margin="10">
+      <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
+      <StackPanel Orientation="Horizontal">
+        <Label>Source language</Label>
+        <ComboBox ItemsSource="{Binding Path=SourceLanguages}"
+                SelectedValue="{Binding ElementName=_this, Path=SourceLanguage, Mode=TwoWay}"
+                Width="200">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding IsoRefName}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+          </ComboBox>
+        <Label>Target language</Label>
+        <ComboBox ItemsSource="{Binding Path=TargetLanguages}"
+                SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
+                Width="200">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding IsoRefName}"/>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+          </ComboBox>
+        <CheckBox VerticalAlignment="Center" IsChecked="{Binding ElementName=_this, Path=ShowSegmentation, Mode=TwoWay}">Show subword segmentation</CheckBox>
+      </StackPanel>
+      <DockPanel>
+        <Label DockPanel.Dock="Left" Content="{x:Static resx:Resources.Translate_SourceTextLabel}"/>
+      </DockPanel>
+      <Border BorderThickness="1" BorderBrush="Black">
+        <Grid>
+          <TextBox IsVisible="{Binding !TranslationActive}" AcceptsReturn="True" Name="SourceInputBox" Height="130"></TextBox>
+          <TextBlock IsVisible="{Binding TranslationActive}" Name="SourceBoxDisplay" Height="130"></TextBlock>
+        </Grid>
+      </Border>
+      <StackPanel Margin="0,5" Orientation="Horizontal">
+        <Button
+            Click="TranslateButtonClick"
+            Content="{x:Static resx:Resources.Translate_TranslateButton}"/>
+        <Button
+            Click="ClearButtonClick"
+            Content="{x:Static resx:Resources.Translate_ClearButton}"/>
+        <Label IsVisible="{Binding Path=DoesNotSupportWordAlignment, FallbackValue=False}">Alignments are not available for this model</Label>
+        <Label IsVisible="{Binding Path=SupportsWordAlignment, FallbackValue=False}">Alignments are available for this model (hover over word to see its aligned words, if any).</Label>
+      </StackPanel>
+      <Label IsVisible="{Binding ElementName=_this, Path=AutoEditedTranslations}, FallbackValue=False}">Auto-postedit rules have been applied to some translations, alignments will not be displayed for those translations.</Label>
+      <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
+      <Border BorderThickness="1" BorderBrush="Black">
+        <TextBlock
+            Name="TargetBox"
+            Height="130"></TextBlock>
+      </Border>
+    </StackPanel>
+  </Grid>
 </UserControl>

@@ -496,6 +496,9 @@
   <data name="Terminology_TerminologyTitle" xml:space="preserve">
     <value>Terminology</value>
   </data>
+  <data name="Translate_ClearButton" xml:space="preserve">
+    <value>Clear</value>
+  </data>
   <data name="Translate_SourceTextLabel" xml:space="preserve">
     <value>Source text:</value>
   </data>
