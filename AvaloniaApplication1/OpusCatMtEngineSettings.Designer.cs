@@ -37,7 +37,7 @@ namespace OpusCatMtEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("opuscat\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("opuscat")]
         public string LocalOpusCatDir {
             get {
                 return ((string)(this["LocalOpusCatDir"]));
@@ -433,26 +433,6 @@ namespace OpusCatMtEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>;</string>
-  <string>(</string>
-  <string>)</string>
-  <string>:</string>
-  <string>,</string>
-  <string />
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection UnbalancedSplitPatterns {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["UnbalancedSplitPatterns"]));
-            }
-            set {
-                this["UnbalancedSplitPatterns"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int UnbalancedSplitMinLength {
             get {
@@ -484,6 +464,26 @@ namespace OpusCatMtEngine {
             }
             set {
                 this["TerminologyDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+  <string>;</string>
+  <string>(</string>
+  <string>)</string>
+  <string>:</string>
+  <string>,</string>
+  <string />
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection UnbalancedSplitPatterns {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["UnbalancedSplitPatterns"]));
+            }
+            set {
+                this["UnbalancedSplitPatterns"] = value;
             }
         }
     }

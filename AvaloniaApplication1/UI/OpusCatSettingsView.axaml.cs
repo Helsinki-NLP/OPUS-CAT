@@ -59,7 +59,7 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
 
     public void OpenCustomSettingsInEditor_Click(object sender, RoutedEventArgs e)
     {
-        var customizeYml = HelperFunctions.GetLocalAppDataPath(OpusCatMtEngineSettings.Default.CustomizationBaseConfig);
+        var customizeYml = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.CustomizationBaseConfig);
         Process.Start("notepad.exe", customizeYml);
     }
 

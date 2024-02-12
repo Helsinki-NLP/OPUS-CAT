@@ -17,7 +17,7 @@
             <Image
             IsVisible="{Binding Closable}"
             IsEnabled="{Binding Closable}"
-            Source="D:\Users\niemi\source\repos\OPUS-CAT\AvaloniaApplication1\Images\cross.png"
+            Source="/Images/cross.png"
             Width="10"
             Height="10"
             PointerReleased="Image_PointerReleased"

@@ -1,5 +1,4 @@
-﻿using Autofac;
-using Autofac.Integration.WebApi;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +6,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog;
-using Microsoft.Owin.Hosting;
-using System.Web.Http;
-using Owin;
+using Microsoft.AspNetCore.Owin;
+
 using OpusCatMtEngine;
+using Microsoft.AspNetCore.Builder;
 
 namespace OpusCatMtEngine
 {
@@ -47,7 +46,9 @@ namespace OpusCatMtEngine
 
         private void StartWebApp(string baseAddress, ModelManager modelManager)
         {
-            var server = WebApp.Start(baseAddress, (appBuilder) =>
+            var builder = WebApplication.CreateBuilder();
+            var app = builder.Build();
+            /*var server = WebApp.Start(baseAddress, (appBuilder) =>
             {
                 var config = new HttpConfiguration();
                 config.Routes.MapHttpRoute(
@@ -66,7 +67,7 @@ namespace OpusCatMtEngine
 
                 appBuilder.UseAutofacWebApi(config);
                 appBuilder.UseWebApi(config);
-            });
+            });*/
         }
     }
 }

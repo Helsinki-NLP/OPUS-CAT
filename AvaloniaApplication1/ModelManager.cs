@@ -997,7 +997,7 @@ namespace OpusCatMtEngine
                 {
                     this.LocalModels.Add(
                         new MTModel(
-                            Regex.Match(modelPath, @"[^\\]+\\[^\\]+$").Value,
+                            Regex.Match(modelPath, @"[^\\/]+[\\/][^\\/]+$").Value,
                             modelPath,
                             this.AutoPreEditRuleCollections,
                             this.AutoPostEditRuleCollections,

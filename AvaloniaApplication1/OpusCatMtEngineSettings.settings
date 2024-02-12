@@ -6,7 +6,7 @@
       <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT-models/</Value>
     </Setting>
     <Setting Name="LocalOpusCatDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">opuscat\</Value>
+      <Value Profile="(Default)">opuscat</Value>
     </Setting>
     <Setting Name="MtServicePort" Type="System.String" Scope="User">
       <Value Profile="(Default)">8477</Value>
@@ -104,17 +104,6 @@
     <Setting Name="FixUnbalancedLongTranslations" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="UnbalancedSplitPatterns" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;string&gt;;&lt;/string&gt;
-  &lt;string&gt;(&lt;/string&gt;
-  &lt;string&gt;)&lt;/string&gt;
-  &lt;string&gt;:&lt;/string&gt;
-  &lt;string&gt;,&lt;/string&gt;
-  &lt;string /&gt;
-&lt;/ArrayOfString&gt;</Value>
-    </Setting>
     <Setting Name="UnbalancedSplitMinLength" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
@@ -123,6 +112,17 @@
     </Setting>
     <Setting Name="TerminologyDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">Terms</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitPatterns" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;;&lt;/string&gt;
+  &lt;string&gt;(&lt;/string&gt;
+  &lt;string&gt;)&lt;/string&gt;
+  &lt;string&gt;:&lt;/string&gt;
+  &lt;string&gt;,&lt;/string&gt;
+  &lt;string /&gt;
+&lt;/ArrayOfString&gt;</Value>
     </Setting>
   </Settings>
 </SettingsFile>

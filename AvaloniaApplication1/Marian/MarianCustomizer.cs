@@ -231,7 +231,7 @@ namespace OpusCatMtEngine
             MarianTrainerConfig trainingConfig;
             
             var baseCustomizeYmlPath =
-                HelperFunctions.GetLocalAppDataPath(
+                HelperFunctions.GetOpusCatDataPath(
                     OpusCatMtEngineSettings.Default.CustomizationBaseConfig);
 
             var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

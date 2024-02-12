@@ -472,7 +472,7 @@ namespace OpusCatMtEngine
         //This creates a zip package of the model that can be moved to another computer
         internal void PackageModel()
         {
-            var customModelZipDirPath = HelperFunctions.GetLocalAppDataPath(OpusCatMtEngineSettings.Default.CustomModelZipPath);
+            var customModelZipDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.CustomModelZipPath);
             if (!Directory.Exists(customModelZipDirPath))
             {
                 Directory.CreateDirectory(customModelZipDirPath);

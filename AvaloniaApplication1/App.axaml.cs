@@ -202,13 +202,22 @@ namespace OpusCatMtEngine
         
         private void InitializePythonEngine()
         {
-            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", "D:\\Users\\niemi\\source\\repos\\OPUS-CAT\\AvaloniaApplication1\\bin\\Debug\\net7.0\\python-3.8.10-embed-amd64\\python38.dll;");
+#if WINDOWS
+            //Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
             Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
-            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
-            Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
-            Runtime.PythonDLL = "D:\\Users\\niemi\\source\\repos\\OPUS-CAT\\AvaloniaApplication1\\bin\\Debug\\net7.0\\python-3.8.10-embed-amd64\\python38.dll";
-
-
+            //Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
+            //Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
+            Runtime.PythonDLL = "..\\python-3.8.10-embed-amd64\\python38.dll";
+            
+#else
+            //Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
+            //Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
+            //Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
+            Environment.SetEnvironmentVariable("PYTHONHOME", "/home/tommin/embed_python_test");
+            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", "/home/tommin/opt/lib:/home/tommin/embed_python_test/lib");
+            Runtime.PythonDLL = "/home/tommin/embed_python_test/lib/libpython3.8.so.1.0";
+#endif
+            PythonEngine.PythonHome = "/home/tommin/embed_python_test";
             PythonEngine.Initialize();
             var home = PythonEngine.PythonHome;
 
@@ -226,7 +235,7 @@ namespace OpusCatMtEngine
         private void CopyConfigs()
         {
             FileInfo baseCustomizeYml = new FileInfo(
-                HelperFunctions.GetLocalAppDataPath(OpusCatMtEngineSettings.Default.CustomizationBaseConfig));
+                HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.CustomizationBaseConfig));
             FileInfo defaultCustomizeYml = new FileInfo(OpusCatMtEngineSettings.Default.CustomizationBaseConfig);
             //There might be a previous customize.yml file present, don't overwrite it unless it's older
             if (!baseCustomizeYml.Exists || (defaultCustomizeYml.LastWriteTime > baseCustomizeYml.LastWriteTime))

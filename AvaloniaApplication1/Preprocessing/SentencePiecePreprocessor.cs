@@ -35,7 +35,7 @@ namespace OpusCatMtEngine
                     "<term_start>", "<term_mask>", "<term_end>", "<trans_end>" })
                 {
                     var tagSubwords = 
-                        String.Join(" ",(string[])this.sentencePieceProcessor.encode(termTag, out_type: "str"));
+                        String.Join(" ",(string[])this.sentencePieceProcessor.encode_as_pieces(termTag));
                     this.TagRestorations.Add(new Tuple<string, string>(termTag, tagSubwords));
                 }
                 
@@ -77,7 +77,7 @@ namespace OpusCatMtEngine
             string preprocessedSentence;
             using (Py.GIL())
             {
-                var preprocessedSentenceArray = (string[])this.sentencePieceProcessor.encode(sentence, out_type: "str");
+                var preprocessedSentenceArray = (string[])this.sentencePieceProcessor.encode_as_pieces(sentence);
                 preprocessedSentence = String.Join(" ", preprocessedSentenceArray);
             }
 

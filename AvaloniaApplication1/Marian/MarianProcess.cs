@@ -97,7 +97,7 @@ namespace OpusCatMtEngine
 
             if (Directory.GetFiles(this.modelDir).Any(x=> new FileInfo(x).Name == "source.spm"))
             {
-                this.preprocessor = new SentencePiecePreprocessor($"{this.modelDir}\\source.spm", $"{this.modelDir}\\target.spm");
+                this.preprocessor = new SentencePiecePreprocessor($"{this.modelDir}{Path.DirectorySeparatorChar}source.spm", $"{this.modelDir}{Path.DirectorySeparatorChar}target.spm");
                 //preprocessCommand = $"Preprocessing\\spm_encode.exe --model \"{this.modelDir}\\source.spm\"";
                 
                 this.segmentation = SegmentationMethod.SentencePiece;
@@ -114,9 +114,14 @@ namespace OpusCatMtEngine
             }
 
             //mtCommand = $"Marian\\marian.exe decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length=200 --max-length-crop --alignment=hard";
-            
-            string mtCommand = "Marian\\marian.exe";
-            string mtArgs = $"decode --log-level=warn -c \"{this.modelDir}\\decoder.yml\" --max-length={OpusCatMtEngineSettings.Default.MaxLength} --max-length-crop --alignment=hard";
+
+#if LINUX
+            string mtCommand = $"Marian{Path.DirectorySeparatorChar}marian";
+#else
+            string mtCommand = $"Marian{Path.DirectorySeparatorChar}marian.exe";
+#endif
+
+            string mtArgs = $"decode --log-level=warn -c \"{this.modelDir}{Path.DirectorySeparatorChar}decoder.yml\" --max-length={OpusCatMtEngineSettings.Default.MaxLength} --max-length-crop --alignment=hard";
 
             //this.MtPipe = MarianHelper.StartProcessInBackgroundWithRedirects(this.mtPipeCmds, this.modelDir);
             /*this.PreprocessProcess = 
