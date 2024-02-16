@@ -5,12 +5,12 @@ using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Data.Sqlite;
 
 namespace OpusCatMtEngine
 {
@@ -51,14 +51,14 @@ namespace OpusCatMtEngine
             if (translationDb.Exists)
             {
                 using (var m_dbConnection =
-                    new SQLiteConnection($"Data Source={translationDb.FullName};Version=3;"))
+                    new SqliteConnection($"Data Source={translationDb.FullName}"))
                 {
                     m_dbConnection.Open();
 
-                    using (SQLiteCommand verify_table =
-                        new SQLiteCommand("PRAGMA table_info(translations);", m_dbConnection))
+                    using (SqliteCommand verify_table =
+                        new SqliteCommand("PRAGMA table_info(translations);", m_dbConnection))
                     {
-                        SQLiteDataReader r = verify_table.ExecuteReader();
+                        SqliteDataReader r = verify_table.ExecuteReader();
 
                         List<string> tableColumnStrikeoutList = new List<string>(translationTableColumns);
 
@@ -129,15 +129,15 @@ namespace OpusCatMtEngine
             var translationDb = new FileInfo(
                 HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.TranslationDBName));
 
-            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+            using (var m_dbConnection = new SqliteConnection($"Data Source={translationDb}"))
             {
                 m_dbConnection.Open();
 
-                using (SQLiteCommand deleteOld =
-                    new SQLiteCommand("DELETE FROM translations WHERE additiondate <= date('now',@period)", m_dbConnection))
+                using (SqliteCommand deleteOld =
+                    new SqliteCommand("DELETE FROM translations WHERE additiondate <= date('now',@period)", m_dbConnection))
                 {
                     deleteOld.Parameters.Add(
-                        new SQLiteParameter(
+                        new SqliteParameter(
                             "@period", $"-{OpusCatMtEngineSettings.Default.DatabaseRemovalInterval} days"));
                     deleteOld.ExecuteNonQuery();
                 }
@@ -147,14 +147,14 @@ namespace OpusCatMtEngine
         private static void CreateTranslationDb()
         {
             var translationDb = new FileInfo(HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.TranslationDBName));
-            SQLiteConnection.CreateFile(translationDb.FullName);
-            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+            
+            using (var m_dbConnection = new SqliteConnection($"Data Source={translationDb}"))
             {
                 m_dbConnection.Open();
 
                 string sql = "create table translations (model TEXT, sourcetext TEXT, translation TEXT, segmentedsource TEXT, segmentedtranslation TEXT, alignment TEXT, additiondate DATETIME, segmentationmethod TEXT, targetlanguage TEXT, maxlength INTEGER, PRIMARY KEY (model,sourcetext,targetlanguage,maxlength))";
 
-                using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
+                using (SqliteCommand command = new SqliteCommand(sql, m_dbConnection))
                 {
                     command.ExecuteNonQuery();
                 }
@@ -181,23 +181,23 @@ namespace OpusCatMtEngine
                 TranslationDbHelper.CreateTranslationDb();
             }
 
-            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+            using (var m_dbConnection = new SqliteConnection($"Data Source={translationDb}"))
             {
                 m_dbConnection.Open();
 
-                using (SQLiteCommand insert =
-                    new SQLiteCommand(
+                using (SqliteCommand insert =
+                    new SqliteCommand(
                         "INSERT or REPLACE INTO translations (sourcetext, translation, segmentedsource, segmentedtranslation, alignment, model, additiondate, segmentationmethod, targetlanguage, maxlength) VALUES (@sourcetext,@translation,@segmentedsource,@segmentedtranslation,@alignment,@model,CURRENT_TIMESTAMP,@segmentationmethod,@targetlanguage,@maxlength)", m_dbConnection))
                 {
-                    insert.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
-                    insert.Parameters.Add(new SQLiteParameter("@translation", translation.Translation));
-                    insert.Parameters.Add(new SQLiteParameter("@segmentedsource", String.Join(" ", translation.SegmentedSourceSentence)));
-                    insert.Parameters.Add(new SQLiteParameter("@segmentedtranslation", String.Join(" ", translation.SegmentedTranslation)));
-                    insert.Parameters.Add(new SQLiteParameter("@alignment", translation.AlignmentString));
-                    insert.Parameters.Add(new SQLiteParameter("@model", model));
-                    insert.Parameters.Add(new SQLiteParameter("@segmentationmethod", segmentationMethod.ToString()));
-                    insert.Parameters.Add(new SQLiteParameter("@targetlanguage", targetLanguage));
-                    insert.Parameters.Add(new SQLiteParameter("@maxlength", OpusCatMtEngineSettings.Default.MaxLength));
+                    insert.Parameters.Add(new SqliteParameter("@sourcetext", sourceText));
+                    insert.Parameters.Add(new SqliteParameter("@translation", translation.Translation));
+                    insert.Parameters.Add(new SqliteParameter("@segmentedsource", String.Join(" ", translation.SegmentedSourceSentence)));
+                    insert.Parameters.Add(new SqliteParameter("@segmentedtranslation", String.Join(" ", translation.SegmentedTranslation)));
+                    insert.Parameters.Add(new SqliteParameter("@alignment", translation.AlignmentString));
+                    insert.Parameters.Add(new SqliteParameter("@model", model));
+                    insert.Parameters.Add(new SqliteParameter("@segmentationmethod", segmentationMethod.ToString()));
+                    insert.Parameters.Add(new SqliteParameter("@targetlanguage", targetLanguage));
+                    insert.Parameters.Add(new SqliteParameter("@maxlength", OpusCatMtEngineSettings.Default.MaxLength));
                     insert.ExecuteNonQuery();
                 }
             }
@@ -230,17 +230,17 @@ namespace OpusCatMtEngine
             var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.TranslationDBName);
 
             List<TranslationPair> translationPairs = new List<TranslationPair>();
-            using (var m_dbConnection = new SQLiteConnection($"Data Source={translationDb};Version=3;"))
+            using (var m_dbConnection = new SqliteConnection($"Data Source={translationDb};Version=3;"))
             {
                 m_dbConnection.Open();
 
-                using (SQLiteCommand fetch =
-                    new SQLiteCommand("SELECT DISTINCT translation,segmentedsource,segmentedtranslation,alignment,segmentationmethod FROM translations WHERE sourcetext=@sourcetext AND model=@model AND targetlanguage=@targetlanguage LIMIT 1", m_dbConnection))
+                using (SqliteCommand fetch =
+                    new SqliteCommand("SELECT DISTINCT translation,segmentedsource,segmentedtranslation,alignment,segmentationmethod FROM translations WHERE sourcetext=@sourcetext AND model=@model AND targetlanguage=@targetlanguage LIMIT 1", m_dbConnection))
                 {
-                    fetch.Parameters.Add(new SQLiteParameter("@sourcetext", sourceText));
-                    fetch.Parameters.Add(new SQLiteParameter("@model", model));
-                    fetch.Parameters.Add(new SQLiteParameter("@targetlanguage", targetLanguage));
-                    SQLiteDataReader r = fetch.ExecuteReader();
+                    fetch.Parameters.Add(new SqliteParameter("@sourcetext", sourceText));
+                    fetch.Parameters.Add(new SqliteParameter("@model", model));
+                    fetch.Parameters.Add(new SqliteParameter("@targetlanguage", targetLanguage));
+                    SqliteDataReader r = fetch.ExecuteReader();
 
                     while (r.Read())
                     {
