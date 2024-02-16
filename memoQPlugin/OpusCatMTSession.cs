@@ -117,8 +117,9 @@ namespace OpusCatMTPlugin
 
         private static Segment createSegmentFromResult(Segment originalSegment, string translatedText, FormattingAndTagsUsageOption formattingAndTagUsage)
         {
+            //TODO: add tag restoration here
             if (formattingAndTagUsage == FormattingAndTagsUsageOption.Plaintext)
-                return SegmentBuilder.CreateFromTrimmedStringAndITags(translatedText, originalSegment.ITags);
+                return SegmentBuilder.CreateFromString(translatedText);
             else if (formattingAndTagUsage == FormattingAndTagsUsageOption.OnlyFormatting)
             {
                 // Convert to segment (conversion is needed because the result can contain formatting information)
