@@ -33,13 +33,19 @@ namespace OpusCatMtEngine
 
             //System.Windows.Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
-            /*TODO: use AVXless Marian
-             * if (!App.HasAvxSupport())
+#if WINDOWS
+            if (!App.HasAvxSupport())
             {
-                MessageBox.Show(
-                    "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.");
-                System.Windows.Application.Current.Shutdown(1);
-            }*/
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    "AVX not available",
+                    "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.",
+                    ButtonEnum.Ok);
+                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+                {
+                    desktopLifetime.Shutdown();
+                }
+            }
+#endif
 
             //Create data dir
 
@@ -80,7 +86,7 @@ namespace OpusCatMtEngine
 
             //The update check is used to keep track of use counts, so disable it in DEBUG mode to keep counts
             //more accurate
-#if !DEBUG
+#if !DEBUG && !DEBUGWSL
             this.CheckForUpdatesAsync();
 #endif
 
@@ -127,7 +133,8 @@ namespace OpusCatMtEngine
         }
         //TODO: this is Windows only, check if bergamot Marian works on old machines, 
         //otherwise do a cross-platform version
-        /*public static bool HasAvxSupport()
+#if WINDOWS
+        public static bool HasAvxSupport()
         {
             try
             {
@@ -141,8 +148,8 @@ namespace OpusCatMtEngine
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
         private static extern long GetEnabledXStateFeatures();
-        */
         
+#endif
 
         private async void CheckForUpdatesAsync()
         {
@@ -207,17 +214,17 @@ namespace OpusCatMtEngine
             Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
             //Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
             //Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
-            Runtime.PythonDLL = "..\\python-3.8.10-embed-amd64\\python38.dll";
+            Runtime.PythonDLL = ".\\python3-windows-3.8.10-amd64\\python38.dll";
             
 #else
             //Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
             //Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
             //Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
-            Environment.SetEnvironmentVariable("PYTHONHOME", "/home/tommin/embed_python_test");
-            Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", "/home/tommin/opt/lib:/home/tommin/embed_python_test/lib");
-            Runtime.PythonDLL = "/home/tommin/embed_python_test/lib/libpython3.8.so.1.0";
+            //Environment.SetEnvironmentVariable("PYTHONHOME", "/mnt/d/Users/niemi/source/repos/OPUS-CAT/AvaloniaApplication1/bin/DebugWsl/net7.0/python3-linux-3.8.13-x86_64/");
+            //Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", "/mnt/d/Users/niemi/source/repos/OPUS-CAT/AvaloniaApplication1/bin/DebugWsl/net7.0/python3-linux-3.8.13-x86_64/lib/");
+            //Environment.SetEnvironmentVariable("PATH", "$PATH:/mnt/d/Users/niemi/source/repos/OPUS-CAT/AvaloniaApplication1/bin/DebugWsl/net7.0/python3-linux-3.8.13-x86_64/lib/");
+            Runtime.PythonDLL = $"./python3-linux-3.8.13-x86_64/lib/libpython3.8.so.1.0";
 #endif
-            PythonEngine.PythonHome = "/home/tommin/embed_python_test";
             PythonEngine.Initialize();
             var home = PythonEngine.PythonHome;
 

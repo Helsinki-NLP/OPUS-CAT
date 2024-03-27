@@ -117,7 +117,7 @@
                             Click="TermList_Click"
                             Content="{x:Static resx:Resources.Main_TermListButton}" />
           <Button
-                        IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
+                        IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                         Name="openModelDir"
                         Click="btnOpenModelDir_Click"
                         Content="{x:Static resx:Resources.Main_OpenModelDirButton}"/>

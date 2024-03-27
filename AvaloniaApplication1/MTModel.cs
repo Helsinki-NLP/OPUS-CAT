@@ -8,8 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Data.Entity.Migrations.History;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;

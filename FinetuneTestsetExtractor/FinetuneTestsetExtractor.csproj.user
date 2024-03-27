@@ -3,4 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>"C:\Users\niemi\Documents\Testing\FinetuningTests\Kela\Etuusohjeet ulos_anonymized VALMIS LÄHTEMÄÄN.sdltm" 20 10 --finetune_only</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugWsl|AnyCPU'">
+    <StartArguments>"C:\Users\niemi\Documents\Testing\FinetuningTests\Kela\Etuusohjeet ulos_anonymized VALMIS LÄHTEMÄÄN.sdltm" 20 10 --finetune_only</StartArguments>
+  </PropertyGroup>
 </Project>

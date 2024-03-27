@@ -6,4 +6,7 @@
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugWsl|AnyCPU'">
+    <StartArguments>C:\Users\niemi\Documents\Code\Tatoeba-Challenge\data\test</StartArguments>
+  </PropertyGroup>
 </Project>

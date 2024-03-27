@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Entity.Migrations.History;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -353,10 +352,13 @@ namespace OpusCatMtEngine
             var original = parent.PriorityClass;
 
             parent.PriorityClass = ProcessPriorityClass.BelowNormal;
-
+#if WINDOWS
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMtEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
-
+#elif LINUX
+            var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
+                           Path.Combine(OpusCatMtEngineSettings.Default.MarianDir, "marian"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
+#endif
             //Restore normal process priority
             parent.PriorityClass = original;
 

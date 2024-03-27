@@ -2,8 +2,10 @@
 using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using SentenceSplitterNet;
 using Serilog;
 using System;
@@ -148,14 +150,22 @@ namespace OpusCatMtEngine
         private async void ClearButtonClick(object? sender, RoutedEventArgs e)
         {
             //TODO: There's a bug in Avalonia that causes Inlines.Clear() not to work.
-            //The bug has been fixed in 1.1.0.8, but that version fails because of some
+            //The bug has apparently been fixed in 1.1.0.8, but that version fails because of some
             //other exception (the control already has a visual parent).
             //Leave this until the last touches, and check if it's been fixed by then
+            
+            //WORKAROUND: Reuse the inline buttons instead of trying to clear and
+            //recreate them. Maybe create x number of buttons beforehand so that they
+            //can be used for any text. This would restrict the length of translations,
+            //but that's not fatal. Leave this for last.
+
+            
             this.TranslationActive = false;
             this.wordsplitList.Clear();
             this.sourceRuns.Clear();
             this.targetRuns.Clear();
-            this.TargetBox.Inlines.Clear();
+
+            this.SourceBoxDisplay.Inlines.Clear();
         }
 
         private async void TranslateButtonClick(object? sender, RoutedEventArgs e)
@@ -324,8 +334,6 @@ namespace OpusCatMtEngine
 
                             if (insideTerm)
                             {
-                                //TODO: add a function generate the element in code, no use
-                                //going for custom controls, lot of work
                                 tokenrun = this.GenerateMousableInline(token,TextDecorations.Underline);
                             }
                             else
@@ -354,6 +362,8 @@ namespace OpusCatMtEngine
                         }
                         else
                         {
+                            //TODO: wordsplits should not show up until the checkbox is selected,
+                            //now they are shown as empty buttons, like spaces
                             var wordsplitRun = GenerateMousableInline("",tag:"wordsplit");
                             
                             runlist.Add(wordsplitRun);

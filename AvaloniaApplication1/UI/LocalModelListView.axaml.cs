@@ -33,7 +33,11 @@ namespace OpusCatMtEngine
         private void btnOpenModelDir_Click(object sender, RoutedEventArgs e)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
-            Process.Start(selectedModel.InstallDir);
+#if WINDOWS
+            Process.Start("explorer.exe", selectedModel.InstallDir);
+#elif LINUX
+            Process.Start("nautilus", selectedModel.InstallDir); 
+#endif
         }
 
 
@@ -65,8 +69,9 @@ namespace OpusCatMtEngine
 
             if (files.Count >= 1)
             {
-                //TODO: test that this works
-                ((ModelManager)this.DataContext).ExtractModel(new FileInfo(files.First().Path.ToString()));
+                //TODO: Fix the path handling here, avalonia adds file:/// to path
+                var path = files.First().Path;
+                ((ModelManager)this.DataContext).ExtractModel(new FileInfo(path.AbsolutePath));
                 ((ModelManager)this.DataContext).GetLocalModels();
             }
 

@@ -230,7 +230,7 @@ namespace OpusCatMtEngine
             var translationDb = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.TranslationDBName);
 
             List<TranslationPair> translationPairs = new List<TranslationPair>();
-            using (var m_dbConnection = new SqliteConnection($"Data Source={translationDb};Version=3;"))
+            using (var m_dbConnection = new SqliteConnection($"Data Source={translationDb}"))
             {
                 m_dbConnection.Open();
 

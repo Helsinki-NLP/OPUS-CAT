@@ -3,6 +3,168 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OpusCatMtEngine.ModelCustomizerView">
-  Welcome to Avalonia!
+             x:Class="OpusCatMtEngine.ModelCustomizerView"
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             x:CompileBindings="False">
+  <ScrollViewer>
+    <StackPanel Margin="5">
+      <StackPanel DockPanel.Dock="Top">
+        <Border BorderBrush="Black" BorderThickness="1">
+          <StackPanel>
+
+            <StackPanel Margin="5,0,0,5">
+              <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TrainingFilesLabel}"/>
+              <StackPanel
+                  Orientation="Horizontal"
+                  IsVisible="{Binding ElementName=_this, Path=SelectedModel.IsMultilingualModel}">
+                <Label>Source language</Label>
+                <ComboBox ItemsSource="{Binding ElementName=_this, Path=SelectedModel.SourceLanguages}"
+                  SelectedValue="{Binding ElementName=_this, Path=SourceLanguage, Mode=TwoWay}"
+                  Width="200">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding IsoRefName}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Label>Target language</Label>
+                <ComboBox ItemsSource="{Binding ElementName=_this, Path=SelectedModel.TargetLanguages}"
+                SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
+                Width="200">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                      <TextBlock Text="{Binding IsoRefName}"/>
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <RadioButton
+                  IsChecked="True"
+                  Name="TmxFiles"
+                  Checked="ModeButton_Checked"
+                  GroupName="Format"
+                  Content="{x:Static resx:Resources.Finetune_TmxRadioButton}"/>
+              <RadioButton
+                  Name="TxtFiles"
+                  Checked="ModeButton_Checked"
+                  GroupName="Format"
+                  Content="{x:Static resx:Resources.Finetune_TxtFilesRadioButton}"/>
+              <!--<RadioButton Name="TranslateOnly" Checked="ModeButton_Checked" GroupName="Format">Batch translate only</RadioButton>-->
+            </StackPanel>
+            <StackPanel
+                IsEnabled="{Binding IsChecked,ElementName=TxtFiles}"
+                IsVisible="{Binding IsChecked,ElementName=TxtFiles}"
+                Orientation="Horizontal">
+              <Label Content="{x:Static resx:Resources.Finetune_SourceFileLabel}"/>
+              <TextBox Name="SourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=SourceFile, Mode=TwoWay}"></TextBox>
+              <Button
+                  DataContext="{Binding ElementName=SourceFileBox}"
+                  Click="browse_Click"
+                  Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
+            </StackPanel>
+            <StackPanel IsEnabled="{Binding IsChecked,ElementName=TmxFiles}" IsVisible="{Binding IsChecked,ElementName=TmxFiles}" Orientation="Horizontal">
+              <Label Content="{x:Static resx:Resources.Finetune_TmxFileLabel}"/>
+              <TextBox Name="TmxFileBox" Width="400" Text="{Binding ElementName=_this,Path=TmxFile, Mode=TwoWay}"/>
+              <Button
+                  DataContext="{Binding ElementName=TmxFileBox}"
+                  Tag="TMX Files|*.tmx"
+                  Click="browse_Click"
+                  Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
+            </StackPanel>
+            <StackPanel IsEnabled="{Binding IsChecked,ElementName=TxtFiles}" IsVisible="{Binding IsChecked,ElementName=TxtFiles}" Orientation="Horizontal">
+              <Label Content="{x:Static resx:Resources.Finetune_TargetFileLabel}"/>
+              <TextBox Name="TargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=TargetFile, Mode=TwoWay}"></TextBox>
+              <Button
+                  DataContext="{Binding ElementName=TargetFileBox}"
+                  Click="browse_Click"
+                  Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="1">
+          <StackPanel Margin="5,0,0,5">
+            <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TagProcessingLabel}"/>
+
+            <CheckBox
+                Margin="0,5,0,0"
+                Name="IncludePlaceholderTagsBox"
+                Content="{x:Static resx:Resources.Finetune_IncludePlaceholderTagsCheckbox}"/>
+            <CheckBox
+                Margin="0,5,0,0"
+                Name="IncludeTagPairBox"
+                Content="{x:Static resx:Resources.Finetune_IncludeTagPairsCheckbox}"/>
+          </StackPanel>
+
+        </Border>
+        <Border BorderBrush="Black" BorderThickness="1">
+          <StackPanel>
+            <StackPanel Margin="5,0,0,5">
+              <Label
+                  FontWeight="Bold"
+                  Content="{x:Static resx:Resources.Finetune_ValidationFilesLabel}">
+              </Label>
+              <RadioButton
+                  IsChecked="True"
+                  Name="SplitValidationFiles"
+                  Checked="ValidationFileTypeButton_Checked"
+                  GroupName="ValidationType"
+                  Content="{x:Static resx:Resources.Finetune_SplitFromTrainingRadioButton}"/>
+              <RadioButton
+                  Name="SeparateValidationFiles"
+                  Checked="ValidationFileTypeButton_Checked"
+                  GroupName="ValidationType"
+                  Content="{x:Static resx:Resources.Finetune_SeparateFilesRadioButton}"/>
+            </StackPanel>
+            <StackPanel IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" IsVisible="{Binding IsChecked,ElementName=SeparateValidationFiles}" Orientation="Horizontal">
+              <Label Content="{x:Static resx:Resources.Finetune_ValidationSourceFileLabel}"/>
+              <TextBox Name="ValidSourceFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidSourceFile, Mode=TwoWay}"></TextBox>
+              <Button
+                  DataContext="{Binding ElementName=ValidSourceFileBox}"
+                  Click="browse_Click"
+                  Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
+            </StackPanel>
+            <StackPanel IsEnabled="{Binding IsChecked,ElementName=SeparateValidationFiles}" IsVisible="{Binding IsChecked,ElementName=SeparateValidationFiles}" Orientation="Horizontal">
+              <Label Content="{x:Static resx:Resources.Finetune_ValidationTargetFileLabel}"/>
+              <TextBox Name="ValidTargetFileBox" Width="400" Text="{Binding ElementName=_this,Path=ValidTargetFile, Mode=TwoWay}"></TextBox>
+              <Button
+                  DataContext="{Binding ElementName=ValidTargetFileBox}"
+                  Click="browse_Click"
+                  Content="{x:Static resx:Resources.Finetune_BrowseButton}"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <StackPanel Orientation="Horizontal">
+          <Label Content="{x:Static resx:Resources.Finetune_FinetunedModelTagLabel}"/>
+          <TextBox IsEnabled="{Binding ElementName=_this,Path=CustomizationNotStarted}" Name="LabelBox" Text="{Binding ElementName=_this,Path=ModelTag, Mode=TwoWay}" Width="200"></TextBox>
+        </StackPanel>
+      </StackPanel>
+      <DockPanel DockPanel.Dock="Right" LastChildFill="False" Height="50">
+        <!--<Button DockPanel.Dock="Right" Margin="5" Height="30" Width="100" Command="ApplicationCommands.Close">Cancel</Button>-->
+        <Button
+            Name="CustomizeButton"
+            DockPanel.Dock="Right"
+            Margin="5"
+            Height="30"
+            Width="100"
+            Click="customize_Click"
+            Content="{x:Static resx:Resources.Finetune_StartFinetuneButton}">
+          <Button.IsVisible>
+            <Binding ElementName="_this" Path="CustomizationNotStarted" />
+          </Button.IsVisible>
+          <Button.IsEnabled>
+            <MultiBinding Converter="{StaticResource ValidationErrorConverter}" Mode="TwoWay">
+              <Binding ElementName="LabelBox" Path="(Validation.Errors)[0]"/>
+              <Binding ElementName="SourceFileBox" Path="(Validation.Errors)[0]"/>
+              <Binding ElementName="TargetFileBox" Path="(Validation.Errors)[0]"/>
+              <Binding ElementName="ValidSourceFileBox" Path="(Validation.Errors)[0]" />
+              <Binding ElementName="ValidTargetFileBox" Path="(Validation.Errors)[0]" />
+              <Binding ElementName="TmxFileBox" Path="(Validation.Errors)[0]"/>
+            </MultiBinding>
+          </Button.IsEnabled>
+        </Button>
+      </DockPanel>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

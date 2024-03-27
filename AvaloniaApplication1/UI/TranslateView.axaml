@@ -58,7 +58,8 @@
       <Border BorderThickness="1" BorderBrush="Black">
         <TextBlock
             Name="TargetBox"
-            Height="130"></TextBlock>
+            Height="130">
+        </TextBlock>
       </Border>
     </StackPanel>
   </Grid>

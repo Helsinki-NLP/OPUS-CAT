@@ -9,11 +9,17 @@
     <AssemblyName>OpusCatMtEngineCore</AssemblyName>
     <RootNamespace>OpusCatMtEngine</RootNamespace>
     <PlatformTarget>x64</PlatformTarget>
+    <Configurations>Debug;Release;DebugWsl</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>anycpu</PlatformTarget>
+    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugWsl|AnyCPU'">
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\cross.png" />
@@ -31,6 +37,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="11.0.7" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.7" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc2" />
     <PackageReference Include="MessageBox.Avalonia" Version="3.1.4" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Include="Microsoft.AspNetCore.Owin" Version="7.0.15" />

@@ -28,11 +28,20 @@ namespace OpusCatMtEngine
             }
         }
 
+        
+
         public static FilePickerFileType ZipFilePickerType { get; } = new("Zip files")
         {
             Patterns = new[] { "*.zip" },
             MimeTypes = new[] { "application/x-zip" }
             //AppleUniformTypeIdentifiers = new[] { "public.image" },
+        };
+
+
+        public static FilePickerFileType TmxFilePickerType { get; } = new("Tmx files")
+        {
+            Patterns = new[] { "*.tmx" },
+            MimeTypes = new[] { "text/xml" }
         };
 
         public static string GetOpusCatDataPath(string restOfPath=null)
