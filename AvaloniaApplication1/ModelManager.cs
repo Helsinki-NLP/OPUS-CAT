@@ -382,7 +382,7 @@ namespace OpusCatMtEngine
         }
 
 
-        internal void UninstallModel(MTModel selectedModel)
+        internal async void UninstallModel(MTModel selectedModel)
         {
             //change the model status in online models, if they have been loaded
             if (this.onlineModels != null)
@@ -414,6 +414,7 @@ namespace OpusCatMtEngine
                         messageBoxText,
                         ButtonEnum.Ok,
                         Icon.Warning);
+                    await box.ShowAsync();
                 }
 
             }
@@ -1207,7 +1208,7 @@ namespace OpusCatMtEngine
 
         //This is used for extraction from a local zip, where the language pair needs to
         //be extracted from the README.md file (some nicer metadata file might be useful)
-        internal void ExtractModel(FileInfo zipFile)
+        internal async void ExtractModel(FileInfo zipFile)
         {
             var tempExtractionPath = Path.Combine(Path.Combine(Path.GetTempPath(),"opus_extract"), zipFile.Name);
             if (Directory.Exists(tempExtractionPath))
@@ -1221,9 +1222,10 @@ namespace OpusCatMtEngine
             }
             catch (System.IO.InvalidDataException ex)
             {
-                MessageBoxManager.GetMessageBoxStandard(
+                var box = MessageBoxManager.GetMessageBoxStandard(
                     "Exception",
                     $"Installation from a model zip failed. The zip archive is invalid.",ButtonEnum.Ok,Icon.Warning);
+                await box.ShowAsync();
                 return;
             }
 
@@ -1250,6 +1252,7 @@ namespace OpusCatMtEngine
                     "Error",
                     messageBoxText,
                     ButtonEnum.Ok, Icon.Warning);
+                await box.ShowAsync();
                 Directory.Delete(tempExtractionPath, true);
             }
             else

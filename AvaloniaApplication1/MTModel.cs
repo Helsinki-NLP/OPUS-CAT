@@ -468,7 +468,7 @@ namespace OpusCatMtEngine
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
         
         //This creates a zip package of the model that can be moved to another computer
-        internal void PackageModel()
+        internal async void PackageModel()
         {
             var customModelZipDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.CustomModelZipPath);
             if (!Directory.Exists(customModelZipDirPath))
@@ -480,10 +480,11 @@ namespace OpusCatMtEngine
 
             if (File.Exists(zipPath))
             {
-                MessageBoxManager.GetMessageBoxStandard(
+                var existsBox = MessageBoxManager.GetMessageBoxStandard(
                     "Model already exists",
                     $"Zipped model already exists: {zipPath}",
                     ButtonEnum.Ok);
+                await existsBox.ShowAsync();
             }
 
             using (var packageZip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
@@ -538,10 +539,11 @@ namespace OpusCatMtEngine
                 }
             }
 
-            MessageBoxManager.GetMessageBoxStandard(
+            var box = MessageBoxManager.GetMessageBoxStandard(
                     "Model packaged",
                     "Model has been packaged and saved to {zipPath}. Click OK to go to folder.",
                     ButtonEnum.Ok);
+            await box.ShowAsync();
 
             System.Diagnostics.Process.Start("explorer.exe", Path.GetDirectoryName(zipPath));
         }
@@ -948,9 +950,19 @@ namespace OpusCatMtEngine
                     return;
             }
 
+#if WINDOWS
+            var validScriptPath =
+                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.WindowsPythonDir, "python.exe .\\Marian\\validate.py"));
+#elif LINUX
+            var validScriptPath =
+                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.LinuxPythonDir, "python.exe .\\Marian\\validate.py"));
+#elif MACOS
+            var validScriptPath =
+                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.MacosPythonDir, "python.exe .\\Marian\\validate.py"));
+#endif
+
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                Path.Combine(OpusCatMtEngineSettings.Default.PythonDir, "python.exe"),
-                $".\\Marian\\validate.py {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
+                $"{validScriptPath} {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
         }
         
 
@@ -1009,12 +1021,12 @@ namespace OpusCatMtEngine
             this.TargetLanguages = targetLangs;
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
-            this.Terminology = new Terminology() { TerminologyName = $"terms for {this.Name}" };
-            this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
             
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
+            this.Terminology = new Terminology() { TerminologyName = $"terms for {this.Name}" };
+            this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
             this.ModelConfig.ModelTags.Add(modelTag);
             this.ModelConfig.IncludePlaceholderTags = includePlaceholderTags;
             this.ModelConfig.IncludeTagPairs = includeTagPairs;

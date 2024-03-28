@@ -3,6 +3,43 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OpusCatMtEngine.TagEditView">
-  Welcome to Avalonia!
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             x:Class="OpusCatMtEngine.TagEditView"
+             x:CompileBindings="False">
+  <Grid>
+    <StackPanel Margin="20" HorizontalAlignment="Left" Width="350">
+      <Label Margin="0,0,0,0" FontSize="20" Content="{x:Static resx:Resources.Tags_ModelTagsLabel}"/>
+        <DataGrid Name="TagList" Height="200" Width="350" VerticalScrollBarVisibility="Auto">
+          <DataGrid.Columns>
+            <DataGridTemplateColumn Width="200">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBox IsReadOnly="True" Text="{Binding Path=., Mode=TwoWay}" />
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Width="100">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Button
+                      Name="DeleteTag"
+                      Tag="{Binding .}"
+                      Click="DeleteTag_Click"
+                      Content="{x:Static resx:Resources.Tags_DeleteTagButton}"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+        <Button
+            IsEnabled="{Binding ElementName=TagTextBox,Path=Text.Length}"
+            Name="add"
+            Click="add_Click"
+            Content="{x:Static resx:Resources.Tags_AddTagButton}"/>
+        <TextBox Width="200" x:Name="TagTextBox" />
+      </StackPanel>
+    </StackPanel>
+  </Grid>
 </UserControl>

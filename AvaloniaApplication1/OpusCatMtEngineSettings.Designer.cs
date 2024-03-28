@@ -361,13 +361,13 @@ namespace OpusCatMtEngine {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("python-3.8.10-embed-amd64")]
-        public string PythonDir {
+        [global::System.Configuration.DefaultSettingValueAttribute("python3-windows-3.8.10-amd64")]
+        public string WindowsPythonDir {
             get {
-                return ((string)(this["PythonDir"]));
+                return ((string)(this["WindowsPythonDir"]));
             }
             set {
-                this["PythonDir"] = value;
+                this["WindowsPythonDir"] = value;
             }
         }
         

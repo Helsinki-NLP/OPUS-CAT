@@ -8,6 +8,7 @@ using System.IO;
 using System;
 using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 using System.Linq;
+using LiveChartsCore.Measure;
 
 namespace OpusCatMtEngine
 {
@@ -72,9 +73,11 @@ namespace OpusCatMtEngine
                 scoresSeries.Add(new LineSeries<double>()
                 {
                     Values = scoresValues[scoreKey],
-                    Name = $"{scoreKey}"
+                    Name = $"{title} {scoreKey}"
                 });
             }
+
+            
 
             return scoresSeries;
         }
@@ -109,10 +112,16 @@ namespace OpusCatMtEngine
                         null);
                 this.SeriesCollection.AddRange(outOfDomainSeries);
             }
-
-
-
+            
             InitializeComponent();
+            
+            this.ProgressChart.XAxes = new List<Axis>
+            {
+                new Axis
+                {
+                    MinStep = 1
+                }
+            };
 
         }
 

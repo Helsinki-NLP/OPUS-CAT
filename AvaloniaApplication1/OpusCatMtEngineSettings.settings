@@ -86,8 +86,8 @@
     <Setting Name="EvaluationDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">evaluations</Value>
     </Setting>
-    <Setting Name="PythonDir" Type="System.String" Scope="User">
-      <Value Profile="(Default)">python-3.8.10-embed-amd64</Value>
+    <Setting Name="WindowsPythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python3-windows-3.8.10-amd64</Value>
     </Setting>
     <Setting Name="EditRuleDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">editrules</Value>

@@ -6,6 +6,7 @@
              x:Class="OpusCatMtEngine.ModelCustomizerView"
              xmlns:local="clr-namespace:OpusCatMtEngine"
              xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             x:Name="_this"
              x:CompileBindings="False">
   <ScrollViewer>
     <StackPanel Margin="5">
@@ -41,7 +42,6 @@
                 </ComboBox>
               </StackPanel>
               <RadioButton
-                  IsChecked="True"
                   Name="TmxFiles"
                   Checked="ModeButton_Checked"
                   GroupName="Format"
@@ -106,7 +106,6 @@
                   Content="{x:Static resx:Resources.Finetune_ValidationFilesLabel}">
               </Label>
               <RadioButton
-                  IsChecked="True"
                   Name="SplitValidationFiles"
                   Checked="ValidationFileTypeButton_Checked"
                   GroupName="ValidationType"
@@ -149,20 +148,12 @@
             Height="30"
             Width="100"
             Click="customize_Click"
-            Content="{x:Static resx:Resources.Finetune_StartFinetuneButton}">
+            Content="{x:Static resx:Resources.Finetune_StartFinetuneButton}"
+            IsEnabled="{Binding AllFieldsAreValid, ElementName=_this}">
           <Button.IsVisible>
             <Binding ElementName="_this" Path="CustomizationNotStarted" />
           </Button.IsVisible>
-          <Button.IsEnabled>
-            <MultiBinding Converter="{StaticResource ValidationErrorConverter}" Mode="TwoWay">
-              <Binding ElementName="LabelBox" Path="(Validation.Errors)[0]"/>
-              <Binding ElementName="SourceFileBox" Path="(Validation.Errors)[0]"/>
-              <Binding ElementName="TargetFileBox" Path="(Validation.Errors)[0]"/>
-              <Binding ElementName="ValidSourceFileBox" Path="(Validation.Errors)[0]" />
-              <Binding ElementName="ValidTargetFileBox" Path="(Validation.Errors)[0]" />
-              <Binding ElementName="TmxFileBox" Path="(Validation.Errors)[0]"/>
-            </MultiBinding>
-          </Button.IsEnabled>
+          
         </Button>
       </DockPanel>
     </StackPanel>

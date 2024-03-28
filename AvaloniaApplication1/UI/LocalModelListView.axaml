@@ -19,7 +19,13 @@
               <Label>Override model target language</Label>
               <ComboBox ItemsSource="{Binding Path=OverrideModel.TargetLanguages}"
                 SelectedItem="{Binding OverrideModelTargetLanguage}"
-                Width="200"/>
+                Width="200">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding IsoRefName}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+                </ComboBox>
               <Button
                         Name="cancelOverride"
                         Click="btnCancelOverride_Click"
@@ -101,18 +107,18 @@
                         Click="btnEvaluateModels_Click"
                         Content="{x:Static resx:Resources.Main_EvaluateModelsButton}" />
           <Button
-                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
+                            IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Name="addModelTag"
                             Click="btnEditModelTags_Click"
                             Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
           <Button
-                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
+                            IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Name="editRules"
                             Click="EditRules_Click"
                             Content="{x:Static resx:Resources.Main_EditRulesButton}" />
           <Button
                             IsVisible="{Binding ElementName=LocalModelList, Path=SelectedItem.SupportsTerminology, FallbackValue=False}"
-                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
+                            IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                             Name="termList"
                             Click="TermList_Click"
                             Content="{x:Static resx:Resources.Main_TermListButton}" />

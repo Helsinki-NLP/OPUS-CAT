@@ -28,7 +28,7 @@ namespace OpusCatMtEngine
             AvaloniaXamlLoader.Load(this);
         }
 
-        public override void OnFrameworkInitializationCompleted()
+        public async override void OnFrameworkInitializationCompleted()
         {
 
             //System.Windows.Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -40,6 +40,7 @@ namespace OpusCatMtEngine
                     "AVX not available",
                     "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.",
                     ButtonEnum.Ok);
+                await box.ShowAsync();
                 if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
                 {
                     desktopLifetime.Shutdown();

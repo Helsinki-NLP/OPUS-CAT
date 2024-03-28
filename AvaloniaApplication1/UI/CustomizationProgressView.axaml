@@ -6,6 +6,10 @@
              xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
              x:Class="OpusCatMtEngine.CustomizationProgressView"
              x:CompileBindings="False">
-  <lvc:CartesianChart Series="{Binding SeriesCollection}">
+  <lvc:CartesianChart
+    Height="400" 
+    LegendPosition="Left" 
+    Name="ProgressChart" 
+    Series="{Binding SeriesCollection}">
   </lvc:CartesianChart>
 </UserControl>

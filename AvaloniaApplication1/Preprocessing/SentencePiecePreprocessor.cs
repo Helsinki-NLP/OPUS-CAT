@@ -57,15 +57,18 @@ namespace OpusCatMtEngine
             }
 
             //Re-segment the term lemma with target spm model
-            var targetLemmaMatches = this.targetLemmaRegex.Matches(segmentedSentence);
-            using (Py.GIL())
+            if (this.targetLemmaRegex != null)
             {
-                foreach (Match match in targetLemmaMatches)
+                var targetLemmaMatches = this.targetLemmaRegex.Matches(segmentedSentence);
+                using (Py.GIL())
                 {
-                    var desegmentedMatch = match.Groups[1].Value.Replace(" ","").Replace("▁", " ").Trim();
-                    var preprocessedLemmaArray = (string[])this.targetSentencePieceProcessor.encode(desegmentedMatch, out_type: "str");
-                    segmentedSentence = segmentedSentence.Replace(
-                        match.Value,$"<term_end> {String.Join(" ", preprocessedLemmaArray)} <trans_end>");
+                    foreach (Match match in targetLemmaMatches)
+                    {
+                        var desegmentedMatch = match.Groups[1].Value.Replace(" ", "").Replace("▁", " ").Trim();
+                        var preprocessedLemmaArray = (string[])this.targetSentencePieceProcessor.encode(desegmentedMatch, out_type: "str");
+                        segmentedSentence = segmentedSentence.Replace(
+                            match.Value, $"<term_end> {String.Join(" ", preprocessedLemmaArray)} <trans_end>");
+                    }
                 }
             }
 

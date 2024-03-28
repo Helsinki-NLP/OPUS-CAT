@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -128,6 +130,7 @@ namespace OpusCatMtEngine
             }
             catch (System.Xml.XmlException ex)
             {
+                
                 Log.Error($"{tmxFile} is not a valid tmx file: {ex.Message}");
                 return null;
             }

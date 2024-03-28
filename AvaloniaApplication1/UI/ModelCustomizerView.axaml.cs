@@ -9,13 +9,15 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Platform.Storage;
-using Octokit;
-using Avalonia.Controls.Shapes;
 using Avalonia;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components.Forms;
+using Avalonia.Data;
+using Avalonia.Markup.Xaml.Templates;
 
 namespace OpusCatMtEngine
 {
-    public partial class ModelCustomizerView : UserControl, IDataErrorInfo, INotifyPropertyChanged
+    public partial class ModelCustomizerView : UserControl, INotifyPropertyChanged
     {
         private MTModel selectedModel;
 
@@ -31,44 +33,121 @@ namespace OpusCatMtEngine
             }
         }
 
-        public string this[string columnName]
-        {
-            get
-            {
-                return Validate(columnName);
-            }
-        }
-
-        public string Error
-        {
-            get { return "...."; }
-        }
-
+        
 
         public string ModelTag
         {
             get => modelTag;
             set
             {
+                this.modelTagIsValid = false;
+                this.AllFieldsAreValid = false;
+
                 //No spaces in model tags, keeps things simple
                 modelTag = value.Replace(' ', '_');
                 //Remove non-ascii characters (issue with paths)
                 modelTag = String.Join("", modelTag.Where(x => x < 127));
+                
+                if (modelTag == null || modelTag == "")
+                {
+                    throw new DataValidationException(Properties.Resources.Finetune_ModelTagNotSpecifiedMessage);
+                }
+                else if (modelTag.Length > OpusCatMtEngineSettings.Default.ModelTagMaxLength)
+                {
+                    throw new DataValidationException(Properties.Resources.Finetune_ModelTagTooLongMessage);
+                }
+                else
+                {
+                    try
+                    {
+                        var customDir = new DirectoryInfo($"{this.SelectedModel.InstallDir}_{modelTag}");
+                        if (customDir.Exists)
+                        {
+                            throw new DataValidationException(Properties.Resources.Finetune_ModelTagInUseMessage);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new DataValidationException(Properties.Resources.Finetune_GenericValidationErrorMessage);
+                    }
+                }
+
+                //TODO: set hacky validation bool, because can't use the same validation
+                //system as in WPF
+                this.modelTagIsValid = true;
+                this.ReValidate();
                 NotifyPropertyChanged();
             }
         }
 
         private string modelTag;
 
-        public string SourceFile { get => sourceFile; set { sourceFile = value.Trim('"'); NotifyPropertyChanged(); } }
+        public string SourceFile 
+        { 
+            get => sourceFile; 
+            set 
+            {
+                sourceFileIsValid = false;
+                this.AllFieldsAreValid = false;
+
+                sourceFile = value.Trim('"');
+                var validationMessage = this.ValidateFilePath(sourceFile);
+                if (!String.IsNullOrEmpty(validationMessage))
+                {
+                    throw new DataValidationException(validationMessage);
+                }
+
+                sourceFileIsValid = true;
+                this.ReValidate();
+                NotifyPropertyChanged(); 
+            } 
+        }
 
         private string sourceFile;
 
-        public string ValidSourceFile { get => validSourceFile; set { validSourceFile = value.Trim('"'); NotifyPropertyChanged(); } }
+        public string ValidSourceFile {
+            get => validSourceFile;
+            set
+            {
+                validSourceFileIsValid = false;
+                this.AllFieldsAreValid = false;
+
+                validSourceFile = value.Trim('"');
+                var validationMessage = this.ValidateFilePath(validSourceFile);
+                if (!String.IsNullOrEmpty(validationMessage))
+                {
+                    throw new DataValidationException(validationMessage);
+                }
+
+                validSourceFileIsValid = true;
+                this.ReValidate();
+                NotifyPropertyChanged();
+            }
+        }
 
         private string validSourceFile;
 
-        public string TargetFile { get => targetFile; set { targetFile = value.Trim('"'); NotifyPropertyChanged(); } }
+        public string TargetFile
+        {
+            get => targetFile;
+            set
+            {
+                targetFileIsValid = false;
+                this.AllFieldsAreValid = false;
+
+                targetFile = value.Trim('"');
+                var validationMessage = this.ValidateFilePath(targetFile);
+                if (!String.IsNullOrEmpty(validationMessage))
+                {
+                    throw new DataValidationException(validationMessage);
+                }
+
+                targetFileIsValid = true;
+                this.ReValidate();
+                NotifyPropertyChanged();
+            }
+        }
 
         private string targetFile;
 
@@ -88,11 +167,49 @@ namespace OpusCatMtEngine
 
         private IsoLanguage targetLanguage;
 
-        public string TmxFile { get => tmxFile; set { tmxFile = value.Trim('"'); NotifyPropertyChanged(); } }
+        public string TmxFile
+        {
+            get => tmxFile;
+            set
+            {
+                tmxIsValid = false;
+                this.AllFieldsAreValid = false;
+
+                tmxFile = value.Trim('"');
+                var validationMessage = this.ValidateFilePath(tmxFile);
+                if (!String.IsNullOrEmpty(validationMessage))
+                {
+                    throw new DataValidationException(validationMessage);
+                }
+
+                tmxIsValid = true;
+                this.ReValidate();
+                NotifyPropertyChanged();
+            }
+        }
 
         private string tmxFile;
 
-        public string ValidTargetFile { get => validTargetFile; set { validTargetFile = value.Trim('"'); NotifyPropertyChanged(); } }
+        public string ValidTargetFile
+        {
+            get => validTargetFile;
+            set
+            {
+                validTargetFileIsValid = false;
+                this.AllFieldsAreValid = false;
+
+                validTargetFile = value.Trim('"');
+                var validationMessage = this.ValidateFilePath(validTargetFile);
+                if (!String.IsNullOrEmpty(validationMessage))
+                {
+                    throw new DataValidationException(validationMessage);
+                }
+
+                validTargetFileIsValid = true;
+                this.ReValidate();
+                NotifyPropertyChanged();
+            }
+        }
 
         public bool CustomizationNotStarted
         {
@@ -114,63 +231,92 @@ namespace OpusCatMtEngine
             }
         }
 
+        public bool ModelTagIsValid
+        {
+            get => modelTagIsValid;
+            set
+            {
+                modelTagIsValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool modelTagIsValid;
+
+        public bool AllFieldsAreValid
+        { 
+            get => allFieldsAreValid;
+            set
+            {
+                allFieldsAreValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool TmxIsValid
+        {
+            get => tmxIsValid;
+            set
+            {
+                tmxIsValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool tmxIsValid;
+
+        public bool SourceFileIsValid
+        {
+            get => sourceFileIsValid;
+            set
+            {
+                sourceFileIsValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool sourceFileIsValid;
+
+        public bool TargetFileIsValid
+        {
+            get => targetFileIsValid;
+            set
+            {
+                targetFileIsValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool targetFileIsValid;
+
+
+        public bool ValidTargetFileIsValid
+        {
+            get => validTargetFileIsValid;
+            set
+            {
+                validTargetFileIsValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool validTargetFileIsValid;
+
+        public bool ValidSourceFileIsValid
+        {
+            get => validSourceFileIsValid;
+            set
+            {
+                validSourceFileIsValid = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool validSourceFileIsValid;
+
+
         private string validTargetFile;
 
-
-        private string Validate(string propertyName)
-        {
-            // Return error message if there is error on else return empty or null string
-            string validationMessage = string.Empty;
-
-            switch (propertyName)
-            {
-                case "ModelTag":
-
-                    if (this.ModelTag == null || this.ModelTag == "")
-                    {
-                        validationMessage = Properties.Resources.Finetune_ModelTagNotSpecifiedMessage;
-                    }
-                    else if (this.ModelTag.Length > OpusCatMtEngineSettings.Default.ModelTagMaxLength)
-                    {
-                        validationMessage = Properties.Resources.Finetune_ModelTagTooLongMessage;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            var customDir = new DirectoryInfo($"{this.SelectedModel.InstallDir}_{this.ModelTag}");
-                            if (customDir.Exists)
-                            {
-                                validationMessage = Properties.Resources.Finetune_ModelTagInUseMessage;
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            validationMessage = Properties.Resources.Finetune_GenericValidationErrorMessage;
-                        }
-                    }
-
-                    break;
-                case "ValidSourceFile":
-                    validationMessage = ValidateFilePath(this.ValidSourceFile);
-                    break;
-                case "ValidTargetFile":
-                    validationMessage = ValidateFilePath(this.ValidTargetFile);
-                    break;
-                case "SourceFile":
-                    validationMessage = ValidateFilePath(this.SourceFile);
-                    break;
-                case "TargetFile":
-                    validationMessage = ValidateFilePath(this.TargetFile);
-                    break;
-                case "TmxFile":
-                    validationMessage = ValidateFilePath(this.TmxFile);
-                    break;
-            }
-
-            return validationMessage;
-        }
 
         private string ValidateFilePath(string filePath)
         {
@@ -193,12 +339,15 @@ namespace OpusCatMtEngine
             this.SelectedModel = selectedModel;
             this.SourceLanguage = selectedModel.SourceLanguages.First();
             this.TargetLanguage = selectedModel.TargetLanguages.First();
-
+            
             this.Title = String.Format(Properties.Resources.Finetune_FineTuneWindowTitle, this.SelectedModel.Name);
             InitializeComponent();
+
+            this.TmxFiles.IsChecked = true;
+            this.SplitValidationFiles.IsChecked = true;
         }
 
-        private void customize_Click(object sender, RoutedEventArgs e)
+        private async void customize_Click(object sender, RoutedEventArgs e)
         {
 
             ParallelFilePair filePair = null;
@@ -225,6 +374,9 @@ namespace OpusCatMtEngine
                                 String.Format(
                                     Properties.Resources.Finetune_TmxFileNotValidMessage, this.TmxFile),
                                 ButtonEnum.Ok);
+
+                        await box.ShowAsync();
+
                         return;
                         
                     }
@@ -262,7 +414,9 @@ namespace OpusCatMtEngine
                                 "Not enough segments",
                                 Properties.Resources.Finetune_NotEnoughSegmentsInTmx,
                                 ButtonEnum.Ok);
+                            await box.ShowAsync();
                             return;
+                            
                         }
                     }
                     break;
@@ -271,7 +425,7 @@ namespace OpusCatMtEngine
             }
 
 
-            if (this.SeparateValidationFiles.IsChecked.Value)
+            if (this.validationFileType == ValidationFileType.Separate)
             {
                 validPair = new ParallelFilePair(this.ValidSourceFileBox.Text, this.ValidTargetFileBox.Text);
             }
@@ -333,9 +487,13 @@ namespace OpusCatMtEngine
         enum InputFileType { TxtFile, TmxFile };
         private InputFileType inputType;
 
+        
+
+
         enum ValidationFileType { Split, Separate };
         private ValidationFileType validationFileType;
         private bool _customizationNotStarted;
+        private bool allFieldsAreValid;
 
         private void ValidationFileTypeButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -345,10 +503,10 @@ namespace OpusCatMtEngine
                 switch (radioButton.Name)
                 {
                     case "SeparateValidationFiles":
-                        this.validationFileType = ValidationFileType.Split;
+                        this.validationFileType = ValidationFileType.Separate;
                         break;
                     case "SplitValidationFiles":
-                        this.validationFileType = ValidationFileType.Separate;
+                        this.validationFileType = ValidationFileType.Split;
                         break;
                 }
             }
@@ -373,14 +531,40 @@ namespace OpusCatMtEngine
             }
         }
 
-        //TODO: rewire the validation events, IsEnabledChanged does not exist
-        private void ReValidate(object sender, AvaloniaPropertyChangedEventArgs e)
+        private void ReValidate()
         {
-            NotifyPropertyChanged("ValidSourceFile");
-            NotifyPropertyChanged("TmxFile");
-            NotifyPropertyChanged("ValidTargetFile");
-            NotifyPropertyChanged("SourceFile");
-            NotifyPropertyChanged("TargetFile");
+            this.AllFieldsAreValid = true;
+            if (this.inputType == InputFileType.TxtFile)
+            {
+                if (!this.sourceFileIsValid || !this.targetFileIsValid)
+                {
+                    this.AllFieldsAreValid = false;
+                    return;
+                }
+            }
+            else if (this.inputType == InputFileType.TmxFile)
+            {
+                if (!this.tmxIsValid)
+                {
+                    this.AllFieldsAreValid = false;
+                    return;
+                }
+            }
+
+            if (this.validationFileType == ValidationFileType.Separate)
+            {
+                if (!this.validSourceFileIsValid || !this.validTargetFileIsValid)
+                {
+                    this.AllFieldsAreValid = false;
+                    return;
+                }
+            }
+
+            if (!this.modelTagIsValid)
+            {
+                this.AllFieldsAreValid = false;
+                return;
+            }
         }
     }
 
