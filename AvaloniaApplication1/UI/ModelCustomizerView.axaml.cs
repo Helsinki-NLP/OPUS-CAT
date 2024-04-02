@@ -390,9 +390,10 @@ namespace OpusCatMtEngine
                             var selectionWindow = new SelectTmxLangPairWindow(eligibleLangPairs);
                             if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                             {
-                                var dialogResult = selectionWindow.ShowDialog(desktop.MainWindow);
-                                dialogResult.Wait();
-                                if (dialogResult.IsCompleted)
+                                var dialogResult = selectionWindow.ShowDialog<bool>(desktop.MainWindow);
+                                await dialogResult;
+
+                                if (dialogResult.Result)
                                 {
                                     filePair = tmxParser.ParseTmxToParallelFiles(
                                         this.TmxFile,

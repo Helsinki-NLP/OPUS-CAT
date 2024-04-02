@@ -3,6 +3,134 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OpusCatMtEngine.EditRulesView">
-  Welcome to Avalonia!
+             x:Class="OpusCatMtEngine.EditRulesView"
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             Height="550" Width="800">
+  <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+      <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesHeading}"/>
+      <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+        <StackPanel>
+          <Label FontWeight="Bold" FontSize="15">Pre-edit rule collections</Label>
+          <DockPanel Margin="10">
+            <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
+              <StackPanel.Resources>
+                <Style TargetType="Button">
+                  <Setter Property="Margin" Value="0,0,0,5" />
+                </Style>
+              </StackPanel.Resources>
+              <Button
+                  Name="createPreRule"
+                  Click="CreatePreRule_Click"
+                  Content="{x:Static resx:Resources.EditRules_CreateRuleButton}" />
+
+              <Button
+                  Name="addPreRuleCollection"
+                  Click="AddPreRuleCollection_Click"
+                  Content="{x:Static resx:Resources.EditRules_AddRuleCollectionButton}" />
+
+              <Button
+                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  Name="editPreRuleCollection"
+                  Click="EditPreRuleCollection_Click"
+                  Content="{x:Static resx:Resources.EditRules_EditRuleCollectionButton}" />
+
+              <Button
+                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  Name="removePreRuleCollection"
+                  Click="RemovePreRuleCollection_Click"
+                  Content="{x:Static resx:Resources.EditRules_RemoveRuleCollectionButton}" />
+              <Button
+                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  Name="deletePreRuleCollection"
+                  Click="DeletePreRuleCollection_Click"
+                  Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
+              <Button
+                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  Name="movePreRuleCollectionUp"
+                  Click="MovePreRuleCollectionUp_Click"
+                  Content="{x:Static resx:Resources.EditRules_MoveUpButton}" />
+              <Button
+                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  Name="movePreRuleCollectionDown"
+                  Click="MovePreRuleCollectionDown_Click"
+                  Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
+
+            </StackPanel>
+           
+
+            <DataGrid Name="AutoPreEditRuleCollectionList">
+              <DataGridTextColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+              <DataGridTextColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+            </DataGrid>
+
+          </DockPanel>
+        </StackPanel>
+      </Border>
+      <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+        <StackPanel>
+          <Label FontWeight="Bold" FontSize="15">Post-edit rule collections</Label>
+          <DockPanel Margin="10">
+            <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
+              <StackPanel.Resources>
+                <Style TargetType="Button">
+                  <Setter Property="Margin" Value="0,0,0,5" />
+                </Style>
+              </StackPanel.Resources>
+              <Button
+          Name="createPostRule"
+          Click="CreatePostRule_Click"
+          Content="{x:Static resx:Resources.EditRules_CreateRuleButton}" />
+
+              <Button
+          Name="addPostRuleCollection"
+          Click="AddPostRuleCollection_Click"
+          Content="{x:Static resx:Resources.EditRules_AddRuleCollectionButton}" />
+
+              <Button
+          IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}"
+          Name="editPostRuleCollection"
+          Click="EditPostRuleCollection_Click"
+          Content="{x:Static resx:Resources.EditRules_EditRuleCollectionButton}" />
+
+              <Button
+          IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}"
+          Name="removePostRuleCollection"
+          Click="RemovePostRuleCollection_Click"
+          Content="{x:Static resx:Resources.EditRules_RemoveRuleCollectionButton}" />
+              <Button
+          IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}"
+          Name="deletePostRuleCollection"
+          Click="DeletePostRuleCollection_Click"
+          Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
+
+              <Button
+          IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+          Name="movePostRuleCollectionUp"
+          Click="MovePostRuleCollectionUp_Click"
+          Content="{x:Static resx:Resources.EditRules_MoveUpButton}" />
+              <Button
+          IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+          Name="movePostRuleCollectionDown"
+          Click="MovePostRuleCollectionDown_Click"
+          Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
+
+            </StackPanel>
+            <DataGrid Name="AutoPostEditRuleCollectionList">
+              <DataGridTextColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+              <DataGridTextColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+            </DataGrid>
+          </DockPanel>
+        </StackPanel>
+      </Border>
+      <Expander Expanded="Tester_Expanded" Margin="5" IsExpanded="False" Header="Rule collection tester">
+        <StackPanel>
+          <Button Margin="5" Padding="5" Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
+          <StackPanel Name="RuleTester" />
+        </StackPanel>
+      </Expander>
+    </StackPanel>
+
+  </ScrollViewer>
 </UserControl>

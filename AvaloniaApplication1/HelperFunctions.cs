@@ -43,6 +43,11 @@ namespace OpusCatMtEngine
             Patterns = new[] { "*.tmx" },
             MimeTypes = new[] { "text/xml" }
         };
+        public static FilePickerFileType TbxFilePickerType { get; } = new ("Tbx files")
+        {
+            Patterns = new[] { "*.tbx" },
+            MimeTypes = new[] { "text/xml" }
+        };
 
         public static string GetOpusCatDataPath(string restOfPath=null)
         {

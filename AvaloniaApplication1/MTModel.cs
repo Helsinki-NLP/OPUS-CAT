@@ -541,7 +541,7 @@ namespace OpusCatMtEngine
 
             var box = MessageBoxManager.GetMessageBoxStandard(
                     "Model packaged",
-                    "Model has been packaged and saved to {zipPath}. Click OK to go to folder.",
+                    $"Model has been packaged and saved to {zipPath}. Click OK to open folder.",
                     ButtonEnum.Ok);
             await box.ShowAsync();
 
