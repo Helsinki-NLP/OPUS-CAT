@@ -47,9 +47,8 @@ namespace OpusCatMtEngine
             }
             catch (ArgumentException ex)
             {
-                var box = MessageBoxManager.GetMessageBoxStandard(
+                var box = MessageBoxManager.GetMessageBoxStandard("Invalid regular expression",
                                  $"Error in regular expression: {ex.Message}",
-                                 Properties.Resources.Finetune_NotEnoughSegmentsInTmx,
                                  ButtonEnum.Ok);
                 await box.ShowAsync();
             }

@@ -1,53 +1,43 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
+using Avalonia.Interactivity;
+using Avalonia.Media.TextFormatting;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
+using System;
+using System.Text;
 
 namespace OpusCatMtEngine
 {
     public partial class TestPreEditRuleControl : UserControl
     {
-        public static readonly DependencyProperty RuleCollectionProperty = DependencyProperty.Register(
-            "RuleCollection", typeof(AutoEditRuleCollection),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<AutoEditRuleCollection> RuleCollectionProperty = 
+            AvaloniaProperty.Register<TestPreEditRuleControl,AutoEditRuleCollection>(nameof(RuleCollection));
 
-        public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
-            "Title", typeof(string),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<string> TitleProperty = 
+            AvaloniaProperty.Register<TestPreEditRuleControl,String>(nameof(Title));
 
-        public static readonly DependencyProperty InputOriginProperty = DependencyProperty.Register(
-          "InputOrigin", typeof(string),
-          typeof(TestPreEditRuleControl)
-          );
+        public static readonly StyledProperty<string> InputOriginProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, String>(nameof(InputOrigin));
 
-        public static readonly DependencyProperty ButtonTextProperty = DependencyProperty.Register(
-            "ButtonText", typeof(string),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<string> ButtonTextProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, String>(nameof(ButtonText));
 
-        public static readonly DependencyProperty PreEditReplacementBoxProperty = DependencyProperty.Register(
-            "PreEditReplacementBox", typeof(TextBox),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<TextBox> PreEditReplacementBoxProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, TextBox>(nameof(PreEditReplacementBox));
 
-        public static readonly DependencyProperty PreEditPatternBoxProperty = DependencyProperty.Register(
-            "PreEditPatternBox", typeof(TextBox),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<TextBox> PreEditPatternBoxProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, TextBox>(nameof(PreEditPatternBox));
 
-        public static readonly DependencyProperty SourcePatternIsRegexProperty = DependencyProperty.Register(
-            "SourcePatternIsRegex", typeof(CheckBox),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<CheckBox> SourcePatternIsRegexProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, CheckBox>(nameof(SourcePatternIsRegex));
 
-        public static readonly DependencyProperty InputBoxLabelProperty = DependencyProperty.Register(
-            "InputBoxLabel", typeof(string),
-            typeof(TestPreEditRuleControl)
-            );
+        public static readonly StyledProperty<string> InputBoxLabelProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, string>(nameof(InputBoxLabel));
 
-        public static readonly DependencyProperty TestButtonVisibilityProperty = DependencyProperty.Register(
-            "TestButtonVisibility", typeof(Visibility),
-            typeof(TestPreEditRuleControl), new UIPropertyMetadata(Visibility.Visible)
-            );
+        public static readonly StyledProperty<bool> TestButtonVisibilityProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, bool>(nameof(TestButtonVisibility));
 
         public bool TestActive { get; private set; }
         public AutoEditRuleCollection RuleCollection
@@ -101,9 +91,9 @@ namespace OpusCatMtEngine
             set => SetValue(InputBoxLabelProperty, value);
         }
 
-        public Visibility TestButtonVisibility
+        public bool TestButtonVisibility
         {
-            get => (Visibility)GetValue(TestButtonVisibilityProperty);
+            get => GetValue(TestButtonVisibilityProperty);
             set => SetValue(TestButtonVisibilityProperty, value);
         }
 
@@ -111,16 +101,11 @@ namespace OpusCatMtEngine
         {
             get
             {
-                TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-                var sourceText = textRange.Text.Trim('\r', '\n');
-                return sourceText;
+                return this.SourceBox.Text;
             }
             set
             {
-                Paragraph sourcePara = new Paragraph();
-                sourcePara.Inlines.Add(new Run(value.Trim('\r', '\n')));
-                this.SourceBox.Document.Blocks.Clear();
-                this.SourceBox.Document.Blocks.Add(sourcePara);
+                this.SourceBox.Text = value;
             }
         }
 
@@ -128,9 +113,16 @@ namespace OpusCatMtEngine
         {
             get
             {
-                TextRange textRange = new TextRange(this.EditedSourceBox.Document.ContentStart, this.EditedSourceBox.Document.ContentEnd);
-                var sourceText = textRange.Text.Trim('\r', '\n');
-                return sourceText;
+                //TODO: check if this works, if not use the code below
+                return this.EditedSourceBox.Inlines.Text;
+
+                StringBuilder outputTextBuilder = new StringBuilder();
+                foreach (var inline in this.EditedSourceBox.Inlines)
+                {
+                    outputTextBuilder.Append(((Run)inline).Text);
+                }
+                
+                return outputTextBuilder.ToString();
             }
 
         }
@@ -143,21 +135,22 @@ namespace OpusCatMtEngine
             InitializeComponent();
         }
 
-        public void ProcessRules()
+        public async void ProcessRules()
         {
             this.TestActive = false;
-            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.Trim('\r', '\n');
-
+            
             try
             {
-                var result = this.RuleCollection.ProcessPreEditRules(sourceText);
+                var result = this.RuleCollection.ProcessPreEditRules(this.SourceText);
                 this.PopulateSourceBox(result);
                 this.PopulateTargetBox(result);
             }
             catch (ArgumentException ex)
             {
-                MessageBox.Show($"Error in regular expression: {ex.Message}");
+                var box = MessageBoxManager.GetMessageBoxStandard("Invalid regular expression",
+                                 $"Error in regular expression: {ex.Message}",
+                                 ButtonEnum.Ok);
+                await box.ShowAsync();
             }
 
             this.TestActive = true;
@@ -192,44 +185,39 @@ namespace OpusCatMtEngine
 
         private void PopulateSourceBox(AutoEditResult result)
         {
-            //Store the source text, use it as basis of the source text with match highlights
-            TextRange textRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-            var sourceText = textRange.Text.Trim('\r', '\n');
-
             int nonMatchStartIndex = 0;
-            Paragraph matchHighlightSource = new Paragraph();
+            
             foreach (var replacement in result.AppliedReplacements)
             {
 
                 if (nonMatchStartIndex < replacement.Match.Index)
                 {
                     var nonMatchText =
-                        sourceText.Substring(
+                        this.SourceText.Substring(
                             nonMatchStartIndex, replacement.Match.Index - nonMatchStartIndex);
-                    matchHighlightSource.Inlines.Add(nonMatchText);
+                    this.SourceHighlightBox.Inlines.Add(nonMatchText);
                 }
 
                 var matchText = replacement.Match.Value;
 
                 var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor, ToolTip = replacement.Rule.SourcePattern };
+                { Background = replacement.MatchColor };
+                //TODO: use HyperLinkButton to add Tooltip
+                //{ Background = replacement.MatchColor, ToolTip = replacement.Rule.SourcePattern };
 
-                matchHighlightSource.Inlines.Add(matchRun);
+                this.SourceHighlightBox.Inlines.Add(matchRun);
 
                 nonMatchStartIndex = replacement.Match.Index + replacement.Match.Length;
             }
 
-            if (nonMatchStartIndex < sourceText.Length)
+            if (nonMatchStartIndex < this.SourceText.Length)
             {
                 var nonMatchText =
-                        sourceText.Substring(
+                        this.SourceText.Substring(
                             nonMatchStartIndex);
-                matchHighlightSource.Inlines.Add(nonMatchText);
+                this.SourceHighlightBox.Inlines.Add(nonMatchText);
             }
 
-            this.SourceBox.Document = new FlowDocument();
-
-            this.SourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 
         private void PopulateTargetBox(AutoEditResult result)
@@ -237,7 +225,7 @@ namespace OpusCatMtEngine
             var editedSourceText = result.Result;
 
             int nonMatchStartIndex = 0;
-            Paragraph matchHighlightSource = new Paragraph();
+
             foreach (var replacement in result.AppliedReplacements)
             {
 
@@ -246,14 +234,14 @@ namespace OpusCatMtEngine
                     var nonMatchText =
                         editedSourceText.Substring(
                             nonMatchStartIndex, replacement.OutputIndex - nonMatchStartIndex);
-                    matchHighlightSource.Inlines.Add(nonMatchText);
+                    this.EditedSourceBox.Inlines.Add(nonMatchText);
                 }
 
                 var matchText = replacement.Output;
                 var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor, ToolTip = replacement.Rule.Replacement };
+                { Background = replacement.MatchColor };
 
-                matchHighlightSource.Inlines.Add(matchRun);
+                this.EditedSourceBox.Inlines.Add(matchRun);
 
                 nonMatchStartIndex = replacement.OutputIndex + replacement.OutputLength;
             }
@@ -263,14 +251,12 @@ namespace OpusCatMtEngine
                 var nonMatchText =
                         editedSourceText.Substring(
                             nonMatchStartIndex);
-                matchHighlightSource.Inlines.Add(nonMatchText);
+                this.EditedSourceBox.Inlines.Add(nonMatchText);
             }
 
 
             this.RulesAppliedRun.Text = $"(rules applied: {result.AppliedReplacements.Count})";
 
-            this.EditedSourceBox.Document.Blocks.Clear();
-            this.EditedSourceBox.Document.Blocks.Add(matchHighlightSource);
         }
 
         public void AnyControl_TextChanged(object sender, EventArgs e)
@@ -281,15 +267,10 @@ namespace OpusCatMtEngine
                 this.TestActive = false;
 
                 //Clear edited output
-                this.EditedSourceBox.Document.Blocks.Clear();
+                this.EditedSourceBox.Inlines.Clear();
 
-                //Remove highlights from source and unedited output
-                TextRange sourceTextRange = new TextRange(this.SourceBox.Document.ContentStart, this.SourceBox.Document.ContentEnd);
-                var sourceText = sourceTextRange.Text.Trim('\r', '\n');
+                this.SourceHighlightBox.Inlines.Clear();
                 this.RulesAppliedRun.Text = "";
-
-                var cleanSource = new Paragraph(new Run(sourceText));
-                RichTextBoxHelper.UpdateRichTextBoxWithCaretInSamePosition(this.SourceBox, cleanSource);
 
             }
         }

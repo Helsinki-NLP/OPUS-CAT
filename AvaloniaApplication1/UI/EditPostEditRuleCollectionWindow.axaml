@@ -4,6 +4,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="OpusCatMtEngine.EditPostEditRuleCollectionWindow"
-        Title="EditPostEditRuleCollectionWindow">
-  Welcome to Avalonia!
+        xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+        xmlns:local="clr-namespace:OpusCatMtEngine"
+        x:Name="_this"
+        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="450" Width="800">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Border BorderBrush="Black" BorderThickness="1">
+      <StackPanel>
+        <Label Name="WindowHeader" Margin="10,0,0,0" FontSize="20"></Label>
+        <DockPanel Margin="5" LastChildFill="True">
+          <Label>Rule collection name</Label>
+          <TextBox Width="500" Text="{Binding ElementName=_this, Path=RuleCollection.CollectionName, Mode=TwoWay}" />
+          <CheckBox DockPanel.Dock="Right" VerticalContentAlignment="Center" IsChecked="{Binding ElementName=_this, Path=RuleCollection.GlobalCollection, Mode=TwoWay}">
+            Global collection
+          </CheckBox>
+        </DockPanel>
+        <DockPanel Margin="10">
+          <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
+            <StackPanel.Resources>
+              <Style TargetType="Button">
+                <Setter Property="Margin" Value="0,0,0,5" />
+              </Style>
+            </StackPanel.Resources>
+            <Button
+            Name="CreateRule"
+            Click="CreateRule_Click"
+            Content="{x:Static resx:Resources.EditRules_CreateRuleButton}" />
+
+            <Button
+            IsEnabled="{Binding ElementName=AutoEditRuleCollectionList, Path=SelectedItems.Count}"
+            Name="EditRule"
+            Click="EditRule_Click"
+            Content="{x:Static resx:Resources.EditRules_EditRuleButton}" />
+
+            <Button
+            IsEnabled="{Binding ElementName=AutoEditRuleCollectionList, Path=SelectedItems.Count}"
+            Name="DeleteRule"
+            Click="DeleteRule_Click"
+            Content="{x:Static resx:Resources.EditRules_DeleteRuleButton}" />
+
+          </StackPanel>
+          <DataGrid
+              Name="AutoEditRuleCollectionList"
+              ItemsSource="{Binding ElementName=_this, Path=RuleCollection.EditRules}">
+
+            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="150" ToolTip="{Binding Description}" />
+            <DataGridTextColumn Header="Source pattern" Binding="{Binding SourcePattern}" Width="150" ToolTip="{Binding SourcePattern}" />
+            <DataGridTextColumn Header="Output pattern" Binding="{Binding OutputPattern}" Width="150" ToolTip="{Binding OutputPattern}" />
+            <DataGridTextColumn Header="Replacement" Binding="{Binding Replacement}" Width="150" ToolTip="{Binding Replacement}" />
+          </DataGrid>
+
+        </DockPanel>
+
+        <Expander Margin="5" IsExpanded="False" Header="Rule collection tester">
+          <local:TestPostEditRuleControl
+              x:Name="Tester"
+              RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
+              Title="Test rule collection"
+              InputBoxLabel="MT output"
+              ButtonText="Apply rules to MT output"
+              SourceBoxVisibility="Collapsed"/>
+        </Expander>
+        <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="10">
+          <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>
+          <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>
+        </DockPanel>
+      </StackPanel>
+
+    </Border>
+  </ScrollViewer>
 </Window>

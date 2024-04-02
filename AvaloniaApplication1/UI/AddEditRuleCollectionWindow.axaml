@@ -2,8 +2,33 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
         x:Class="OpusCatMtEngine.AddEditRuleCollectionWindow"
-        Title="AddEditRuleCollectionWindow">
-  Welcome to Avalonia!
+        xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+        xmlns:local="clr-namespace:OpusCatMtEngine"
+        x:Name="_this"
+        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="400" Width="500">
+  <Grid>
+    <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+      <StackPanel Height="360">
+        <Label Margin="10,0,0,0" FontSize="20" Content="Check rule collections to use with model"/>
+        <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="5">
+          <Button  DockPanel.Dock="Left" Padding="5" Click="ImportRules_Click">Import rule collections</Button>
+          <CheckBox Name="ReplaceCheckBox" VerticalAlignment="Center" IsChecked="False">Replace existing rules</CheckBox>
+          <Button DockPanel.Dock="Right" Padding="5" Click="ExportRules_Click">Export checked</Button>
+        </DockPanel>
+        <ScrollViewer Height="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <DataGrid Margin="5" Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollectionCheckBoxList, Mode=TwoWay}">
+
+            <DataGridTextColumn Header="Collection name" Binding="{Binding Path=CollectionName}" Width="100"/>
+            <DataGridCheckBoxColumn Width="60" Header="Use with model" Binding ="{Binding Path=Checked, Mode=TwoWay}" />
+          </DataGrid>
+        </ScrollViewer>
+        <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="5">
+          <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>
+          <Button DockPanel.Dock="Right" Padding="5" Click="CancelButton_Click">Cancel</Button>
+        </DockPanel>
+      </StackPanel>
+    </Border>
+  </Grid>
 </Window>

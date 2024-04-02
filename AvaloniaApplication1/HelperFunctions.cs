@@ -43,6 +43,13 @@ namespace OpusCatMtEngine
             Patterns = new[] { "*.tmx" },
             MimeTypes = new[] { "text/xml" }
         };
+
+        public static FilePickerFileType YmlFilePickerType { get; } = new("Yml files")
+        {
+            Patterns = new[] { "*.yml","*.yaml" },
+            MimeTypes = new[] { "application/x-yaml" }
+        };
+
         public static FilePickerFileType TbxFilePickerType { get; } = new ("Tbx files")
         {
             Patterns = new[] { "*.tbx" },

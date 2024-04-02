@@ -17,7 +17,8 @@
             <Run Text="{Binding InputBoxLabel}"/>
             <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
           </TextBlock>
-          <RichTextBox Name="SourceBox" Margin="5" IsDocumentEnabled="True" TextChanged="AnyControl_TextChanged" />
+          <TextBox Visibility="{Binding !TestActive}" Name="SourceBox" Margin="5" TextChanged="AnyControl_TextChanged" />
+          <TextBlock Visibility="{Binding TestActive}" Name="SourceHighlightBox" Margin="5" />
         </StackPanel>
       </Border>
       <Button Visibility="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click" Content="{Binding ButtonText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -27,7 +28,7 @@
             <Run>Edited source text</Run>
             <Run FontStyle="Italic" Name="RulesAppliedRun" />
           </TextBlock>
-          <RichTextBox IsReadOnly="True" Name="EditedSourceBox" IsDocumentEnabled="True" Margin="5" TextChanged="AnyControl_TextChanged" />
+          <TextBlock Name="EditedSourceBox" Margin="5" />
         </StackPanel>
       </Border>
 
