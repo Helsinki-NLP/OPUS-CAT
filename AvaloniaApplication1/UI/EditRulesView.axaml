@@ -6,7 +6,8 @@
              x:Class="OpusCatMtEngine.EditRulesView"
              xmlns:local="clr-namespace:OpusCatMtEngine"
              xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
-             Height="550" Width="800">
+             Height="550" Width="800"
+             x:CompileBindings="False">
   <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
     <StackPanel>
       <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesHeading}"/>
@@ -15,11 +16,7 @@
           <Label FontWeight="Bold" FontSize="15">Pre-edit rule collections</Label>
           <DockPanel Margin="10">
             <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
-              <StackPanel.Resources>
-                <Style TargetType="Button">
-                  <Setter Property="Margin" Value="0,0,0,5" />
-                </Style>
-              </StackPanel.Resources>
+              
               <Button
                   Name="createPreRule"
                   Click="CreatePreRule_Click"
@@ -61,8 +58,10 @@
            
 
             <DataGrid Name="AutoPreEditRuleCollectionList">
-              <DataGridTextColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-              <DataGridTextColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+              <DataGrid.Columns>
+              <DataGridTextColumn Width="350" Header="Collection name" Binding="{Binding Path=CollectionName, Mode=TwoWay}" />
+              <DataGridTextColumn Header="Number of rules" Binding="{Binding Path=EditRules.Count, Mode=OneWay}" />
+              </DataGrid.Columns>
             </DataGrid>
 
           </DockPanel>
@@ -73,11 +72,6 @@
           <Label FontWeight="Bold" FontSize="15">Post-edit rule collections</Label>
           <DockPanel Margin="10">
             <StackPanel DockPanel.Dock="Right" Margin="10,0" Orientation="Vertical">
-              <StackPanel.Resources>
-                <Style TargetType="Button">
-                  <Setter Property="Margin" Value="0,0,0,5" />
-                </Style>
-              </StackPanel.Resources>
               <Button
           Name="createPostRule"
           Click="CreatePostRule_Click"
@@ -118,8 +112,10 @@
 
             </StackPanel>
             <DataGrid Name="AutoPostEditRuleCollectionList">
-              <DataGridTextColumn Width="350" Header="Collection name" DisplayMemberBinding="{Binding Path=CollectionName, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-              <DataGridTextColumn Header="Number of rules" DisplayMemberBinding="{Binding Path=EditRules.Count, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+              <DataGrid.Columns>
+                <DataGridTextColumn Width="350" Header="Collection name" Binding="{Binding Path=CollectionName, Mode=TwoWay}" />
+                <DataGridTextColumn Header="Number of rules" Binding="{Binding Path=EditRules.Count, Mode=OneWay}" />
+              </DataGrid.Columns>
             </DataGrid>
           </DockPanel>
         </StackPanel>

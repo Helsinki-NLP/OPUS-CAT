@@ -35,6 +35,8 @@ namespace OpusCatMtEngine
             }
         }
 
+        public EditPostEditRuleCollectionWindow() { }
+
         public EditPostEditRuleCollectionWindow(AutoEditRuleCollection selectedCollection)
         {
 

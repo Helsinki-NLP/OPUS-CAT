@@ -17,6 +17,8 @@ namespace OpusCatMtEngine
         public ObservableCollection<CheckBoxListItem<AutoEditRuleCollection>> RuleCollectionCheckBoxList { get; set; }
         public IEnumerable<AutoEditRuleCollection> EditedRuleCollectionList { get; private set; }
 
+        public AddEditRuleCollectionWindow() { }
+
         public AddEditRuleCollectionWindow(
             ObservableCollection<AutoEditRuleCollection> allAutoEditRuleCollections,
             ObservableCollection<AutoEditRuleCollection> modelAutoEditRuleCollections
@@ -38,6 +40,8 @@ namespace OpusCatMtEngine
             }
 
             InitializeComponent();
+
+            this.AutoEditRuleCollectionList.ItemsSource = this.RuleCollectionCheckBoxList;
         }
 
         private void DeleteTag_Click(object sender, RoutedEventArgs e)

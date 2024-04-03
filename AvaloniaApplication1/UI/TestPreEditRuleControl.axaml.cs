@@ -7,11 +7,23 @@ using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
 using System;
 using System.Text;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace OpusCatMtEngine
 {
-    public partial class TestPreEditRuleControl : UserControl
+    public partial class TestPreEditRuleControl : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
         public static readonly StyledProperty<AutoEditRuleCollection> RuleCollectionProperty = 
             AvaloniaProperty.Register<TestPreEditRuleControl,AutoEditRuleCollection>(nameof(RuleCollection));
 
@@ -39,7 +51,15 @@ namespace OpusCatMtEngine
         public static readonly StyledProperty<bool> TestButtonVisibilityProperty =
             AvaloniaProperty.Register<TestPreEditRuleControl, bool>(nameof(TestButtonVisibility));
 
-        public bool TestActive { get; private set; }
+        public bool TestActive
+        {
+            get => testActive;
+            set
+            {
+                testActive = value;
+                NotifyPropertyChanged();
+            }
+        }
         public AutoEditRuleCollection RuleCollection
         {
             get => (AutoEditRuleCollection)GetValue(RuleCollectionProperty);
@@ -128,11 +148,18 @@ namespace OpusCatMtEngine
         }
 
         public bool textBoxHandlersAssigned = false;
+        private bool testActive;
 
         public TestPreEditRuleControl()
         {
             this.DataContext = this;
             InitializeComponent();
+            this.SourceBox.TextChanged += SourceBox_TextChanged;
+        }
+
+        private void SourceBox_TextChanged(object? sender, TextChangedEventArgs e)
+        {
+            AnyControl_TextChanged(sender, e);
         }
 
         public async void ProcessRules()
@@ -154,6 +181,11 @@ namespace OpusCatMtEngine
             }
 
             this.TestActive = true;
+        }
+
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            AnyControl_TextChanged(sender, e);
         }
 
         private void PreEditTest_Click(object sender, RoutedEventArgs e)
@@ -259,7 +291,9 @@ namespace OpusCatMtEngine
 
         }
 
-        public void AnyControl_TextChanged(object sender, EventArgs e)
+
+
+        public void AnyControl_TextChanged(object? sender, RoutedEventArgs e)
         {
             if (this.TestActive)
             {

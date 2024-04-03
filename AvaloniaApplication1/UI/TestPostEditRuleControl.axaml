@@ -3,6 +3,40 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="OpusCatMtEngine.TestPostEditRuleControl">
-  Welcome to Avalonia!
+             x:Class="OpusCatMtEngine.TestPostEditRuleControl"
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             x:CompileBindings="False">
+  <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+    <StackPanel>
+      <TextBlock Margin="5">
+        <Run FontWeight="Bold" Text="{Binding Title}" />
+        <Run FontStyle="Italic" Text="{Binding RuleCollection.CollectionName}" />
+      </TextBlock>
+      <Border IsVisible="{Binding SourceBoxVisibility}" Name= "SourceBoxBorder" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+        <StackPanel Margin="5">
+          <Label>Source text (this is only displayed for post-edit rules with source conditions)</Label>
+          <TextBlock Name="SourceBox" Margin="5" />
+        </StackPanel>
+      </Border>
+      <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+        <StackPanel Margin="5">
+          <TextBlock>
+            <Run Text="{Binding InputBoxLabel}"/>
+            <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
+          </TextBlock>
+          <TextBlock Name="OutputBox" Margin="5" />
+        </StackPanel>
+      </Border>
+      <Button IsVisible="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">Apply post-edit rule to MT output</Button>
+      <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+        <StackPanel Margin="5">
+          <TextBlock Name="OutputBoxTitle">
+            <Run>Edited MT output</Run>
+            <Run FontStyle="Italic" Name="RulesAppliedRun" />
+          </TextBlock>
+          <TextBlock Name="EditedOutputBox" Margin="5" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Border>
 </UserControl>

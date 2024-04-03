@@ -6,7 +6,8 @@
         x:Class="OpusCatMtEngine.CreatePreEditRuleWindow"
         xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMtEngine"
-        Title="{x:Static resx:Resources.EditRules_CreatePreEditRuleTitle}">
+        Title="{x:Static resx:Resources.EditRules_CreatePreEditRuleTitle}"
+        x:CompileBindings="False">
   <Grid>
     <StackPanel Orientation="Vertical">
       <Border Margin="5" BorderBrush="Black" BorderThickness="1">
@@ -37,7 +38,8 @@
               PreEditReplacementBox="{Binding ElementName=PreEditReplacement}"
               Title="Test pre-edit rule"
               InputBoxLabel="Source text"
-              ButtonText="Apply pre-edit rule to source text" />
+              ButtonText="Apply pre-edit rule to source text"
+              TestButtonVisibility="True"/>
           <!--<Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
                         <StackPanel>
                             <Label FontWeight="Bold">Test pre-edit rule</Label>

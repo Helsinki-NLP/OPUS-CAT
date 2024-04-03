@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using System;
 using System.ComponentModel;
@@ -34,6 +35,7 @@ namespace OpusCatMtEngine
             }
         }
 
+        public EditPreEditRuleCollectionWindow() { }
         public EditPreEditRuleCollectionWindow(AutoEditRuleCollection selectedCollection)
         {
 
@@ -53,7 +55,7 @@ namespace OpusCatMtEngine
             this.Close(false);
         }
 
-        private void CreateRule_Click(object sender, RoutedEventArgs e)
+        private async void CreateRule_Click(object sender, RoutedEventArgs e)
         {
             ICreateRuleWindow createRuleWindow = null;
             switch (this.RuleCollection.CollectionType)
@@ -69,19 +71,19 @@ namespace OpusCatMtEngine
 
             };
 
-            if (createRuleWindow != null)
+            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                ((Window)createRuleWindow).Owner = this;
-                var dialogResult = ((Window)createRuleWindow).ShowDialog();
+                var dialogResult = ((Window)createRuleWindow).ShowDialog<bool>(desktop.MainWindow);
+                await dialogResult;
 
-                if (dialogResult != null && dialogResult.Value)
+                if (dialogResult.Result)
                 {
                     this.RuleCollection.AddRule(createRuleWindow.CreatedRule);
                 }
             }
         }
 
-        private void EditRule_Click(object sender, RoutedEventArgs e)
+        private async void EditRule_Click(object sender, RoutedEventArgs e)
         {
             var rule = (AutoEditRule)this.AutoEditRuleCollectionList.SelectedItem;
             ICreateRuleWindow createRuleWindow = null;
@@ -99,12 +101,15 @@ namespace OpusCatMtEngine
 
             if (createRuleWindow != null)
             {
-                ((Window)createRuleWindow).Owner = this;
-                var dialogResult = ((Window)createRuleWindow).ShowDialog();
-
-                if (dialogResult != null && dialogResult.Value)
+                if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 {
-                    this.RuleCollection.ReplaceRule(rule, createRuleWindow.CreatedRule);
+                    var dialogResult = ((Window)createRuleWindow).ShowDialog<bool>(desktop.MainWindow);
+                    await dialogResult;
+
+                    if (dialogResult.Result)
+                    {
+                        this.RuleCollection.ReplaceRule(rule, createRuleWindow.CreatedRule);
+                    }
                 }
             }
         }

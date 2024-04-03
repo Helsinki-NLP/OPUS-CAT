@@ -26,6 +26,7 @@ namespace OpusCatMtEngine
 
         private MTModel model;
 
+        public EditRulesView() { }
         public EditRulesView(
             MTModel selectedModel,
             ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
@@ -87,8 +88,8 @@ namespace OpusCatMtEngine
                         Title = title,
                         InputBoxLabel = inputBoxLabel,
                         InputOrigin = inputOrigin,
-                        TestButtonVisibility = Visibility.Collapsed,
-                        SourceBoxVisibility = Visibility.Collapsed
+                        TestButtonVisibility = false,
+                        SourceBoxVisibility = false
                     };
                 inputOrigin = $"Output from {postEditRuleCollection.CollectionName}";
 
@@ -323,7 +324,8 @@ namespace OpusCatMtEngine
                 {
                     selectedCollection.CopyValuesFromOtherCollection(editCollectionWindow.RuleCollection);
                     selectedCollection.Save();
-                    this.AutoPostEditRuleCollectionList.Items.Refresh();
+                    //TODO: check if this is needed
+                    //this.AutoPostEditRuleCollectionList.ItemsSource.Refresh();
                     InitializeTester();
                 }
             }

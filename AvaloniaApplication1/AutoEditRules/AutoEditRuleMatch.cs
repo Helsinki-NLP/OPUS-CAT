@@ -49,6 +49,6 @@ namespace OpusCatMtEngine
         
         public int MatchIndex { get; }
         public bool RepeatedSourceMatch { get; internal set; }
-        public Brush MatchColor { get; internal set; }
+        public IBrush MatchColor { get; internal set; }
     }
 }

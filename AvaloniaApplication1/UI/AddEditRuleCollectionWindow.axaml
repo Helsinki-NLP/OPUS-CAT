@@ -7,7 +7,8 @@
         xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMtEngine"
         x:Name="_this"
-        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="400" Width="500">
+        Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="400" Width="500"
+        x:CompileBindings="False">
   <Grid>
     <Border Margin="5" BorderBrush="Black" BorderThickness="1">
       <StackPanel Height="360">
@@ -18,10 +19,11 @@
           <Button DockPanel.Dock="Right" Padding="5" Click="ExportRules_Click">Export checked</Button>
         </DockPanel>
         <ScrollViewer Height="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-          <DataGrid Margin="5" Name="AutoEditRuleCollectionList" ItemsSource="{Binding ElementName=_this, Path=RuleCollectionCheckBoxList, Mode=TwoWay}">
-
-            <DataGridTextColumn Header="Collection name" Binding="{Binding Path=CollectionName}" Width="100"/>
-            <DataGridCheckBoxColumn Width="60" Header="Use with model" Binding ="{Binding Path=Checked, Mode=TwoWay}" />
+          <DataGrid Name="AutoEditRuleCollectionList">
+            <DataGrid.Columns>
+              <DataGridTextColumn Width="100" Header="Collection name" Binding="{Binding Item.CollectionName}"/>
+              <DataGridCheckBoxColumn Width="60" Header="Use with model" Binding="{Binding Checked, Mode=TwoWay}" />
+            </DataGrid.Columns>
           </DataGrid>
         </ScrollViewer>
         <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="5">
