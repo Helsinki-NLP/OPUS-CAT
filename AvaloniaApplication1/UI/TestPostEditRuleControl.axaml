@@ -15,7 +15,10 @@
       <Border IsVisible="{Binding SourceBoxVisibility}" Name= "SourceBoxBorder" Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel Margin="5">
           <Label>Source text (this is only displayed for post-edit rules with source conditions)</Label>
-          <TextBlock Name="SourceBox" Margin="5" />
+          <TextBox IsVisible="{Binding !TestActive}" Name="SourceBox" Margin="5" />
+          <Border IsVisible="{Binding TestActive}" Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Name="SourceHighlightBox" Margin="5" />
+          </Border>
         </StackPanel>
       </Border>
       <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
@@ -24,17 +27,29 @@
             <Run Text="{Binding InputBoxLabel}"/>
             <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
           </TextBlock>
-          <TextBlock Name="OutputBox" Margin="5" />
+          <TextBox IsVisible="{Binding !TestActive}" Name="OutputBox" Margin="5" />
+          <Border IsVisible="{Binding TestActive}" Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Name="OutputHighlightBox" Margin="5" />
+          </Border>
         </StackPanel>
       </Border>
-      <Button IsVisible="{Binding TestButtonVisibility}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">Apply post-edit rule to MT output</Button>
+      <StackPanel IsVisible="{Binding TestButtonVisibility}" Orientation="Horizontal">
+        <Button IsVisible="{Binding !TestActive}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PostEditTest_Click">
+          Apply post-edit rule to MT output
+        </Button>
+        <Button IsVisible="{Binding TestActive}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="Clear_Click">
+          Clear
+        </Button>
+      </StackPanel>
       <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
         <StackPanel Margin="5">
           <TextBlock Name="OutputBoxTitle">
             <Run>Edited MT output</Run>
             <Run FontStyle="Italic" Name="RulesAppliedRun" />
           </TextBlock>
-          <TextBlock Name="EditedOutputBox" Margin="5" />
+          <Border Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Name="EditedOutputBox" Margin="5" />
+          </Border>
         </StackPanel>
       </Border>
     </StackPanel>

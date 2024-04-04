@@ -52,7 +52,8 @@
                 InputBoxLabel="Unedited MT output"
                 Title="Test post-edit rule"
                 ButtonText="Apply post-edit rule to MT output"
-                SourceBoxVisibility="False"/>
+                SourceBoxVisibility="False"
+                TestButtonVisibility="True"/>
 
             <DockPanel LastChildFill="False" Margin="5">
               <Button DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save rule</Button>

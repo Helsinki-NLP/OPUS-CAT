@@ -19,7 +19,9 @@
             <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
           </TextBlock>
           <TextBox IsVisible="{Binding !TestActive}" Name="SourceBox" Margin="5" TextChanged="SourceBox_TextChanged" />
-          <TextBlock IsVisible="{Binding TestActive}" Name="SourceHighlightBox" Margin="5" />
+          <Border IsVisible="{Binding TestActive}" Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Name="SourceHighlightBox" Margin="5" />
+          </Border>
         </StackPanel>
       </Border>
       <StackPanel IsVisible="{Binding TestButtonVisibility}" Orientation="Horizontal">
@@ -34,8 +36,8 @@
             <Run>Edited source text</Run>
             <Run FontStyle="Italic" Name="RulesAppliedRun" />
           </TextBlock>
-          <Border BorderBrush="Black">
-            <TextBlock Background="White" Name="EditedSourceBox" Margin="5" />
+          <Border Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Margin="5" Name="EditedSourceBox" />
           </Border>
         </StackPanel>
       </Border>

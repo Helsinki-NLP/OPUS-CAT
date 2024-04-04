@@ -445,7 +445,7 @@ namespace OpusCatMtEngine
                     output = postEditRuleCollection.ProcessPostEditRules(input, output).Result;
                 }
 
-                if (output != translationPair.Translation)
+                if (output != null && output != translationPair.Translation)
                 {
                     translationPair.AutoEditedTranslation = true;
                     translationPair.Translation = output;

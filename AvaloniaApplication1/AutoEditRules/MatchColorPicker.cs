@@ -7,14 +7,15 @@ namespace OpusCatMtEngine
         private static int colorIndex = 0;
         public static IBrush[] MatchColorList = new IBrush[]
         {
-            Brushes.AliceBlue,
             Brushes.CadetBlue,
             Brushes.HotPink,
             Brushes.LightGreen,
             Brushes.DodgerBlue,
             Brushes.Fuchsia,
             Brushes.Orange,
-            Brushes.Aquamarine
+            Brushes.Aquamarine,
+            Brushes.CornflowerBlue,
+            Brushes.Chartreuse
             
         };
 

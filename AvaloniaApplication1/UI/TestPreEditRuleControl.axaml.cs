@@ -134,6 +134,7 @@ namespace OpusCatMtEngine
             get
             {
                 //TODO: check if this works, if not use the code below
+                //This does not work, text needs to be extracted from inlines
                 return this.EditedSourceBox.Inlines.Text;
 
                 StringBuilder outputTextBuilder = new StringBuilder();
@@ -232,8 +233,13 @@ namespace OpusCatMtEngine
 
                 var matchText = replacement.Match.Value;
 
-                var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor };
+                var matchRun = new MousableInline()
+                {
+                    Background = replacement.MatchColor,
+                    Content = matchText,
+                    MouseOverText = replacement.Rule.SourcePattern
+                };
+
                 //TODO: use HyperLinkButton to add Tooltip
                 //{ Background = replacement.MatchColor, ToolTip = replacement.Rule.SourcePattern };
 
@@ -270,10 +276,16 @@ namespace OpusCatMtEngine
                 }
 
                 var matchText = replacement.Output;
-                var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor };
+                var matchRun = new MousableInline()
+                { 
+                    Background = replacement.MatchColor,
+                    Content = matchText,
+                    MouseOverText = replacement.Rule.SourcePattern
+                };
+                
 
                 this.EditedSourceBox.Inlines.Add(matchRun);
+                
 
                 nonMatchStartIndex = replacement.OutputIndex + replacement.OutputLength;
             }
@@ -302,8 +314,11 @@ namespace OpusCatMtEngine
 
                 //Clear edited output
                 this.EditedSourceBox.Inlines.Clear();
+                this.EditedSourceBox.Text = "";
 
                 this.SourceHighlightBox.Inlines.Clear();
+                this.SourceHighlightBox.Text = "";
+
                 this.RulesAppliedRun.Text = "";
 
             }

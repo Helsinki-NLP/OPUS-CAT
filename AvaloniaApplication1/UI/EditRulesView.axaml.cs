@@ -355,6 +355,7 @@ namespace OpusCatMtEngine
 
         private void TestRules_Click(object sender, RoutedEventArgs e)
         {
+            
             string previousTesterOutput = null;
             string rawSource = null;
             foreach (var tester in this.PreEditTesters)
@@ -365,7 +366,14 @@ namespace OpusCatMtEngine
                 }
                 else
                 {
-                    rawSource = tester.SourceText;
+                    if (String.IsNullOrEmpty(tester.SourceText))
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        rawSource = tester.SourceText;
+                    }
                 }
                 tester.ProcessRules();
                 previousTesterOutput = tester.OutputText;

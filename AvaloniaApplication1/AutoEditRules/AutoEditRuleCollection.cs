@@ -283,6 +283,11 @@ namespace OpusCatMtEngine
 
         public AutoEditResult ProcessPostEditRules(string source, string unedited)
         {
+            if (String.IsNullOrEmpty(unedited))
+            {
+                return null;
+            }
+
             string edited = unedited;
 
             List<AutoEditRuleMatch> appliedReplacements = new List<AutoEditRuleMatch>();

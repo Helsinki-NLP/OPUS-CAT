@@ -8,49 +8,73 @@ using System;
 using System.Linq;
 using System.Text;
 using Avalonia.Interactivity;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Connections.Features;
 
 namespace OpusCatMtEngine
 {
-    public partial class TestPostEditRuleControl : UserControl
+    public partial class TestPostEditRuleControl : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+    
         public static readonly StyledProperty<AutoEditRuleCollection> RuleCollectionProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, AutoEditRuleCollection>(nameof(RuleCollection));
+            AvaloniaProperty.Register<TestPostEditRuleControl, AutoEditRuleCollection>(nameof(RuleCollection));
 
         public static readonly StyledProperty<string> TitleProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, String>(nameof(Title));
+            AvaloniaProperty.Register<TestPostEditRuleControl, String>(nameof(Title));
 
         public static readonly StyledProperty<string> InputOriginProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, String>(nameof(InputOrigin));
+            AvaloniaProperty.Register<TestPostEditRuleControl, String>(nameof(InputOrigin));
 
         public static readonly StyledProperty<string> ButtonTextProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, String>(nameof(ButtonText));
+            AvaloniaProperty.Register<TestPostEditRuleControl, String>(nameof(ButtonText));
 
         public static readonly StyledProperty<TextBox> SourcePatternBoxProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, TextBox>(nameof(SourcePatternBox));
+            AvaloniaProperty.Register<TestPostEditRuleControl, TextBox>(nameof(SourcePatternBox));
 
         public static readonly StyledProperty<TextBox> PostEditReplacementBoxProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, TextBox>(nameof(PostEditReplacementBox));
+            AvaloniaProperty.Register<TestPostEditRuleControl, TextBox>(nameof(PostEditReplacementBox));
 
         public static readonly StyledProperty<CheckBox> SourcePatternIsRegexProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, CheckBox>(nameof(SourcePatternIsRegex));
+            AvaloniaProperty.Register<TestPostEditRuleControl, CheckBox>(nameof(SourcePatternIsRegex));
 
         public static readonly StyledProperty<TextBox> PostEditPatternBoxProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, TextBox>(nameof(PostEditPatternBox));
+            AvaloniaProperty.Register<TestPostEditRuleControl, TextBox>(nameof(PostEditPatternBox));
 
         public static readonly StyledProperty<CheckBox> PostEditPatternIsRegexProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, CheckBox>(nameof(PostEditPatternIsRegex));
+            AvaloniaProperty.Register<TestPostEditRuleControl, CheckBox>(nameof(PostEditPatternIsRegex));
 
         public static readonly StyledProperty<string> InputBoxLabelProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, string>(nameof(InputBoxLabel));
+            AvaloniaProperty.Register<TestPostEditRuleControl, string>(nameof(InputBoxLabel));
 
         public static readonly StyledProperty<bool> TestButtonVisibilityProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, bool>(nameof(TestButtonVisibility));
+            AvaloniaProperty.Register<TestPostEditRuleControl, bool>(nameof(TestButtonVisibility));
 
         public static readonly StyledProperty<bool> SourceBoxVisibilityProperty =
-            AvaloniaProperty.Register<TestPreEditRuleControl, bool>(nameof(SourceBoxVisibility));
+            AvaloniaProperty.Register<TestPostEditRuleControl, bool>(nameof(SourceBoxVisibility));
 
 
-        public bool TestActive { get; private set; }
+        public bool TestActive
+        {
+            get => testActive;
+            set
+            {
+                testActive = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public AutoEditRuleCollection RuleCollection
         {
             get => (AutoEditRuleCollection)GetValue(RuleCollectionProperty);
@@ -160,7 +184,15 @@ namespace OpusCatMtEngine
         {
             get
             {
-                return this.SourceBox.Text;
+                if (this.SourceBox.Text != null)
+                {
+                    return this.SourceBox.Text;
+                }
+                else
+                {
+                    return String.Empty;
+                }
+                    
             }
             set
             {
@@ -172,16 +204,7 @@ namespace OpusCatMtEngine
         {
             get
             {
-                //TODO: check if this works, if not use the code below
-                return this.OutputBox.Inlines.Text;
-
-                StringBuilder outputTextBuilder = new StringBuilder();
-                foreach (var inline in this.OutputBox.Inlines)
-                {
-                    outputTextBuilder.Append(((Run)inline).Text);
-                }
-
-                return outputTextBuilder.ToString();
+                return this.OutputBox.Text;
             }
             set
             {
@@ -194,7 +217,7 @@ namespace OpusCatMtEngine
         {
             get
             {
-                //TODO: check if this works, if not use the code below
+                //TODO: check if this works with cascaded rules, if not use the code below
                 return this.EditedOutputBox.Inlines.Text;
 
                 StringBuilder outputTextBuilder = new StringBuilder();
@@ -210,6 +233,7 @@ namespace OpusCatMtEngine
 
         public bool handlersAssigned = false;
         private bool sourceBoxDefaultVisibility;
+        private bool testActive;
 
         public TestPostEditRuleControl()
         {
@@ -219,7 +243,12 @@ namespace OpusCatMtEngine
             //Need to add a handler to source pattern box after the dependency property has been set,
             //this will do it after all other rendering is complete
             //TODO: check that this works
-            Dispatcher.UIThread.Invoke(new Action(() => SetHandlers()), DispatcherPriority.ContextIdle);
+            this.Loaded += TestPostEditRuleControl_Loaded;
+        }
+
+        private void TestPostEditRuleControl_Loaded(object? sender, RoutedEventArgs e)
+        {
+            SetHandlers();
         }
 
         private void SetHandlers()
@@ -240,6 +269,10 @@ namespace OpusCatMtEngine
             try
             {
                 var result = this.RuleCollection.ProcessPostEditRules(this.SourceText, this.OutputText);
+                if (result == null)
+                {
+                    return;
+                }
                 if (this.RuleCollection.EditRules.Any(x => !String.IsNullOrWhiteSpace(x.SourcePattern)))
                 {
                     this.PopulateSourceBox(result);
@@ -264,10 +297,20 @@ namespace OpusCatMtEngine
             {
                 this.RuleCollection = new AutoEditRuleCollection();
 
+                string sourcePattern;
+                if (this.SourcePatternBox.IsEnabled)
+                {
+                    sourcePattern = this.SourcePatternBox.Text;
+                }
+                else
+                {
+                    sourcePattern = String.Empty;
+                }
+
                 this.RuleCollection.AddRule(
                     new AutoEditRule()
                     {
-                        SourcePattern = this.SourcePatternBox.Text,
+                        SourcePattern = sourcePattern,
                         SourcePatternIsRegex = this.SourcePatternIsRegex.IsChecked.Value,
                         OutputPattern = this.PostEditPatternBox.Text,
                         OutputPatternIsRegex = this.PostEditPatternIsRegex.IsChecked.Value,
@@ -307,16 +350,18 @@ namespace OpusCatMtEngine
                         var nonMatchText =
                             this.SourceText.Substring(
                                 nonMatchStartIndex, replacement.SourceMatch.Index - nonMatchStartIndex);
-                        this.SourceBox.Inlines.Add(nonMatchText);
+                        this.SourceHighlightBox.Inlines.Add(nonMatchText);
                     }
 
                     var matchText = replacement.SourceMatch.Value;
-                    var matchRun = new Run(matchText)
+                    var matchRun = new MousableInline()
                     {
                         Background = replacement.MatchColor,
+                        Content = matchText,
+                        MouseOverText = replacement.Rule.SourcePattern
                     };
 
-                    this.SourceBox.Inlines.Add(matchRun);
+                    this.SourceHighlightBox.Inlines.Add(matchRun);
 
                     nonMatchStartIndex = replacement.SourceMatch.Index + replacement.SourceMatch.Length;
                 }
@@ -326,7 +371,7 @@ namespace OpusCatMtEngine
                     var nonMatchText =
                             this.SourceText.Substring(
                                 nonMatchStartIndex);
-                    this.SourceBox.Inlines.Add(nonMatchText);
+                    this.SourceHighlightBox.Inlines.Add(nonMatchText);
                 }
 
             }
@@ -336,6 +381,10 @@ namespace OpusCatMtEngine
             }
         }
 
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            AnyControl_TextChanged(sender, e);
+        }
         private void PopulateOutputBox(AutoEditResult result)
         {
 
@@ -348,14 +397,18 @@ namespace OpusCatMtEngine
                     var nonMatchText =
                         this.OutputText.Substring(
                             nonMatchStartIndex, replacement.Match.Index - nonMatchStartIndex);
-                    this.OutputBox.Inlines.Add(nonMatchText);
+                    this.OutputHighlightBox.Inlines.Add(nonMatchText);
                 }
 
                 var matchText = replacement.Match.Value;
-                var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor };
+                var matchRun = new MousableInline()
+                {
+                    Background = replacement.MatchColor,
+                    Content = matchText,
+                    MouseOverText = replacement.Rule.OutputPattern
+                };
 
-                this.OutputBox.Inlines.Add(matchRun);
+                this.OutputHighlightBox.Inlines.Add(matchRun);
 
                 nonMatchStartIndex = replacement.Match.Index + replacement.Match.Length;
             }
@@ -365,7 +418,7 @@ namespace OpusCatMtEngine
                 var nonMatchText =
                         this.OutputText.Substring(
                             nonMatchStartIndex);
-                this.OutputBox.Inlines.Add(nonMatchText);
+                this.OutputHighlightBox.Inlines.Add(nonMatchText);
             }
 
             this.RulesAppliedRun.Text = $"(rules applied: {result.AppliedReplacements.Count})";
@@ -389,8 +442,13 @@ namespace OpusCatMtEngine
                 }
 
                 var matchText = replacement.Output;
-                var matchRun = new Run(matchText)
-                { Background = replacement.MatchColor};
+                
+                var matchRun = new MousableInline()
+                {
+                    Background = replacement.MatchColor,
+                    Content = matchText,
+                    MouseOverText = replacement.Rule.Replacement
+                };
 
                 this.EditedOutputBox.Inlines.Add(matchRun);
 
@@ -428,15 +486,16 @@ namespace OpusCatMtEngine
                 this.TestActive = false;
 
                 //Clear edited output
+                this.SourceHighlightBox.Inlines.Clear();
+                this.SourceHighlightBox.Text = "";
+
+                this.OutputHighlightBox.Inlines.Clear();
+                this.OutputHighlightBox.Text = "";
+
                 this.EditedOutputBox.Inlines.Clear();
+                this.EditedOutputBox.Text = "";
+
                 this.RulesAppliedRun.Text = "";
-
-                //Remove highlights from source and unedited output
-                //TODO: add the highlighted alternative boxes here, they are implemented only for pre-edit
-                //tester at the moment
-                this.SourceBox.Text = this.SourceText;
-
-                this.OutputBox.Text = this.OutputText;
 
             }
         }
