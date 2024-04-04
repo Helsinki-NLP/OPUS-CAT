@@ -51,6 +51,9 @@ namespace OpusCatMtEngine
         public static readonly StyledProperty<bool> TestButtonVisibilityProperty =
             AvaloniaProperty.Register<TestPreEditRuleControl, bool>(nameof(TestButtonVisibility));
 
+        public static readonly StyledProperty<bool> ClearOnInputChangeProperty =
+            AvaloniaProperty.Register<TestPreEditRuleControl, bool>(nameof(ClearOnInputChange));
+
         public bool TestActive
         {
             get => testActive;
@@ -117,6 +120,12 @@ namespace OpusCatMtEngine
             set => SetValue(TestButtonVisibilityProperty, value);
         }
 
+        public bool ClearOnInputChange
+        {
+            get => GetValue(ClearOnInputChangeProperty);
+            set => SetValue(ClearOnInputChangeProperty, value);
+        }
+
         public string SourceText
         {
             get
@@ -131,25 +140,13 @@ namespace OpusCatMtEngine
 
         public string OutputText
         {
-            get
-            {
-                //TODO: check if this works, if not use the code below
-                //This does not work, text needs to be extracted from inlines
-                return this.EditedSourceBox.Inlines.Text;
-
-                StringBuilder outputTextBuilder = new StringBuilder();
-                foreach (var inline in this.EditedSourceBox.Inlines)
-                {
-                    outputTextBuilder.Append(((Run)inline).Text);
-                }
-                
-                return outputTextBuilder.ToString();
-            }
+            get => outputText; set => outputText = value;
 
         }
 
         public bool textBoxHandlersAssigned = false;
         private bool testActive;
+        private string outputText;
 
         public TestPreEditRuleControl()
         {
@@ -160,7 +157,14 @@ namespace OpusCatMtEngine
 
         private void SourceBox_TextChanged(object? sender, TextChangedEventArgs e)
         {
-            AnyControl_TextChanged(sender, e);
+            if (!this.ClearOnInputChange)
+            {
+                return;
+            }
+            else
+            {
+                AnyControl_TextChanged(sender, e);
+            }
         }
 
         public async void ProcessRules()
@@ -170,6 +174,8 @@ namespace OpusCatMtEngine
             try
             {
                 var result = this.RuleCollection.ProcessPreEditRules(this.SourceText);
+                
+                this.OutputText = result.Result;
                 this.PopulateSourceBox(result);
                 this.PopulateTargetBox(result);
             }
@@ -239,9 +245,6 @@ namespace OpusCatMtEngine
                     Content = matchText,
                     MouseOverText = replacement.Rule.SourcePattern
                 };
-
-                //TODO: use HyperLinkButton to add Tooltip
-                //{ Background = replacement.MatchColor, ToolTip = replacement.Rule.SourcePattern };
 
                 this.SourceHighlightBox.Inlines.Add(matchRun);
 

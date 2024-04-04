@@ -755,10 +755,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="SentenceSplitterNet">
       <HintPath>..\packages\SentenceSplitterNet\SentenceSplitterNet.dll</HintPath>
     </Reference>
@@ -2756,6 +2752,10 @@
   <ItemGroup>
     <EmbeddedResource Include="iso-639-3_20200515.tab" />
     <EmbeddedResource Include="iso639-5.tsv" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj" />
   </ItemGroup>
 
   <ItemGroup>

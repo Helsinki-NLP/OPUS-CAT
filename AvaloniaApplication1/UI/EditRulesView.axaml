@@ -28,28 +28,28 @@
                   Content="{x:Static resx:Resources.EditRules_AddRuleCollectionButton}" />
 
               <Button
-                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  IsEnabled="{Binding #AutoPreEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                   Name="editPreRuleCollection"
                   Click="EditPreRuleCollection_Click"
                   Content="{x:Static resx:Resources.EditRules_EditRuleCollectionButton}" />
 
               <Button
-                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  IsEnabled="{Binding #AutoPreEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                   Name="removePreRuleCollection"
                   Click="RemovePreRuleCollection_Click"
                   Content="{x:Static resx:Resources.EditRules_RemoveRuleCollectionButton}" />
               <Button
-                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  IsEnabled="{Binding #AutoPreEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                   Name="deletePreRuleCollection"
                   Click="DeletePreRuleCollection_Click"
                   Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
               <Button
-                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  IsEnabled="{Binding #AutoPreEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                   Name="movePreRuleCollectionUp"
                   Click="MovePreRuleCollectionUp_Click"
                   Content="{x:Static resx:Resources.EditRules_MoveUpButton}" />
               <Button
-                  IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+                  IsEnabled="{Binding #AutoPreEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                   Name="movePreRuleCollectionDown"
                   Click="MovePreRuleCollectionDown_Click"
                   Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
@@ -83,29 +83,29 @@
           Content="{x:Static resx:Resources.EditRules_AddRuleCollectionButton}" />
 
               <Button
-          IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}"
+          IsEnabled="{Binding #AutoPostEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
           Name="editPostRuleCollection"
           Click="EditPostRuleCollection_Click"
           Content="{x:Static resx:Resources.EditRules_EditRuleCollectionButton}" />
 
               <Button
-          IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}"
+          IsEnabled="{Binding #AutoPostEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
           Name="removePostRuleCollection"
           Click="RemovePostRuleCollection_Click"
           Content="{x:Static resx:Resources.EditRules_RemoveRuleCollectionButton}" />
               <Button
-          IsEnabled="{Binding ElementName=AutoPostEditRuleCollectionList, Path=SelectedItems.Count}"
+          IsEnabled="{Binding #AutoPostEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
           Name="deletePostRuleCollection"
           Click="DeletePostRuleCollection_Click"
           Content="{x:Static resx:Resources.EditRules_DeleteRuleCollectionButton}" />
 
               <Button
-          IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+          IsEnabled="{Binding #AutoPostEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
           Name="movePostRuleCollectionUp"
           Click="MovePostRuleCollectionUp_Click"
           Content="{x:Static resx:Resources.EditRules_MoveUpButton}" />
               <Button
-          IsEnabled="{Binding ElementName=AutoPreEditRuleCollectionList, Path=SelectedItems.Count}"
+          IsEnabled="{Binding #AutoPostEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
           Name="movePostRuleCollectionDown"
           Click="MovePostRuleCollectionDown_Click"
           Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
@@ -122,7 +122,8 @@
       </Border>
       <Expander Expanded="Tester_Expanded" Margin="5" IsExpanded="False" Header="Rule collection tester">
         <StackPanel>
-          <Button Margin="5" Padding="5" Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
+          <Button IsVisible="{Binding !TestActive}" Margin="5" Padding="5" Click="TestRules_Click">Test all pre- and post-edit rule collections</Button>
+          <Button IsVisible="{Binding TestActive}" Margin="5" Padding="5" Click="ClearTest_Click">Clear test</Button>
           <StackPanel Name="RuleTester" />
         </StackPanel>
       </Expander>

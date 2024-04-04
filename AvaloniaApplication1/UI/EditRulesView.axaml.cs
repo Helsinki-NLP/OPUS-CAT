@@ -25,6 +25,7 @@ namespace OpusCatMtEngine
         }
 
         private MTModel model;
+        private bool testActive;
 
         public EditRulesView() { }
         public EditRulesView(
@@ -32,6 +33,8 @@ namespace OpusCatMtEngine
             ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
             ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
         {
+            this.DataContext = this;
+
             this.Model = selectedModel;
             this.Title = String.Format(Properties.Resources.EditRules_EditRulesTitle, Model.Name);
             this.AutoPreEditRuleCollections = autoPreEditRuleCollections;
@@ -67,6 +70,7 @@ namespace OpusCatMtEngine
                         InputBoxLabel = inputBoxLabel,
                         InputOrigin = inputOrigin,
                         TestButtonVisibility = false,
+                        ClearOnInputChange = false,
                         ButtonText = "Test all pre- and postediting rules"
                     };
 
@@ -104,6 +108,20 @@ namespace OpusCatMtEngine
         public ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
         public List<TestPreEditRuleControl> PreEditTesters { get; private set; }
         public List<TestPostEditRuleControl> PostEditTesters { get; private set; }
+        public bool TestActive
+        { 
+            get => testActive;
+            set
+            {
+                testActive = value;
+                NotifyPropertyChanged();
+            }    
+        }
+        private async void ClearTest_Click(object sender, RoutedEventArgs e)
+        {
+            this.InitializeTester();
+            this.TestActive = false;
+        }
 
         private async void CreatePreRule_Click(object sender, RoutedEventArgs e)
         {
@@ -355,7 +373,6 @@ namespace OpusCatMtEngine
 
         private void TestRules_Click(object sender, RoutedEventArgs e)
         {
-            
             string previousTesterOutput = null;
             string rawSource = null;
             foreach (var tester in this.PreEditTesters)
@@ -373,6 +390,7 @@ namespace OpusCatMtEngine
                     else
                     {
                         rawSource = tester.SourceText;
+                        this.TestActive = true;
                     }
                 }
                 tester.ProcessRules();

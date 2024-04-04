@@ -42,6 +42,7 @@
 
           </StackPanel>
           <DataGrid
+            GridLinesVisibility="All"
               Name="AutoEditRuleCollectionList"
               ItemsSource="{Binding ElementName=_this, Path=RuleCollection.EditRules}">
             <DataGrid.Columns>

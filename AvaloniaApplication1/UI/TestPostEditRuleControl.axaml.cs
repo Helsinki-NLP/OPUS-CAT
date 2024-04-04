@@ -215,25 +215,14 @@ namespace OpusCatMtEngine
 
         public string EditedOutputText
         {
-            get
-            {
-                //TODO: check if this works with cascaded rules, if not use the code below
-                return this.EditedOutputBox.Inlines.Text;
-
-                StringBuilder outputTextBuilder = new StringBuilder();
-                foreach (var inline in this.EditedOutputBox.Inlines)
-                {
-                    outputTextBuilder.Append(((Run)inline).Text);
-                }
-
-                return outputTextBuilder.ToString();
-            }
+            get => editedOutputText; set => editedOutputText = value;
 
         }
 
         public bool handlersAssigned = false;
         private bool sourceBoxDefaultVisibility;
         private bool testActive;
+        private string editedOutputText;
 
         public TestPostEditRuleControl()
         {
@@ -269,6 +258,7 @@ namespace OpusCatMtEngine
             try
             {
                 var result = this.RuleCollection.ProcessPostEditRules(this.SourceText, this.OutputText);
+                this.EditedOutputText = result.Result;
                 if (result == null)
                 {
                     return;

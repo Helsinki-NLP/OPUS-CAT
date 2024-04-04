@@ -290,7 +290,6 @@ namespace OpusCatMtEngine
                     selectedModel,
                     ((ModelManager)this.DataContext).AutoPreEditRuleCollections,
                     ((ModelManager)this.DataContext).AutoPostEditRuleCollections);
-            editRules.DataContext = this.DataContext;
 
             if (Avalonia.Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
