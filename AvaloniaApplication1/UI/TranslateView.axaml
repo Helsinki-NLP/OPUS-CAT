@@ -13,7 +13,7 @@
       <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
       <StackPanel Orientation="Horizontal">
         <Label>Source language</Label>
-        <ComboBox ItemsSource="{Binding Path=SourceLanguages}"
+        <ComboBox ItemsSource="{Binding Path=Model.SourceLanguages}"
                 SelectedValue="{Binding ElementName=_this, Path=SourceLanguage, Mode=TwoWay}"
                 Width="200">
           <ComboBox.ItemTemplate>
@@ -23,7 +23,7 @@
           </ComboBox.ItemTemplate>
           </ComboBox>
         <Label>Target language</Label>
-        <ComboBox ItemsSource="{Binding Path=TargetLanguages}"
+        <ComboBox ItemsSource="{Binding Path=Model.TargetLanguages}"
                 SelectedValue="{Binding ElementName=_this, Path=TargetLanguage, Mode=TwoWay}"
                 Width="200">
           <ComboBox.ItemTemplate>
@@ -39,19 +39,21 @@
       </DockPanel>
       <Border BorderThickness="1" BorderBrush="Black">
         <Grid>
-          <TextBox IsVisible="{Binding !TranslationActive}" AcceptsReturn="True" Name="SourceInputBox" Height="130"></TextBox>
-          <TextBlock IsVisible="{Binding TranslationActive}" Name="SourceBoxDisplay" Height="130"></TextBlock>
+          <TextBox IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="130"></TextBox>
+          <TextBlock IsVisible="{Binding TranslationActive, Mode=TwoWay}" Name="SourceBoxDisplay" Height="130"></TextBlock>
         </Grid>
       </Border>
       <StackPanel Margin="0,5" Orientation="Horizontal">
         <Button
+            IsVisible="{Binding !TranslationActive, Mode=TwoWay}"
             Click="TranslateButtonClick"
             Content="{x:Static resx:Resources.Translate_TranslateButton}"/>
         <Button
+            IsVisible="{Binding TranslationActive, Mode=TwoWay}"
             Click="ClearButtonClick"
             Content="{x:Static resx:Resources.Translate_ClearButton}"/>
-        <Label IsVisible="{Binding Path=DoesNotSupportWordAlignment, FallbackValue=False}">Alignments are not available for this model</Label>
-        <Label IsVisible="{Binding Path=SupportsWordAlignment, FallbackValue=False}">Alignments are available for this model (hover over word to see its aligned words, if any).</Label>
+        <Label IsVisible="{Binding Path=Model.DoesNotSupportWordAlignment, FallbackValue=False}">Alignments are not available for this model</Label>
+        <Label IsVisible="{Binding Path=Model.SupportsWordAlignment, FallbackValue=False}">Alignments are available for this model (hover over word to see its aligned words, if any).</Label>
       </StackPanel>
       <Label IsVisible="{Binding ElementName=_this, Path=AutoEditedTranslations}, FallbackValue=False}">Auto-postedit rules have been applied to some translations, alignments will not be displayed for those translations.</Label>
       <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>

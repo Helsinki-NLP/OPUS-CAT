@@ -65,7 +65,7 @@
                                 <TextBox
                                     Name="RemovalIntervalBox"
                                     Text="{Binding ElementName=_this, Path=DatabaseRemovalInterval, Mode=TwoWay}"
-                                    Width="20" 
+                                    Width="100" 
                                     VerticalAlignment="Center" />
                                 <Label VerticalAlignment="Center" Width="183">days after it has been generated</Label>
                             </StackPanel>
@@ -81,13 +81,11 @@
                     <StackPanel Orientation="Horizontal">
                         <Button 
                                 Margin="5" 
-                                IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}" 
-                                Width="100"  
+                                IsEnabled="{Binding ElementName=_this, Path=SaveButtonEnabled}"  
                                 Click="saveButton_Click"
                                 Content="{x:Static resx:Resources.Settings_SaveButton}"/>
                         <Button 
                                 Margin="5"  
-                                Width="100"  
                                 Click="revertToDefaultsButton_Click"
                                 Content="{x:Static resx:Resources.Settings_RevertToDefaultsButton}"/>
                     </StackPanel>

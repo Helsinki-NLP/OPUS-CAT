@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" Height="380"
              x:Class="OpusCatMtEngine.LocalModelListView"
              xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
              xmlns:local="clr-namespace:OpusCatMTEngine"
@@ -134,18 +134,43 @@
                         Content="{x:Static resx:Resources.Main_SetAsOverrideModelButton}"/>
         </StackPanel>
         <DataGrid
-                    Name="LocalModelList"
-                    Height="500"
-                    GridLinesVisibility="All"
-                    ItemsSource="{Binding LocalModels, Mode=OneWay}">
+            CanUserSortColumns="True"
+            CanUserResizeColumns="True"
+            CanUserReorderColumns="True"
+            Name="LocalModelList"
+            Height="320"
+            GridLinesVisibility="All"
+            ItemsSource="{Binding LocalModels, Mode=OneWay}">
 
           <DataGrid.Columns>
 
-            <DataGridTextColumn  Binding="{Binding Path=SourceLanguageString}" Header="Source languages" Width="100"/>
-            <DataGridTextColumn  Binding="{Binding Path=TargetLanguageString, Mode=OneWay}" Header="Target languages" Width="100" />
+            <DataGridTemplateColumn SortMemberPath="SourceLanguageString" Width="100" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                <TextBlock VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}">
+                  <ToolTip.Tip>
+                    <TextBlock MaxWidth="400" TextWrapping="Wrap" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"></TextBlock>
+                  </ToolTip.Tip>
+                </TextBlock>
+                  </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTemplateColumn SortMemberPath="TargetLanguageString" Width="100" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}">
+                    <ToolTip.Tip>
+                      <TextBlock MaxWidth="400" TextWrapping="Wrap" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"></TextBlock>
+                    </ToolTip.Tip>
+                  </TextBlock>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            
             <DataGridTextColumn  Binding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
 
-            <DataGridTemplateColumn Width="220" Header="Status">
+            <DataGridTemplateColumn SortMemberPath="StatusAndEstimateString" Width="220" Header="Status">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Grid>

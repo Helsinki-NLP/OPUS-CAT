@@ -6,6 +6,7 @@
         x:Class="OpusCatMtEngine.CreatePostEditRuleWindow"
         xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMtEngine"
+        Icon="/Images/opus.bmp"
         Title="{x:Static resx:Resources.EditRules_CreatePostEditRuleTitle}" Height="450" Width="800"
         x:CompileBindings="False">
   <ScrollViewer>

@@ -6,6 +6,7 @@
         x:Class="OpusCatMtEngine.CreatePreEditRuleWindow"
         xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMtEngine"
+        Icon="/Images/opus.bmp"
         Title="{x:Static resx:Resources.EditRules_CreatePreEditRuleTitle}"
         x:CompileBindings="False">
   <Grid>

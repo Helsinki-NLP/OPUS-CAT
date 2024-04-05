@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:OpusCatMtEngine"
         Title="OPUS-CAT machine translation" Height="200" Width="400"
         Topmost="{Binding IsChecked,ElementName=TopmostBox}"
-        x:Name="_this">
+        x:Name="_this"
+        Icon="/Images/opus.bmp">
   <Border Margin="5" BorderThickness="1" BorderBrush="Black">
     <DockPanel LastChildFill="True">
 

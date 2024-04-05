@@ -9,18 +9,34 @@ using System;
 using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 using System.Linq;
 using LiveChartsCore.Measure;
+using System.Timers;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using LiveChartsCore.SkiaSharpView.Painting;
+using Avalonia.Media;
 
 namespace OpusCatMtEngine
 {
-    public partial class CustomizationProgressView : UserControl
+    public partial class CustomizationProgressView : UserControl, INotifyPropertyChanged
     {
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+        }
 
         private MTModel model;
 
         private IEnumerable<LineSeries<double>> ScoresToSeries(
             IEnumerable<FileInfo> scoreFiles,
-            string title,
-            Geometry geometry)
+            string title)
         {
 
             Dictionary<string, List<double>> scoresValues = new Dictionary<string, List<double>>();
@@ -73,13 +89,34 @@ namespace OpusCatMtEngine
                 scoresSeries.Add(new LineSeries<double>()
                 {
                     Values = scoresValues[scoreKey],
-                    Name = $"{title} {scoreKey}"
+                    Name = $"{title} {scoreKey}",
                 });
             }
 
             
 
             return scoresSeries;
+        }
+
+        public void UpdateChart()
+        {
+            this.SeriesCollection.Clear();
+            var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
+            var inDomainSeries =
+                this.ScoresToSeries(
+                    inDomainFiles,
+                    Properties.Resources.Progress_InDomainSeriesName);
+            this.SeriesCollection.AddRange(inDomainSeries);
+
+            if (this.model.HasOODValidSet)
+            {
+                var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
+                var outOfDomainSeries =
+                    this.ScoresToSeries(
+                        outOfDomainFiles,
+                        Properties.Resources.Progress_OutOfDomainSeriesName);
+                this.SeriesCollection.AddRange(outOfDomainSeries);
+            }
         }
 
         public CustomizationProgressView()
@@ -91,38 +128,48 @@ namespace OpusCatMtEngine
         {
             this.DataContext = this;
 
-            this.SeriesCollection = new List<LineSeries<double>>();
             this.Model = selectedModel;
+            this.SeriesCollection = new List<LineSeries<double>>();
+
+            if (this.Model.FinetuneProcess != null)
+            {
+                this.SetTimer();
+            }
             this.Title = $"Fine-tuning progress for model {Model.Name}";
 
-            var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
-            var inDomainSeries =
-                this.ScoresToSeries(
-                    inDomainFiles,
-                    Properties.Resources.Progress_InDomainSeriesName, null);
-            this.SeriesCollection.AddRange(inDomainSeries);
-
-            if (this.model.HasOODValidSet)
-            {
-                var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
-                var outOfDomainSeries =
-                    this.ScoresToSeries(
-                        outOfDomainFiles,
-                        Properties.Resources.Progress_OutOfDomainSeriesName,
-                        null);
-                this.SeriesCollection.AddRange(outOfDomainSeries);
-            }
-            
+            this.UpdateChart();
             InitializeComponent();
             
             this.ProgressChart.XAxes = new List<Axis>
             {
                 new Axis
                 {
-                    MinStep = 1
+                    MinStep = 1,
                 }
             };
 
+
+        }
+
+        private System.Timers.Timer aTimer;
+
+        private void SetTimer()
+        {
+            // Create a timer with 60 second interval.
+            aTimer = new System.Timers.Timer(60000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += OnTimedEvent;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+        }
+
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            this.UpdateChart();
+            if (this.Model.ModelConfig.FinetuningComplete)
+            {
+                aTimer.Stop();
+            }
         }
 
         private List<LineSeries<double>> seriesCollection;
@@ -130,7 +177,15 @@ namespace OpusCatMtEngine
         public string Title { get; private set; }
         public string[] Labels { get; set; }
         public Func<double, string> YFormatter { get; set; }
-        public List<LineSeries<double>> SeriesCollection { get => seriesCollection; set => seriesCollection = value; }
+        public List<LineSeries<double>> SeriesCollection
+        { 
+            get => seriesCollection;
+            set
+            {
+                seriesCollection = value;
+                NotifyPropertyChanged();
+            }
+        }
     }
 }
 

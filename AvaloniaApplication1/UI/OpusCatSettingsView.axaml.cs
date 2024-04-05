@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using OpusCatMtEngine;
 using OpusCatMtEngine.UI;
@@ -11,6 +12,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -114,7 +116,7 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
         get => httpServicePortBox;
         set
         {
-            httpServicePortBox = value;
+            httpServicePortBox = value.Replace("_", "");
             NotifyPropertyChanged();
             NotifyPropertyChanged("SaveButtonEnabled");
         }
@@ -186,7 +188,7 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
         get => servicePortBox;
         set
         {
-            servicePortBox = value;
+            servicePortBox = value.Replace("_","");
             NotifyPropertyChanged();
             NotifyPropertyChanged("SaveButtonEnabled");
         }
@@ -219,7 +221,16 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
                 this.DisplayOverlay == OpusCatMtEngineSettings.Default.DisplayOverlay &&
                 this.MaxLength == OpusCatMtEngineSettings.Default.MaxLength.ToString();
 
-            return !allSettingsDefault && !this.validationErrors;
+
+            foreach (var tBox in this.GetVisualDescendants().OfType<TextBox>())
+            {
+                if (DataValidationErrors.GetHasErrors(tBox))
+                {
+                    return false;
+                }
+            }
+
+            return !allSettingsDefault;
         }
     }
 
@@ -227,7 +238,6 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
     private bool httpServicePortBoxIsValid;
     private bool servicePortBoxIsValid;
     private bool _cacheMtInDatabase;
-    private bool validationErrors;
     private bool useDatabaseRemoval;
     private bool _displayOverlay;
     private string? maxLength;

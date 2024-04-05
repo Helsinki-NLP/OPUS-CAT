@@ -7,6 +7,7 @@
         xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMtEngine"
         x:Name="_this"
+        Icon="/Images/opus.bmp"
         Title="{x:Static resx:Resources.EditRules_AddEditRuleCollectionTitle}" Height="450" Width="800"
         x:CompileBindings="False">
   <ScrollViewer VerticalScrollBarVisibility="Auto">

@@ -6,6 +6,7 @@
         x:Class="OpusCatMtEngine.SelectTmxLangPairWindow"
         xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
         xmlns:local="clr-namespace:OpusCatMtEngine"
+        Icon="/Images/opus.bmp"
         Title="{x:Static resx:Resources.SelectTmxLangPair_Title}"
         x:CompileBindings="False">
   <Border BorderBrush="Black" BorderThickness="1" Margin="3">

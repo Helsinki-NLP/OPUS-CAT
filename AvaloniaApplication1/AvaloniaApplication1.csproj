@@ -2757,7 +2757,15 @@
   <ItemGroup>
     <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <AvaloniaResource Update="Images\opus.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AvaloniaResource>
+  </ItemGroup>
 
+  
+  
   <ItemGroup>
     <EmbeddedResource Condition=" '$(EnableDefaultEmbeddedResourceItems)' == 'true' " Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

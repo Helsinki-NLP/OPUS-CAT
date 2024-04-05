@@ -24,8 +24,8 @@
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
-            <RowDefinition Height="25"></RowDefinition>
-            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
           </Grid.RowDefinitions>
           <Label
@@ -79,22 +79,33 @@
           <Label HorizontalAlignment="Center" Name="ModelCount" Content="{Binding FilteredOnlineModels.Count, Mode=OneWay}"/>
         </StackPanel>
         <DataGrid
+          CanUserReorderColumns="True"
+          CanUserResizeColumns="True"
+          CanUserSortColumns="True"
           Name="ModelListView"
           ItemsSource="{Binding FilteredOnlineModels, Mode=OneWay}"
-          DockPanel.Dock="Bottom" Height="300"
+          DockPanel.Dock="Bottom" Height="250"
           GridLinesVisibility="All">
           <DataGrid.Columns>
-            <DataGridTemplateColumn Width="120" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}">
+            <DataGridTemplateColumn SortMemberPath="SourceLanguageString" Width="120" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock VerticalAlignment="Center" ToolTip.Tip="{Binding Path=SourceLanguageString, Mode=OneWay}" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"></TextBlock>
+                <TextBlock VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}">
+                  <ToolTip.Tip>
+                    <TextBlock MaxWidth="400" TextWrapping="Wrap" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"></TextBlock>
+                  </ToolTip.Tip>
+                </TextBlock>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
-            <DataGridTemplateColumn Width="120" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}">
+            <DataGridTemplateColumn SortMemberPath="TargetLanguageString" Width="120" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
-                  <TextBlock VerticalAlignment="Center" ToolTip.Tip="{Binding Path=TargetLanguageString, Mode=OneWay}" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"></TextBlock>
+                  <TextBlock VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}">
+                      <ToolTip.Tip>
+                        <TextBlock MaxWidth="400" TextWrapping="Wrap" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"></TextBlock>  
+                      </ToolTip.Tip>                    
+                  </TextBlock>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
@@ -105,7 +116,7 @@
                 <DataTemplate>
                   <Grid>
                     <ProgressBar Foreground="Green" Width="220" Maximum="100" Value="{Binding Path=InstallProgress, Mode=OneWay}"/>
-                    <TextBlock HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
+                    <TextBlock Foreground="White" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=InstallStatus, Mode=OneWay}"/>
                   </Grid>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>

@@ -11,10 +11,10 @@
   <ScrollViewer>
     <StackPanel Margin="5">
       <StackPanel DockPanel.Dock="Top">
-        <Border BorderBrush="Black" BorderThickness="1">
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1">
           <StackPanel>
 
-            <StackPanel Margin="5,0,0,5">
+            <StackPanel Margin="5">
               <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TrainingFilesLabel}"/>
               <StackPanel
                   Orientation="Horizontal"
@@ -83,8 +83,8 @@
             </StackPanel>
           </StackPanel>
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1">
-          <StackPanel Margin="5,0,0,5">
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+          <StackPanel Margin="5">
             <Label FontWeight="Bold" Content="{x:Static resx:Resources.Finetune_TagProcessingLabel}"/>
 
             <CheckBox
@@ -98,9 +98,9 @@
           </StackPanel>
 
         </Border>
-        <Border BorderBrush="Black" BorderThickness="1">
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1">
           <StackPanel>
-            <StackPanel Margin="5,0,0,5">
+            <StackPanel Margin="5">
               <Label
                   FontWeight="Bold"
                   Content="{x:Static resx:Resources.Finetune_ValidationFilesLabel}">

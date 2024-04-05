@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace OpusCatMtEngine
 {
-    public partial class TranslateView : UserControl
+    public partial class TranslateView : UserControl, INotifyPropertyChanged
     {
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -31,13 +31,13 @@ namespace OpusCatMtEngine
         public event PropertyChangedEventHandler PropertyChanged;
 
         private MTModel model;
-        private List<List<Inline>> sourceRuns;
-        private List<List<Inline>> targetRuns;
+        private List<InlineCollection> sourceRuns;
+        private List<InlineCollection> targetRuns;
 
         private IsoLanguage sourceLanguage;
         private IsoLanguage targetLanguage;
         private bool _showSegmentation;
-        private List<Inline> wordsplitList;
+        private InlineCollection wordsplitList;
 
         internal string Title { get; set; }
 
@@ -50,8 +50,8 @@ namespace OpusCatMtEngine
         {
             
             this.Model = selectedModel;
-            this.DataContext = selectedModel;
-            this.wordsplitList = new List<Inline>();
+            this.DataContext = this;
+            this.wordsplitList = new InlineCollection();
             this.SourceLanguage = this.Model.SourceLanguages.First();
             this.TargetLanguage = this.Model.TargetLanguages.First();
             this.Title = String.Format(Properties.Resources.Translate_TranslateTitle, Model.Name);
@@ -88,8 +88,8 @@ namespace OpusCatMtEngine
                 {
                     foreach (var wordsplit in this.wordsplitList)
                     {
-                        var textblock = this.GetMousableRunTextBlock(wordsplit);
-                        textblock.Text = "|";
+                        var textblock = this.GetMousableInline(wordsplit);
+                        textblock.Content = "|";
                         textblock.Foreground = Brushes.Red;
                     }
                 }
@@ -97,8 +97,8 @@ namespace OpusCatMtEngine
                 {
                     foreach (var wordsplit in this.wordsplitList)
                     {
-                        var textblock = this.GetMousableRunTextBlock(wordsplit);
-                        textblock.Text = "";
+                        var textblock = this.GetMousableInline(wordsplit);
+                        textblock.Content = "";
                     }
                 }
 
@@ -111,15 +111,11 @@ namespace OpusCatMtEngine
             }
         }
 
-        private TextBlock GetMousableRunTextBlock(Inline mousableRun)
-        {
-            return (TextBlock)this.GetMousableRunButton(mousableRun).Content;
-        }
-
-        private Button GetMousableRunButton(Inline mousableRun)
+        
+        private MousableInline GetMousableInline(Inline mousableRun)
         {
             var container = (InlineUIContainer)mousableRun;
-            return (Button)container.Child;
+            return (MousableInline)container.Child;
         }
 
 
@@ -149,16 +145,6 @@ namespace OpusCatMtEngine
 
         private async void ClearButtonClick(object? sender, RoutedEventArgs e)
         {
-            //TODO: There's a bug in Avalonia that causes Inlines.Clear() not to work.
-            //The bug has apparently been fixed in 1.1.0.8, but that version fails because of some
-            //other exception (the control already has a visual parent).
-            //Leave this until the last touches, and check if it's been fixed by then
-            
-            //WORKAROUND: Reuse the inline buttons instead of trying to clear and
-            //recreate them. Maybe create x number of buttons beforehand so that they
-            //can be used for any text. This would restrict the length of translations,
-            //but that's not fatal. Leave this for last.
-
             
             this.TranslationActive = false;
             this.wordsplitList.Clear();
@@ -166,6 +152,7 @@ namespace OpusCatMtEngine
             this.targetRuns.Clear();
 
             this.SourceBoxDisplay.Inlines.Clear();
+            this.TargetBox.Inlines.Clear();
         }
 
         private async void TranslateButtonClick(object? sender, RoutedEventArgs e)
@@ -177,8 +164,8 @@ namespace OpusCatMtEngine
             //set the segment split to empty before translating.
             foreach (var wordsplit in this.wordsplitList)
             {
-                var textblock = this.GetMousableRunTextBlock(wordsplit);
-                textblock.Text = "";
+                var textblock = this.GetMousableInline(wordsplit);
+                textblock.Content = "";
             }
             this.wordsplitList.Clear();
             try
@@ -240,8 +227,8 @@ namespace OpusCatMtEngine
         private void PopulateBoxes(List<TranslationPair> translation)
         {
             this.SourceBoxDisplay.Inlines.Clear();
-            this.sourceRuns = new List<List<Inline>>();
-            this.targetRuns = new List<List<Inline>>();
+            this.sourceRuns = new List<InlineCollection>();
+            this.targetRuns = new List<InlineCollection>();
 
             bool firstTranslationPair = true;
             foreach (var (pair, pairindex) in translation.Select((x, i) => (x, i)))
@@ -280,43 +267,28 @@ namespace OpusCatMtEngine
             }
         }
 
-        private InlineUIContainer GenerateMousableInline(
+        private MousableInline GenerateMousableInline(
             string text, TextDecorationCollection underline=null, string tag = null)
         {
-            var container = new InlineUIContainer();
-            var button = new Button();
-            container.Child = button;
-            var textBlock = new TextBlock();
-            button.Content = textBlock;
-            textBlock.Text = text;
-            if (underline != null) 
-            {
-                textBlock.TextDecorations = underline;
-            }
-            if (tag != null)
-            {
-                button.Tag = tag;
-            }
-
-            return container;
+            return new MousableInline() { Tag=tag, Content=text };
         }
 
-        private List<Inline> GenerateRuns(
+        private InlineCollection GenerateRuns(
             string[] tokens,
             Dictionary<int, List<int>> alignment,
             SegmentationMethod segmentation,
             int translationIndex,
-            List<List<Inline>> otherRuns,
+            List<InlineCollection> otherRuns,
             bool autoEditedTranslation)
         {
-            var runlist = new List<Inline>();
+            var runlist = new InlineCollection();
             //Change this to add each token as a run, and add empty runs for space and pipe runs for segmentation
             //visualization
             bool insideTerm = false;
             foreach (var (token, index) in tokens.Select((x, i) => (x, i)))
             {
                 string processedToken = token;
-                Inline tokenrun;
+                MousableInline tokenrun;
                 switch (segmentation)
                 {
                     case SegmentationMethod.SentencePiece:
@@ -345,18 +317,18 @@ namespace OpusCatMtEngine
                         }
                         else if (token == "<term_start>" || token == "<term_mask>")
                         {
-                            tokenrun = new Run("");
+                            tokenrun = this.GenerateMousableInline("");
                             runlist.Add(tokenrun);
                         }
                         else if (token == "<term_end>")
                         {
-                            tokenrun = new Run("");
+                            tokenrun = this.GenerateMousableInline("");
                             runlist.Add(tokenrun);
                             insideTerm = true;
                         }
                         else if (token == "<trans_end>")
                         {
-                            tokenrun = new Run("");
+                            tokenrun = this.GenerateMousableInline("");
                             runlist.Add(tokenrun);
                             insideTerm = false;
                         }
@@ -384,7 +356,7 @@ namespace OpusCatMtEngine
                         if (token.EndsWith("@@"))
                         {
                             processedToken = processedToken.Substring(0, processedToken.Length - 2);
-                            tokenrun = new Run(processedToken);
+                            tokenrun = this.GenerateMousableInline(processedToken);
                             runlist.Add(tokenrun);
 
                             var wordsplitRun = this.GenerateMousableInline("",tag:"wordsplit");
@@ -411,8 +383,8 @@ namespace OpusCatMtEngine
                 if (this.model.SupportsWordAlignment && !autoEditedTranslation && alignment.ContainsKey(index))
                 {
                     var alignedTokens = alignment[index];
-                    this.GetMousableRunButton(tokenrun).PointerEntered += (x, y) => Tokenrun_MouseEnter(alignedTokens, otherRuns, translationIndex, x, y);
-                    this.GetMousableRunButton(tokenrun).PointerExited += (x, y) => Tokenrun_MouseLeave(alignedTokens, otherRuns, translationIndex, x, y);
+                    tokenrun.PointerEntered += (x, y) => Tokenrun_MouseEnter(alignedTokens, otherRuns, translationIndex, x, y);
+                    tokenrun.PointerExited += (x, y) => Tokenrun_MouseLeave(alignedTokens, otherRuns, translationIndex, x, y);
                 }
 
             }
@@ -422,29 +394,29 @@ namespace OpusCatMtEngine
             return runlist;
         }
 
-        private void Tokenrun_MouseLeave(List<int> alignedTokens, List<List<Inline>> otherRuns, int pairindex, object sender, PointerEventArgs e)
+        private void Tokenrun_MouseLeave(List<int> alignedTokens, List<InlineCollection> otherRuns, int pairindex, object sender, PointerEventArgs e)
         {
-            var tokenTextBlock = (TextBlock)((Button)sender).Content;
-            tokenTextBlock.Background = Brushes.Transparent;
+            var mousableInline = (MousableInline)sender;
+            mousableInline.Background = Brushes.Transparent;
             //Ignore space and wordsplit token, since they are not included in the alignment
-            var runlist = otherRuns[pairindex].Where(x => this.GetMousableRunButton(x).Tag == null ||
-                (this.GetMousableRunButton(x).Tag.ToString() != "space" && this.GetMousableRunButton(x).Tag.ToString() != "wordsplit")).ToList();
+            var runlist = otherRuns[pairindex].Where(x => this.GetMousableInline(x).Tag == null ||
+                (this.GetMousableInline(x).Tag.ToString() != "space" && this.GetMousableInline(x).Tag.ToString() != "wordsplit")).ToList();
             foreach (var tokenIndex in alignedTokens)
             {
-                this.GetMousableRunTextBlock(runlist[tokenIndex]).Background = Brushes.Transparent;
+                this.GetMousableInline(runlist[tokenIndex]).Background = Brushes.Transparent;
             }
         }
 
-        private void Tokenrun_MouseEnter(List<int> alignedTokens, List<List<Inline>> otherRuns, int pairindex, object sender, PointerEventArgs e)
+        private void Tokenrun_MouseEnter(List<int> alignedTokens, List<InlineCollection> otherRuns, int pairindex, object sender, PointerEventArgs e)
         {
-            var tokenTextBlock = (TextBlock)((Button)sender).Content;
-            tokenTextBlock.Background = Brushes.BlueViolet;
+            var mousableInline = (MousableInline)sender;
+            mousableInline.Background = Brushes.BlueViolet;
             //Ignore space and wordsplit token, since they are not included in the alignment
-            var runlist = otherRuns[pairindex].Where(x => this.GetMousableRunButton(x).Tag == null ||
-                (this.GetMousableRunButton(x).Tag.ToString() != "space" && this.GetMousableRunButton(x).Tag.ToString() != "wordsplit")).ToList();
+            var runlist = otherRuns[pairindex].Where(x => this.GetMousableInline(x).Tag == null ||
+                (this.GetMousableInline(x).Tag.ToString() != "space" && this.GetMousableInline(x).Tag.ToString() != "wordsplit")).ToList();
             foreach (var tokenIndex in alignedTokens)
             {
-                this.GetMousableRunTextBlock(runlist[tokenIndex]).Background = Brushes.BlueViolet;
+                this.GetMousableInline(runlist[tokenIndex]).Background = Brushes.BlueViolet;
             }
         }
     }
