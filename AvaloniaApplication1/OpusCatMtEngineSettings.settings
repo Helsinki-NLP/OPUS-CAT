@@ -124,5 +124,8 @@
   &lt;string /&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
+    <Setting Name="LinuxPythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python3-linux-3.8.13-x86_64</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

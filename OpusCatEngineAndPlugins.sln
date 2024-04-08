@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpusCatTranslationProvider"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpusCatTranslationProvider2017", "Trados2017Plugin\OpusCatTranslationProvider2017.csproj", "{FC5E3080-72AB-432E-9071-FBE72F30AAE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpusMTInterface", "OpusMTInterface\OpusMTInterface.csproj", "{8F60B71D-D796-4B35-A7FB-42B9C90CD943}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpusMTInterface", "OpusMTInterface\OpusMTInterface.csproj", "{8F60B71D-D796-4B35-A7FB-42B9C90CD943}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpusCatMTEngine", "OpusCatMTEngine\OpusCatMTEngine.csproj", "{03BF6215-D7C1-4401-A427-3590990C70A8}"
 EndProject

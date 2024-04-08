@@ -486,5 +486,17 @@ namespace OpusCatMtEngine {
                 this["UnbalancedSplitPatterns"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("python3-linux-3.8.13-x86_64")]
+        public string LinuxPythonDir {
+            get {
+                return ((string)(this["LinuxPythonDir"]));
+            }
+            set {
+                this["LinuxPythonDir"] = value;
+            }
+        }
     }
 }

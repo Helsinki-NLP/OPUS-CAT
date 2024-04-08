@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -2752,10 +2752,6 @@
   <ItemGroup>
     <EmbeddedResource Include="iso-639-3_20200515.tab" />
     <EmbeddedResource Include="iso639-5.tsv" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\OpusMTInterface\OpusMTInterface.csproj" />
   </ItemGroup>
   
   <ItemGroup>
