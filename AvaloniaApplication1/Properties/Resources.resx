@@ -499,6 +499,9 @@
   <data name="Translate_ClearButton" xml:space="preserve">
     <value>Clear</value>
   </data>
+  <data name="Translate_CopyButton" xml:space="preserve">
+    <value>Copy translation to clipboard</value>
+  </data>
   <data name="Translate_SourceTextLabel" xml:space="preserve">
     <value>Source text:</value>
   </data>

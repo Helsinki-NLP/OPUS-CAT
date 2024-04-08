@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -142,6 +143,29 @@ namespace OpusCatMtEngine
 
         private bool autoEditedTranslations;
         private bool translationActive;
+
+
+        private async void CopyToClipboard_Click(object? sender, RoutedEventArgs e)
+        {
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            var dataObject = new DataObject();
+            StringBuilder translation = new StringBuilder();
+            foreach (Inline inline in this.TargetBox.Inlines)
+            {
+                if (inline is Run run)
+                {
+                    translation.Append(run.Text);
+                }
+                else if (inline is InlineUIContainer container)
+                {
+                    translation.Append(((MousableInline)(container.Child)).Content);
+                }
+                    
+                dataObject.Set(DataFormats.Text, translation.ToString());
+                await clipboard.SetDataObjectAsync(dataObject);
+            }
+            
+        }
 
         private async void ClearButtonClick(object? sender, RoutedEventArgs e)
         {
@@ -306,11 +330,11 @@ namespace OpusCatMtEngine
 
                             if (insideTerm)
                             {
-                                tokenrun = this.GenerateMousableInline(token,TextDecorations.Underline);
+                                tokenrun = this.GenerateMousableInline(processedToken,TextDecorations.Underline);
                             }
                             else
                             {
-                                tokenrun = this.GenerateMousableInline(token);
+                                tokenrun = this.GenerateMousableInline(processedToken);
                             }
 
                             runlist.Add(tokenrun);

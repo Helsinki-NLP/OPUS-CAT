@@ -39,8 +39,10 @@
       </DockPanel>
       <Border BorderThickness="1" BorderBrush="Black">
         <Grid>
-          <TextBox IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="130"></TextBox>
-          <TextBlock IsVisible="{Binding TranslationActive, Mode=TwoWay}" Name="SourceBoxDisplay" Height="130"></TextBlock>
+          <TextBox TextWrapping="Wrap" IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="130"></TextBox>
+          <ScrollViewer Height="130" IsVisible="{Binding TranslationActive, Mode=TwoWay}" >
+            <SelectableTextBlock TextWrapping="Wrap" Name="SourceBoxDisplay"></SelectableTextBlock>
+          </ScrollViewer>
         </Grid>
       </Border>
       <StackPanel Margin="0,5" Orientation="Horizontal">
@@ -48,20 +50,22 @@
             IsVisible="{Binding !TranslationActive, Mode=TwoWay}"
             Click="TranslateButtonClick"
             Content="{x:Static resx:Resources.Translate_TranslateButton}"/>
-        <Button
-            IsVisible="{Binding TranslationActive, Mode=TwoWay}"
-            Click="ClearButtonClick"
+        <StackPanel IsVisible="{Binding TranslationActive, Mode=TwoWay}" Orientation="Horizontal">
+          <Button    
+              Click="ClearButtonClick"
             Content="{x:Static resx:Resources.Translate_ClearButton}"/>
+          <Button Click="CopyToClipboard_Click"
+              Content="{x:Static resx:Resources.Translate_CopyButton}"/>
+        </StackPanel>
         <Label IsVisible="{Binding Path=Model.DoesNotSupportWordAlignment, FallbackValue=False}">Alignments are not available for this model</Label>
         <Label IsVisible="{Binding Path=Model.SupportsWordAlignment, FallbackValue=False}">Alignments are available for this model (hover over word to see its aligned words, if any).</Label>
       </StackPanel>
       <Label IsVisible="{Binding ElementName=_this, Path=AutoEditedTranslations}, FallbackValue=False}">Auto-postedit rules have been applied to some translations, alignments will not be displayed for those translations.</Label>
       <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
       <Border BorderThickness="1" BorderBrush="Black">
-        <TextBlock
-            Name="TargetBox"
-            Height="130">
-        </TextBlock>
+        <ScrollViewer Height="130" >
+          <TextBlock Name="TargetBox" TextWrapping="Wrap" />
+        </ScrollViewer>
       </Border>
     </StackPanel>
   </Grid>
