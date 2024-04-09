@@ -71,6 +71,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMacos|AnyCPU'">
+    <OutputPath>bin\DebugMacos\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMacos|x64'">
+    <OutputPath>bin\x64\DebugMacos\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MemoQ.Addins.Common">
       <HintPath>..\References-958\MemoQ.Addins.Common.dll</HintPath>

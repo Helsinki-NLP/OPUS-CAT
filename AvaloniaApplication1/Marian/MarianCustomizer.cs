@@ -363,7 +363,7 @@ namespace OpusCatMtEngine
 #if WINDOWS
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMtEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
-#elif LINUX
+#else
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                            Path.Combine(OpusCatMtEngineSettings.Default.MarianDir, "marian"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
 #endif

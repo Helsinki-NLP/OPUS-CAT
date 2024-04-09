@@ -127,5 +127,8 @@
     <Setting Name="LinuxPythonDir" Type="System.String" Scope="User">
       <Value Profile="(Default)">python3-linux-3.8.13-x86_64</Value>
     </Setting>
+    <Setting Name="MacosPythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python3-macos-3.8.13-universal2</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

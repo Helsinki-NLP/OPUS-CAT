@@ -217,7 +217,7 @@ namespace OpusCatMtEngine
             //Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
             Runtime.PythonDLL = ".\\python3-windows-3.8.10-amd64\\python38.dll";
             
-#else
+#elif LINUX
             //Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
             //Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
             //Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
@@ -225,6 +225,8 @@ namespace OpusCatMtEngine
             //Environment.SetEnvironmentVariable("LD_LIBRARY_PATH", "/mnt/d/Users/niemi/source/repos/OPUS-CAT/AvaloniaApplication1/bin/DebugWsl/net7.0/python3-linux-3.8.13-x86_64/lib/");
             //Environment.SetEnvironmentVariable("PATH", "$PATH:/mnt/d/Users/niemi/source/repos/OPUS-CAT/AvaloniaApplication1/bin/DebugWsl/net7.0/python3-linux-3.8.13-x86_64/lib/");
             Runtime.PythonDLL = $"./python3-linux-3.8.13-x86_64/lib/libpython3.8.so.1.0";
+#elif MACOS
+            Runtime.PythonDLL = $"./python3-macos-3.8.13-universal2/lib/libpython3.8.dylib";
 #endif
             PythonEngine.Initialize();
             var home = PythonEngine.PythonHome;

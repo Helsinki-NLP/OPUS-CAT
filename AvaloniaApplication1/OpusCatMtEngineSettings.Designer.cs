@@ -498,5 +498,17 @@ namespace OpusCatMtEngine {
                 this["LinuxPythonDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("python3-macos-3.8.13-universal2")]
+        public string MacosPythonDir {
+            get {
+                return ((string)(this["MacosPythonDir"]));
+            }
+            set {
+                this["MacosPythonDir"] = value;
+            }
+        }
     }
 }
