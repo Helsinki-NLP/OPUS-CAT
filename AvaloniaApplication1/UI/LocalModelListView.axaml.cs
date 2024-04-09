@@ -37,6 +37,8 @@ namespace OpusCatMtEngine
             Process.Start("explorer.exe", selectedModel.InstallDir);
 #elif LINUX
             Process.Start("nautilus", selectedModel.InstallDir); 
+#elif MACOS
+            Process.Start($"file:///{selectedModel.InstallDir}"); 
 #endif
         }
 
