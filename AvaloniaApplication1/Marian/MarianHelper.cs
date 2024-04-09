@@ -59,16 +59,17 @@ namespace OpusCatMtEngine
 
             //Add process to job object to make sure it is closed if the engine crashes without
             //calling the exit code.
-            //TODO: fix this for crossplatform (see if there's an universal way, otherwise
-            //do bespoke for all)
-            ChildProcessTracker.AddProcess(ExternalProcess);
+
 
             ExternalProcess.EnableRaisingEvents = true;
             ExternalProcess.BeginErrorReadLine();
 
             ExternalProcess.StandardInput.AutoFlush = true;
 
-            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+#if WINDOWS
+            ChildProcessTracker.AddProcess(ExternalProcess);
+                  AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+#endif
 
             return ExternalProcess;
         }
@@ -112,17 +113,19 @@ namespace OpusCatMtEngine
 
             ExternalProcess.Start();
 
-            //Add process to job object to make sure it is closed if the engine crashes without
-            //calling the exit code.
-            //TODO: fix this
-            ChildProcessTracker.AddProcess(ExternalProcess);
+  
 
             ExternalProcess.EnableRaisingEvents = true;
             ExternalProcess.BeginErrorReadLine();
 
             ExternalProcess.StandardInput.AutoFlush = true;
-
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+#if WINDOWS
+            ChildProcessTracker.AddProcess(ExternalProcess);
             AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+#endif
+
 
             return ExternalProcess;
         }
@@ -165,18 +168,21 @@ namespace OpusCatMtEngine
             }
 
             ExternalProcess.Start();
-            
-            //Add process to job object to make sure it is closed if the engine crashes without
-            //calling the exit code.
-            //TODO
-            ChildProcessTracker.AddProcess(ExternalProcess);
+
+ 
 
             ExternalProcess.EnableRaisingEvents = true;
             ExternalProcess.BeginErrorReadLine();
             
             ExternalProcess.StandardInput.AutoFlush = true;
 
-            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+#if WINDOWS
+            ChildProcessTracker.AddProcess(ExternalProcess);
+                  AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+#endif
+
 
             return ExternalProcess;
         }
@@ -207,14 +213,18 @@ namespace OpusCatMtEngine
             ExternalProcess.StartInfo.CreateNoWindow = false;
             ExternalProcess.Start();
 
-            //Add process to job object to make sure it is closed if the engine crashes without
-            //calling the exit code.
-            ChildProcessTracker.AddProcess(ExternalProcess);
+
 
             ExternalProcess.EnableRaisingEvents = true;
             //ExternalProcess.BeginErrorReadLine();
 
-            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+            //Add process to job object to make sure it is closed if the engine crashes without
+            //calling the exit code.
+#if WINDOWS
+            ChildProcessTracker.AddProcess(ExternalProcess);
+                  AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
+#endif
+
 
             return ExternalProcess;
         }
