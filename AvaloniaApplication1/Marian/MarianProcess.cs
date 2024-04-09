@@ -117,7 +117,9 @@ namespace OpusCatMtEngine
 
 #if LINUX
             string mtCommand = $"Marian{Path.DirectorySeparatorChar}marian";
-#else
+#if MACOS
+            string mtCommand = $"Marian{Path.DirectorySeparatorChar}marian";
+#elif WINDOWS
             string mtCommand = $"Marian{Path.DirectorySeparatorChar}marian.exe";
 #endif
 
