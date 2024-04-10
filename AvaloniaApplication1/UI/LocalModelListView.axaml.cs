@@ -30,7 +30,7 @@ namespace OpusCatMtEngine
             
         }
 
-        private void btnOpenModelDir_Click(object sender, RoutedEventArgs e)
+        private void btnOpenModelDir_Click(object sender, RoutedEventArgs se)
         {
             var selectedModel = (MTModel)this.LocalModelList.SelectedItem;
 #if WINDOWS
@@ -38,7 +38,7 @@ namespace OpusCatMtEngine
 #elif LINUX
             Process.Start("nautilus", selectedModel.InstallDir); 
 #elif MACOS
-            Process.Start($"file:///{selectedModel.InstallDir}"); 
+            Process.Start("open",$"\"{selectedModel.InstallDir}\""); 
 #endif
         }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using MsBox.Avalonia.Enums;
+﻿using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
 using Serilog;
 using System;
@@ -403,8 +402,7 @@ namespace OpusCatMtEngine
             {
                 try
                 {
-                    FileSystem.DeleteDirectory(
-                    Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath), UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                    Directory.Delete(Path.Combine(this.opusModelDir.FullName, selectedModel.ModelPath),true);
                 }
                 catch (Exception ex)
                 {

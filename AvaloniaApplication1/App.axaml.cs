@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace OpusCatMtEngine
 {
@@ -195,7 +196,18 @@ namespace OpusCatMtEngine
 
                     if (result == ButtonResult.Ok)
                     {
-                        System.Diagnostics.Process.Start(latestRelease.HtmlUrl);
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            Process.Start(new ProcessStartInfo("cmd", $"/c start {latestRelease.HtmlUrl}"));
+                        }
+                        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                        {
+                            Process.Start("xdg-open", latestRelease.HtmlUrl);
+                        }
+                        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                        {
+                            Process.Start("open", latestRelease.HtmlUrl);
+                        }
                     }
                 }
             }
@@ -226,11 +238,11 @@ namespace OpusCatMtEngine
             //Environment.SetEnvironmentVariable("PATH", "$PATH:/mnt/d/Users/niemi/source/repos/OPUS-CAT/AvaloniaApplication1/bin/DebugWsl/net7.0/python3-linux-3.8.13-x86_64/lib/");
             Runtime.PythonDLL = $"./python3-linux-3.8.13-x86_64/lib/libpython3.8.so.1.0";
 #elif MACOS
-            Runtime.PythonDLL = $"./python3-macos-3.8.13-universal2/lib/libpython3.8.dylib";
+            
+            Runtime.PythonDLL = $"./python3-macos-3.8.13-universal2/lib/libpython3.8.dylib"; //./python3-macos-3.8.13-universal2/lib/libpython3.8.dylib";
 #endif
             PythonEngine.Initialize();
             var home = PythonEngine.PythonHome;
-
             
             PythonEngine.BeginAllowThreads();
             using (Py.GIL())
