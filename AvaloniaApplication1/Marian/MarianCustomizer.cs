@@ -313,7 +313,7 @@ namespace OpusCatMtEngine
 
             trainingConfig.validScriptArgs = 
                 new List<string> {
-                    $"{spValidTarget.FullName}",
+                    $"\"{spValidTarget.FullName}\"",
                     OpusCatMtEngineSettings.Default.OODValidSetSize.ToString(),
                     this.segmentationMethod};
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
