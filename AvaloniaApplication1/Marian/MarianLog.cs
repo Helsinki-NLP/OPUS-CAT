@@ -56,6 +56,7 @@ namespace OpusCatMtEngine
             //This parsing with regexes is prone to failing, so don't let it crash everything
             try
             {
+                //TODO: fix for Linux/Macos
                 if (this.errorRegex.IsMatch(data))
                 {
                     this.EncounteredError = true;
@@ -65,7 +66,7 @@ namespace OpusCatMtEngine
                     var totalLinesMatch = this.totalLineCountRegex.Match(data);
                     if (totalLinesMatch.Success)
                     {
-                        this.epochLines = Int32.Parse(totalLinesMatch.Groups["totalLineCount"].Value);
+                        this.epochLines = Int32.Parse(totalLinesMatch.Groups["totalLineCount"].Value.Replace(",","").Replace(".",""));
                         this.totalEpochs = Int32.Parse(trainingConfig.afterEpochs);
                         this.TotalLines = this.totalEpochs * this.epochLines;
                     }

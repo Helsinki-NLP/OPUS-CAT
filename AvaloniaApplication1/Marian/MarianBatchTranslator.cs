@@ -131,7 +131,8 @@ namespace OpusCatMtEngine
             //same systems, i.e. keep track of decoder settings)
 
             FileInfo transAndAlign = new FileInfo($"{spOutput.FullName}.transandalign");
-            var args = $"\"{this.modelDir.FullName}\" \"{spInput.FullName}\" \"{transAndAlign.FullName}\" --log-level=info --quiet";
+            //var args = $"\"{this.modelDir.FullName}\" \"{spInput.FullName}\" \"{transAndAlign.FullName}\" --log-level=info --quiet";
+            var args = $"decode -i \"{spInput.FullName}\" -o \"{transAndAlign.FullName}\" --log-level=error -c \"{this.modelDir.FullName}\"\\batch.yml --max-length=200 --max-length-crop";
 
             if (storeTranslations)
             {
@@ -140,7 +141,12 @@ namespace OpusCatMtEngine
             
             EventHandler exitHandler = (x, y) => BatchProcess_Exited(transAndAlign, spOutput, x, y);
 
-            var cmd = "TranslateBatchSentencePiece.bat";
+            //var cmd = "TranslateBatchSentencePiece.bat";
+#if WINDOWS
+            var cmd = "Marian\\marian.exe";
+#else
+            var cmd = "Marian/marian";
+#endif
             var batchProcess = MarianHelper.StartProcessInBackgroundWithRedirects(cmd, args, exitHandler);
             
 

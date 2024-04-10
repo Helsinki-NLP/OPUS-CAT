@@ -225,7 +225,17 @@ namespace OpusCatMtEngine
 
             //Use the initial translation time as basis for estimating the duration of validation file
             //translation
-            this.trainingLog.EstimatedTranslationDuration = Convert.ToInt32((initialValidProcess.ExitTime - initialValidProcess.StartTime).TotalSeconds);
+            //For some reason the StartTime access is sometimes denied. This is not essential, so just cathing it
+            try
+            {
+                this.trainingLog.EstimatedTranslationDuration = Convert.ToInt32((initialValidProcess.ExitTime - initialValidProcess.StartTime).TotalSeconds);
+            }
+            catch
+            {
+                this.trainingLog.EstimatedTranslationDuration = 1;
+            }
+
+
             
             MarianTrainerConfig trainingConfig;
             
@@ -295,10 +305,10 @@ namespace OpusCatMtEngine
                 Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.WindowsPythonDir), "python.exe .\\Marian\\validate.py");
 #elif LINUX
             trainingConfig.validScriptPath =
-                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.LinuxPythonDir), "python.exe .\\Marian\\validate.py");
+                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.LinuxPythonDir), "bin/python3 ./Marian/validate.py");
 #elif MACOS
             trainingConfig.validScriptPath =
-                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.MacosPythonDir), "python.exe .\\Marian\\validate.py");
+                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.MacosPythonDir), "bin/python3 ./Marian/validate.py");
 #endif
 
             trainingConfig.validScriptArgs = 
@@ -354,22 +364,23 @@ namespace OpusCatMtEngine
             /*byte[] bytes = Encoding.Default.GetBytes(trainingArgs);
             trainingArgs = Encoding.UTF8.GetString(bytes);*/
 
+#if WINDOWS
             // Fine-tuning tends to cause IO lockup when the model is written, so assign low priority
-            // by changing main process priority to 
+            // by changing main process priority
+            //TODO: this only works in Windows, are there IO hangs on Mac/Linux?
             var parent = Process.GetCurrentProcess();
             var original = parent.PriorityClass;
-
             parent.PriorityClass = ProcessPriorityClass.BelowNormal;
-#if WINDOWS
+
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 Path.Combine(OpusCatMtEngineSettings.Default.MarianDir, "marian.exe"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
+            //Restore normal process priority
+            parent.PriorityClass = original;
 #else
             var trainProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                            Path.Combine(OpusCatMtEngineSettings.Default.MarianDir, "marian"), trainingArgs, this.MarianExitHandler, this.MarianProgressHandler);
 #endif
-            //Restore normal process priority
-            parent.PriorityClass = original;
-
+            
 
             return trainProcess;
         }

@@ -6,9 +6,9 @@
              x:Class="OpusCatMtEngine.EditRulesView"
              xmlns:local="clr-namespace:OpusCatMtEngine"
              xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
-             Height="550" Width="800"
+             Height="450" Width="800"
              x:CompileBindings="False">
-  <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto">
+  <ScrollViewer Name="ScrollViewer" VerticalScrollBarVisibility="Auto" Height="350">
     <StackPanel>
       <Label Margin="10,0,0,0" FontSize="20" Content="{x:Static resx:Resources.EditRules_EditRulesHeading}"/>
       <Border Margin="5" BorderBrush="Black" BorderThickness="1">

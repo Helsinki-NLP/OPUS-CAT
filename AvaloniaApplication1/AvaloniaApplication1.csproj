@@ -10,6 +10,7 @@
     <RootNamespace>OpusCatMtEngine</RootNamespace>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Configurations>Debug;Release;DebugWsl;DebugMacos</Configurations>
+    <Version>1.3.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>4</WarningLevel>
@@ -738,6 +739,9 @@
 
   <ItemGroup>
     <None Update="customize.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Marian\validate.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="OpusCatMtEngineSettings.settings">

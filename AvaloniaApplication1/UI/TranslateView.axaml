@@ -39,8 +39,8 @@
       </DockPanel>
       <Border BorderThickness="1" BorderBrush="Black">
         <Grid>
-          <TextBox TextWrapping="Wrap" IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="130"></TextBox>
-          <ScrollViewer Height="130" IsVisible="{Binding TranslationActive, Mode=TwoWay}" >
+          <TextBox TextWrapping="Wrap" IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="120"></TextBox>
+          <ScrollViewer Height="120" IsVisible="{Binding TranslationActive, Mode=TwoWay}" >
             <SelectableTextBlock TextWrapping="Wrap" Name="SourceBoxDisplay"></SelectableTextBlock>
           </ScrollViewer>
         </Grid>
@@ -63,7 +63,7 @@
       <Label IsVisible="{Binding ElementName=_this, Path=AutoEditedTranslations}, FallbackValue=False}">Auto-postedit rules have been applied to some translations, alignments will not be displayed for those translations.</Label>
       <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
       <Border BorderThickness="1" BorderBrush="Black">
-        <ScrollViewer Height="130" >
+        <ScrollViewer Height="120" >
           <TextBlock Name="TargetBox" TextWrapping="Wrap" />
         </ScrollViewer>
       </Border>

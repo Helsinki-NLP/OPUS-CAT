@@ -14,6 +14,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using LiveChartsCore.SkiaSharpView.Painting;
 using Avalonia.Media;
+using LiveChartsCore.Drawing;
+using LiveChartsCore.SkiaSharpView.VisualElements;
 
 namespace OpusCatMtEngine
 {
@@ -34,9 +36,9 @@ namespace OpusCatMtEngine
 
         private MTModel model;
 
-        private IEnumerable<LineSeries<double>> ScoresToSeries(
+        private IEnumerable<LineSeries<double, SVGPathGeometry>> ScoresToSeries(
             IEnumerable<FileInfo> scoreFiles,
-            string title)
+            string title, string geometry=null)
         {
 
             Dictionary<string, List<double>> scoresValues = new Dictionary<string, List<double>>();
@@ -45,7 +47,7 @@ namespace OpusCatMtEngine
             {
                 try
                 {
-                    using (var reader = new StreamReader(file.Open(FileMode.Open, FileAccess.Read, FileShare.None)))
+                    using (var reader = new StreamReader(file.Open(FileMode.Open, FileAccess.Read, FileShare.Write)))
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)
@@ -83,13 +85,15 @@ namespace OpusCatMtEngine
                 }
             }
 
-            List<LineSeries<double>> scoresSeries = new List<LineSeries<double>>();
+            List<LineSeries<double, SVGPathGeometry>> scoresSeries = new List<LineSeries<double, SVGPathGeometry>>();
             foreach (var scoreKey in scoresValues.Keys)
             {
-                scoresSeries.Add(new LineSeries<double>()
+                scoresSeries.Add(new LineSeries<double, SVGPathGeometry>()
                 {
                     Values = scoresValues[scoreKey],
                     Name = $"{title} {scoreKey}",
+                    GeometrySvg = geometry,
+                    Fill = null
                 });
             }
 
@@ -100,22 +104,31 @@ namespace OpusCatMtEngine
 
         public void UpdateChart()
         {
-            this.SeriesCollection.Clear();
-            var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
-            var inDomainSeries =
-                this.ScoresToSeries(
-                    inDomainFiles,
-                    Properties.Resources.Progress_InDomainSeriesName);
-            this.SeriesCollection.AddRange(inDomainSeries);
-
-            if (this.model.HasOODValidSet)
+            //The update may happen at the same time as the scores as being written, in that case
+            //simply skip the update, it will run again soon
+            try
             {
-                var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
-                var outOfDomainSeries =
+                this.SeriesCollection.Clear();
+                var inDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_1.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime);
+                var inDomainSeries =
                     this.ScoresToSeries(
-                        outOfDomainFiles,
-                        Properties.Resources.Progress_OutOfDomainSeriesName);
-                this.SeriesCollection.AddRange(outOfDomainSeries);
+                        inDomainFiles,
+                        Properties.Resources.Progress_InDomainSeriesName, SVGPoints.Square);
+                this.SeriesCollection.AddRange(inDomainSeries);
+
+                if (this.model.HasOODValidSet)
+                {
+                    var outOfDomainFiles = Directory.GetFiles(this.Model.InstallDir, "valid*_0.score.txt").Select(x => new FileInfo(x)).OrderBy(x => x.CreationTime); ;
+                    var outOfDomainSeries =
+                        this.ScoresToSeries(
+                            outOfDomainFiles,
+                            Properties.Resources.Progress_OutOfDomainSeriesName, SVGPoints.Circle);
+                    this.SeriesCollection.AddRange(outOfDomainSeries);
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
@@ -129,7 +142,7 @@ namespace OpusCatMtEngine
             this.DataContext = this;
 
             this.Model = selectedModel;
-            this.SeriesCollection = new List<LineSeries<double>>();
+            this.SeriesCollection = new List<LineSeries<double, SVGPathGeometry>>();
 
             if (this.Model.FinetuneProcess != null)
             {
@@ -139,7 +152,15 @@ namespace OpusCatMtEngine
 
             this.UpdateChart();
             InitializeComponent();
-            
+
+            this.ProgressChart.YAxes = new List<Axis>
+            {
+                new Axis
+                {
+                    MinLimit = 0,
+                    MaxLimit = 100,
+                }
+            };
             this.ProgressChart.XAxes = new List<Axis>
             {
                 new Axis
@@ -172,12 +193,12 @@ namespace OpusCatMtEngine
             }
         }
 
-        private List<LineSeries<double>> seriesCollection;
+        private List<LineSeries<double, SVGPathGeometry>> seriesCollection;
         public MTModel Model { get => model; set => model = value; }
         public string Title { get; private set; }
         public string[] Labels { get; set; }
         public Func<double, string> YFormatter { get; set; }
-        public List<LineSeries<double>> SeriesCollection
+        public List<LineSeries<double, SVGPathGeometry>> SeriesCollection
         { 
             get => seriesCollection;
             set

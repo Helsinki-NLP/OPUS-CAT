@@ -150,9 +150,11 @@ namespace OpusCatMtEngine
 
         public void ShutdownMtPipe()
         {
+#if WINDOWS
             KillProcessAndChildren(this.mtPipe.Id);
             //Remove the event handler so it doesn't try to kill an already killed process
             AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
+#endif
         }
         
         private TranslationPair TranslateSentence(string rawSourceSentence)

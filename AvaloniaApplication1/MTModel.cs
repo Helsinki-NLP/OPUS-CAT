@@ -950,19 +950,23 @@ namespace OpusCatMtEngine
                     return;
             }
 
+            var processDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
 #if WINDOWS
             var validScriptPath =
                 Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.WindowsPythonDir, "python.exe .\\Marian\\validate.py"));
 #elif LINUX
             var validScriptPath =
-                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.LinuxPythonDir, "python.exe .\\Marian\\validate.py"));
+                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.LinuxPythonDir, "bin/python3 ./Marian/validate.py"));
 #elif MACOS
             var validScriptPath =
-                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.MacosPythonDir, "python.exe .\\Marian\\validate.py"));
+                Path.Combine(Path.Combine(OpusCatMtEngineSettings.Default.MacosPythonDir, "bin/python3 ./Marian/validate.py"));
 #endif
 
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
                 $"{validScriptPath} {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
+
+
         }
         
 
