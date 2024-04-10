@@ -964,7 +964,7 @@ namespace OpusCatMtEngine
 #endif
 
             var evalProcess = MarianHelper.StartProcessInBackgroundWithRedirects(
-                $"{validScriptPath} {refFile.FullName} {outOfDomainSize} {segmethodArg} {spOutput.FullName}");
+                $"\"{validScriptPath}\" \"{refFile.FullName}\" {outOfDomainSize} {segmethodArg} \"{spOutput.FullName}\"");
 
 
         }
