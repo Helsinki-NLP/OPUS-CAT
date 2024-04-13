@@ -1,12 +1,31 @@
 ﻿import sacrebleu
 import sys
+import argparse
 
 #Both input files are expected to be segmented (either SentencePiece or BPE).
 
-valid_target_path = sys.argv[1]
-ood_size = int(sys.argv[2])
-system_seg_method = sys.argv[3]
-system_output_path = sys.argv[4]
+parser = argparse.ArgumentParser(
+    prog='validator',
+    description='Validates Marian output for OPUS-CAT, splits the valid set into ood and in-domain')
+
+
+parser.add_argument('--ood_size', type=int,
+                    help='size of the ood set')
+parser.add_argument('--seg_method', type=str,
+                    help='spm or sentencepiece')
+# Nargs is used as a cross-platform workaround for spaces in paths
+parser.add_argument('--valid_target', type=str, nargs='+',
+                    help='path to target ref')
+parser.add_argument('--system_output', type=str, nargs='+',
+                    help='path to system output')
+
+
+args = parser.parse_args()
+
+valid_target_path = " ".join(args.valid_target)
+ood_size = args.ood_size
+system_seg_method = args.seg_method
+system_output_path = " ".join(args.system_output)
 
 def extract_lines_and_split(sent_file_path, seg_method=None):
 	with open(sent_file_path,'rt', encoding='utf-8') as sent_file:

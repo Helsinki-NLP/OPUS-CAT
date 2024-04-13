@@ -301,8 +301,9 @@ namespace OpusCatMtEngine
             }*/
 
 #if WINDOWS
-            trainingConfig.validScriptPath =
-                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.WindowsPythonDir), "python.exe .\\Marian\\validate.py");
+            var pythonPath = 
+                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.WindowsPythonDir), "python.exe");
+            trainingConfig.validScriptPath = $"\"{pythonPath}\" .\\Marian\\validate.py";
 #elif LINUX
             trainingConfig.validScriptPath =
                 Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.LinuxPythonDir), "bin/python3 ./Marian/validate.py");

@@ -132,7 +132,7 @@ namespace OpusCatMtEngine
 
             FileInfo transAndAlign = new FileInfo($"{spOutput.FullName}.transandalign");
             //var args = $"\"{this.modelDir.FullName}\" \"{spInput.FullName}\" \"{transAndAlign.FullName}\" --log-level=info --quiet";
-            var args = $"decode -i \"{spInput.FullName}\" -o \"{transAndAlign.FullName}\" --log-level=error -c \"{this.modelDir.FullName}\"\\batch.yml --max-length=200 --max-length-crop";
+            var args = $"decode -i \"{spInput.FullName}\" -o \"{transAndAlign.FullName}\" --log-level=error -c \"{this.modelDir.FullName}\\batch.yml\" --max-length=200 --max-length-crop";
 
             if (storeTranslations)
             {
