@@ -2,6 +2,7 @@
 import sys
 import argparse
 
+#This is used as the valid script in a Marian training config
 #Both input files are expected to be segmented (either SentencePiece or BPE).
 
 parser = argparse.ArgumentParser(

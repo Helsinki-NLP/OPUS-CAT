@@ -168,6 +168,7 @@ namespace OpusCatMtEngine
         private void Image_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
             this.UiTabs.RemoveAt(Tabs.SelectedIndex);
+            
         }
     }
 }

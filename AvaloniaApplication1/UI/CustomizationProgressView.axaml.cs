@@ -25,6 +25,8 @@ namespace OpusCatMtEngine
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
+
+
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
@@ -140,7 +142,7 @@ namespace OpusCatMtEngine
         public CustomizationProgressView(MTModel selectedModel)
         {
             this.DataContext = this;
-
+            this.DetachedFromVisualTree += CustomizationProgressView_DetachedFromVisualTree;
             this.Model = selectedModel;
             this.SeriesCollection = new List<LineSeries<double, SVGPathGeometry>>();
 
@@ -170,6 +172,14 @@ namespace OpusCatMtEngine
             };
 
 
+        }
+
+        private void CustomizationProgressView_DetachedFromVisualTree(object? sender, Avalonia.VisualTreeAttachmentEventArgs e)
+        {
+            if (this.aTimer != null)
+            {
+                this.aTimer.Stop();
+            }
         }
 
         private System.Timers.Timer aTimer;

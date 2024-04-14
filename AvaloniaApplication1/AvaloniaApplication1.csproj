@@ -744,6 +744,9 @@
     <None Update="Marian\validate.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="OpusCatMtEngine.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="OpusCatMtEngineSettings.settings">
       <LastGenOutput>OpusCatMtEngineSettings.Designer.cs</LastGenOutput>
       <Generator>SettingsSingleFileGenerator</Generator>

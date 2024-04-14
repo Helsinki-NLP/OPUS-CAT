@@ -305,18 +305,22 @@ namespace OpusCatMtEngine
                 Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.WindowsPythonDir), "python.exe");
             trainingConfig.validScriptPath = $"\"{pythonPath}\" .\\Marian\\validate.py";
 #elif LINUX
-            trainingConfig.validScriptPath =
-                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.LinuxPythonDir), "bin/python3 ./Marian/validate.py");
+            var pythonPath =
+                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.LinuxPythonDir), "bin/python3");
+            trainingConfig.validScriptPath = $"\"{pythonPath}\" ./Marian/validate.py";
 #elif MACOS
-            trainingConfig.validScriptPath =
-                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.MacosPythonDir), "bin/python3 ./Marian/validate.py");
+            var pythonPath =
+                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.MacosPythonDir), "bin/python3");
+            trainingConfig.validScriptPath = $"\"{pythonPath}\" ./Marian/validate.py";
 #endif
 
             trainingConfig.validScriptArgs = 
                 new List<string> {
-                    $"\"{spValidTarget.FullName}\"",
-                    OpusCatMtEngineSettings.Default.OODValidSetSize.ToString(),
-                    this.segmentationMethod};
+                    $"--valid_target {spValidTarget.FullName}",
+                    $"--ood_size {OpusCatMtEngineSettings.Default.OODValidSetSize.ToString()}",
+                    $"--seg_method {this.segmentationMethod}",
+                    "--system_output"
+                };
             trainingConfig.validTranslationOutput = Path.Combine(this.customDir.FullName,"valid.{U}.txt");
 
             if (this.guidedAlignment)

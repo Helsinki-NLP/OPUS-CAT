@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Owin;
 
 using OpusCatMtEngine;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace OpusCatMtEngine
 {
@@ -47,27 +49,17 @@ namespace OpusCatMtEngine
         private void StartWebApp(string baseAddress, ModelManager modelManager)
         {
             var builder = WebApplication.CreateBuilder();
+            builder.Services.AddControllers().AddJsonOptions(
+                options => { options.JsonSerializerOptions.PropertyNamingPolicy = null; options.JsonSerializerOptions.PropertyNameCaseInsensitive = false; });
+            builder.Services.AddSingleton<IMtProvider>(modelManager);
             var app = builder.Build();
-            /*var server = WebApp.Start(baseAddress, (appBuilder) =>
-            {
-                var config = new HttpConfiguration();
-                config.Routes.MapHttpRoute(
-                    "DefaultApi",
-                    "{controller}/{action}");
-                var builder = new ContainerBuilder();
-
-                // Register Web API controller in executing assembly.
-                builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-                
-                //builder.Register(c => modelManager).As<IMtProvider>().SingleInstance();
-                builder.RegisterInstance<IMtProvider>(modelManager);
-                // Create and assign a dependency resolver for Web API to use.
-                var container = builder.Build();
-                config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-
-                appBuilder.UseAutofacWebApi(config);
-                appBuilder.UseWebApi(config);
-            });*/
+            
+            app.UseRouting();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller}/{action}");
+            app.RunAsync(baseAddress);
+            
         }
     }
 }

@@ -80,7 +80,9 @@ namespace OpusCatMtEngine
                 var deserializer = new Deserializer();
                 var decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
                 decoderSettings.miniBatch = "16";
-                decoderSettings.log = Path.Combine(this.modelDir.FullName,"batch.log");
+                //Not sure why the log was needed, but having the full name here made batch
+                //translation fail when moving models to another path, so removed it
+                //decoderSettings.log = Path.Combine(this.modelDir.FullName,"batch.log");
                 decoderSettings.alignment = "hard";
 
                 var serializer = new Serializer();
