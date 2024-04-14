@@ -8,7 +8,6 @@ namespace OpusCatMtEngine
 {
     public class MarianDecoderConfig
     {
-        public string log { get; set; }
         public string alignment { get; set; }
         public List<string> models { get; set; }
         public List<string> vocabs { get; set; }
