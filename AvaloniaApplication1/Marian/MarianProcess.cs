@@ -106,8 +106,8 @@ namespace OpusCatMtEngine
             {
                 this.preprocessor = 
                     new MosesBpePreprocessor(
-                        $"{this.modelDir}\\source.tcmodel",
-                        $"{this.modelDir}\\source.bpe",
+                        Path.Combine(this.modelDir,"source.tcmodel"),
+                        Path.Combine(this.modelDir,"source.bpe"),
                         this.SourceCode, this.TargetCode);
 
                 this.segmentation = SegmentationMethod.Bpe;

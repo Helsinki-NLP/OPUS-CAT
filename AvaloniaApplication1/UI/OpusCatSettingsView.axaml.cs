@@ -4,6 +4,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 using OpusCatMtEngine;
 using OpusCatMtEngine.UI;
 using System;
@@ -14,6 +16,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -59,10 +62,33 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
         NotifyPropertyChanged("SaveButtonEnabled");
     }
 
-    public void OpenCustomSettingsInEditor_Click(object sender, RoutedEventArgs e)
+    public async void OpenCustomSettingsInEditor_Click(object sender, RoutedEventArgs e)
     {
         var customizeYml = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.CustomizationBaseConfig);
-        Process.Start("notepad.exe", customizeYml);
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {customizeYml}"));
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", customizeYml);
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", customizeYml);
+            }
+        }
+        catch (Exception ex)
+        {
+            string messageBoxText = "Could not open customize.yml in a text editor.";
+            var box = MessageBoxManager.GetMessageBoxStandard(
+                "Cannot open editor",
+                messageBoxText,
+                ButtonEnum.Ok);
+            var result = await box.ShowAsync();
+        }
     }
 
 

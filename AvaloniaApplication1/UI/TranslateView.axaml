@@ -8,6 +8,9 @@
              xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
              x:Name="_this"
              x:CompileBindings="False">
+  <UserControl.Resources>
+    <local:RightToLeftConverter x:Key="rtlConverter"/>
+  </UserControl.Resources>
   <Grid>
     <StackPanel Margin="10">
       <Label>Note: This translation functionality is intended mainly for testing models. Sentences of the source text should be on separate lines.</Label>
@@ -39,9 +42,9 @@
       </DockPanel>
       <Border BorderThickness="1" BorderBrush="Black">
         <Grid>
-          <TextBox TextWrapping="Wrap" IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="120"></TextBox>
+          <TextBox FlowDirection="{Binding ElementName=_this, Path=SourceLanguage.IsRightToLeft, Converter={StaticResource rtlConverter}}" TextWrapping="Wrap" IsVisible="{Binding !TranslationActive, Mode=TwoWay}" AcceptsReturn="True" Name="SourceInputBox" Height="120"></TextBox>
           <ScrollViewer Height="120" IsVisible="{Binding TranslationActive, Mode=TwoWay}" >
-            <SelectableTextBlock TextWrapping="Wrap" Name="SourceBoxDisplay"></SelectableTextBlock>
+            <SelectableTextBlock FlowDirection="{Binding ElementName=_this, Path=SourceLanguage.IsRightToLeft, Converter={StaticResource rtlConverter}}" TextWrapping="Wrap" Name="SourceBoxDisplay"></SelectableTextBlock>
           </ScrollViewer>
         </Grid>
       </Border>
@@ -64,7 +67,7 @@
       <Label Content="{x:Static resx:Resources.Translate_TranslationLabel}"/>
       <Border BorderThickness="1" BorderBrush="Black">
         <ScrollViewer Height="120" >
-          <TextBlock Name="TargetBox" TextWrapping="Wrap" />
+          <TextBlock FlowDirection="{Binding ElementName=_this, Path=TargetLanguage.IsRightToLeft, Converter={StaticResource rtlConverter}}" Name="TargetBox" TextWrapping="Wrap" />
         </ScrollViewer>
       </Border>
     </StackPanel>

@@ -6,6 +6,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugWsl|AnyCPU'">
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLinux|AnyCPU'">
+    <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup>
     <ActiveDebugProfile>AvaloniaApplication1</ActiveDebugProfile>
   </PropertyGroup>

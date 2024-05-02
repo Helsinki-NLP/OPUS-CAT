@@ -66,8 +66,8 @@ namespace OpusCatMtEngine
             get => sourceLanguage;
             set
             {
-                NotifyPropertyChanged();
                 sourceLanguage = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -76,8 +76,8 @@ namespace OpusCatMtEngine
             get => targetLanguage;
             set
             {
-                NotifyPropertyChanged();
                 targetLanguage = value;
+                NotifyPropertyChanged();
             }
         }
 

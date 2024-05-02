@@ -646,7 +646,8 @@ namespace OpusCatMtEngine
             get => sourceLanguages;
             set
             {
-                sourceLanguages = value;
+                var sortedLangs = value.OrderBy(x => x.IsoRefName);
+                sourceLanguages = sortedLangs.ToList();
                 NotifyPropertyChanged("SourceLanguageString");
             }
         }
@@ -656,7 +657,9 @@ namespace OpusCatMtEngine
             get => targetLanguages;
             set
             {
-                targetLanguages = value;
+                var sortedLangs = value.OrderBy(x => x.IsoRefName);
+                targetLanguages = sortedLangs.ToList();
+                
                 NotifyPropertyChanged("TargetLanguageString");
             }
         }

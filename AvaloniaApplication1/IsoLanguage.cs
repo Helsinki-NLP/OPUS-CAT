@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -60,6 +61,27 @@ namespace OpusCatMtEngine
             }
         }
 
+        private static void ParseIso639_3MacroMappings()
+        {
+            var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(), "");
+            using (var isoTable = new StreamReader(embeddedProvider.GetFileInfo("OpusCatMtEngine.iso-639-3-macrolanguages.tab").CreateReadStream()))
+            {
+
+                //Skip header
+                isoTable.ReadLine();
+
+                string line;
+                while ((line = isoTable.ReadLine()) != null)
+                {
+                    var split = line.Split('\t');
+                    var iso639_3_macro = split[0];
+                    var iso639_3_micro = split[1];
+                    IsoLanguage.Iso639_3MacroMappings[iso639_3_micro] = iso639_3_macro;
+                    
+                }
+            }
+        }
+
         private static void ParseIso639_5()
         {
             var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(), "");
@@ -85,12 +107,14 @@ namespace OpusCatMtEngine
         {
             IsoLanguage.ParseIso639_3();
             IsoLanguage.ParseIso639_5();
+            IsoLanguage.ParseIso639_3MacroMappings();
         }
 
         private static Dictionary<string, string> Iso639_3To639_1 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_1To639_3 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_2BTo639_3 = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_3ToRefName = new Dictionary<string, string>();
+        private static Dictionary<string, string> Iso639_3MacroMappings = new Dictionary<string, string>();
         private static Dictionary<string, string> Iso639_5ToRefName = new Dictionary<string, string>();
 
         public string Iso639_5Code { get; set; }
@@ -130,6 +154,33 @@ namespace OpusCatMtEngine
         public string Iso15924Script { get; set; }
         public string IsoRefName { get; }
         public string OriginalCode { get; }
+        public bool IsRightToLeft
+        { 
+            get
+            {
+                List<CultureInfo> CultureInfos = CultureInfo
+                            .GetCultures(CultureTypes.SpecificCultures)
+                            .ToList();
+
+                foreach (CultureInfo cultureInfo in CultureInfos)
+                {
+                    if (cultureInfo.TwoLetterISOLanguageName == this.Iso639_1Code ||
+                        cultureInfo.ThreeLetterISOLanguageName == this.Iso639_3Code)
+                    {
+                        return cultureInfo.TextInfo.IsRightToLeft;
+                    }
+                    else if (IsoLanguage.Iso639_3MacroMappings.ContainsKey(this.Iso639_3Code))
+                    {
+                        if (cultureInfo.ThreeLetterISOLanguageName == IsoLanguage.Iso639_3MacroMappings[this.Iso639_3Code])
+                        {
+                            return cultureInfo.TextInfo.IsRightToLeft;
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
 
         //This constructor parses the code.
         //The language code may be from a MT model, Opus MT models generally have ISO-639-1 codes if possible,
