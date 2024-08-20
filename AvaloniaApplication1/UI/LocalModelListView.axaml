@@ -134,6 +134,7 @@
                         Content="{x:Static resx:Resources.Main_SetAsOverrideModelButton}"/>
         </StackPanel>
         <DataGrid
+            LoadingRow="OnLoadRow"
             CanUserSortColumns="True"
             CanUserResizeColumns="True"
             CanUserReorderColumns="True"
@@ -143,7 +144,6 @@
             ItemsSource="{Binding LocalModels, Mode=OneWay}">
 
           <DataGrid.Columns>
-
             <DataGridTemplateColumn SortMemberPath="SourceLanguageString" Width="100" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
@@ -168,7 +168,7 @@
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
             
-            <DataGridTextColumn  Binding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
+            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
 
             <DataGridTemplateColumn SortMemberPath="StatusAndEstimateString" Width="220" Header="Status">
               <DataGridTemplateColumn.CellTemplate>

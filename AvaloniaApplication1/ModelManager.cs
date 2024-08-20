@@ -294,7 +294,13 @@ namespace OpusCatMtEngine
         {
             var overrideModelIndex = this.localModels.IndexOf(this.OverrideModel);
             this.localModels.Move(overrideModelIndex, 0);
+            this.LocalModels = new ObservableCollection<MTModel>(this.LocalModels);
             NotifyPropertyChanged("LocalModels");
+        }
+
+        internal void UpdateLocalModels()
+        {
+            this.LocalModels = new ObservableCollection<MTModel>(this.LocalModels);
         }
 
         internal void SortLocalModels(string header, ListSortDirection direction)

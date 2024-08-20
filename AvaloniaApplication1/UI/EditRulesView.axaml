@@ -57,7 +57,7 @@
             </StackPanel>
            
 
-            <DataGrid Name="AutoPreEditRuleCollectionList">
+            <DataGrid GridLinesVisibility="All" Name="AutoPreEditRuleCollectionList">
               <DataGrid.Columns>
               <DataGridTextColumn Width="350" Header="Collection name" Binding="{Binding Path=CollectionName, Mode=TwoWay}" />
               <DataGridTextColumn Header="Number of rules" Binding="{Binding Path=EditRules.Count, Mode=OneWay}" />
@@ -111,7 +111,7 @@
           Content="{x:Static resx:Resources.EditRules_MoveDownButton}" />
 
             </StackPanel>
-            <DataGrid Name="AutoPostEditRuleCollectionList">
+            <DataGrid GridLinesVisibility="All" Name="AutoPostEditRuleCollectionList">
               <DataGrid.Columns>
                 <DataGridTextColumn Width="350" Header="Collection name" Binding="{Binding Path=CollectionName, Mode=TwoWay}" />
                 <DataGridTextColumn Header="Number of rules" Binding="{Binding Path=EditRules.Count, Mode=OneWay}" />

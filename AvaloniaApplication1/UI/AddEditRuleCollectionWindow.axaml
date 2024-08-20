@@ -20,10 +20,10 @@
           <Button DockPanel.Dock="Right" Padding="5" Click="ExportRules_Click">Export checked</Button>
         </DockPanel>
         <ScrollViewer Height="240" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-          <DataGrid Name="AutoEditRuleCollectionList">
+          <DataGrid GridLinesVisibility="All" Name="AutoEditRuleCollectionList">
             <DataGrid.Columns>
-              <DataGridTextColumn Width="100" Header="Collection name" Binding="{Binding Item.CollectionName}"/>
-              <DataGridCheckBoxColumn Width="60" Header="Use with model" Binding="{Binding Checked, Mode=TwoWay}" />
+              <DataGridTextColumn IsReadOnly="True" Width="300" Header="Collection name" Binding="{Binding Item.CollectionName}"/>
+              <DataGridCheckBoxColumn Width="100" Header="Use with model" Binding="{Binding Checked, Mode=TwoWay}" />
             </DataGrid.Columns>
           </DataGrid>
         </ScrollViewer>

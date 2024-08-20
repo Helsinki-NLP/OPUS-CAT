@@ -12,7 +12,7 @@ plugins {
     id("com.palantir.git-version") version "3.0.0" apply false
 }
 
-version = "1.0.0"
+version = "2.0.0"
 
 
 java {

@@ -30,13 +30,13 @@
             Content="{x:Static resx:Resources.EditRules_CreateRuleButton}" />
 
             <Button
-            IsEnabled="{Binding ElementName=AutoEditRuleCollectionList, Path=SelectedItems.Count}"
+            IsEnabled="{Binding #AutoEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
             Name="EditRule"
             Click="EditRule_Click"
             Content="{x:Static resx:Resources.EditRules_EditRuleButton}" />
 
             <Button
-            IsEnabled="{Binding ElementName=AutoEditRuleCollectionList, Path=SelectedItems.Count}"
+            IsEnabled="{Binding #AutoEditRuleCollectionList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
             Name="DeleteRule"
             Click="DeleteRule_Click"
             Content="{x:Static resx:Resources.EditRules_DeleteRuleButton}" />
@@ -61,7 +61,8 @@
               RuleCollection="{Binding ElementName=_this, Path=RuleCollection}"
               InputBoxLabel="Source text"
               Title="Test rule collection:"
-              ButtonText="Apply rules to source text" />
+              ButtonText="Apply rules to source text"
+              TestButtonVisibility="True" />
         </Expander>
         <DockPanel VerticalAlignment="Bottom" LastChildFill="False" Margin="10">
           <Button  DockPanel.Dock="Left" Padding="5" Click="SaveButton_Click">Save</Button>

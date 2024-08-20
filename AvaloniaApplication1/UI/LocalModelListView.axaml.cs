@@ -10,6 +10,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using System.Linq;
 using System.Collections.Generic;
 using Avalonia.Platform.Storage;
+using Avalonia.Data;
+using Avalonia.Media;
+using Avalonia;
 
 namespace OpusCatMtEngine
 {
@@ -101,6 +104,35 @@ namespace OpusCatMtEngine
             ((ModelManager)this.DataContext).OverrideModel = selectedModel;
             ((ModelManager)this.DataContext).OverrideModelTargetLanguage = selectedModel.TargetLanguages.First();
             ((ModelManager)this.DataContext).MoveOverrideToTop();
+
+        }
+
+        private void OnLoadRow(object sender, DataGridRowEventArgs e)
+        {
+            DataGridRow row = e.Row;
+            MTModel modelObject = e.Row.DataContext as MTModel;
+            if (modelObject.IsOverridden)
+            {
+                row.Opacity = 0.2;
+                row.Background = Brushes.Beige;
+                row.BorderBrush = null;
+            }
+            else
+            {
+                row.Opacity = 1;
+                row.Background = Brushes.LightBlue;
+                if (modelObject.IsOverrideModel)
+                {
+                    row.BorderBrush = Brushes.Red;
+                    row.BorderThickness = new Thickness(1);
+                }
+                else
+                {
+                    row.Background = Brushes.LightBlue;
+                    row.BorderBrush = null;
+                }
+                
+            }   
         }
 
         private void btnCancelOverride_Click(object sender, RoutedEventArgs e)
@@ -113,6 +145,7 @@ namespace OpusCatMtEngine
 
             ((ModelManager)this.DataContext).OverrideModel.IsOverrideModel = false;
             ((ModelManager)this.DataContext).OverrideModel = null;
+            ((ModelManager)this.DataContext).UpdateLocalModels();
         }
 
         private async void btnDeleteModel_Click(object sender, RoutedEventArgs e)

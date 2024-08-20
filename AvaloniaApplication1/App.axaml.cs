@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace OpusCatMtEngine
 {
@@ -34,20 +35,24 @@ namespace OpusCatMtEngine
 
             //System.Windows.Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
 
-#if WINDOWS
-            if (!App.HasAvxSupport())
-            {
-                var box = MessageBoxManager.GetMessageBoxStandard(
-                    "AVX not available",
-                    "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.",
-                    ButtonEnum.Ok);
-                await box.ShowAsync();
-                if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
-                {
-                    desktopLifetime.Shutdown();
-                }
-            }
-#endif
+
+            Log.Information("Perform AVX check");
+            /*#if WINDOWS
+
+                        if (!App.HasAvxSupport())
+                        {
+                            var box = MessageBoxManager.GetMessageBoxStandard(
+                                "AVX not available",
+                                "OPUS-CAT MT Engine requires a CPU with AVX support. Your CPU does not support AVX, so OPUS-CAT MT Engine cannot start.",
+                                ButtonEnum.Ok);
+                            await box.ShowAsync();
+                            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+                            {
+                                desktopLifetime.Shutdown();
+                            }
+                        }
+
+            #endif*/
 
             //Create data dir
 
@@ -65,7 +70,7 @@ namespace OpusCatMtEngine
             //Log.Information("Setting Tls12 as security protocol (required for accessing online model storage");
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            this.InitializePythonEngine();
+            var pythonInitialized = this.InitializePythonEngine().Result;
 
             Log.Information("Opening OPUS-CAT MT Engine window");
 
@@ -75,6 +80,23 @@ namespace OpusCatMtEngine
             {
                 desktop.MainWindow = new MainWindow();
                 desktop.MainWindow.Show();
+
+                if (!pythonInitialized) 
+                { 
+                    string messageBoxText = "Python Engine initialization failed.";
+                    var box = MessageBoxManager.GetMessageBoxStandard(
+                    "Python Engine initialization failed. The program will exit.",
+                    messageBoxText,
+                    ButtonEnum.Ok);
+
+                    await box.ShowAsync();
+
+                    if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+                    {
+                        lifetime.Shutdown();
+                    }
+            }
+
             }
 
             if (OpusCatMtEngineSettings.Default.DisplayOverlay)
@@ -220,7 +242,7 @@ namespace OpusCatMtEngine
 
 
         
-        private void InitializePythonEngine()
+        private async Task<Boolean> InitializePythonEngine()
         {
 #if WINDOWS
             //Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
@@ -228,7 +250,9 @@ namespace OpusCatMtEngine
             //Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
             //Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
             Runtime.PythonDLL = ".\\python3-windows-3.8.10-amd64\\python38.dll";
-            
+
+            //Note: vcruntime dlls need to be present in the main OPUS-CAT dir, otherwise PythonNet
+            //will fail silently.
 #elif LINUX
             //Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
             //Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
@@ -241,14 +265,24 @@ namespace OpusCatMtEngine
             
             Runtime.PythonDLL = $"./python3-macos-3.8.13-universal2/lib/libpython3.8.dylib"; //./python3-macos-3.8.13-universal2/lib/libpython3.8.dylib";
 #endif
-            PythonEngine.Initialize();
-            var home = PythonEngine.PythonHome;
-            
-            PythonEngine.BeginAllowThreads();
-            using (Py.GIL())
+            try
             {
-                Py.Import("sacremoses");
+                PythonEngine.Initialize();
+
+                var home = PythonEngine.PythonHome;
+
+                PythonEngine.BeginAllowThreads();
+                using (Py.GIL())
+                {
+                    Py.Import("sacremoses");
+                }
+                return true;
             }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            
         }
 
         /// <summary>
