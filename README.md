@@ -1,5 +1,5 @@
 # OPUS-CAT MT Engine and CAT plugins
 
-Full documentation is available here: https://helsinki-nlp.github.io
+Full documentation is available here: https://helsinki-nlp.github.io/OPUS-CAT/
 
 OPUS-CAT MT Engine is a local machine translation system built on the [Marian NMT framework](https://marian-nmt.github.io/). OPUS-CAT MT Engine makes it possible to use a large selection of advanced neural machine translation models natively on local computers (Windows, MacOS or Linux). The primary purpose of OPUS-CAT Engine is to provide professional translators local, secure, and confidential neural machine translation in computer-assisted translation tools (CAT tools), which usually run on local computers. To that end, there are plugins available for two of the most popular CAT tools, SDL Trados Studio and memoQ (OPUS-CAT can also be used in the Wordfast CAT tool as a custom provider), as well as integrations for other CAT tools. OPUS-CAT MT Engine provides pretrained MT models for a very wide selection of language pairs, courtesy of the OPUS MT project ([listing of OPUS MT models](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models)).
