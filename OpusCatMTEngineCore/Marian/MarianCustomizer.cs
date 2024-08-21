@@ -311,7 +311,9 @@ namespace OpusCatMtEngine
 #elif MACOS
             var pythonPath =
                 Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.MacosPythonDir), "bin/python3");
-            trainingConfig.validScriptPath = $"\"{pythonPath}\" ./Marian/validate.py";
+            var pythonLibPath = 
+                Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.MacosPythonDir), "lib");
+            trainingConfig.validScriptPath = $"DYLD_LIBRARY_PATH={pythonLibPath} \"{pythonPath}\" ./Marian/validate.py";
 #endif
 
             trainingConfig.validScriptArgs = 
