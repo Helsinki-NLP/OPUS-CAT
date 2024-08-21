@@ -87,6 +87,8 @@ namespace OpusCatMtEngine
                     }
                     m_dbConnection.Close();
                     m_dbConnection.Dispose();
+                    //If this is not called, the db stays locked and deletion fails
+                    SqliteConnection.ClearAllPools();
                 }
             }
 
@@ -101,7 +103,24 @@ namespace OpusCatMtEngine
 
                 if (result == ButtonResult.Ok)
                 {
-                    translationDb.Delete();
+                    try
+                    {
+                        translationDb.Delete();
+                    }
+                    catch 
+                    {
+                        Log.Warning($"Database {translationDb.FullName} was invalid, but it could not be deleted");
+                        var deletionFailedBox = MessageBoxManager.GetMessageBoxStandard(
+                            OpusCatMtEngine.Properties.Resources.App_ConfirmDbCaption,
+                            OpusCatMtEngine.Properties.Resources.App_InvalidDbDeleteFailedMessage,
+                            ButtonEnum.Ok);
+
+                        var deletionResult = await deletionFailedBox.ShowAsync();
+
+                        OpusCatMtEngineSettings.Default.CacheMtInDatabase = false;
+                        OpusCatMtEngineSettings.Default.Save();
+                        OpusCatMtEngineSettings.Default.Reload();
+                    }
                 }
                 else
                 {

@@ -120,6 +120,9 @@
   <data name="App_ConfirmDbCaption" xml:space="preserve">
     <value>New database confirmation</value>
   </data>
+  <data name="App_InvalidDbDeleteFailedMessage" xml:space="preserve">
+    <value>Invalid database deletion failed. Caching of translations into the database will disabled (it can be re-enabled in settings).</value>
+  </data>
   <data name="App_InvalidDbMessage" xml:space="preserve">
     <value>The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking OK. If you click Cancel, the database will be kept, but the caching of translations into the database will disabled (it can be re-enabled in settings).</value>
   </data>

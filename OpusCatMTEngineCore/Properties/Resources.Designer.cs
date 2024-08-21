@@ -70,6 +70,15 @@ namespace OpusCatMtEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid database deletion failed. Caching of translations into the database will disabled (it can be re-enabled in settings)..
+        /// </summary>
+        public static string App_InvalidDbDeleteFailedMessage {
+            get {
+                return ResourceManager.GetString("App_InvalidDbDeleteFailedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The existing translation database was created for an older version of OPUS-CAT MT Engine. A new database must be created for the new version. Delete old database and create a new one by clicking OK. If you click Cancel, the database will be kept, but the caching of translations into the database will disabled (it can be re-enabled in settings)..
         /// </summary>
         public static string App_InvalidDbMessage {
