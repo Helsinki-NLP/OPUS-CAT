@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class AutoEditRuleCollection
     {
@@ -198,8 +198,8 @@ namespace OpusCatMTEngine
         {
             MessageBoxResult messageBoxResult =
                 System.Windows.MessageBox.Show(
-                    String.Format(OpusCatMTEngine.Properties.Resources.Rules_DeleteRuleCollectionConfirmation, this.CollectionName),
-                    OpusCatMTEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
+                    String.Format(OpusCatMtEngine.Properties.Resources.Rules_DeleteRuleCollectionConfirmation, this.CollectionName),
+                    OpusCatMtEngine.Properties.Resources.Main_DeleteModelConfirmationTitle, System.Windows.MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
                 if (this.ruleCollectionFile != null && this.ruleCollectionFile.Exists)
@@ -221,7 +221,7 @@ namespace OpusCatMTEngine
             string edited = unedited;
 
             List<AutoEditRuleMatch> appliedReplacements = new List<AutoEditRuleMatch>();
-            List<Tuple<int, int>> coveredUneditedSourceSpans = new List<Tuple<int, int>>();
+            
             //Collect matches for all rules
             Dictionary<int, List<AutoEditRuleMatch>> uneditedSourceMatches = this.GetAllSourceMatches(unedited);
 
@@ -230,6 +230,12 @@ namespace OpusCatMTEngine
             int editingOffset = 0;
             foreach (var matchesAtPosition in uneditedSourceMatches.OrderBy(x => x.Key))
             {
+                //If the previous replacement has overwritten this position, skip over the match
+                if (endOfLastMatchIndex > matchesAtPosition.Key)
+                {
+                    continue;
+                }
+
                 //Select the longest match (selection could be based on other factors, but this is 
                 //the simplest)
                 var longestMatch = matchesAtPosition.Value.OrderBy(x => x.Match.Length).Last();
@@ -273,15 +279,22 @@ namespace OpusCatMTEngine
             string edited = unedited;
 
             List<AutoEditRuleMatch> appliedReplacements = new List<AutoEditRuleMatch>();
-            List<Tuple<int, int>> coveredUneditedOutputSpans = new List<Tuple<int, int>>();
+            
             //Collect matches for all rules
             Dictionary<int, List<AutoEditRuleMatch>> uneditedSourceMatches = this.GetAllOutputMatches(source,unedited);
 
             int endOfLastMatchIndex = -1;
-            //How much the length of the edited source has changed in comparison with unedited source
+            
+            //How much the length of the edited mt has changed in comparison with unedited mt
             int editingOffset = 0;
             foreach (var matchesAtPosition in uneditedSourceMatches.OrderBy(x => x.Key))
             {
+                //If the previous replacement has overwritten this position, skip over the match
+                if (endOfLastMatchIndex > matchesAtPosition.Key)
+                {
+                    continue;
+                }
+
                 //Select the longest match (selection could be based on other factors, but this is 
                 //the simplest)
                 var longestMatch = matchesAtPosition.Value.OrderBy(x => x.Match.Length).Last();

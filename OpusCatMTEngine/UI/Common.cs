@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class ValidationErrorConverter : IMultiValueConverter
     {

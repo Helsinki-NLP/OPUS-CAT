@@ -11,11 +11,12 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.ServiceModel;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -99,6 +100,8 @@ namespace OpusCatMTEngine
             Log.Information("Setting Tls12 as security protocol (required for accessing online model storage");
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
+            this.InitializePythonEngine();
+
             Log.Information("Opening OPUS-CAT MT Engine window");
 
             // Create the startup window
@@ -116,9 +119,11 @@ namespace OpusCatMTEngine
                 App.CloseOverlay();
             }
 
-            this.InitializePythonEngine();
-
+//The update check is used to keep track of use counts, so disable it in DEBUG mode to keep counts
+//more accurate
+#if !DEBUG
             this.CheckForUpdatesAsync();
+#endif            
         }
 
         private async void CheckForUpdatesAsync()
@@ -176,11 +181,19 @@ namespace OpusCatMTEngine
 
         private void InitializePythonEngine()
         {
-            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll");
-            Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64");
-            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64");
+            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", ".\\python-3.8.10-embed-amd64\\python38.dll;");
+            Environment.SetEnvironmentVariable("PATH", ".\\python-3.8.10-embed-amd64;");
+            Environment.SetEnvironmentVariable("PYTHONPATH", ".\\python-3.8.10-embed-amd64;");
+            Environment.SetEnvironmentVariable("PYTHONHOME", ".\\python-3.8.10-embed-amd64;");
+
+            var home = PythonEngine.PythonHome;
+
             PythonEngine.Initialize();
             PythonEngine.BeginAllowThreads();
+            using (Py.GIL())
+            {
+                PythonEngine.ImportModule("sacremoses");
+            }
         }
 
         /// <summary>

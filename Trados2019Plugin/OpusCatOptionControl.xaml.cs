@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
@@ -38,8 +39,15 @@ namespace OpusCatTranslationProvider
             this.DataContext = this;
             this.CredentialStore = credentialStore;
             this.Options = options;
+
+#if (TRADOS22)
+            this.projectLanguagePairs = languagePairs.Select(
+                x => $"{new CultureInfo(x.SourceCulture.Name).TwoLetterISOLanguageName}-" +
+                $"{new CultureInfo(x.TargetCulture.Name).TwoLetterISOLanguageName}").ToList();
+#else
             this.projectLanguagePairs = languagePairs.Select(
                 x => $"{x.SourceCulture.TwoLetterISOLanguageName}-{x.TargetCulture.TwoLetterISOLanguageName}").ToList();
+#endif
 
             InitializeComponent();
             this.ConnectionSelection.LanguagePairs = this.projectLanguagePairs;

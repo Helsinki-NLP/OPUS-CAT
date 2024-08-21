@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for Overlay.xaml

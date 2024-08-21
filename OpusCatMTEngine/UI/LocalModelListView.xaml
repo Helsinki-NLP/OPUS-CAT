@@ -1,10 +1,10 @@
-﻿<UserControl x:Class="OpusCatMTEngine.LocalModelListView"
+﻿<UserControl x:Class="OpusCatMtEngine.LocalModelListView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:OpusCatMTEngine"
-             xmlns:resx="clr-namespace:OpusCatMTEngine.Properties"
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1000">
     <UserControl.Resources>
@@ -126,9 +126,15 @@
                             Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
                     <Button 
                             IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
-                            Name="editRulesTag" 
-                            Click="EditRulesTag_Click"
+                            Name="editRules" 
+                            Click="EditRules_Click"
                             Content="{x:Static resx:Resources.Main_EditRulesButton}" />
+                    <Button 
+                            Visibility="{Binding ElementName=LocalModelList, Path=SelectedItem.SupportsTerminology, Converter={StaticResource VisibleIfTrueConverter}, FallbackValue=Collapsed}"
+                            IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}" 
+                            Name="termList" 
+                            Click="TermList_Click"
+                            Content="{x:Static resx:Resources.Main_TermListButton}" />
                     <Button 
                         IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
                         Name="openModelDir"

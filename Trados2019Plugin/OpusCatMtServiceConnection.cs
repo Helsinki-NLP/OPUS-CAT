@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using OpusCatMTEngine;
+using OpusCatMtEngine;
 using OpusMTInterface;
 using RestSharp;
 using System;

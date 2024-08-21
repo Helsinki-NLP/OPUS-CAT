@@ -4,7 +4,7 @@ using YamlDotNet.RepresentationModel;
 using YamlDotNet.Helpers;
 using YamlDotNet.Core;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class MarianDecoderConfig
     {

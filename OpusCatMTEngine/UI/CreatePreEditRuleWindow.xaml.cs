@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public partial class CreatePreEditRuleWindow : Window, ICreateRuleWindow
     {

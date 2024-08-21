@@ -24,7 +24,7 @@ using System.Xml.Linq;
 using YamlDotNet.Serialization;
 using static System.Environment;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// This class contains methods for checking and downloading latest models from
@@ -236,6 +236,7 @@ namespace OpusCatMTEngine
 
         internal ObservableCollection<AutoEditRuleCollection> AutoPreEditRuleCollections { get; private set; }
         internal ObservableCollection<AutoEditRuleCollection> AutoPostEditRuleCollections { get; private set; }
+        internal ObservableCollection<Terminology> Terminologies { get; private set; }
 
         private bool onlineModelListFetched;
         private IsoLanguage _overrideModelTargetLanguage;
@@ -411,6 +412,36 @@ namespace OpusCatMTEngine
             }
         }
 
+        private void InitializeTerminologies()
+        {
+            this.Terminologies = new ObservableCollection<Terminology>();
+
+            var terminologyDir = new DirectoryInfo(
+                HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.TerminologyDir));
+            if (!terminologyDir.Exists)
+            {
+                terminologyDir.Create();
+            }
+
+            var deserializer = new Deserializer();
+            foreach (var file in terminologyDir.EnumerateFiles())
+            {
+                using (var reader = file.OpenText())
+                {
+                    try
+                    {
+                        var loadedTerminology = deserializer.Deserialize<Terminology>(reader);
+                        this.Terminologies.Add(loadedTerminology);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Terminology deserialization failed, file {file.Name}. Exception: {ex.Message}");
+                    }
+                }
+            }
+
+        }
+
         private void InitializeAutoEditRuleCollections()
         {
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
@@ -423,6 +454,9 @@ namespace OpusCatMTEngine
             {
                 editRuleDir.Create();
             }
+
+            //TODO: The rule collections should be loaded as needed, not all at once (in case there are massive
+            //rule collections)
             var deserializer = new Deserializer();
             foreach (var file in editRuleDir.EnumerateFiles())
             {
@@ -464,6 +498,7 @@ namespace OpusCatMTEngine
             this.ShowNewestOnly = true;
 
             this.InitializeAutoEditRuleCollections();
+            this.InitializeTerminologies();
 
             var modelDirPath = HelperFunctions.GetOpusCatDataPath(OpusCatMTEngineSettings.Default.ModelDir);
             this.opusModelDir = new DirectoryInfo(modelDirPath);
@@ -520,14 +555,27 @@ namespace OpusCatMTEngine
             //Use distinct to remove duplicate entries
             foreach (var line in modelList.Split('\n').Distinct())
             {
-                var split = line.Split('\t');
+                var split = line.Split(new char[] { '\t' });
                 if (split.Length >= 4)
                 {
                     var modelPath = split[0];
                     var modelUri = new Uri($"{OpusCatMTEngineSettings.Default.TatoebaModelStorageUrl}{modelPath}");
                     var modelType = split[1];
                     IEnumerable<string> sourceLangs = split[2].Split(',');
-                    IEnumerable<string> targetLangs = split[3].Split(',');
+                    IEnumerable<string> targetLangs;
+
+                    //Multilingual models have a use-target-labels field (fifth column in tsv), which contains the target
+                    //labels of the model, use that instead of target languages, as it will include
+                    //script info (e.g. Latn or Cyrl).
+                    if (String.IsNullOrWhiteSpace(split[4]))
+                    {
+                        targetLangs = split[3].Split(',');
+                    }
+                    else
+                    {
+                        //Remove the target code delimiters >>code<< -> code
+                        targetLangs = split[4].Replace("<", "").Replace(">", "").Split(',');
+                    }
 
                     //Some entries might have empty source and target languages
                     if (!sourceLangs.Any() || !targetLangs.Any())
@@ -536,8 +584,10 @@ namespace OpusCatMTEngine
                     }
                     var model = new MTModel(modelPath.Replace(".zip", ""), modelUri);
                     model.ModelType = modelType;
-                    model.SourceLanguages = sourceLangs.Select(x => new IsoLanguage(x)).ToList();
+                    
                     model.TargetLanguages = targetLangs.Select(x => new IsoLanguage(x)).ToList();
+                    model.SourceLanguages = sourceLangs.Select(x => new IsoLanguage(x)).ToList();
+
                     this.onlineModels.Add(model);
                 }
             }
@@ -729,22 +779,8 @@ namespace OpusCatMTEngine
         private void modelYamlDownloadComplete(Uri modelUri, string model, object sender, DownloadStringCompletedEventArgs e)
         {
             var yamlString = e.Result;
-            yamlString = Regex.Replace(yamlString, "- (>>[^<]+<<)", "- \"$1\"");
-            yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
-            if (Regex.Match(yamlString, @"(?<!- )devset = top").Success)
-            {
-                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
-                yamlString = Regex.Replace(yamlString, @"(?<!- )devset = top", "devset: top");
-
-            }
-            if (yamlString.Contains("unused dev/test data is added to training data"))
-            {
-                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
-                yamlString = Regex.Replace(
-                        yamlString,
-                        @"unused dev/test data is added to training data",
-                        "other: unused dev/test data is added to training data");
-            }
+            yamlString = HelperFunctions.FixOpusYaml(yamlString, model);
+            
             var onlineModel = new MTModel(model.Replace(".zip", ""), modelUri, yamlString);
             this.CheckIfOnlineModelInstalled(onlineModel);
             this.onlineModels.Add(onlineModel);
@@ -943,7 +979,8 @@ namespace OpusCatMTEngine
                             Regex.Match(modelPath, @"[^\\]+\\[^\\]+$").Value,
                             modelPath,
                             this.AutoPreEditRuleCollections,
-                            this.AutoPostEditRuleCollections));
+                            this.AutoPostEditRuleCollections,
+                            this.Terminologies));
                 }
                 catch
                 {

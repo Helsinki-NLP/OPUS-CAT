@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     // This class will be the Tab int the TabControl
     public class ActionTabItem

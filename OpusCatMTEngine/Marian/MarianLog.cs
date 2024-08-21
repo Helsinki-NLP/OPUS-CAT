@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     //This is an object for the information contained in a Marian training log.
     public class MarianLog

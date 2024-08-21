@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
 
     public class MarianCustomizer

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class HelperFunctions
     {
@@ -198,6 +199,28 @@ namespace OpusCatMTEngine
             }
 
             return new ParallelFilePair(dummySource, dummyTarget);
+        }
+
+        internal static string FixOpusYaml(string yamlString, string model)
+        {
+            yamlString = Regex.Replace(yamlString, "- (>>[^<]+<<)", "- \"$1\"");
+            yamlString = Regex.Replace(yamlString, "(?<!- )'(>>[^<]+<<)'", "- \"$1\"");
+            if (Regex.Match(yamlString, @"(?<!- )devset = top").Success)
+            {
+                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
+                yamlString = Regex.Replace(yamlString, @"(?<!- )devset = top", "devset: top");
+
+            }
+            if (yamlString.Contains("unused dev/test data is added to training data"))
+            {
+                Log.Information($"Corrupt yaml line in model {model} yaml file, applying fix");
+                yamlString = Regex.Replace(
+                        yamlString,
+                        @"unused dev/test data is added to training data",
+                        "other: unused dev/test data is added to training data");
+            }
+
+            return yamlString;
         }
     }
 }

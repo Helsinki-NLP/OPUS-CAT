@@ -1,5 +1,7 @@
-﻿using Serilog;
+﻿using Python.Runtime;
+using Serilog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -20,9 +22,11 @@ using System.Windows;
 using System.Windows.Data;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
+
     
+
     public enum MTModelStatus
     {
         OK,
@@ -64,6 +68,30 @@ namespace OpusCatMTEngine
     
     public class MTModel : INotifyPropertyChanged
     {
+        private dynamic lemmatizer;
+
+        internal List<Tuple<int, int, string>> Lemmatize(string input)
+        {
+            List<Tuple<int, int, string>> lemmaList = new List<Tuple<int, int, string>>();
+            using (Py.GIL())
+            {
+                var output = new List<Tuple<int, int, string>>();
+
+                dynamic processed = this.lemmatizer(input);
+
+                foreach (var sentence in processed.sentences)
+                {
+                    foreach (var word in sentence.words)
+                    {
+                        output.Add(new Tuple<int, int, string>((int)word.start_char, (int)word.end_char, (string)word.lemma));
+                    }
+                }
+
+                return output;
+            }
+
+        }
+
         public object this[string propertyName]
         {
             get
@@ -160,17 +188,136 @@ namespace OpusCatMTEngine
                 foreach (var langpair in this.marianProcesses.Keys)
                 {
                     this.marianProcesses[langpair].ShutdownMtPipe();
-                    this.marianProcesses[langpair] = null;
+                    //this.marianProcesses[langpair] = null;
                 }
             }
             this.marianProcesses = null;
+        }
+
+        private Dictionary<int, List<TermMatch>> GetTermMatches(string input)
+        {
+            var termMatches = new Dictionary<int, List<TermMatch>>();
+
+            foreach (var term in this.Terminology.Terms)
+            {
+                var thisTermMatches = term.SourcePatternRegex.Matches(input);
+                foreach (Match termMatch in thisTermMatches)
+                {
+                    if (termMatches.ContainsKey(termMatch.Index))
+                    {
+                        termMatches[termMatch.Index].Add(
+                            new TermMatch(term, termMatch));
+                    }
+                    else
+                    {
+                        termMatches[termMatch.Index] = new List<TermMatch>() {
+                            new TermMatch(term, termMatch)};
+                    }
+                }
+                
+            }
+
+            return termMatches;
+        }
+
+
+        private Dictionary<int,List<TermMatch>> GetLemmaMatches(string input, Dictionary<int, List<TermMatch>> termMatches = null)
+        {
+            if (termMatches == null)
+            {
+                termMatches = new Dictionary<int, List<TermMatch>>();
+            }
+            
+
+            //Get lemmatized input and find lemmatized term matches. Prioritize normal term matches
+            //in case of overlap
+            //var lemmatizedInput = PythonNetHelper.Lemmatize(this.sourceLanguages.First().ShortestIsoCode, input);
+            var lemmatizedInput = this.Lemmatize(input);
+
+            var lemmaToPositionDict = new Dictionary<string, List<int>>();
+            int lemmaCounter = 0;
+            foreach (var lemma in lemmatizedInput.Select(x => x.Item3))
+            {
+                if (lemmaToPositionDict.ContainsKey(lemma))
+                {
+                    lemmaToPositionDict[lemma].Add(lemmaCounter);
+                }
+                else
+                {
+                    lemmaToPositionDict[lemma] = new List<int>() { lemmaCounter };
+                }
+                lemmaCounter++;
+            }
+
+            foreach (var term in this.Terminology.Terms.Where(x => x.MatchSourceLemma))
+            {
+
+                if (term.SourceLemmas == null)
+                {
+                    term.SourceLemmas = this.Lemmatize(term.SourcePattern).Select(x => x.Item3).ToList();
+                }
+                var sourceLemmas = term.SourceLemmas;
+
+                //Check if first lemma in term found in sentence
+
+                bool termLemmaFound;
+
+                if (lemmaToPositionDict.ContainsKey(sourceLemmas[0]))
+                {
+                    var firstLemmaPositions = lemmaToPositionDict[sourceLemmas[0]];
+
+                    //Then check if the other lemmas of the term follow in the source sentence
+                    foreach (var startPos in firstLemmaPositions)
+                    {
+                        int sourceSentencePos = startPos;
+                        termLemmaFound = true;
+                        //start looking at second lemma
+                        for (var termLemmaIndex = 1; termLemmaIndex < sourceLemmas.Count; termLemmaIndex++)
+                        {
+                            sourceSentencePos = startPos + termLemmaIndex;
+                            if (sourceSentencePos < lemmatizedInput.Count)
+                            {
+                                if (lemmatizedInput[sourceSentencePos].Item3 != sourceLemmas[termLemmaIndex])
+                                {
+                                    termLemmaFound = false;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                termLemmaFound = false;
+                                break;
+                            }
+                        }
+
+                        if (termLemmaFound)
+                        {
+                            var startChar = lemmatizedInput[startPos].Item1;
+                            var endChar = lemmatizedInput[sourceSentencePos].Item2;
+                            if (termMatches.ContainsKey(startChar))
+                            {
+                                termMatches[startChar].Add(
+                                    new TermMatch(term, startChar, endChar - startChar, true));
+                            }
+                            else
+                            {
+                                termMatches[startChar] = new List<TermMatch>() {
+                                            new TermMatch(term, startChar, endChar-startChar, true)};
+                            }
+                        }
+                    }
+                }
+            }
+
+            return termMatches;
         }
 
         public Task<TranslationPair> Translate(
             string input, 
             IsoLanguage sourceLang, 
             IsoLanguage targetLang,
-            bool applyEditRules=true)
+            bool applyEditRules=true,
+            bool applyTerminology=true)
         {
             if (String.IsNullOrWhiteSpace(input))
             {
@@ -186,7 +333,40 @@ namespace OpusCatMTEngine
                     input = preEditRuleCollection.ProcessPreEditRules(input).Result;
                 }
             }
+            
+            if (this.SupportsTerminology && applyTerminology)
+            {
+                
+                //Apply terminology
+                //Use a simple method of removing overlapping matches of different terms:
+                //For each position record only the longest term match, then when annotating term data,
+                //start from the term closest to edge and skip overlapping terms.
+                var termMatches = this.GetTermMatches(input);
 
+                //Match term at lemma level, if specified
+                if (this.Terminology.Terms.Any(x => x.MatchSourceLemma))
+                {
+                    termMatches = this.GetLemmaMatches(input, termMatches);
+                }
+
+                int lastEditStart = input.Length;
+                foreach (var index in termMatches.Keys.ToList().OrderByDescending(x => x))
+                {
+                    //Start from longest match
+                    var matchesDescending = termMatches[index].OrderByDescending(x => x.Length);
+                    foreach (var match in matchesDescending)
+                    {
+                        if (match.Length + index <= lastEditStart)
+                        {
+                            input = input.Remove(index, match.Length).Insert(index,
+                                $" <term_start> <term_mask> <term_end> {match.Term.TargetLemma} <trans_end>");
+                            lastEditStart = index;
+                            continue;
+                        }
+                    }
+                }
+            }
+            
             //Need to get the original codes, since those are the ones the marian model uses
             var modelSourceLang =
                 this.SourceLanguages.SingleOrDefault(x => x.ShortestIsoCode == sourceLang.ShortestIsoCode);
@@ -200,8 +380,14 @@ namespace OpusCatMTEngine
                 modelOrigSourceCode = modelSourceLang.OriginalCode;
             }
 
+            //Try to get an exact match first, then try for shortest code match, this is for
+            //matching correct script variants of same languages
             var modelTargetLang =
-                this.TargetLanguages.SingleOrDefault(x => x.ShortestIsoCode == targetLang.ShortestIsoCode);
+                this.TargetLanguages.SingleOrDefault(x => x.OriginalCode == targetLang.OriginalCode);
+            if (modelTargetLang == null)
+            {
+                modelTargetLang = this.TargetLanguages.Where(x => x.ShortestIsoCode == targetLang.ShortestIsoCode).First();
+            }
             string modelOrigTargetCode;
             if (modelTargetLang == null)
             {
@@ -279,13 +465,7 @@ namespace OpusCatMTEngine
         {
             this.InstallProgress = e.ProgressPercentage;
         }
-
-        public List<IsoLanguage> TargetLanguages
-        {
-            get => targetLanguages;
-            set => targetLanguages = value;
-        }
-
+        
         public MTModelStatus Status { get => status; set { status = value; NotifyPropertyChanged(); } }
         
         //This creates a zip package of the model that can be moved to another computer
@@ -454,7 +634,25 @@ namespace OpusCatMTEngine
             }
         }
 
-        public List<IsoLanguage> SourceLanguages { get => sourceLanguages; set => sourceLanguages = value; }
+        public List<IsoLanguage> SourceLanguages
+        {
+            get => sourceLanguages;
+            set
+            {
+                sourceLanguages = value;
+                NotifyPropertyChanged("SourceLanguageString");
+            }
+        }
+
+        public List<IsoLanguage> TargetLanguages
+        {
+            get => targetLanguages;
+            set
+            {
+                targetLanguages = value;
+                NotifyPropertyChanged("TargetLanguageString");
+            }
+        }
 
         public string Name { get => name; set => name = value; }
 
@@ -555,9 +753,8 @@ namespace OpusCatMTEngine
         private void ParseDecoderConfig()
         {
             var decoderYaml = new DirectoryInfo(this.InstallDir).GetFiles("decoder.yml").Single();
-            var deserializer = new Deserializer();
-            this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText());
-            
+            var deserializer = new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
+            this.decoderSettings = deserializer.Deserialize<MarianDecoderConfig>(decoderYaml.OpenText()); 
         }
 
         private void ParseModelConfig()
@@ -586,37 +783,65 @@ namespace OpusCatMTEngine
 
         private void UpdateModelYamlPath()
         {
-            //Recent models have yaml files containing metadata, they have the same name as the model npz file
-            var modelFilePath = Path.Combine(this.InstallDir, this.decoderSettings.models[0]);
-            this.modelYamlFilePath = Path.ChangeExtension(modelFilePath, "yml");
+            //Recent models have yaml files containing metadata, their naming conventions may change, so
+            //need to find the correct yml file. Three yml files can be excluded based on their name.
+            var modelYamlCandidates = Directory.GetFiles(this.InstallDir, "*.yml").Where(
+                x => !x.EndsWith("decoder.yml") && !x.EndsWith("modelconfig.yml") && !x.EndsWith("vocab.yml"));
+
+            foreach (var candidate in modelYamlCandidates)
+            {
+                using (var reader = File.OpenText(candidate))
+                {
+                    var candidateString = reader.ReadToEnd();
+                    
+                    if (ParseModelYaml(candidateString))
+                    {
+                        this.Faulted = false;
+                        this.modelYaml = candidateString;
+                        this.modelYamlFilePath = candidate;
+                        this.Name = Path.GetFileName(this.InstallDir);
+                        break;
+                    }
+                    else
+                    {
+                        this.Faulted = true;
+                    }
+                }
+            }
+           
         }
 
         public MTModel(
             string modelPath, 
             string installDir,
             ObservableCollection<AutoEditRuleCollection> autoPreEditRuleCollections,
-            ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections)
+            ObservableCollection<AutoEditRuleCollection> autoPostEditRuleCollections,
+            ObservableCollection<Terminology> terminologies)
         {
+
+            this.ModelPath = modelPath;
             this.InstallDir = installDir;
 
             this.ParseDecoderConfig();
             this.UpdateModelYamlPath();
 
             this.SupportsWordAlignment = this.decoderSettings.models[0].Contains("-align");
-
-            if (File.Exists(this.modelYamlFilePath))
-            {
-                using (var reader = File.OpenText(this.modelYamlFilePath))
-                {
-                    this.modelYaml = reader.ReadToEnd();
-                } 
-            }
-
-            this.ParseModelPath(modelPath);
+            this.SupportsTerminology = this.decoderSettings.models[0].Contains("-terms");
 
             this.ParseModelConfig();
 
-            //
+            if (this.modelYaml == null)
+            {
+                this.ParseModelPathForLanguages(modelPath);
+
+                if (this.modelConfig.SourceLanguageCodes != null &&
+                    this.modelConfig.TargetLanguageCodes != null)
+                {
+                    this.SourceLanguages = this.modelConfig.SourceLanguageCodes.Select(x => new IsoLanguage(x)).ToList();
+                    this.TargetLanguages = this.modelConfig.TargetLanguageCodes.Select(x => new IsoLanguage(x)).ToList();
+                }
+            }
+            
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>(
                 this.ModelConfig.AutoPreEditRuleCollectionGuids.Select(x => autoPreEditRuleCollections.SingleOrDefault(
                     y => y.CollectionGuid == x)).Where(y => y != null));
@@ -624,11 +849,43 @@ namespace OpusCatMTEngine
                 this.ModelConfig.AutoPostEditRuleCollectionGuids.Select(x => autoPostEditRuleCollections.SingleOrDefault(
                     y => y.CollectionGuid == x)).Where(y => y != null));
 
+            if (this.SupportsTerminology)
+            {
+                this.Terminology = terminologies.SingleOrDefault(x => x.TerminologyGuid == this.ModelConfig.TerminologyGuid);
+                //If there is no terminology guid or the terminology does not exits, Terminology will be null,
+                //so use new Terminology
+                if (this.Terminology == null)
+                {
+                    this.Terminology = new Terminology() { TerminologyName = $"terms for {this.Name}" };
+                    this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
+                    this.SaveModelConfig();
+                }
+
+                using (Py.GIL())
+                {
+                    dynamic stanza = PythonEngine.ImportModule("stanza");
+                    this.lemmatizer = stanza.Pipeline(
+                            this.SourceLanguages[0].ShortestIsoCode, processors: "tokenize,mwt,pos,lemma");
+                }
+
+            }
+            
             this.ModelConfig.ModelTags.CollectionChanged += ModelTags_CollectionChanged;
         }
 
         internal void SaveModelConfig()
         {
+            if (this.ModelConfig == null)
+            {
+                this.ModelConfig = new MTModelConfig();
+            }
+
+            if (this.SourceLanguages != null && this.TargetLanguages != null)
+            {
+                this.ModelConfig.SourceLanguageCodes = new ObservableCollection<String>(this.SourceLanguages.Select(x => x.OriginalCode));
+                this.ModelConfig.TargetLanguageCodes = new ObservableCollection<String>(this.TargetLanguages.Select(x => x.OriginalCode));
+            }
+
             //The directory might not exists yet in case of customized models (i.e. copying of the base model
             //is not complete)
             if (Directory.Exists(this.InstallDir))
@@ -697,7 +954,7 @@ namespace OpusCatMTEngine
             this.SaveModelConfig();
         }
         
-        private void ParseModelPath(string modelPath)
+        private void ParseModelPathForLanguages(string modelPath)
         {
             char separator;
             if (modelPath.Contains('/'))
@@ -714,25 +971,19 @@ namespace OpusCatMTEngine
             //For OPUS-MT models and monolingual Tatoeba models, 
             //languages are included in path. For multilingual Tatoeba models,
             //languages have to be fetched the metadata yml file
-            if (this.modelYaml == null)
+            
+            //There may be weird paths with no hyphen separating source from target languages, e.g.
+            //just "westgermanic" (presumably both source and target languages are westgermanic).
+            if (pathSplit[0].Contains("-"))
             {
-                //There may be weird paths with no hyphen separating source from target languages, e.g.
-                //just "westgermanic" (presumably both source and target languages are westgermanic).
-                if (pathSplit[0].Contains("-"))
-                {
-                    this.SourceLanguages =
-                        pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
-                    this.TargetLanguages =
-                        pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
-                }
-            }
-            else
-            {
-                this.ParseModelYaml(this.modelYaml);
+                this.SourceLanguages =
+                    pathSplit[0].Split('-')[0].Split('+').Select(x => new IsoLanguage(x)).ToList();
+                this.TargetLanguages =
+                    pathSplit[0].Split('-')[1].Split('+').Select(x => new IsoLanguage(x)).ToList();
             }
             
+            
             this.Name = pathSplit[1];
-            this.ModelPath = modelPath;
         }
 
         //This is mainly for creating finetuned models, hence the process argument (which holds the fine tuning process)
@@ -753,6 +1004,9 @@ namespace OpusCatMTEngine
             this.TargetLanguages = targetLangs;
             this.AutoPostEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
             this.AutoPreEditRuleCollections = new ObservableCollection<AutoEditRuleCollection>();
+            this.Terminology = new Terminology() { TerminologyName = $"terms for {this.Name}" };
+            this.ModelConfig.TerminologyGuid = this.Terminology.TerminologyGuid;
+            
             this.Status = status;
             this.FinetuneProcess = finetuneProcess;
             this.ModelConfig = new MTModelConfig();
@@ -776,16 +1030,25 @@ namespace OpusCatMTEngine
         }
 
         //This is used for online models, model uri is included for later download of models
-        public MTModel(string modelPath, Uri modelUri, string yamlString=null)
+        public MTModel(string modelPath, Uri modelUri, string yamlString = null)
         {
+            this.ModelPath = modelPath;
             this.modelYaml = yamlString;
+            if (yamlString != null)
+            {
+                this.ParseModelYaml(this.modelYaml);
+            }
+            else
+            {
+                this.ParseModelPathForLanguages(modelPath);
+            }
             this.ModelUri = modelUri;
-            this.ParseModelPath(modelPath);
+            
         }
 
-        private void ParseModelYaml(string yamlString)
+        private Boolean ParseModelYaml(string yamlString)
         {
-
+            yamlString = HelperFunctions.FixOpusYaml(yamlString, this.Name);
             try
             {
                 this.SourceLanguages = new List<IsoLanguage>();
@@ -815,11 +1078,17 @@ namespace OpusCatMTEngine
                 else
                 {
                     Log.Error($"No source langs in {this.ModelUri} yaml file.");
-                    this.Faulted = true;
                     this.SourceLanguages.Add(new IsoLanguage("NO SOURCE LANGUAGES"));
+                    return false;
                 }
                 List<object> xamlTargetLangs = null;
-                if (res.ContainsKey("target-languages"))
+                //There may be more target labels than target language, in case you have different
+                //writing systems etc., so use target labels as target languages whenever they exist
+                if (res.ContainsKey("use-target-labels"))
+                {
+                    xamlTargetLangs = res["use-target-labels"];
+                }
+                else if (res.ContainsKey("target-languages"))
                 {
                     xamlTargetLangs = res["target-languages"];
                 }
@@ -828,14 +1097,14 @@ namespace OpusCatMTEngine
                 {
                     foreach (var lang in xamlTargetLangs)
                     {
-                        this.TargetLanguages.Add(new IsoLanguage(lang.ToString()));
+                        this.TargetLanguages.Add(new IsoLanguage(lang.ToString().Trim(new char[] { '>', '<' })));
                     }
                 }
                 else
                 {
                     Log.Error($"No target langs in {this.ModelUri} yaml file.");
-                    this.Faulted = true;
                     this.TargetLanguages.Add(new IsoLanguage("NO TARGET LANGUAGES"));
+                    return false;
                 }
             }
             catch (YamlDotNet.Core.SyntaxErrorException ex)
@@ -843,12 +1112,10 @@ namespace OpusCatMTEngine
                 Log.Error($"Error in the yaml syntax of model {this.ModelUri}. Error: {ex.Message}.");
                 this.SourceLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
                 this.TargetLanguages.Add(new IsoLanguage("ERROR IN YAML SYNTAX"));
+                return false;
             }
-            catch (Exception ex)
-            {
-                Log.Error($"source-langs or target-langs key missing from {this.ModelUri} yaml file.");
-            }
-            
+
+            return true;
         }
 
         //This indicates whether the model is ready for translation
@@ -973,7 +1240,7 @@ namespace OpusCatMTEngine
         }
 
         public string ModelPath { get; internal set; }
-        public string InstallDir { get; }
+        public string InstallDir { get; set; }
         public bool Prioritized { get => _prioritized; set { _prioritized = value; NotifyPropertyChanged(); } }
         
         private MarianLog TrainingLog;
@@ -989,6 +1256,7 @@ namespace OpusCatMTEngine
         private MarianDecoderConfig decoderSettings;
 
         public bool SupportsWordAlignment { get => supportsWordAlignment; set => supportsWordAlignment = value; }
+        public bool SupportsTerminology { get; private set; }
         public bool DoesNotSupportWordAlignment { get => !supportsWordAlignment; }
         public SegmentationMethod ModelSegmentationMethod
         {
@@ -1036,6 +1304,13 @@ namespace OpusCatMTEngine
             get;
             internal set;
         }
+
+        public Terminology Terminology
+        {
+            get;
+            internal set;
+        }
+        private dynamic SourceLemmatizer { get; set; }
 
         private MTModelStatus status;
         private MTModelConfig modelConfig;

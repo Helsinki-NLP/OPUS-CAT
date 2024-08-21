@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace OpusCatMTEngine.Properties {
+namespace OpusCatMtEngine.Properties {
     using System;
     
     
@@ -691,6 +691,15 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Terminology.
+        /// </summary>
+        public static string Main_TermListButton {
+            get {
+                return ResourceManager.GetString("Main_TermListButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Translate with model.
         /// </summary>
         public static string Main_TranslateWithModelButton {
@@ -980,6 +989,29 @@ namespace OpusCatMTEngine.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to import stanza
+        ///
+        ///class StanzaWrapper:
+        ///
+        ///    def __init__(self,
+        ///                 lang,
+        ///                 processors):
+        ///        self.stanza = stanza.Pipeline(lang, processors=&apos;tokenize,pos,lemma,depparse&apos;)
+        ///        
+        ///    def lemmatize(self,input):
+        ///        doc = self.stanza(input)
+        ///        lemma_tuples = []
+        ///        for sentence in doc.sentences:
+        ///            lemma_tuples +=[(x.start_char,x.end_char,x.lemma) for x in sentence.words]
+        ///        return lemma_tuples.
+        /// </summary>
+        public static string StanzaWrapperCode {
+            get {
+                return ResourceManager.GetString("StanzaWrapperCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add.
         /// </summary>
         public static string Tags_AddTagButton {
@@ -1012,6 +1044,69 @@ namespace OpusCatMTEngine.Properties {
         public static string Tags_ModelTagsLabel {
             get {
                 return ResourceManager.GetString("Tags_ModelTagsLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add term.
+        /// </summary>
+        public static string Terminology_AddTermButton {
+            get {
+                return ResourceManager.GetString("Terminology_AddTermButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete term.
+        /// </summary>
+        public static string Terminology_DeleteTermButton {
+            get {
+                return ResourceManager.GetString("Terminology_DeleteTermButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit term.
+        /// </summary>
+        public static string Terminology_EditTermButton {
+            get {
+                return ResourceManager.GetString("Terminology_EditTermButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import TBX.
+        /// </summary>
+        public static string Terminology_ImportTbxButton {
+            get {
+                return ResourceManager.GetString("Terminology_ImportTbxButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save terminology.
+        /// </summary>
+        public static string Terminology_SaveTerminologyButton {
+            get {
+                return ResourceManager.GetString("Terminology_SaveTerminologyButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminology.
+        /// </summary>
+        public static string Terminology_TerminologyHeading {
+            get {
+                return ResourceManager.GetString("Terminology_TerminologyHeading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Terminology.
+        /// </summary>
+        public static string Terminology_TerminologyTitle {
+            get {
+                return ResourceManager.GetString("Terminology_TerminologyTitle", resourceCulture);
             }
         }
         

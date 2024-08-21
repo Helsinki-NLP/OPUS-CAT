@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class AutoEditRuleMatch
     {

@@ -7,7 +7,7 @@ using System.Windows;
 using OpusMTInterface;
 using Serilog;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
 
     /// <summary>
@@ -111,7 +111,7 @@ namespace OpusCatMTEngine
             catch (AddressAlreadyInUseException ex)
             {
                 MessageBox.Show(String.Format(
-                    OpusCatMTEngine.Properties.Resources.Service_PortNotAvailable, OpusCatMTEngineSettings.Default.HttpMtServicePort));
+                    OpusCatMtEngine.Properties.Resources.Service_PortNotAvailable, OpusCatMTEngineSettings.Default.HttpMtServicePort));
                 System.Windows.Application.Current.Shutdown();
             }
             

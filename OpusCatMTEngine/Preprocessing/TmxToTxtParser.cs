@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class TmxToTxtParser
     {

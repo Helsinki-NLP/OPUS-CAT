@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public static class MatchColorPicker
     {

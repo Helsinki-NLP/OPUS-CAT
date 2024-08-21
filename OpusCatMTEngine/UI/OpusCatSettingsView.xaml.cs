@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     /// <summary>
     /// Interaction logic for CustomizationView.xaml
@@ -39,7 +39,7 @@ namespace OpusCatMTEngine
         public OpusCatSettingsView()
         {
             InitializeComponent();
-            
+
             this.Loaded += SettingsControl_Loaded;
         }
 
@@ -47,7 +47,7 @@ namespace OpusCatMTEngine
         private void SettingsControl_Loaded(object sender, RoutedEventArgs e)
         {
             this.Loaded -= SettingsControl_Loaded;
-            
+
             this.ServicePortBox = OpusCatMTEngineSettings.Default.MtServicePort;
             this.HttpServicePortBox = OpusCatMTEngineSettings.Default.HttpMtServicePort;
             this.StoreDataInAppdata = OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata;
@@ -55,6 +55,7 @@ namespace OpusCatMTEngine
             this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
             this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
             this.DisplayOverlay = OpusCatMTEngineSettings.Default.DisplayOverlay;
+            this.MaxLength = OpusCatMTEngineSettings.Default.MaxLength.ToString();
             NotifyPropertyChanged("SaveButtonEnabled");
         }
 
@@ -72,6 +73,7 @@ namespace OpusCatMTEngine
             OpusCatMTEngineSettings.Default.HttpMtServicePort = this.HttpServicePortBox;
             OpusCatMTEngineSettings.Default.StoreOpusCatDataInLocalAppdata = this.StoreDataInAppdata;
             OpusCatMTEngineSettings.Default.DatabaseRemovalInterval = Int32.Parse(this.DatabaseRemovalInterval);
+            OpusCatMTEngineSettings.Default.MaxLength = Int32.Parse(this.MaxLength);
             if (OpusCatMTEngineSettings.Default.CacheMtInDatabase != this.CacheMtInDatabase)
             {
                 OpusCatMTEngineSettings.Default.CacheMtInDatabase = this.CacheMtInDatabase;
@@ -121,6 +123,7 @@ namespace OpusCatMTEngine
             {
                 httpServicePortBox = value;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
             }
         }
 
@@ -132,6 +135,7 @@ namespace OpusCatMTEngine
             {
                 databaseRemovalInterval = value;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
             }
         }
 
@@ -187,6 +191,18 @@ namespace OpusCatMTEngine
             {
                 servicePortBox = value;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
+            }
+        }
+
+        public string MaxLength
+        {
+            get => maxLength;
+            set
+            {   
+                maxLength = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("SaveButtonEnabled");
             }
         }
 
@@ -194,7 +210,7 @@ namespace OpusCatMTEngine
         {
             get
             {
-                
+
                 bool allSettingsDefault =
                     this.ServicePortBox == OpusCatMTEngineSettings.Default.MtServicePort &&
                     this.HttpServicePortBox == OpusCatMTEngineSettings.Default.HttpMtServicePort &&
@@ -202,12 +218,13 @@ namespace OpusCatMTEngine
                     this.DatabaseRemovalInterval == OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString() &&
                     this.UseDatabaseRemoval == OpusCatMTEngineSettings.Default.UseDatabaseRemoval &&
                     this.CacheMtInDatabase == OpusCatMTEngineSettings.Default.CacheMtInDatabase &&
-                    this.DisplayOverlay == OpusCatMTEngineSettings.Default.DisplayOverlay;
+                    this.DisplayOverlay == OpusCatMTEngineSettings.Default.DisplayOverlay &&
+                    this.MaxLength == OpusCatMTEngineSettings.Default.MaxLength.ToString();
 
                 return !allSettingsDefault && !this.validationErrors;
             }
         }
-        
+
         private bool _storeDataInAppdata;
         private bool httpServicePortBoxIsValid;
         private bool servicePortBoxIsValid;
@@ -215,11 +232,13 @@ namespace OpusCatMTEngine
         private bool validationErrors;
         private bool useDatabaseRemoval;
         private bool _displayOverlay;
+        private string maxLength;
 
         public string Error
         {
             get { return "...."; }
         }
+
 
 
         private string Validate(string propertyName)
@@ -229,6 +248,22 @@ namespace OpusCatMTEngine
             this.validationErrors = false;
             switch (propertyName)
             {
+                case "MaxLength":
+                    if (!String.IsNullOrEmpty(this.MaxLength))
+                    {
+                        var length = Int32.Parse(this.MaxLength);
+                        if (length == 0)
+                        {
+                            validationMessage = "Error";
+                            this.validationErrors = true;
+                        }
+                    }
+                    else
+                    {
+                        validationMessage = "Error";
+                        this.validationErrors = true;
+                    }
+                    break;
                 case "DatabaseRemovalInterval":
                     if (!String.IsNullOrEmpty(this.DatabaseRemovalInterval))
                     {
@@ -299,6 +334,7 @@ namespace OpusCatMTEngine
             this.DatabaseRemovalInterval = OpusCatMTEngineSettings.Default.DatabaseRemovalInterval.ToString();
             this.UseDatabaseRemoval = OpusCatMTEngineSettings.Default.UseDatabaseRemoval;
             this.CacheMtInDatabase = OpusCatMTEngineSettings.Default.CacheMtInDatabase;
+            this.MaxLength = OpusCatMTEngineSettings.Default.MaxLength.ToString();
         }
     }
 }

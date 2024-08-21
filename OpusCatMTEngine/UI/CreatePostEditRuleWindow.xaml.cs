@@ -13,9 +13,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using static OpusCatMTEngine.AutoEditRule;
+using static OpusCatMtEngine.AutoEditRule;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public partial class CreatePostEditRuleWindow : Window, ICreateRuleWindow, INotifyPropertyChanged
     {

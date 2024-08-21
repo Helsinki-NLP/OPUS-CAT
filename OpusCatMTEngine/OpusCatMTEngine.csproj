@@ -63,6 +63,33 @@
   <PropertyGroup>
     <ApplicationIcon>opus.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugWsl|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugWsl\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugWsl|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\DebugWsl\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMacos|AnyCPU'">
+    <OutputPath>bin\DebugMacos\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMacos|x64'">
+    <OutputPath>bin\x64\DebugMacos\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Autofac, Version=6.1.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.6.1.0\lib\netstandard2.0\Autofac.dll</HintPath>
@@ -272,6 +299,10 @@
     <Compile Include="Preprocessing\MosesBpePreprocessor.cs" />
     <Compile Include="Preprocessing\SentencePiecePreprocessor.cs" />
     <Compile Include="Preprocessing\TmxToTxtParser.cs" />
+    <Compile Include="PythonNetHelper.cs" />
+    <Compile Include="Terminology\TermMatch.cs" />
+    <Compile Include="Terminology\Term.cs" />
+    <Compile Include="Terminology\Terminology.cs" />
     <Compile Include="UI\ActionTabItem.cs" />
     <Compile Include="UI\EditPreEditRuleCollectionWindow.xaml.cs">
       <DependentUpon>EditPreEditRuleCollectionWindow.xaml</DependentUpon>
@@ -292,6 +323,9 @@
     <Compile Include="UI\Common.cs" />
     <Compile Include="UI\CustomizationProgressView.xaml.cs">
       <DependentUpon>CustomizationProgressView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TerminologyView.xaml.cs">
+      <DependentUpon>TerminologyView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ICreateRuleWindow.cs" />
     <Compile Include="UI\ModelEvaluatorView.xaml.cs">
@@ -363,6 +397,10 @@
     <Page Include="UI\CustomizationProgressView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\TerminologyView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\ModelEvaluatorView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -589,6 +627,6 @@
   <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.112.2\build\net40\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.112.2\build\net40\System.Data.SQLite.Core.targets')" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(ProjectDir)python-3.8.10-embed-amd64\*.*" "$(TargetDir)python-3.8.10-embed-amd64" /Y /I /E</PreBuildEvent>
+    <PreBuildEvent>REM xcopy "$(ProjectDir)python-3.8.10-embed-amd64\*.*" "$(TargetDir)python-3.8.10-embed-amd64" /Y /I /E</PreBuildEvent>
   </PropertyGroup>
 </Project>

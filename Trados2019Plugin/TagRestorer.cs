@@ -1,4 +1,4 @@
-﻿using OpusCatMTEngine;
+﻿using OpusCatMtEngine;
 using OpusMTInterface;
 using Sdl.LanguagePlatform.Core;
 using System;
@@ -120,7 +120,7 @@ namespace OpusCatTranslationProvider
             {
                 Type elementType = segElement.GetType();
 
-                if (elementType == typeof(Text))
+                if (elementType == typeof(Text) && sourceSubwordQueue.Count > 0)
                 {
                     //Only check for numbers and letters, as they should be identical with both BPE
                     //and SentencePiece subwords.

@@ -15,7 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
 
     /// <summary>
@@ -54,8 +54,8 @@ namespace OpusCatMTEngine
            
             this.RuleCollection = selectedCollection;
             InitializeComponent();
-            this.Title = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
-            this.WindowHeader.Content = String.Format(OpusCatMTEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
+            this.Title = String.Format(OpusCatMtEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
+            this.WindowHeader.Content = String.Format(OpusCatMtEngine.Properties.Resources.EditRules_EditRuleCollectionTitle, selectedCollection.CollectionName);
             this.Tester.Refresh();
         }
             

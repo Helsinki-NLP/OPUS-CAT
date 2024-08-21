@@ -16,7 +16,7 @@ using System.Windows.Controls.Primitives;
 using YamlDotNet.Serialization;
 using Microsoft.Win32;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class MarianBatchTranslator
     {

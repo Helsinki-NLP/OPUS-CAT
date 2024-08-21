@@ -5,10 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
-namespace OpusCatMTEngine
+namespace OpusCatMtEngine
 {
     public class ModelMetadata
     {
+        //This does not appear to be used anywhere, currently these model yaml files
+        //are parsed dynamically
+
         [YamlMember(Alias = "release", ApplyNamingConventions = false)]
         public string Release { get; set; }
 

@@ -98,5 +98,31 @@
     <Setting Name="GithubRepo" Type="System.String" Scope="User">
       <Value Profile="(Default)">OPUS-CAT</Value>
     </Setting>
+    <Setting Name="MaxLength" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="FixUnbalancedLongTranslations" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitPatterns" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;;&lt;/string&gt;
+  &lt;string&gt;(&lt;/string&gt;
+  &lt;string&gt;)&lt;/string&gt;
+  &lt;string&gt;:&lt;/string&gt;
+  &lt;string&gt;,&lt;/string&gt;
+  &lt;string /&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitMinLength" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitLengthRatio" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">1.5</Value>
+    </Setting>
+    <Setting Name="TerminologyDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Terms</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

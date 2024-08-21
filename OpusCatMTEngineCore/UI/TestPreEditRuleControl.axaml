@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="OpusCatMtEngine.TestPreEditRuleControl"
+             xmlns:local="clr-namespace:OpusCatMtEngine"
+             x:CompileBindings="False">
+  <Border Background="AliceBlue" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+    <StackPanel>
+      <TextBlock Margin="5">
+        <Run FontWeight="Bold" Text="{Binding Title}" />
+        <Run FontStyle="Italic" Text="{Binding RuleCollection.CollectionName}" />
+      </TextBlock>
+      <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+        <StackPanel Margin="5">
+          <TextBlock>
+            <Run Text="{Binding InputBoxLabel}"/>
+            <Run FontStyle="Italic" Text="{Binding InputOrigin}"/>
+          </TextBlock>
+          <TextBox IsVisible="{Binding !TestActive}" Name="SourceBox" Margin="5" TextChanged="SourceBox_TextChanged" />
+          <Border IsVisible="{Binding TestActive}" Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Name="SourceHighlightBox" Margin="5" />
+          </Border>
+        </StackPanel>
+      </Border>
+      <StackPanel IsVisible="{Binding TestButtonVisibility}" Orientation="Horizontal">
+        <Button IsVisible="{Binding !TestActive}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="PreEditTest_Click" Content="{Binding ButtonText, Mode=TwoWay}" />
+        <Button IsVisible="{Binding TestActive}" HorizontalAlignment="Center" Margin="5" Padding="20,5" Click="Clear_Click">
+          Clear
+        </Button>
+      </StackPanel>
+      <Border Background="Azure" Margin="5" BorderBrush="Black" BorderThickness="0.5">
+        <StackPanel Margin="5">
+          <TextBlock Name="EditedSourceBoxTitle">
+            <Run>Edited source text</Run>
+            <Run FontStyle="Italic" Name="RulesAppliedRun" />
+          </TextBlock>
+          <Border Background="White" BorderBrush="Black" BorderThickness="1">
+            <TextBlock Margin="5" Name="EditedSourceBox" />
+          </Border>
+        </StackPanel>
+      </Border>
+
+    </StackPanel>
+
+  </Border>
+</UserControl>
