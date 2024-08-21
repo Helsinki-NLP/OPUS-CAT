@@ -1,0 +1,134 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OpusCatMtEngine" GeneratedClassName="OpusCatMtEngineSettings">
+  <Profiles />
+  <Settings>
+    <Setting Name="OpusModelStorageUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://object.pouta.csc.fi/OPUS-MT-models/</Value>
+    </Setting>
+    <Setting Name="LocalOpusCatDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">opuscat</Value>
+    </Setting>
+    <Setting Name="MtServicePort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8477</Value>
+    </Setting>
+    <Setting Name="CustomizationBaseConfig" Type="System.String" Scope="User">
+      <Value Profile="(Default)">customize.yml</Value>
+    </Setting>
+    <Setting Name="TranslationDBName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">translations.sqlite</Value>
+    </Setting>
+    <Setting Name="LogDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">logs</Value>
+    </Setting>
+    <Setting Name="MarianDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Marian</Value>
+    </Setting>
+    <Setting Name="PreprocessingDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Preprocessing</Value>
+    </Setting>
+    <Setting Name="ModelTagMaxLength" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="StartWcfHttpService" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TatoebaDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">TatoebaTestsets</Value>
+    </Setting>
+    <Setting Name="OODValidSetSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="TrainLogName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">train.log</Value>
+    </Setting>
+    <Setting Name="IDValidSetSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="PostFinetuneBatchName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">postfinetune.txt</Value>
+    </Setting>
+    <Setting Name="CustomModelZipPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">custom_model_packages</Value>
+    </Setting>
+    <Setting Name="HttpMtServicePort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8500</Value>
+    </Setting>
+    <Setting Name="StoreOpusCatDataInLocalAppdata" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ModelDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">models</Value>
+    </Setting>
+    <Setting Name="TatoebaModelStorageUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://a3s.fi/Tatoeba-MT-models/</Value>
+    </Setting>
+    <Setting Name="DatabaseRemovalInterval" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="CacheMtInDatabase" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UseDatabaseRemoval" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AllowRemoteUse" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DisplayOverlay" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="OverlayFontsize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">14</Value>
+    </Setting>
+    <Setting Name="FinetuningSetMinSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="EvaluationDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">evaluations</Value>
+    </Setting>
+    <Setting Name="WindowsPythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python3-windows-3.8.10-amd64</Value>
+    </Setting>
+    <Setting Name="EditRuleDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">editrules</Value>
+    </Setting>
+    <Setting Name="GithubOrg" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Helsinki-NLP</Value>
+    </Setting>
+    <Setting Name="GithubRepo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OPUS-CAT</Value>
+    </Setting>
+    <Setting Name="MaxLength" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="FixUnbalancedLongTranslations" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitMinLength" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitLengthRatio" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">1.5</Value>
+    </Setting>
+    <Setting Name="TerminologyDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Terms</Value>
+    </Setting>
+    <Setting Name="UnbalancedSplitPatterns" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;;&lt;/string&gt;
+  &lt;string&gt;(&lt;/string&gt;
+  &lt;string&gt;)&lt;/string&gt;
+  &lt;string&gt;:&lt;/string&gt;
+  &lt;string&gt;,&lt;/string&gt;
+  &lt;string /&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="LinuxPythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python3-linux-3.8.13-x86_64</Value>
+    </Setting>
+    <Setting Name="MacosPythonDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)">python3-macos-3.8.13-universal2</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

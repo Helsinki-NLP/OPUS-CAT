@@ -1,0 +1,17 @@
+﻿beam-size: 6
+disp-freq: 10
+save-freq: 100u
+mini-batch-words: 400
+cpu-threads: 1
+overwrite: true
+after-epochs: 1
+normalize: 1
+workspace: 2048
+early-stopping: 20
+learn-rate: 0.00002
+valid-freq: 100u
+valid-metrics:
+- translation
+valid-max-length: 200
+gradient-checkpointing: true
+shuffle-in-ram: true

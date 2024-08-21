@@ -1,0 +1,190 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" Height="380"
+             x:Class="OpusCatMtEngine.LocalModelListView"
+             xmlns:resx="clr-namespace:OpusCatMtEngine.Properties"
+             xmlns:local="clr-namespace:OpusCatMTEngine"
+             x:CompileBindings="False">
+  <Border BorderBrush="Black" BorderThickness="1" Margin="5">
+    <StackPanel>
+      <Label Margin="10,0,0,0" FontSize="20">Installed models</Label>
+      <DockPanel Margin="10,10,10.333,10">
+        <StackPanel DockPanel.Dock="Right" Margin="10,0">
+          <Border
+                        BorderBrush="Black" BorderThickness="1"
+                        IsVisible="{Binding Path=OverrideModelSet}">
+            <StackPanel Margin="5">
+              <Label>Override model target language</Label>
+              <ComboBox ItemsSource="{Binding Path=OverrideModel.TargetLanguages}"
+                SelectedItem="{Binding OverrideModelTargetLanguage}"
+                Width="200">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding IsoRefName}"/>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+                </ComboBox>
+              <Button
+                        Name="cancelOverride"
+                        Click="btnCancelOverride_Click"
+                        Content="{x:Static resx:Resources.Main_CancelOverrideButton}"/>
+            </StackPanel>
+          </Border>
+          <Button Name="addOnlineModel" Click="btnAddOnlineModel_Click" Content="{x:Static resx:Resources.Main_InstallFromWebButton}" />
+          <Button Name="addZipModel" Click="btnAddZipModel_Click" Content="{x:Static resx:Resources.Main_InstallFromZipButton}" />
+          <Button Name="customizeModel" Click="btnCustomizeModel_Click" Content="{x:Static resx:Resources.Main_FinetuneButton}">
+            <Button.IsVisible>
+              <Binding
+                                FallbackValue="False"
+                                ElementName="LocalModelList"
+                                Path="SelectedItem.IsReady"/>
+            </Button.IsVisible>
+          </Button>
+          <Button Name="continueCustomization" Click="btnContinueCustomization_Click" Content="{x:Static resx:Resources.Main_ContinueFinetuneButton}">
+            <Button.IsVisible>
+              <Binding
+                                FallbackValue="False"
+                                ElementName="LocalModelList"
+                                Path="SelectedItem.CanContinueFinetuning"/>
+            </Button.IsVisible>
+          </Button>
+          <Button Name="customizationProgress" Click="btnCustomizationProgress_Click"
+                            Content="{x:Static resx:Resources.Main_CustomizationProgressButton}">
+            <Button.IsVisible>
+              <Binding
+                                FallbackValue="False"
+                                ElementName="LocalModelList"
+                                Path="SelectedItem.HasProgress"/>
+            </Button.IsVisible>
+          </Button>
+          <Button Name="packageCustomModel" Click="btnpackageCustomModel_Click"
+                            Content="{x:Static resx:Resources.Main_PackageModelButton}">
+            <Button.IsVisible>
+              <Binding
+                                FallbackValue="Collapsed"
+                                ElementName="LocalModelList"
+                                Path="SelectedItem.CanPackage"/>
+            </Button.IsVisible>
+          </Button>
+          <Button Name="deleteModel" Click="btnDeleteModel_Click"
+                            Content="{x:Static resx:Resources.Main_DeleteModelButton}">
+            <Button.IsVisible>
+              <Binding
+                                FallbackValue="Collapsed"
+                                ElementName="LocalModelList"
+                                Path="SelectedItem.CanDelete"/>
+            </Button.IsVisible>
+          </Button>
+          <Button Name="translateWithModel" Click="btnTranslateWithModel_Click"
+                            Content="{x:Static resx:Resources.Main_TranslateWithModelButton}">
+            <Button.IsVisible>
+              <Binding
+                                FallbackValue="False"
+                                ElementName="LocalModelList"
+                                Path="SelectedItem.CanTranslate"/>
+            </Button.IsVisible>
+          </Button>
+          <!--
+                    <Button Name="openModelInOverlay" Click="btnOpenModelInOverlay_Click"
+                            Content="{x:Static resx:Resources.OpenModelInOverlayButton}">
+                        <Button.Visibility>
+                            <Binding 
+                                Converter="{StaticResource VisibleIfTrueConverter}" 
+                                FallbackValue="Collapsed" 
+                                ElementName="LocalModelList" 
+                                Path="SelectedItem.CanTranslate"/>
+                        </Button.Visibility>
+                    </Button>-->
+          <!-- This is disabled until the testing functionalities can be polished a bit more
+                        <Button IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItem.IsReady}" Name="testModel" Click="btnTestModel_Click">Test model</Button>
+                    -->
+          <Button
+                        IsVisible="False"
+                        IsEnabled="{Binding ElementName=LocalModelList, Path=SelectedItems.Count}"
+                        Name="evaluateModels"
+                        Click="btnEvaluateModels_Click"
+                        Content="{x:Static resx:Resources.Main_EvaluateModelsButton}" />
+          <Button
+                            IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            Name="addModelTag"
+                            Click="btnEditModelTags_Click"
+                            Content="{x:Static resx:Resources.Main_EditModelTagsButton}" />
+          <Button
+                            IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            Name="editRules"
+                            Click="EditRules_Click"
+                            Content="{x:Static resx:Resources.Main_EditRulesButton}" />
+          <Button
+                            IsVisible="{Binding ElementName=LocalModelList, Path=SelectedItem.SupportsTerminology, FallbackValue=False}"
+                            IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            Name="termList"
+                            Click="TermList_Click"
+                            Content="{x:Static resx:Resources.Main_TermListButton}" />
+          <Button
+                        IsEnabled="{Binding #LocalModelList.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        Name="openModelDir"
+                        Click="btnOpenModelDir_Click"
+                        Content="{x:Static resx:Resources.Main_OpenModelDirButton}"/>
+          <Button
+                        IsVisible="{Binding ElementName=LocalModelList, Path=SelectedItem.CanSetAsOverrideModel, FallbackValue=True}"
+                        Name="setAsOverride"
+                        Click="btnSetOverride_Click"
+                        Content="{x:Static resx:Resources.Main_SetAsOverrideModelButton}"/>
+        </StackPanel>
+        <DataGrid
+            LoadingRow="OnLoadRow"
+            CanUserSortColumns="True"
+            CanUserResizeColumns="True"
+            CanUserReorderColumns="True"
+            Name="LocalModelList"
+            Height="320"
+            GridLinesVisibility="All"
+            ItemsSource="{Binding LocalModels, Mode=OneWay}">
+
+          <DataGrid.Columns>
+            <DataGridTemplateColumn SortMemberPath="SourceLanguageString" Width="100" Header="{x:Static resx:Resources.Online_SourceLanguagesHeader}">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                <TextBlock VerticalAlignment="Center" Text="{Binding Path=SourceLanguageString, Mode=OneWay}">
+                  <ToolTip.Tip>
+                    <TextBlock MaxWidth="400" TextWrapping="Wrap" Text="{Binding Path=SourceLanguageString, Mode=OneWay}"></TextBlock>
+                  </ToolTip.Tip>
+                </TextBlock>
+                  </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTemplateColumn SortMemberPath="TargetLanguageString" Width="100" Header="{x:Static resx:Resources.Online_TargetLanguagesHeader}">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <TextBlock VerticalAlignment="Center" Text="{Binding Path=TargetLanguageString, Mode=OneWay}">
+                    <ToolTip.Tip>
+                      <TextBlock MaxWidth="400" TextWrapping="Wrap" Text="{Binding Path=TargetLanguageString, Mode=OneWay}"></TextBlock>
+                    </ToolTip.Tip>
+                  </TextBlock>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            
+            <DataGridTextColumn IsReadOnly="True" Binding="{Binding Path=Name, Mode=OneWay}" Header="Model name" Width="200"/>
+
+            <DataGridTemplateColumn SortMemberPath="StatusAndEstimateString" Width="220" Header="Status">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Grid>
+                    <ProgressBar Width="220" Maximum="100" Value="{Binding Path=StatusProgress, Mode=OneWay}"/>
+                    <TextBlock HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=StatusAndEstimateString, Mode=OneWay}"/>
+                  </Grid>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridCheckBoxColumn  Width="60" Header="Prioritized" Binding ="{Binding Path=Prioritized, Mode=TwoWay}" />
+
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
