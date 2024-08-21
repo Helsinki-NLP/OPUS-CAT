@@ -50,7 +50,7 @@ namespace OpusCatTranslationProvider
 
             _visitor = new OpusCatProviderElementVisitor();
 
-#if (TRADOS22)
+#if (TRADOS22 || TRADOS24)
             var sourceCode = new CultureInfo(this._languageDirection.SourceCulture.Name).TwoLetterISOLanguageName;
             var targetCode = new CultureInfo(this._languageDirection.TargetCulture.Name).TwoLetterISOLanguageName;
 #else
@@ -105,7 +105,7 @@ namespace OpusCatTranslationProvider
 #endregion
             string sourceText = _visitor.PlainText;
 
-#if (TRADOS22)
+#if (TRADOS22 || TRADOS24)
             var sourceCode = new CultureInfo(this._languageDirection.SourceCulture.Name).TwoLetterISOLanguageName;
             var targetCode = new CultureInfo(this._languageDirection.TargetCulture.Name).TwoLetterISOLanguageName;
 #else
@@ -231,7 +231,7 @@ namespace OpusCatTranslationProvider
             
             if (this._options.showMtAsOrigin)
             {
-#if (TRADOS21 || TRADOS22)
+#if (TRADOS21 || TRADOS22 || TRADOS24)
                 tu.Origin = TranslationUnitOrigin.Nmt;
 #else
                 tu.Origin = TranslationUnitOrigin.MachineTranslation;
@@ -257,7 +257,7 @@ namespace OpusCatTranslationProvider
 
         public static Segment CurrentTranslation { get; private set; }
 
-#if (TRADOS22)
+#if (TRADOS22 || TRADOS24)
         CultureCode ITranslationProviderLanguageDirection.SourceLanguage => new CultureCode(this.SourceLanguage);
         CultureCode ITranslationProviderLanguageDirection.TargetLanguage => new CultureCode(this.TargetLanguage);
 #endif

@@ -144,7 +144,7 @@ namespace OpusCatTranslationProvider
             int maxConcordanceWindow)
         {
             this.tms = tms;
-#if (TRADOS22)
+#if (TRADOS22 || TRADOS24)
             this.sourceLanguage = new CultureInfo(tms.First().SourceLanguage.Name).TwoLetterISOLanguageName;
 #else
             this.sourceLanguage = tms.First().SourceLanguage.TwoLetterISOLanguageName;

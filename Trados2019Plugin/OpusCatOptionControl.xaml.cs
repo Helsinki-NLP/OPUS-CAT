@@ -40,7 +40,7 @@ namespace OpusCatTranslationProvider
             this.CredentialStore = credentialStore;
             this.Options = options;
 
-#if (TRADOS22)
+#if (TRADOS22 || TRADOS24)
             this.projectLanguagePairs = languagePairs.Select(
                 x => $"{new CultureInfo(x.SourceCulture.Name).TwoLetterISOLanguageName}-" +
                 $"{new CultureInfo(x.TargetCulture.Name).TwoLetterISOLanguageName}").ToList();
