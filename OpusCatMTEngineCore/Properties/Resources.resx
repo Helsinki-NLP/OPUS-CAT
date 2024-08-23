@@ -268,7 +268,10 @@
     <value>Confirm exit</value>
   </data>
   <data name="Main_ConfirmExitMessage" xml:space="preserve">
-    <value>Fine-tuning or batch translation is in progress. Fine-tuning can be resumed later from the last save point, but batch translation will be aborted permanently. Are you sure you want to close the OpusCAT MT Engine?</value>
+    <value>Fine-tuning or batch translation is in progress.
+Fine-tuning can be resumed later from the last save point,
+but batch translation will be aborted permanently.
+Are you sure you want to close the OpusCAT MT Engine?</value>
   </data>
   <data name="Main_ContinueFinetuneButton" xml:space="preserve">
     <value>Continue fine-tuning</value>

@@ -18,6 +18,31 @@ namespace OpusCatMtEngine
 {
     public partial class MainWindow : Window
     {
+
+        private bool closingConfirmed;
+        protected override async void OnClosing(WindowClosingEventArgs e)
+        {
+            if (!closingConfirmed && this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
+            {
+                e.Cancel = true;
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    OpusCatMtEngine.Properties.Resources.Main_ConfirmExitCaption,
+                    OpusCatMtEngine.Properties.Resources.Main_ConfirmExitMessage,
+                    ButtonEnum.YesNo,
+                    MsBox.Avalonia.Enums.Icon.Warning);
+
+                var result = await box.ShowAsync();
+
+                
+                if (result == ButtonResult.Yes)
+                {
+                    closingConfirmed = true;
+                    this.Close();
+                }
+            }
+            base.OnClosing(e);
+        }
+
         public MainWindow()
         {
             Log.Information("Starting OPUS-CAT MT Engine");
@@ -46,22 +71,7 @@ namespace OpusCatMtEngine
         public ModelManager? ModelManager { get; private set; }
 
         
-        //TODO: make this work in Avalonia, maybe wait until Mac implementation to avoid
-        //wasted effort (apparently this works differently there)
-        /*protected override void OnClosing(CancelEventArgs e)
-        {
-            if (this.ModelManager.FinetuningOngoing || this.ModelManager.BatchTranslationOngoing)
-            {
-                MessageBoxResult result = MessageBox.Show(Properties.Resources.Main_ConfirmExitMessage,
-                                          Properties.Resources.Main_ConfirmExitCaption,
-                                          MessageBoxButton.YesNo,
-                                          MessageBoxImage.Question);
-                if (result != MessageBoxResult.Yes)
-                {
-                    e.Cancel = true;
-                }
-            }
-        }*/
+        
 
 
         internal void AddTab(ActionTabItem actionTabItem)

@@ -511,7 +511,10 @@ namespace OpusCatMtEngine.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fine-tuning or batch translation is in progress. Fine-tuning can be resumed later from the last save point, but batch translation will be aborted permanently. Are you sure you want to close the OpusCAT MT Engine?.
+        ///   Looks up a localized string similar to Fine-tuning or batch translation is in progress.
+        ///Fine-tuning can be resumed later from the last save point,
+        ///but batch translation will be aborted permanently.
+        ///Are you sure you want to close the OpusCAT MT Engine?.
         /// </summary>
         public static string Main_ConfirmExitMessage {
             get {
