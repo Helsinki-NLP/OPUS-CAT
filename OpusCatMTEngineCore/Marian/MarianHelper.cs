@@ -180,9 +180,8 @@ namespace OpusCatMtEngine
             //calling the exit code.
 #if WINDOWS
             ChildProcessTracker.AddProcess(ExternalProcess);
-                  AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
 #endif
-
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
 
             return ExternalProcess;
         }
