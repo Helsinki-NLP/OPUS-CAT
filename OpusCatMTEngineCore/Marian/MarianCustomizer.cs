@@ -278,28 +278,7 @@ namespace OpusCatMtEngine
                         Path.Combine(this.customDir.FullName, decoderSettings.vocabs[0])
                     };
 
-            /* This is the old method, using a batch file, now uses python script
-             * switch (this.segmentationMethod)
-            {
-
-                case ".bpe":
-                    string validScriptPath = Path.Combine(this.customDir.FullName, "ValidateBpe.bat");
-                    trainingConfig.validScriptPath = 
-                        $"\"{validScriptPath}\"";
-                    File.Copy(
-                        Path.Combine(processDir, "ValidateBpe.bat"), validScriptPath);
-                    break;
-                case ".spm":
-                    validScriptPath = Path.Combine(this.customDir.FullName, "ValidateSp.bat");
-                    trainingConfig.validScriptPath =
-                        $"\"{validScriptPath}\"";
-                    File.Copy(
-                        Path.Combine(processDir, "ValidateSp.bat"), validScriptPath);
-                    break;
-                default:
-                    break;
-            }*/
-
+            
 #if WINDOWS
             var pythonPath = 
                 Path.Combine(Path.Combine(processDir, OpusCatMtEngineSettings.Default.WindowsPythonDir), "python.exe");

@@ -222,10 +222,8 @@ namespace OpusCatMtEngine
             //calling the exit code.
 #if WINDOWS
             ChildProcessTracker.AddProcess(ExternalProcess);
-                  AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
 #endif
-
-
+            AppDomain.CurrentDomain.ProcessExit += (x, y) => CurrentDomain_ProcessExit(x, y, ExternalProcess);
             return ExternalProcess;
         }
 
@@ -256,7 +254,11 @@ namespace OpusCatMtEngine
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e, Process externalProcess)
         {
+#if WINDOWS
             KillProcessAndChildren(externalProcess.Id);
+#else
+            externalProcess.Kill();
+#endif
         }
 
         private static void defaultErrorDataHandler(object sender, DataReceivedEventArgs e)

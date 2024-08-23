@@ -187,6 +187,7 @@ namespace OpusCatMtEngine
                     //this.marianProcesses[langpair] = null;
                 }
             }
+
             this.marianProcesses = null;
         }
 

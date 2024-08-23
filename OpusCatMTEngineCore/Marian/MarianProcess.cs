@@ -153,8 +153,8 @@ namespace OpusCatMtEngine
 #if WINDOWS
             KillProcessAndChildren(this.mtPipe.Id);
             //Remove the event handler so it doesn't try to kill an already killed process
-            AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
 #endif
+            AppDomain.CurrentDomain.ProcessExit -= CurrentDomain_ProcessExit;
         }
         
         private TranslationPair TranslateSentence(string rawSourceSentence)
