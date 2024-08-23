@@ -19,6 +19,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace OpusCatMtEngine;
 
@@ -67,18 +68,13 @@ public partial class OpusCatSettingsView : Avalonia.Controls.UserControl, INotif
         var customizeYml = HelperFunctions.GetOpusCatDataPath(OpusCatMtEngineSettings.Default.CustomizationBaseConfig);
         try
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {customizeYml}"));
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                Process.Start("xdg-open", customizeYml);
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                Process.Start("open", customizeYml);
-            }
+#if WINDOWS
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {customizeYml}"));
+#elif LINUX
+            Process.Start("xdg-open", customizeYml);
+#elif MACOS
+            Process.Start("open", $"\"{ customizeYml}\"");
+#endif
         }
         catch (Exception ex)
         {

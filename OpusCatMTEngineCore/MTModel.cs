@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace OpusCatMtEngine
 {
@@ -542,9 +543,14 @@ namespace OpusCatMtEngine
                     $"Model has been packaged and saved to {zipPath}. Click OK to open folder.",
                     ButtonEnum.Ok);
             await box.ShowAsync();
-
-            System.Diagnostics.Process.Start("explorer.exe", Path.GetDirectoryName(zipPath));
-        }
+#if WINDOWS
+            Process.Start("explorer.exe", Path.GetDirectoryName(zipPath));
+#elif LINUX
+            Process.Start("nautilus", Path.GetDirectoryName(zipPath)); 
+#elif MACOS
+            Process.Start("open", $"\"{Path.GetDirectoryName(zipPath)}\"");
+#endif
+         }
 
         public string StatusAndEstimateString
         {
