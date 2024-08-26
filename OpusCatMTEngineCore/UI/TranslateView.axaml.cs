@@ -203,10 +203,9 @@ namespace OpusCatMtEngine
                 }
                 this.TranslationActive = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Log.Error(x.Exception.ToString());
-                //MessageBox.Show(x.Exception.ToString());
+                Log.Error(ex.ToString());
                 var errorRun = new Run("Error in the translation service, see log file for details");
                 errorRun.Background = Brushes.Red;
                 errorRun.Foreground = Brushes.White;
