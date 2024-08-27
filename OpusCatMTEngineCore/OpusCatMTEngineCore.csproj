@@ -766,6 +766,9 @@
       <LastGenOutput>OpusCatMtEngineSettings.Designer.cs</LastGenOutput>
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
+    <None Update="ThirdPartyNotices.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TranslateBatchSentencePiece.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

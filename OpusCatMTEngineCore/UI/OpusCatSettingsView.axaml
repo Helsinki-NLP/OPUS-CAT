@@ -31,17 +31,7 @@
                 <StackPanel>
                     <TextBlock Margin="5" DockPanel.Dock="Top">
                     <Run FontWeight="Bold" Text="{x:Static resx:Resources.Settings_NoteHeading}"/> <Run Text="{x:Static resx:Resources.Settings_RestartReminder}"/></TextBlock>
-                    <DockPanel Margin="0,0,0,0">
-
-                        <Label 
-                            DockPanel.Dock="Left"
-                            Content="{x:Static resx:Resources.Settings_NetTcpPortLabel}"/>
-                        <!--<Button Margin="5" DockPanel.Dock="Right" Width="100" Click="restartButton_Click">Restart service</Button>-->
-
-
-                        <MaskedTextBox Mask="00009" Name="ServicePortBoxElement" Text="{Binding ElementName=_this, Path=ServicePortBox, Mode=TwoWay}" VerticalAlignment="Center"></MaskedTextBox>
-
-                    </DockPanel>
+                    
                     <DockPanel Margin="0,0,0,0">
                         <Label 
                             DockPanel.Dock="Left"

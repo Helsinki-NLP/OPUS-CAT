@@ -80,14 +80,7 @@ namespace OpusCatMTPlugin
             get { return false; }
         }
 
-        /// <summary>
-        /// Creates a session for translating segments. Session will not be used in a multi-threaded way.
-        /// </summary>
-        public override ISessionForStoringTranslations CreateStoreTranslationSession()
-        {
-            return new OpusCatMTSession(srcLangCode, trgLangCode, options);
-        }
-
+        
         #endregion
 
         #region IDisposable Members
@@ -95,6 +88,11 @@ namespace OpusCatMTPlugin
         public override void Dispose()
         {
             // dispose your resources if needed
+        }
+
+        public override ISessionForStoringTranslations CreateStoreTranslationSession()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

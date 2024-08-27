@@ -3,6 +3,12 @@ using System.Linq;
 using MemoQ.Addins.Common.DataStructures;
 using MemoQ.Addins.Common.Utils;
 using MemoQ.MTInterfaces;
+using OpusCatTranslationProvider;
+using OpusCatMtEngine;
+using System.Net.Http;
+using System.Net;
+using System.Web.Services.Description;
+using Newtonsoft.Json;
 
 namespace OpusCatMTPlugin
 {
@@ -14,8 +20,9 @@ namespace OpusCatMTPlugin
     ///     - The MTException class is used to wrap the original exceptions occurred during the translation.
     ///     - All allocated resources are disposed correctly in the session.
     /// </remarks>
-    public class OpusCatMTSession : ISession, ISessionForStoringTranslations
+    public class OpusCatMTSession : ISession
     {
+        
         /// <summary>
         /// The source language.
         /// </summary>
@@ -30,12 +37,16 @@ namespace OpusCatMTPlugin
         /// Options of the plugin.
         /// </summary>
         private readonly OpusCatMTOptions options;
+        private HttpClient opusCatConnection;
 
         public OpusCatMTSession(string srcLangCode, string trgLangCode, OpusCatMTOptions options)
         {
             this.srcLangCode = srcLangCode;
             this.trgLangCode = trgLangCode;
             this.options = options;
+            this.opusCatConnection = 
+                new HttpClient() 
+                    { BaseAddress = new Uri($"http://localhost:{options.GeneralSettings.MtServicePort}/MtRestService/") };
         }
 
         #region ISession Members
@@ -50,8 +61,10 @@ namespace OpusCatMTPlugin
             try
             {
                 string textToTranslate = createTextFromSegment(segm, FormattingAndTagsUsageOption.Plaintext);
-                string translation = OpusCatMTServiceHelper.Translate(options, textToTranslate, this.srcLangCode, this.trgLangCode);
-                result.Translation = createSegmentFromResult(segm, translation, FormattingAndTagsUsageOption.Plaintext);
+                var response = this.opusCatConnection.GetAsync($"TranslateJson?tokenCode=0&input={textToTranslate}&srcLangCode={this.srcLangCode}&trgLangCode={this.trgLangCode}&modelTag=\"\"");
+                var jsonResponse = response.Result.Content;
+                TranslationPair translation = JsonConvert.DeserializeObject<TranslationPair>(jsonResponse.ReadAsStringAsync().Result);
+                result.Translation = createSegmentFromResult(segm, translation.Translation, FormattingAndTagsUsageOption.Plaintext);
             }
             catch (Exception e)
             {
@@ -74,10 +87,12 @@ namespace OpusCatMTPlugin
             {
                 var texts = segs.Select(s => createTextFromSegment(s, FormattingAndTagsUsageOption.Plaintext)).ToList();
                 int i = 0;
-                foreach (string translation in OpusCatMTServiceHelper.BatchTranslate(options, texts, this.srcLangCode, this.trgLangCode))
-                {
+                foreach (string textToTranslate in texts) {
+                    var response = this.opusCatConnection.GetAsync($"TranslateJson?tokenCode=0&input={textToTranslate}&srcLangCode={this.srcLangCode}&trgLangCode={this.trgLangCode}&modelTag=\"\"");
+                    var jsonResponse = response.Result.Content;
+                    TranslationPair translation = JsonConvert.DeserializeObject<TranslationPair>(jsonResponse.ReadAsStringAsync().Result);
                     results[i] = new TranslationResult();
-                    results[i].Translation = createSegmentFromResult(segs[i], translation, FormattingAndTagsUsageOption.Plaintext);
+                    results[i].Translation = createSegmentFromResult(segs[i], translation.Translation, FormattingAndTagsUsageOption.Plaintext);
                     i++;
                 }
             }
@@ -139,40 +154,6 @@ namespace OpusCatMTPlugin
 
         #endregion
 
-        #region ISessionForStoringTranslations
-
-        public void StoreTranslation(TranslationUnit transunit)
-        {
-            try
-            {
-                OpusCatMTServiceHelper.StoreTranslation(options, transunit.Source.PlainText, transunit.Target.PlainText, this.srcLangCode, this.trgLangCode);
-            }
-            catch (Exception e)
-            {
-                // Use the MTException class is to wrap the original exceptions occurred during the translation.
-                string localizedMessage = LocalizationHelper.Instance.GetResourceString("NetworkError");
-                throw new MTException(string.Format(localizedMessage, e.Message), string.Format("A network error occured ({0}).", e.Message), e);
-            }
-        }
-
-        public int[] StoreTranslation(TranslationUnit[] transunits)
-        {
-
-            try
-            {
-                return OpusCatMTServiceHelper.BatchStoreTranslation(options,
-                                        transunits.Select(s => s.Source.PlainText).ToList(), transunits.Select(s => s.Target.PlainText).ToList(),
-                                        this.srcLangCode, this.trgLangCode);
-            }
-            catch (Exception e)
-            {
-                // Use the MTException class is to wrap the original exceptions occurred during the translation.
-                string localizedMessage = LocalizationHelper.Instance.GetResourceString("NetworkError");
-                throw new MTException(string.Format(localizedMessage, e.Message), string.Format("A network error occured ({0}).", e.Message), e);
-            }
-        }
-
-        #endregion
 
         #region IDisposable Members
 

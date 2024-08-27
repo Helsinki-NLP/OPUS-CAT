@@ -12,7 +12,7 @@ namespace OpusCatTranslationProvider {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     internal sealed partial class OpusCatTpSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static OpusCatTpSettings defaultInstance = ((OpusCatTpSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new OpusCatTpSettings())));
@@ -188,6 +188,18 @@ namespace OpusCatTranslationProvider {
             }
             set {
                 this["MtServicePortHttp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8500")]
+        public string MtServicePort {
+            get {
+                return ((string)(this["MtServicePort"]));
+            }
+            set {
+                this["MtServicePort"] = value;
             }
         }
     }

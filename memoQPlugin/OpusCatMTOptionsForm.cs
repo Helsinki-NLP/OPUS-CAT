@@ -1,6 +1,9 @@
 ﻿using MemoQ.MTInterfaces;
+using Newtonsoft.Json;
+using OpusCatTranslationProvider;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -89,21 +92,13 @@ namespace OpusCatMTPlugin
             {
                 // try to login
                 // Do not call any blocking service in the user interface thread; it has to use background threads.
-                string tokenCode = await Task.Run(() => OpusCatMTServiceHelper.Login(userName, password, this.mtServicePortTextBox.Text));
-
-                if (string.IsNullOrEmpty(tokenCode))
-                {
-                    // invalid user name or password
-                    loginResult.LoginSuccessful = false;
-                }
-                else
-                {
-                    // successful login
-                    loginResult.LoginSuccessful = true;
-                    // try to get the list of the supported languages in the background
-                    // Do not call any blocking service in the user interface thread; it has to use background threads.
-                    loginResult.SupportedLanguages = await Task.Run(() => OpusCatMTServiceHelper.ListSupportedLanguages(tokenCode,this.mtServicePortTextBox.Text));
-                }
+                var opusCatConnection = new HttpClient()
+                    { BaseAddress = new Uri($"http://localhost:{this.mtServicePortTextBox.Text}/MtRestService/") };
+                var response = await opusCatConnection.GetAsync($"ListSupportedLanguagePairs?tokenCode=0");
+                var jsonResponse = response.Content;
+                loginResult.SupportedLanguages = JsonConvert.DeserializeObject<List<string>>(jsonResponse.ReadAsStringAsync().Result);
+                loginResult.LoginSuccessful = true;
+                
             }
             catch (Exception ex)
             {

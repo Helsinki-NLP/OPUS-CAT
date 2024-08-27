@@ -33,7 +33,7 @@
     /// </summary>
     public class OpusCatMTGeneralSettings
     {
-        public string MtServicePort = "8477";
+        public string MtServicePort = "8500";
     }
 
     /// <summary>
