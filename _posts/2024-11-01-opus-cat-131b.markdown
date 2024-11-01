@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Beta version of cross-platform OPUS-CAT MT Engine (v1.3.1b) available"
+date:   2024-11-01 16:00:00 +0200
+categories: opus-cat update
+---
+A [cross-platform version of OPUS-CAT MT Engine](https://github.com/Helsinki-NLP/OPUS-CAT/releases/tag/engine_v1.3.1beta) has been released. The cross-platform version can be used in both MacOS and Linux. This is a beta version, and some bugs may remain.
+
+The user interface looks slightly different due to a change in the user interface framework (WPF was changed cross-platform Avalonia UI). The screenshots in instructions have not been updated yet, but the instructions should still be usable, as this new version is identical to the preceding v1.2 versions in terms of functionality.
