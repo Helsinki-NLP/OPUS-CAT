@@ -39,13 +39,14 @@
             this.mtServicePortLabel = new System.Windows.Forms.Label();
             this.mtServicePortTextBox = new System.Windows.Forms.TextBox();
             this.instructionTextBox = new System.Windows.Forms.TextBox();
+            this.RestoreTagsCheckbox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnOK
             // 
             this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOK.Location = new System.Drawing.Point(327, 380);
+            this.btnOK.Location = new System.Drawing.Point(415, 379);
             this.btnOK.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(112, 35);
@@ -57,7 +58,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(447, 380);
+            this.btnCancel.Location = new System.Drawing.Point(535, 379);
             this.btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(112, 35);
@@ -70,7 +71,7 @@
             this.lnkRetrieveLangs.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.lnkRetrieveLangs.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
             this.lnkRetrieveLangs.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
-            this.lnkRetrieveLangs.Location = new System.Drawing.Point(12, 143);
+            this.lnkRetrieveLangs.Location = new System.Drawing.Point(12, 157);
             this.lnkRetrieveLangs.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lnkRetrieveLangs.Name = "lnkRetrieveLangs";
             this.lnkRetrieveLangs.Size = new System.Drawing.Size(564, 31);
@@ -84,19 +85,19 @@
             this.lbLanguages.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbLanguages.FormattingEnabled = true;
             this.lbLanguages.ItemHeight = 20;
-            this.lbLanguages.Location = new System.Drawing.Point(18, 225);
+            this.lbLanguages.Location = new System.Drawing.Point(18, 245);
             this.lbLanguages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.lbLanguages.Name = "lbLanguages";
-            this.lbLanguages.Size = new System.Drawing.Size(660, 144);
+            this.lbLanguages.Size = new System.Drawing.Size(749, 124);
             this.lbLanguages.TabIndex = 6;
             // 
             // progressBar
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.progressBar.Location = new System.Drawing.Point(18, 389);
+            this.progressBar.Location = new System.Drawing.Point(18, 384);
             this.progressBar.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(297, 18);
+            this.progressBar.Size = new System.Drawing.Size(389, 25);
             this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.progressBar.TabIndex = 7;
             this.progressBar.Visible = false;
@@ -104,10 +105,10 @@
             // lblSupportedLanguages
             // 
             this.lblSupportedLanguages.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblSupportedLanguages.Location = new System.Drawing.Point(12, 174);
+            this.lblSupportedLanguages.Location = new System.Drawing.Point(12, 190);
             this.lblSupportedLanguages.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSupportedLanguages.Name = "lblSupportedLanguages";
-            this.lblSupportedLanguages.Size = new System.Drawing.Size(667, 53);
+            this.lblSupportedLanguages.Size = new System.Drawing.Size(755, 53);
             this.lblSupportedLanguages.TabIndex = 5;
             this.lblSupportedLanguages.Text = "Local language pairs (additional language pairs can be installed in the OPUS-CAT " +
     "MT Engine application)";
@@ -115,7 +116,7 @@
             // btnHelp
             // 
             this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnHelp.Location = new System.Drawing.Point(567, 380);
+            this.btnHelp.Location = new System.Drawing.Point(655, 379);
             this.btnHelp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnHelp.Name = "btnHelp";
             this.btnHelp.Size = new System.Drawing.Size(112, 35);
@@ -127,7 +128,7 @@
             // mtServicePortLabel
             // 
             this.mtServicePortLabel.AutoSize = true;
-            this.mtServicePortLabel.Location = new System.Drawing.Point(14, 108);
+            this.mtServicePortLabel.Location = new System.Drawing.Point(12, 90);
             this.mtServicePortLabel.Name = "mtServicePortLabel";
             this.mtServicePortLabel.Size = new System.Drawing.Size(444, 20);
             this.mtServicePortLabel.TabIndex = 11;
@@ -135,9 +136,9 @@
             // 
             // mtServicePortTextBox
             // 
-            this.mtServicePortTextBox.Location = new System.Drawing.Point(477, 105);
+            this.mtServicePortTextBox.Location = new System.Drawing.Point(645, 84);
             this.mtServicePortTextBox.Name = "mtServicePortTextBox";
-            this.mtServicePortTextBox.Size = new System.Drawing.Size(203, 26);
+            this.mtServicePortTextBox.Size = new System.Drawing.Size(123, 26);
             this.mtServicePortTextBox.TabIndex = 12;
             // 
             // instructionTextBox
@@ -148,9 +149,19 @@
             this.instructionTextBox.Multiline = true;
             this.instructionTextBox.Name = "instructionTextBox";
             this.instructionTextBox.ReadOnly = true;
-            this.instructionTextBox.Size = new System.Drawing.Size(661, 87);
+            this.instructionTextBox.Size = new System.Drawing.Size(750, 66);
             this.instructionTextBox.TabIndex = 13;
             this.instructionTextBox.Text = resources.GetString("instructionTextBox.Text");
+            // 
+            // RestoreTagsCheckbox
+            // 
+            this.RestoreTagsCheckbox.AutoSize = true;
+            this.RestoreTagsCheckbox.Location = new System.Drawing.Point(17, 126);
+            this.RestoreTagsCheckbox.Name = "RestoreTagsCheckbox";
+            this.RestoreTagsCheckbox.Size = new System.Drawing.Size(231, 24);
+            this.RestoreTagsCheckbox.TabIndex = 14;
+            this.RestoreTagsCheckbox.Text = "Restore tags (experimental)";
+            this.RestoreTagsCheckbox.UseVisualStyleBackColor = true;
             // 
             // OpusCatMTOptionsForm
             // 
@@ -158,7 +169,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(692, 428);
+            this.ClientSize = new System.Drawing.Size(780, 428);
+            this.Controls.Add(this.RestoreTagsCheckbox);
             this.Controls.Add(this.instructionTextBox);
             this.Controls.Add(this.mtServicePortTextBox);
             this.Controls.Add(this.mtServicePortLabel);
@@ -194,5 +206,6 @@
         private System.Windows.Forms.Label mtServicePortLabel;
         private System.Windows.Forms.TextBox mtServicePortTextBox;
         private System.Windows.Forms.TextBox instructionTextBox;
+        private System.Windows.Forms.CheckBox RestoreTagsCheckbox;
     }
 }

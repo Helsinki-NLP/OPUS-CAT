@@ -53,6 +53,7 @@ namespace OpusCatMTPlugin
             base.OnLoad(e);
 
             mtServicePortTextBox.Text = Options.GeneralSettings.MtServicePort;
+            RestoreTagsCheckbox.Checked = Options.GeneralSettings.RestoreTags;
             btnHelp.Enabled = isShowHelpSupported();
         }
 
@@ -153,7 +154,8 @@ namespace OpusCatMTPlugin
 
         private void OpusCatMTOptionsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            
+            Options.GeneralSettings.RestoreTags = this.RestoreTagsCheckbox.Checked;
+            Options.GeneralSettings.MtServicePort = this.mtServicePortTextBox.Text;
         }
 
         private bool isShowHelpSupported()
@@ -167,5 +169,6 @@ namespace OpusCatMTPlugin
             (environment as IEnvironment2)?.ShowHelp("opuscat_help.html");
         }
 
+       
     }
 }

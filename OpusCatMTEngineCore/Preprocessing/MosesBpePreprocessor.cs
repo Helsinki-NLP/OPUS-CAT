@@ -21,6 +21,7 @@ namespace OpusCatMtEngine
                 this.bpeProcessor = subwordnmt.BPE(io.open(bpeModelPath, encoding: "utf-8"));
                 this.trueCaser = sacremoses.MosesTruecaser(tcModelPath);
                 this.tokenizer = sacremoses.MosesTokenizer(lang: sourceLang);
+
                 if (targetLang != null)
                 {
                     this.deTokenizer = sacremoses.MosesDetokenizer(lang: targetLang);
@@ -47,7 +48,7 @@ namespace OpusCatMtEngine
             using (Py.GIL())
             {
                 var desegmentedSentence = segmentedSentence.Replace("@@ ", "");
-                postprocessedSentence = String.Join(" ", (string[])this.bpeProcessor.process_line(desegmentedSentence));
+                postprocessedSentence = this.deTokenizer.detokenize(desegmentedSentence.Split());
             }
 
             return postprocessedSentence;

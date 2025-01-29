@@ -9,6 +9,9 @@ using System.Net.Http;
 using System.Net;
 using System.Web.Services.Description;
 using Newtonsoft.Json;
+using System.Xml.Linq;
+using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace OpusCatMTPlugin
 {
@@ -61,10 +64,10 @@ namespace OpusCatMTPlugin
             try
             {
                 string textToTranslate = createTextFromSegment(segm, FormattingAndTagsUsageOption.Plaintext);
-                var response = this.opusCatConnection.GetAsync($"TranslateJson?tokenCode=0&input={textToTranslate}&srcLangCode={this.srcLangCode}&trgLangCode={this.trgLangCode}&modelTag=\"\"");
+                var response = this.opusCatConnection.GetAsync($"TranslateJson?tokenCode=0&input={HttpUtility.UrlEncode(textToTranslate)}&srcLangCode={this.srcLangCode}&trgLangCode={this.trgLangCode}&modelTag=\"\"");
                 var jsonResponse = response.Result.Content;
                 TranslationPair translation = JsonConvert.DeserializeObject<TranslationPair>(jsonResponse.ReadAsStringAsync().Result);
-                result.Translation = createSegmentFromResult(segm, translation.Translation, FormattingAndTagsUsageOption.Plaintext);
+                result.Translation = createSegmentFromResult(segm, translation);
             }
             catch (Exception e)
             {
@@ -88,11 +91,11 @@ namespace OpusCatMTPlugin
                 var texts = segs.Select(s => createTextFromSegment(s, FormattingAndTagsUsageOption.Plaintext)).ToList();
                 int i = 0;
                 foreach (string textToTranslate in texts) {
-                    var response = this.opusCatConnection.GetAsync($"TranslateJson?tokenCode=0&input={textToTranslate}&srcLangCode={this.srcLangCode}&trgLangCode={this.trgLangCode}&modelTag=\"\"");
+                    var response = this.opusCatConnection.GetAsync($"TranslateJson?tokenCode=0&input={HttpUtility.UrlEncode(textToTranslate)}&srcLangCode={this.srcLangCode}&trgLangCode={this.trgLangCode}&modelTag=\"\"");
                     var jsonResponse = response.Result.Content;
                     TranslationPair translation = JsonConvert.DeserializeObject<TranslationPair>(jsonResponse.ReadAsStringAsync().Result);
                     results[i] = new TranslationResult();
-                    results[i].Translation = createSegmentFromResult(segs[i], translation.Translation, FormattingAndTagsUsageOption.Plaintext);
+                    results[i].Translation = createSegmentFromResult(segs[i], translation);
                     i++;
                 }
             }
@@ -130,26 +133,23 @@ namespace OpusCatMTPlugin
             }
         }
 
-        private static Segment createSegmentFromResult(Segment originalSegment, string translatedText, FormattingAndTagsUsageOption formattingAndTagUsage)
+        private Segment createSegmentFromResult(Segment originalSegment, TranslationPair translation)
         {
-            //TODO: add tag restoration here
-            if (formattingAndTagUsage == FormattingAndTagsUsageOption.Plaintext)
-                return SegmentBuilder.CreateFromString(translatedText);
-            else if (formattingAndTagUsage == FormattingAndTagsUsageOption.OnlyFormatting)
+            if (options.GeneralSettings.RestoreTags)
             {
-                // Convert to segment (conversion is needed because the result can contain formatting information)
-                var convertedSegment = SegmentHtmlConverter.ConvertHtml2Segment(translatedText, originalSegment.ITags);
-                var sb = new SegmentBuilder();
-                sb.AppendSegment(convertedSegment);
-
-                // Insert the tags to the end of the segment
-                foreach (InlineTag it in originalSegment.ITags)
-                    sb.AppendInlineTag(it);
-
-                return sb.ToSegment();
+                var xmlSegmentString = SegmentXMLConverter.ConvertSegment2Xml(originalSegment, true, true);
+                var restorer = new TagRestorer(xmlSegmentString, translation);
+                var target = restorer.AddTagsByAlignment();
+                var targetSegment = SegmentXMLConverter.ConvertXML2Segment(target, originalSegment.ITags);
+                var normalizedTargetSegment =
+                    TagWhitespaceNormalizer.NormalizeWhitespaceAroundTags(originalSegment, targetSegment, this.srcLangCode, this.trgLangCode);
+                return normalizedTargetSegment;
             }
             else
-                return SegmentHtmlConverter.ConvertHtml2Segment(translatedText, originalSegment.ITags);
+            {
+                return SegmentBuilder.CreateFromString(translation.translation);
+            }
+
         }
 
         #endregion

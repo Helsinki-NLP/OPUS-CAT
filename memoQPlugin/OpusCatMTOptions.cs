@@ -34,6 +34,7 @@
     public class OpusCatMTGeneralSettings
     {
         public string MtServicePort = "8500";
+        public bool RestoreTags = false;
     }
 
     /// <summary>

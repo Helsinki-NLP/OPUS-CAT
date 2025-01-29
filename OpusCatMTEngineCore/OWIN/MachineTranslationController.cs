@@ -97,10 +97,13 @@ namespace OpusCatMtEngine
 
         //For integration with Wordfast
         [HttpPost]
-        public Translation TranslatePost(string tokenCode = "", string input = "", string srcLangCode = "", string trgLangCode = "", string modelTag = "")
+        public IActionResult TranslatePost(string tokenCode = "", string input = "", string srcLangCode = "", string trgLangCode = "", string modelTag = "")
         {
-            var translation = this.Translate(tokenCode, input, srcLangCode, trgLangCode, modelTag);
-            return new Translation(translation);
+            var sourceLang = new IsoLanguage(srcLangCode);
+            var targetLang = new IsoLanguage(trgLangCode);
+
+            var translation = this.mtProvider.Translate(input, sourceLang, targetLang, modelTag).Result;
+            return new OkObjectResult(translation);
         }
         
 
