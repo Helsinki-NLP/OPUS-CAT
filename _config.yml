@@ -32,6 +32,7 @@ header_pages:
  - contact.md
  - install.md
  - editrules.md
+ - secure.md
 #plugins:
 #i  - jekyll-feed
 
