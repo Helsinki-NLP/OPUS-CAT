@@ -18,7 +18,7 @@ If you wish to translate sensitive infomation, such as non-anonymized personal i
     - Install machine translation models for the language directions that you require.
     - Optional: also [install OmegaT](https://omegat.org/) and the OPUS-CAT OmegaT plugin to make translating files easier).
     - Test that the models work by using the *Translate with model* functionality.
-4. Transfer your data to the sandbox environment e.g. by copy-pasting them to your actual Windows environment.
+4. Transfer your data to the sandbox environment e.g. by copy-pasting them from your actual Windows environment or by downloading them.
 5. Optional: disconnect your network connection to further ensure that the data cannot be compromised.
 6. Translate your data using either OmegaT with the OPUS-CAT plugin or the *Translate with model* functionality of OPUS-CAT.
 7. Transfer the translations out of the sandbox environment.
